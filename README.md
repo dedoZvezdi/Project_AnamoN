@@ -12,7 +12,7 @@ Still working
 ## Contributing
 Still working
 
-##Copyright notice and license
+## Copyright notice and license
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
