@@ -1,7 +1,7 @@
 # Project AnamoN
 
 ## Description
-A Project AnamoN is trading card games simulator for types of card games that don't use mana as a resource for playing, like MTG, Yu-Gi-Oh, Flesh and Blood, Grand Archive and more. The main goal of the project full freedom even cross TCG games.
+A Project AnamoN is trading card games simulator for types of card games that don't use mana as a resource for playing, like MTG, Yu-Gi-Oh, Flesh and Blood, Grand Archive and more. The main goal of the project full freedom of playing, even cross TCG games.
 
 ## Visuals
 Still Woking
