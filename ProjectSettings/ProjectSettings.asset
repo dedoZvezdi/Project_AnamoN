@@ -804,8 +804,8 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: Project Anamon
-  metroPackageVersion: 
+  metroPackageName: ProjectAnamon
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -813,7 +813,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: Project Anamon
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: Project Anamon
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
