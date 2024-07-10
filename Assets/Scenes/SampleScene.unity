@@ -855,7 +855,7 @@ Transform:
   m_GameObject: {fileID: 1382979220}
   serializedVersion: 2
   m_LocalRotation: {x: 0.2164396, y: 0, z: 0, w: 0.97629607}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.33, y: 0.02, z: 0.01}
   m_LocalScale: {x: 2.5, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -913,7 +913,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayCard: []
   displayId: 1
-  id: 0
   types: []
   classes: []
   subtypes: []
@@ -921,11 +920,11 @@ MonoBehaviour:
   cardname: 
   effect: 
   flavor: 
-  costmemory: 0
-  costreserve: 0
-  level: 0
-  life: 0
-  durability: 0
+  costmemory: 
+  costreserve: 
+  level: 
+  life: 
+  durability: 
   speed: 
   cardImage: {fileID: 1693843559}
 --- !u!114 &1693843559
@@ -1095,8 +1094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayCard: []
-  displayId: 0
-  id: 0
+  displayId: 1
   types: []
   classes: []
   subtypes: []
@@ -1104,11 +1102,11 @@ MonoBehaviour:
   cardname: 
   effect: 
   flavor: 
-  costmemory: 0
-  costreserve: 0
-  level: 0
-  life: 0
-  durability: 0
+  costmemory: 
+  costreserve: 
+  level: 
+  life: 
+  durability: 
   speed: 
   cardImage: {fileID: 1990890818}
 --- !u!114 &1990890818

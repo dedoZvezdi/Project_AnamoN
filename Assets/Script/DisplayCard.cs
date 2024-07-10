@@ -6,10 +6,9 @@ using UnityEngine.EventSystems;
 
 public class DisplayCard : MonoBehaviour
 {
-    public List<Card> displayCard = new List<Card> ();
+    public List<Card> displayCard = new List<Card>();
     public int displayId;
 
-    public int id;
     public List<string> types;
     public List<string> classes;
     public List<string> subtypes;
@@ -17,24 +16,20 @@ public class DisplayCard : MonoBehaviour
     public string cardname;
     public string effect;
     public string flavor;
-    public int costmemory;
-    public int costreserve;
-    public int level;
-    public int life;
-    public int durability;
+    public string costmemory;
+    public string costreserve;
+    public string level;
+    public string life;
+    public string durability;
     public string speed;
-    
-
     public Image cardImage;
-
 
     void Start()
     {
         if (displayCard.Count == 0)
         {
-            displayCard.Add(new Card());  
+            displayCard.Add(new Card());
         }
-
 
         if (displayId >= 0 && displayId < CardDatabase.cardList.Count)
         {
@@ -46,15 +41,12 @@ public class DisplayCard : MonoBehaviour
         }
     }
 
-
-
     void Update()
     {
         if (displayCard.Count > 0)
         {
             var card = displayCard[0];
 
-            id = card.id;
             types = card.types ?? new List<string>();
             classes = card.classes ?? new List<string>();
             subtypes = card.subtypes ?? new List<string>();
@@ -62,14 +54,13 @@ public class DisplayCard : MonoBehaviour
             cardname = card.cardname ?? string.Empty;
             effect = card.effect ?? string.Empty;
             flavor = card.flavor ?? string.Empty;
-            costmemory = card.costmemory ?? 0; 
-            costreserve = card.costreserve ?? 0; 
-            level = card.level ?? 0; 
-            life = card.life ?? 0; 
-            durability = card.durability ?? 0; 
+            costmemory = card.costmemory.HasValue ? card.costmemory.Value.ToString() : string.Empty;
+            costreserve = card.costreserve.HasValue ? card.costreserve.Value.ToString() : string.Empty;
+            level = card.level.HasValue ? card.level.Value.ToString() : string.Empty;
+            life = card.life.HasValue ? card.life.Value.ToString() : string.Empty;
+            durability = card.durability.HasValue ? card.durability.Value.ToString() : string.Empty;
             speed = card.speed ?? string.Empty;
 
-            
             if (cardImage != null && card.image != null)
             {
                 cardImage.sprite = card.image;
