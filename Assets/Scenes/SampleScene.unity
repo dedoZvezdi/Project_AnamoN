@@ -855,7 +855,7 @@ Transform:
   m_GameObject: {fileID: 1382979220}
   serializedVersion: 2
   m_LocalRotation: {x: 0.2164396, y: 0, z: 0, w: 0.97629607}
-  m_LocalPosition: {x: -0.33, y: 0.02, z: 0.01}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2.5, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1094,7 +1094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayCard: []
-  displayId: 1
+  displayId: 0
   types: []
   classes: []
   subtypes: []
