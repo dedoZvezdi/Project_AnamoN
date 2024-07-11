@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 public class DisplayCard : MonoBehaviour
 {
     public List<Card> displayCard = new List<Card>();
+    
     public int displayId;
 
     public List<string> types;
@@ -15,7 +16,7 @@ public class DisplayCard : MonoBehaviour
     public string element;
     public string cardname;
     public string effect;
-    public string flavor;
+    //public string flavor;
     public string costmemory;
     public string costreserve;
     public string level;
@@ -53,7 +54,7 @@ public class DisplayCard : MonoBehaviour
             element = card.element ?? string.Empty;
             cardname = card.cardname ?? string.Empty;
             effect = card.effect ?? string.Empty;
-            flavor = card.flavor ?? string.Empty;
+            //flavor = card.flavor ?? string.Empty;
             costmemory = card.costmemory.HasValue ? card.costmemory.Value.ToString() : string.Empty;
             costreserve = card.costreserve.HasValue ? card.costreserve.Value.ToString() : string.Empty;
             level = card.level.HasValue ? card.level.Value.ToString() : string.Empty;

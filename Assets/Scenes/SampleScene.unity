@@ -919,7 +919,6 @@ MonoBehaviour:
   element: 
   cardname: 
   effect: 
-  flavor: 
   costmemory: 
   costreserve: 
   level: 
@@ -1101,7 +1100,6 @@ MonoBehaviour:
   element: 
   cardname: 
   effect: 
-  flavor: 
   costmemory: 
   costreserve: 
   level: 

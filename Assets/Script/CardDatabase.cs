@@ -21,7 +21,7 @@ public class CardDatabase : MonoBehaviour
             "NORM",//Element
             "Apotheosis Rite",//Name
             "Divine Relic   Banish Apotheosis Rite: Your champion becomes an Ascendant in addition to its other types. Draw a card.",//Effect
-            null,//Flavor
+            //null,//Flavor
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -39,7 +39,7 @@ public class CardDatabase : MonoBehaviour
             "FIRE", //Element
             "Apotheosis Rite", //Name
             "On Enter: Draw seven cards.", //Effect
-            "The leyline within Flagma flares to life once more, bathing intrepid souls in a fiery vortex of might.",//Flavor
+            //"The leyline within Flagma flares to life once more, bathing intrepid souls in a fiery vortex of might.",//Flavor
             0,//CostMemory
             null,//CostReserve
             0,//level
