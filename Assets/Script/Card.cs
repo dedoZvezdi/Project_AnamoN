@@ -13,7 +13,7 @@ public class Card
     public string? element { get; set; }
     public string? cardname { get; set; }
     public string? effect { get; set; }
-    public string? flavor { get; set; }
+    //public string? flavor { get; set; }
     public int? costmemory { get; set; }
     public int? costreserve { get; set; }
     public int? level { get; set; }
@@ -28,7 +28,7 @@ public class Card
     }
 
     public Card(int Id, List<string>? Types, List<string>? Classes, List<string>? Subtypes, string? Element, string? CardName, string? Effect,
-                string? Flavor, int? CostMemory, int? CostReserve, int? Level, int? Life, int? Durability, string? Speed, Sprite? Image)
+                /*string? Flavor,*/ int? CostMemory, int? CostReserve, int? Level, int? Life, int? Durability, string? Speed, Sprite? Image)
     {
         id = Id;
         types = Types;
@@ -37,7 +37,7 @@ public class Card
         element = Element;
         cardname = CardName;
         effect = Effect;
-        flavor = Flavor;
+        //flavor = Flavor;
         costmemory = CostMemory;
         costreserve = CostReserve;
         level = Level;
