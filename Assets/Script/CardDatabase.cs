@@ -11,6 +11,8 @@ public class CardDatabase : MonoBehaviour
     {
         Sprite ApotheosisRite_0 = Resources.Load<Sprite>("Images/ga_id_1");
         Sprite SpiritofFire_0 = Resources.Load<Sprite>("Images/ga_id_2");
+        Sprite SpiritofFire_1 = Resources.Load<Sprite>("Images/ga_id_2a");
+        Sprite LostSpirit_0 = Resources.Load<Sprite>("Images/ga_id_3");
 
 
         cardList.Add(new Card(
@@ -21,7 +23,7 @@ public class CardDatabase : MonoBehaviour
             "NORM",//Element
             "Apotheosis Rite",//Name
             "Divine Relic   Banish Apotheosis Rite: Your champion becomes an Ascendant in addition to its other types. Draw a card.",//Effect
-            //null,//Flavor
+            false,//isToken
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -37,9 +39,9 @@ public class CardDatabase : MonoBehaviour
             new List<string> { "Spirit" }, //Classes
             new List<string> { "Spirit" }, //SubTypes
             "FIRE", //Element
-            "Apotheosis Rite", //Name
+            "Spirit of Fire", //Name
             "On Enter: Draw seven cards.", //Effect
-            //"The leyline within Flagma flares to life once more, bathing intrepid souls in a fiery vortex of might.",//Flavor
+            false,//isToken
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -47,5 +49,39 @@ public class CardDatabase : MonoBehaviour
             null,//Durability
             null,//Speed
             SpiritofFire_0)); //Image
+
+        cardList.Add(new Card(
+            2, //id
+            new List<string> { "Champion" }, //Types
+            new List<string> { "Spirit" }, //Classes
+            new List<string> { "Spirit" }, //SubTypes
+            "FIRE", //Element
+            "Spirit of Fire", //Name
+            "On Enter: Draw seven cards.", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            0,//level
+            15,//Life
+            null,//Durability
+            null,//Speed
+            SpiritofFire_1)); //Image
+
+        cardList.Add(new Card(
+            3, //id
+            new List<string> { "Champion" }, //Types
+            new List<string> { "Spirit" }, //Classes
+            new List<string> { "Spirit" }, //SubTypes
+            "NORM", //Element
+            "Lost", //Name
+            "On Enter: Draw seven cards.", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            0,//level
+            15,//Life
+            null,//Durability
+            null,//Speed
+            LostSpirit_0)); //Image
     }
 }
