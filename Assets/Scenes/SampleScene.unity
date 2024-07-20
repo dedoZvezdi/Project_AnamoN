@@ -919,6 +919,7 @@ MonoBehaviour:
   element: 
   cardname: 
   effect: 
+  isToken: 
   costmemory: 
   costreserve: 
   level: 
@@ -1022,6 +1023,7 @@ MonoBehaviour:
   element: 
   cardname: 
   effect: 
+  isToken: 
   costmemory: 
   costreserve: 
   level: 
