@@ -472,7 +472,7 @@ public class CardDatabase : MonoBehaviour
             "Merlin, Kingslayer", //Name
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
-            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 until end of turn.", //Effect
+            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2(ATTACK) until end of turn.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
@@ -491,7 +491,7 @@ public class CardDatabase : MonoBehaviour
             "Merlin, Kingslayer", //Name
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
-            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 until end of turn.", //Effect
+            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2(ATTACK) until end of turn.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
@@ -510,7 +510,7 @@ public class CardDatabase : MonoBehaviour
             "Merlin, Kingslayer", //Name
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
-            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 until end of turn.", //Effect
+            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2(ATTACK) until end of turn.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
