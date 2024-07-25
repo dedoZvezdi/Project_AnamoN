@@ -36,10 +36,29 @@ public class CardDatabase : MonoBehaviour
         Sprite MerlinKingslayer_0 = Resources.Load<Sprite>("Images/ga_id_19");
         Sprite MerlinKingslayer_1 = Resources.Load<Sprite>("Images/ga_id_19a");
         Sprite MerlinKingslayer_2 = Resources.Load<Sprite>("Images/ga_id_19b");
-        
-
-
-
+        Sprite TristanShadowdancer_0 = Resources.Load<Sprite>("Images/ga_id_20");
+        Sprite TristanShadowdancer_1 = Resources.Load<Sprite>("Images/ga_id_20a");
+        Sprite SilvieSlimeSovereign_0 = Resources.Load<Sprite>("Images/ga_id_21");
+        Sprite SilvieSlimeSovereign_1 = Resources.Load<Sprite>("Images/ga_id_21a");
+        Sprite ArisannaMasterAlchemist_0 = Resources.Load<Sprite>("Images/ga_id_22");
+        Sprite ArisannaMasterAlchemist_1 = Resources.Load<Sprite>("Images/ga_id_22a");
+        Sprite ArisannaMasterAlchemist_2 = Resources.Load<Sprite>("Images/ga_id_22b");
+        Sprite LorraineBlademaster_0 = Resources.Load<Sprite>("Images/ga_id_23");
+        Sprite LorraineBlademaster_1 = Resources.Load<Sprite>("Images/ga_id_23a");
+        Sprite LorraineBlademaster_2 = Resources.Load<Sprite>("Images/ga_id_23b");
+        Sprite LorraineCruxKnight_0 = Resources.Load<Sprite>("Images/ga_id_24");
+        Sprite LorraineCruxKnight_1 = Resources.Load<Sprite>("Images/ga_id_24a");
+        Sprite LorraineCruxKnight_2 = Resources.Load<Sprite>("Images/ga_id_24b");
+        Sprite TristanHiredBlade_0 = Resources.Load<Sprite>("Images/ga_id_25");
+        Sprite TristanHiredBlade_1 = Resources.Load<Sprite>("Images/ga_id_25a");
+        Sprite AzureProtectiveTrinket = Resources.Load<Sprite>("Images/ga_id_26");
+        Sprite AssassinsMantle = Resources.Load<Sprite>("Images/ga_id_27");
+        Sprite ZanderDeftExecutor_0 = Resources.Load<Sprite>("Images/ga_id_28");
+        Sprite ZanderDeftExecutor_1 = Resources.Load<Sprite>("Images/ga_id_28a");
+        Sprite ArisannaAstralZenith_0 = Resources.Load<Sprite>("Images/ga_id_29");
+        Sprite ArisannaAstralZenith_1 = Resources.Load<Sprite>("Images/ga_id_29a");
+        Sprite LorraineSpiritRuler_0 = Resources.Load<Sprite>("Images/ga_id_30");
+        Sprite LorraineSpiritRuler_1 = Resources.Load<Sprite>("Images/ga_id_30a");
 
         cardList.Add(new Card(
             0, //id
@@ -519,5 +538,433 @@ public class CardDatabase : MonoBehaviour
             null,//Durability
             null,//Speed
             MerlinKingslayer_2)); //Image
+
+        cardList.Add(new Card(
+            27, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "UMBRA", //Element
+            "Tristan, Shadowdancer", //Name
+            "Tristan Lineage\r\n\r\n" +
+            "On Enter: Summon two Ominous Shadow tokens and put a preparation counter on Tristan.\r\n\r\n" +
+            "Remove two preparation counters from Tristan: Change the target of an attack that targets Tristan to a phantasia ally you control.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            TristanShadowdancer_0)); //Image
+
+        cardList.Add(new Card(
+            28, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "UMBRA", //Element
+            "Tristan, Shadowdancer", //Name
+            "Tristan Lineage\r\n\r\n" +
+            "On Enter: Summon two Ominous Shadow tokens and put a preparation counter on Tristan.\r\n\r\n" +
+            "Remove two preparation counters from Tristan: Change the target of an attack that targets Tristan to a phantasia ally you control.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            TristanShadowdancer_1)); //Image
+
+        cardList.Add(new Card(
+            29, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "TERA", //Element
+            "Silvie, Slime Sovereign", //Name
+            "Silvie Lineage\r\n\r\n" +
+            "On Enter: The next Slime ally card you activate this turn costs 2 less to activate and enters the field with two additional buff counters on it." +
+            "\r\n\r\nIgnore the elemental requirements of advanced element Slime cards you activate.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            SilvieSlimeSovereign_0)); //Image
+
+        cardList.Add(new Card(
+            30, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "TERA", //Element
+            "Silvie, Slime Sovereign", //Name
+            "Silvie Lineage\r\n\r\n" +
+            "On Enter: The next Slime ally card you activate this turn costs 2 less to activate and enters the field with two additional buff counters on it." +
+            "\r\n\r\nIgnore the elemental requirements of advanced element Slime cards you activate.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            SilvieSlimeSovereign_0)); //Image
+
+        cardList.Add(new Card(
+            31, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Arisanna, Master Alchemist", //Name
+            "Arisanna Lineage\r\n\r\n" +
+            "On Enter: Gather twice.\r\n\r\n" +
+            "Inherited Effect: At the beginning of your end phase, you may sacrifice two Herbs with the same name. If you do, draw a card.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaMasterAlchemist_0)); //Image
+
+        cardList.Add(new Card(
+            32, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Arisanna, Master Alchemist", //Name
+            "Arisanna Lineage\r\n\r\n" +
+            "On Enter: Gather twice.\r\n\r\n" +
+            "Inherited Effect: At the beginning of your end phase, you may sacrifice two Herbs with the same name. If you do, draw a card.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaMasterAlchemist_1)); //Image
+
+        cardList.Add(new Card(
+            33, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Arisanna, Master Alchemist", //Name
+            "Arisanna Lineage\r\n\r\n" +
+            "On Enter: Gather twice.\r\n\r\n" +
+            "Inherited Effect: At the beginning of your end phase, you may sacrifice two Herbs with the same name. If you do, draw a card.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaMasterAlchemist_2)); //Image
+
+        cardList.Add(new Card(
+            34, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Lorraine, Blademaster", //Name
+            "Lorraine Lineage\r\n\r\n" +
+            "On Enter: Until end of turn, Lorraine's attacks get +2 ATTACK and gain \"On Kill: Draw a car\"", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            24,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaMasterAlchemist_0)); //Image
+
+        cardList.Add(new Card(
+            35, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Lorraine, Blademaster", //Name
+            "Lorraine Lineage\r\n\r\n" +
+            "On Enter: Until end of turn, Lorraine's attacks get +2 ATTACK and gain \"On Kill: Draw a car\"", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            24,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaMasterAlchemist_1)); //Image
+
+        cardList.Add(new Card(
+            36, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Lorraine, Blademaster", //Name
+            "Lorraine Lineage\r\n\r\n" +
+            "On Enter: Until end of turn, Lorraine's attacks get +2 ATTACK and gain \"On Kill: Draw a car\"", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            24,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaMasterAlchemist_2)); //Image
+
+        cardList.Add(new Card(
+            37, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "HUMAN" }, //SubTypes
+            "CRUX", //Element
+            "Lorraine, Crux Knight", //Name
+            "Lorraine Lineage\r\n\r\n" +
+            "Lorraine's attacks get +1 ATTACK for each regalia weapon card in your banishment. ", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            28,//Life
+            null,//Durability
+            null,//Speed
+            LorraineCruxKnight_0)); //Image
+
+        cardList.Add(new Card(
+            38, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "HUMAN" }, //SubTypes
+            "CRUX", //Element
+            "Lorraine, Crux Knight", //Name
+            "Lorraine Lineage\r\n\r\n" +
+            "Lorraine's attacks get +1 ATTACK for each regalia weapon card in your banishment. ", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            28,//Life
+            null,//Durability
+            null,//Speed
+            LorraineCruxKnight_1)); //Image
+
+        cardList.Add(new Card(
+            39, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "HUMAN" }, //SubTypes
+            "CRUX", //Element
+            "Lorraine, Crux Knight", //Name
+            "Lorraine Lineage\r\n\r\n" +
+            "Lorraine's attacks get +1 ATTACK for each regalia weapon card in your banishment. ", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            28,//Life
+            null,//Durability
+            null,//Speed
+            LorraineCruxKnight_2)); //Image
+
+        cardList.Add(new Card(
+            40, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Tristan, Hired Blade", //Name
+            "Tristan Lineage\r\n\r\n" +
+            "On Enter: If Tristan has two or more preparation counters on her, draw a card. " +
+            "Then if Tristan has four or more preparation counters on her, draw an additional card.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            TristanHiredBlade_0)); //Image
+
+        cardList.Add(new Card(
+            41, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Tristan, Hired Blade", //Name
+            "Tristan Lineage\r\n\r\n" +
+            "On Enter: If Tristan has two or more preparation counters on her, draw a card. " +
+            "Then if Tristan has four or more preparation counters on her, draw an additional card.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            TristanHiredBlade_1)); //Image
+
+        cardList.Add(new Card(
+            42, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "ACCESSORY" }, //SubTypes
+            "NORM", //Element
+            "Azure Protective Trinket", //Name
+            "Banish Azure Protective Trinket: Banish up to three target fire element cards from a single graveyard.", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            AzureProtectiveTrinket)); //Image
+
+        cardList.Add(new Card(
+            43, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "ACCESSORY" }, //SubTypes
+            "NORM", //Element
+            "Assassin's Mantle", //Name
+            "If your champion would take damage, you may banish Assassin's Mantle. " +
+            "If you do, prevent 1 of that damage. Put a preparation counter on your champion if damage was prevented this way.", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            AssassinsMantle)); //Image
+
+        cardList.Add(new Card(
+            44, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Zander, Deft Executor", //Name
+            "Zander Lineage\r\n\r\n" +
+            "On Enter: Put two preparation counters on Zander. " +
+            "Then you may remove a preparation counter from him. " +
+            "If you do, return an Assassin action or an Assassin attack card from your graveyard to your hand.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            ZanderDeftExecutor_0)); //Image
+
+        cardList.Add(new Card(
+            45, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Zander, Deft Executor", //Name
+            "Zander Lineage\r\n\r\n" +
+            "On Enter: Put two preparation counters on Zander. " +
+            "Then you may remove a preparation counter from him. " +
+            "If you do, return an Assassin action or an Assassin attack card from your graveyard to your hand.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            ZanderDeftExecutor_1)); //Image
+
+        cardList.Add(new Card(
+            46, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "HUMAN" }, //SubTypes
+            "ASTRA", //Element
+            "Arisanna, Astral Zenith", //Name
+            "Arisanna Lineage\r\n\r\n" +
+            "Once per turn, you may pay (0) rather than pay a card's starcalling costs.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaAstralZenith_0)); //Image
+
+        cardList.Add(new Card(
+            47, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "HUMAN" }, //SubTypes
+            "ASTRA", //Element
+            "Arisanna, Astral Zenith", //Name
+            "Arisanna Lineage\r\n\r\n" +
+            "Once per turn, you may pay (0) rather than pay a card's starcalling costs.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaAstralZenith_1)); //Image
+
+        cardList.Add(new Card(
+            48, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "HUMAN" }, //SubTypes
+            "CRUX", //Element
+            "Lorraine, Spirit Ruler", //Name
+            "Lorraine Lineage\r\n\r\n" +
+            "On Enter: Choose a Sword regalia card with memory cost 1 or less from your banishment and put it onto the field. " +
+            "It enters the field with three additional durability counters on it.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            28,//Life
+            null,//Durability
+            null,//Speed
+            LorraineSpiritRuler_0)); //Image
+
+        cardList.Add(new Card(
+            49, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "HUMAN" }, //SubTypes
+            "CRUX", //Element
+            "Lorraine, Spirit Ruler", //Name
+            "Lorraine Lineage\r\n\r\n" +
+            "On Enter: Choose a Sword regalia card with memory cost 1 or less from your banishment and put it onto the field. " +
+            "It enters the field with three additional durability counters on it.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            28,//Life
+            null,//Durability
+            null,//Speed
+            LorraineSpiritRuler_1)); //Image
     }
 }
