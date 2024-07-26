@@ -59,12 +59,29 @@ public class CardDatabase : MonoBehaviour
         Sprite ArisannaAstralZenith_1 = Resources.Load<Sprite>("Images/ga_id_29a");
         Sprite LorraineSpiritRuler_0 = Resources.Load<Sprite>("Images/ga_id_30");
         Sprite LorraineSpiritRuler_1 = Resources.Load<Sprite>("Images/ga_id_30a");
+        Sprite CrimsonProtectiveTrinket = Resources.Load<Sprite>("Images/ga_id_31");
+        Sprite TristanShadowreaver_0 = Resources.Load<Sprite>("Images/ga_id_32");
+        Sprite TristanShadowreaver_1 = Resources.Load<Sprite>("Images/ga_id_32a");
+        Sprite ArisannaLucentArbiter_0 = Resources.Load<Sprite>("Images/ga_id_33");
+        Sprite ArisannaLucentArbiter_1 = Resources.Load<Sprite>("Images/ga_id_33a");
+        Sprite RaiSpellcrafter_0 = Resources.Load<Sprite>("Images/ga_id_34");
+        Sprite RaiSpellcrafter_1 = Resources.Load<Sprite>("Images/ga_id_34a");
+        Sprite Alkahest = Resources.Load<Sprite>("Images/ga_id_35");
+        Sprite QuicksilverGrail = Resources.Load<Sprite>("Images/ga_id_36");
+        Sprite DianaKeenHuntress_0 = Resources.Load<Sprite>("Images/ga_id_37");
+        Sprite DianaKeenHuntress_1 = Resources.Load<Sprite>("Images/ga_id_37a");
+        Sprite RaiArchmage_0 = Resources.Load<Sprite>("Images/ga_id_38");
+        Sprite RaiArchmage_1 = Resources.Load<Sprite>("Images/ga_id_38a");
+        Sprite RaiStormSeer_0 = Resources.Load<Sprite>("Images/ga_id_39");
+        Sprite RaiStormSeer_1 = Resources.Load<Sprite>("Images/ga_id_39a");
+        Sprite RaiStormSeer_2 = Resources.Load<Sprite>("Images/ga_id_39b");
+        Sprite TariffRing = Resources.Load<Sprite>("Images/ga_id_40");
 
         cardList.Add(new Card(
             0, //id
             new List<string> { "REGALIA", "ITEM" },//Types
             new List<string> { "WARRIOR"}, //Classes
-            new List<string> { "WARRIOR", "Ring" }, //SubTypes
+            new List<string> { "WARRIOR", "RING" }, //SubTypes
             "NORM",//Element
             "Apotheosis Rite",//Name
             "Divine Relic\r\n\r\nBanish Apotheosis Rite: " +
@@ -966,5 +983,331 @@ public class CardDatabase : MonoBehaviour
             null,//Durability
             null,//Speed
             LorraineSpiritRuler_1)); //Image
+
+        cardList.Add(new Card(
+            50, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "ACCESSORY" }, //SubTypes
+            "NORM", //Element
+            "Crimson Protective Trinket", //Name
+            "Banish Crimson Protective Trinket: " +
+            "Target opponent reveals two cards at random from their memory. " +
+            "Banish each wind element card revealed this way.", //Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            CrimsonProtectiveTrinket)); //Image
+
+        cardList.Add(new Card(
+            51, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "UMBRA", //Element
+            "Tristan, Shadowreaver", //Name
+            "Tristan Lineage\r\n\r\n" +
+            "Tristan can level up into champions of the same base level. " +
+            "When she does, draw two cards.\r\n\r\n" +
+            "On Enter: Banish the top four cards of target opponent’s deck face down. " +
+            "As long as they’re banished, you may play those cards, ignoring their elemental requirements.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            TristanShadowreaver_0)); //Image
+
+        cardList.Add(new Card(
+            52, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "UMBRA", //Element
+            "Tristan, Shadowreaver", //Name
+            "Tristan Lineage\r\n\r\n" +
+            "Tristan can level up into champions of the same base level. " +
+            "When she does, draw two cards.\r\n\r\n" +
+            "On Enter: Banish the top four cards of target opponent’s deck face down. " +
+            "As long as they’re banished, you may play those cards, ignoring their elemental requirements.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            TristanShadowreaver_1)); //Image
+
+        cardList.Add(new Card(
+            53, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "HUMAN" }, //SubTypes
+            "ASTRA", //Element
+            "Arisanna, Lucent Arbiter", //Name
+            "Arisanna Lineage \r\n\r\n" +
+            "(3),TAP : Reveal the top card of your deck. " +
+            "Negate target card activation if its reserve cost is equal to the reserve cost of the revealed card.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaLucentArbiter_0)); //Image
+
+        cardList.Add(new Card(
+            54, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "HUMAN" }, //SubTypes
+            "ASTRA", //Element
+            "Arisanna, Lucent Arbiter", //Name
+            "Arisanna Lineage \r\n\r\n" +
+            "(3),TAP : Reveal the top card of your deck. " +
+            "Negate target card activation if its reserve cost is equal to the reserve cost of the revealed card.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            ArisannaLucentArbiter_1)); //Image
+
+        cardList.Add(new Card(
+            55, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Rai, Spellcrafter", //Name
+            "On Enter: " +
+            "Put two enlighten counters on Rai. " +
+            "(You may remove three enlighten counters from your champion to draw a card.)", //Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            1,//level
+            19,//Life
+            null,//Durability
+            null,//Speed
+            RaiSpellcrafter_0)); //Image
+
+        cardList.Add(new Card(
+            56, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Rai, Spellcrafter", //Name
+            "On Enter: " +
+            "Put two enlighten counters on Rai. " +
+            "(You may remove three enlighten counters from your champion to draw a card.)", //Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            1,//level
+            19,//Life
+            null,//Durability
+            null,//Speed
+            RaiSpellcrafter_1)); //Image
+
+        cardList.Add(new Card(
+            57, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "SOLVENT" }, //SubTypes
+            "NORM", //Element
+            "Alkahestt", //Name
+            "At the beginning of your recollection phase, put an age counter on a Potion item you control." +
+            "\r\n\r\nLevel 4+ Banish Alkahest: " +
+            "Destroy target item or weapon with memory cost 0 or reserve cost 4 or less.", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            Alkahest)); //Image
+
+        cardList.Add(new Card(
+            58, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "ARTIFACT" }, //SubTypes
+            "NORM", //Element
+            "Quicksilver Grail", //Name
+            "Divine Relic (You can only have one card with this keyword in your material deck.)" +
+            "\r\n\r\nOn Enter: " +
+            "Banish a non-champion card from your material deck face down.\r\n\r\n" +
+            "Banish Quicksilver Grail: You may play the banished card. " +
+            "(You still pay for its costs.)", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            QuicksilverGrail)); //Image
+
+        cardList.Add(new Card(
+            59, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Diana, Keen Huntress", //Name
+            "Lineage Release — Materialize a Gun card from your material deck. " +
+            "(Activate this ability by banishing this card from your champion's inner lineage.)", //Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            1,//level
+            19,//Life
+            null,//Durability
+            null,//Speed
+            DianaKeenHuntress_0)); //Image
+
+        cardList.Add(new Card(
+            60, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Diana, Keen Huntress", //Name
+            "Lineage Release — Materialize a Gun card from your material deck. " +
+            "(Activate this ability by banishing this card from your champion's inner lineage.)", //Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            1,//level
+            19,//Life
+            null,//Durability
+            null,//Speed
+            DianaKeenHuntress_1)); //Image
+
+        cardList.Add(new Card(
+            61, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Rai, Archmage", //Name
+            "Rai Lineage (Rai, Archmage must be leveled from a previous level \"Rai\" champion.)" +
+            "\r\n\r\nInherited Effect: " +
+            "Whenever you activate your first Mage action card each turn, put an enlighten counter on your champion. " +
+            "(Your champion has this ability as long as this card is part of its lineage.)", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            RaiArchmage_0)); //Image
+
+        cardList.Add(new Card(
+            62, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Rai, Archmage", //Name
+            "Rai Lineage (Rai, Archmage must be leveled from a previous level \"Rai\" champion.)" +
+            "\r\n\r\nInherited Effect: " +
+            "Whenever you activate your first Mage action card each turn, put an enlighten counter on your champion. " +
+            "(Your champion has this ability as long as this card is part of its lineage.)", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            RaiArchmage_1)); //Image
+
+        cardList.Add(new Card(
+            63, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "ARCANE", //Element
+            "Rai, Storm Seer", //Name
+            "Rai Lineage\r\n\r\n" +
+            "Rai gets +1 level for each arcane element Mage Spell card in your banishment.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            RaiStormSeer_0)); //Image
+
+        cardList.Add(new Card(
+            64, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "ARCANE", //Element
+            "Rai, Storm Seer", //Name
+            "Rai Lineage\r\n\r\n" +
+            "Rai gets +1 level for each arcane element Mage Spell card in your banishment.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            RaiStormSeer_1)); //Image
+
+        cardList.Add(new Card(
+            65, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "ARCANE", //Element
+            "Rai, Storm Seer", //Name
+            "Rai Lineage\r\n\r\n" +
+            "Rai gets +1 level for each arcane element Mage Spell card in your banishment.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            RaiStormSeer_2)); //Image
+
+        cardList.Add(new Card(
+            66, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "GUARDIAN" }, //Classes
+            new List<string> { "GUARDIAN", "ACCESSORY" }, //SubTypes
+            "NORM",//Element
+            "Tariff Ring",//Name
+            "Banish Tariff Ring: " +
+            "Until end of turn, players can't declare attacks unless they pay (2)" +
+            "for each attack declaration. Activate this ability only during an opponent's recollection phase.",//Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            TariffRing));//Image
     }
 }
