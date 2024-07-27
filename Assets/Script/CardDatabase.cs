@@ -76,6 +76,17 @@ public class CardDatabase : MonoBehaviour
         Sprite RaiStormSeer_1 = Resources.Load<Sprite>("Images/ga_id_39a");
         Sprite RaiStormSeer_2 = Resources.Load<Sprite>("Images/ga_id_39b");
         Sprite TariffRing = Resources.Load<Sprite>("Images/ga_id_40");
+        Sprite BackupCharger = Resources.Load<Sprite>("Images/ga_id_41");
+        Sprite KeySlimePudding = Resources.Load<Sprite>("Images/ga_id_42");
+        Sprite DianaDeadlyDuelist_0 = Resources.Load<Sprite>("Images/ga_id_43");
+        Sprite DianaDeadlyDuelist_1 = Resources.Load<Sprite>("Images/ga_id_43a");
+        Sprite DianaDeadlyDuelist_2 = Resources.Load<Sprite>("Images/ga_id_43b");
+        Sprite RaiManaWeaver_0 = Resources.Load<Sprite>("Images/ga_id_44");
+        Sprite RaiManaWeaver_1 = Resources.Load<Sprite>("Images/ga_id_44a");
+        Sprite SilvieLovedbyAll_0 = Resources.Load<Sprite>("Images/ga_id_45");
+        Sprite SilvieLovedbyAll_1 = Resources.Load<Sprite>("Images/ga_id_45a");
+        Sprite TitheProclamation_0 = Resources.Load<Sprite>("Images/ga_id_46");
+        Sprite TitheProclamation_1 = Resources.Load<Sprite>("Images/ga_id_46a");
 
         cardList.Add(new Card(
             0, //id
@@ -1309,5 +1320,207 @@ public class CardDatabase : MonoBehaviour
             null,//Durability
             null,//Speed
             TariffRing));//Image
+
+        cardList.Add(new Card(
+            67, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "ACCESSORY" }, //SubTypes
+            "NORM",//Element
+            "Backup Charger",//Name
+            "(3), Banish Backup Charger: Summon a Powercell token rested. Draw a card into your memory.",//Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            BackupCharger));//Image
+
+        cardList.Add(new Card(
+            68, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "FOOD" }, //SubTypes
+            "NORM",//Element
+            "Key Slime Pudding",//Name
+            "Banish Key Slime Pudding: " +
+            "Until end of turn, Slime allies that enter the field under your control enter with an additional buff counter on them.",//Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            KeySlimePudding));//Image
+
+        cardList.Add(new Card(
+            69, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Diana, Deadly Duelist", //Name
+            "Diana Lineage\r\n\r\n" +
+            "On Enter: Materialize a Bullet card from your material deck." +
+            "\r\n\r\nInherited Effect: Ranged 2", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            DianaDeadlyDuelist_0)); //Image
+
+        cardList.Add(new Card(
+            70, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Diana, Deadly Duelist", //Name
+            "Diana Lineage\r\n\r\n" +
+            "On Enter: Materialize a Bullet card from your material deck." +
+            "\r\n\r\nInherited Effect: Ranged 2", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            DianaDeadlyDuelist_1)); //Image
+
+        cardList.Add(new Card(
+            71, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Diana, Deadly Duelist", //Name
+            "Diana Lineage\r\n\r\n" +
+            "On Enter: Materialize a Bullet card from your material deck." +
+            "\r\n\r\nInherited Effect: Ranged 2", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Durability
+            null,//Speed
+            DianaDeadlyDuelist_2)); //Image
+
+        cardList.Add(new Card(
+            72, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "ARCANE", //Element
+            "Rai, Mana Weaver", //Name
+            "Rai Lineage\r\n\r\n" +
+            "TAP, Remove four enlighten counters from Rai: Copy target Mage Spell card activation. " +
+            "You may choose new targets for the copy.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            RaiManaWeaver_0)); //Image
+
+        cardList.Add(new Card(
+            73, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "HUMAN" }, //SubTypes
+            "ARCANE", //Element
+            "Rai, Mana Weaver", //Name
+            "Rai Lineage\r\n\r\n" +
+            "TAP, Remove four enlighten counters from Rai: Copy target Mage Spell card activation. " +
+            "You may choose new targets for the copy.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            RaiManaWeaver_1)); //Image
+
+        cardList.Add(new Card(
+            74, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "TERA", //Element
+            "Silvie, Loved by All", //Name
+            "Silvie Lineage\r\n\r\n" +
+            "Animal and Beast allies you control get +1 LIFE and have intercept.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            SilvieLovedbyAll_0)); //Image
+
+        cardList.Add(new Card(
+            75, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "TERA", //Element
+            "Silvie, Loved by All", //Name
+            "Silvie Lineage\r\n\r\n" +
+            "Animal and Beast allies you control get +1 LIFE and have intercept.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Durability
+            null,//Speed
+            SilvieLovedbyAll_1)); //Image
+
+        cardList.Add(new Card(
+            76, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "SCRIPTURE" }, //SubTypes
+            "NORM",//Element
+            "Tithe Proclamation",//Name
+            "On Enter: Draw a card.\r\n\r\n" +
+            "Players can't draw more than three cards each turn unless it's their first turn of the game.",//Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            TitheProclamation_0));//Image
+
+        cardList.Add(new Card(
+            77, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "SCRIPTURE" }, //SubTypes
+            "NORM",//Element
+            "Tithe Proclamation",//Name
+            "On Enter: Draw a card.\r\n\r\n" +
+            "Each player can't draw more than three cards each turn unless it's their first turn of the game.",//Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Durability
+            null,//Speed
+            TitheProclamation_1));//Image
     }
 }
