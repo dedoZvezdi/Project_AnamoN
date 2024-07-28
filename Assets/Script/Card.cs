@@ -18,6 +18,7 @@ public class Card
     public int? costreserve { get; set; }
     public int? level { get; set; }
     public int? life { get; set; }
+    public int? power { get; set; }
     public int? durability { get; set; }
     public string? speed { get; set; }
     public Sprite? image { get; set; }
@@ -28,7 +29,7 @@ public class Card
     }
 
     public Card(int Id, List<string>? Types, List<string>? Classes, List<string>? Subtypes, string? Element, string? CardName, string? Effect,
-                bool? IsToken, int? CostMemory, int? CostReserve, int? Level, int? Life, int? Durability, string? Speed, Sprite? Image)
+                bool? IsToken, int? CostMemory, int? CostReserve, int? Level, int? Life, int? Power, int? Durability, string? Speed, Sprite? Image)
     {
         id = Id;
         types = Types;
@@ -42,7 +43,9 @@ public class Card
         costreserve = CostReserve;
         level = Level;
         life = Life;
+        power = Power;
         durability = Durability;
+        speed = Speed;
         image = Image;
     }
 }
