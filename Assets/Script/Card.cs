@@ -13,7 +13,7 @@ public class Card
     public string? element { get; set; }
     public string? cardname { get; set; }
     public string? effect { get; set; }
-    public bool? isToken { get; set; }
+    public bool? generated { get; set; }
     public int? costmemory { get; set; }
     public int? costreserve { get; set; }
     public int? level { get; set; }
@@ -29,7 +29,7 @@ public class Card
     }
 
     public Card(int Id, List<string>? Types, List<string>? Classes, List<string>? Subtypes, string? Element, string? CardName, string? Effect,
-                bool? IsToken, int? CostMemory, int? CostReserve, int? Level, int? Life, int? Power, int? Durability, string? Speed, Sprite? Image)
+                bool? Generated, int? CostMemory, int? CostReserve, int? Level, int? Life, int? Power, int? Durability, string? Speed, Sprite? Image)
     {
         id = Id;
         types = Types;
@@ -38,7 +38,7 @@ public class Card
         element = Element;
         cardname = CardName;
         effect = Effect;
-        isToken = IsToken;
+        generated = Generated;
         costmemory = CostMemory;
         costreserve = CostReserve;
         level = Level;
