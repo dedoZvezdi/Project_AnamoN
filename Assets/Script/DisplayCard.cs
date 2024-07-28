@@ -21,6 +21,7 @@ public class DisplayCard : MonoBehaviour
     public string costreserve;
     public string level;
     public string life;
+    public string power;
     public string durability;
     public string speed;
     public Image cardImage;
@@ -59,6 +60,7 @@ public class DisplayCard : MonoBehaviour
             costreserve = card.costreserve.HasValue ? card.costreserve.Value.ToString() : string.Empty;
             level = card.level.HasValue ? card.level.Value.ToString() : string.Empty;
             life = card.life.HasValue ? card.life.Value.ToString() : string.Empty;
+            power = card.power.HasValue ? card.power.Value.ToString() : string.Empty;
             durability = card.durability.HasValue ? card.durability.Value.ToString() : string.Empty;
             speed = card.speed ?? string.Empty;
 

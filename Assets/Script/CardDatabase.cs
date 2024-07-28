@@ -87,6 +87,26 @@ public class CardDatabase : MonoBehaviour
         Sprite SilvieLovedbyAll_1 = Resources.Load<Sprite>("Images/ga_id_45a");
         Sprite TitheProclamation_0 = Resources.Load<Sprite>("Images/ga_id_46");
         Sprite TitheProclamation_1 = Resources.Load<Sprite>("Images/ga_id_46a");
+        Sprite GearstrideGloves = Resources.Load<Sprite>("Images/ga_id_47");
+        Sprite ClockworkMusicbox = Resources.Load<Sprite>("Images/ga_id_48");
+        Sprite AithneSpiritofFire = Resources.Load<Sprite>("Images/ga_id_49");
+        Sprite DianaCursebreaker_0 = Resources.Load<Sprite>("Images/ga_id_50");
+        Sprite DianaCursebreaker_1 = Resources.Load<Sprite>("Images/ga_id_50a");
+        Sprite SilvieWildsWhisperer_0 = Resources.Load<Sprite>("Images/ga_id_51");
+        Sprite SilvieWildsWhisperer_1 = Resources.Load<Sprite>("Images/ga_id_51a");
+        Sprite ZanderBlindingSteel_0 = Resources.Load<Sprite>("Images/ga_id_52");
+        Sprite ZanderBlindingSteel_1 = Resources.Load<Sprite>("Images/ga_id_52a");
+        Sprite ViridianProtectiveTrinket_0 = Resources.Load<Sprite>("Images/ga_id_53");
+        Sprite ViridianProtectiveTrinket_1 = Resources.Load<Sprite>("Images/ga_id_53a");
+        Sprite FrameworkSidearm = Resources.Load<Sprite>("Images/ga_id_54");
+        Sprite SlimeNexus = Resources.Load<Sprite>("Images/ga_id_55");
+        Sprite DusksoulStone = Resources.Load<Sprite>("Images/ga_id_56");
+        Sprite MorriganLostSpirit = Resources.Load<Sprite>("Images/ga_id_57");
+        Sprite DianaDuskstalker_0 = Resources.Load<Sprite>("Images/ga_id_58");
+        Sprite DianaDuskstalker_1 = Resources.Load<Sprite>("Images/ga_id_58a");
+        Sprite SilvieWiththePack_0 = Resources.Load<Sprite>("Images/ga_id_59");
+        Sprite SilvieWiththePack_1 = Resources.Load<Sprite>("Images/ga_id_59a");
+        Sprite BeastsoulVisage = Resources.Load<Sprite>("Images/ga_id_60");
 
         cardList.Add(new Card(
             0, //id
@@ -102,6 +122,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ApotheosisRite));//Image
@@ -120,6 +141,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofFire_0)); //Image
@@ -137,6 +159,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofFire_1)); //Image
@@ -154,6 +177,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             LostSpirit)); //Image
@@ -172,6 +196,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofSlime)); //Image
@@ -190,6 +215,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofSereneFire)); //Image
@@ -207,6 +233,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             FragmentedSpiritofFire)); //Image
@@ -226,6 +253,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ScepterofLumina)); //Image
@@ -243,6 +271,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofWater_0)); //Image
@@ -260,6 +289,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofWater_1)); //Image
@@ -278,6 +308,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofSereneWater)); //Image
@@ -295,6 +326,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             FragmentedSpiritofWater)); //Image
@@ -313,6 +345,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             StonescaleBand)); //Image
@@ -330,6 +363,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofWind_0)); //Image
@@ -347,6 +381,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofWind_1)); //Image
@@ -365,6 +400,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SpiritofSereneWind)); //Image
@@ -382,6 +418,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             0,//level
             15,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             FragmentedSpiritofWind)); //Image
@@ -400,6 +437,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             InsigniaoftheCorhazi)); //Image
@@ -418,6 +456,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             19,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaHerbalistProdigy_0)); //Image
@@ -436,6 +475,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             19,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaHerbalistProdigy_1)); //Image
@@ -453,6 +493,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             20,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             LorraineWanderingWarrior_0)); //Image
@@ -470,6 +511,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             20,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             LorraineWanderingWarrior_1)); //Image
@@ -488,6 +530,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             19,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TristanUnderhanded_0)); //Image
@@ -506,6 +549,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             19,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TristanUnderhanded_1)); //Image
@@ -519,12 +563,13 @@ public class CardDatabase : MonoBehaviour
             "Merlin, Kingslayer", //Name
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
-            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2(ATTACK) until end of turn.", //Effect
+            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 POWER until end of turn.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             28,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             MerlinKingslayer_0)); //Image
@@ -538,12 +583,13 @@ public class CardDatabase : MonoBehaviour
             "Merlin, Kingslayer", //Name
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
-            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2(ATTACK) until end of turn.", //Effect
+            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 POWER until end of turn.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             28,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             MerlinKingslayer_1)); //Image
@@ -557,12 +603,13 @@ public class CardDatabase : MonoBehaviour
             "Merlin, Kingslayer", //Name
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
-            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2(ATTACK) until end of turn.", //Effect
+            "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 POWER until end of turn.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             28,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             MerlinKingslayer_2)); //Image
@@ -582,6 +629,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TristanShadowdancer_0)); //Image
@@ -601,6 +649,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TristanShadowdancer_1)); //Image
@@ -620,6 +669,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SilvieSlimeSovereign_0)); //Image
@@ -639,6 +689,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SilvieSlimeSovereign_0)); //Image
@@ -658,6 +709,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaMasterAlchemist_0)); //Image
@@ -677,6 +729,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaMasterAlchemist_1)); //Image
@@ -696,6 +749,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaMasterAlchemist_2)); //Image
@@ -708,12 +762,13 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Lorraine, Blademaster", //Name
             "Lorraine Lineage\r\n\r\n" +
-            "On Enter: Until end of turn, Lorraine's attacks get +2 ATTACK and gain \"On Kill: Draw a car\"", //Effect
+            "On Enter: Until end of turn, Lorraine's attacks get +2 POWER and gain \"On Kill: Draw a car\"", //Effect
             false,//isToken
             2,//CostMemory
             null,//CostReserve
             2,//level
             24,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaMasterAlchemist_0)); //Image
@@ -726,12 +781,13 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Lorraine, Blademaster", //Name
             "Lorraine Lineage\r\n\r\n" +
-            "On Enter: Until end of turn, Lorraine's attacks get +2 ATTACK and gain \"On Kill: Draw a car\"", //Effect
+            "On Enter: Until end of turn, Lorraine's attacks get +2 POWER and gain \"On Kill: Draw a car\"", //Effect
             false,//isToken
             2,//CostMemory
             null,//CostReserve
             2,//level
             24,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaMasterAlchemist_1)); //Image
@@ -744,12 +800,13 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Lorraine, Blademaster", //Name
             "Lorraine Lineage\r\n\r\n" +
-            "On Enter: Until end of turn, Lorraine's attacks get +2 ATTACK and gain \"On Kill: Draw a car\"", //Effect
+            "On Enter: Until end of turn, Lorraine's attacks get +2 POWER and gain \"On Kill: Draw a car\"", //Effect
             false,//isToken
             2,//CostMemory
             null,//CostReserve
             2,//level
             24,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaMasterAlchemist_2)); //Image
@@ -762,12 +819,13 @@ public class CardDatabase : MonoBehaviour
             "CRUX", //Element
             "Lorraine, Crux Knight", //Name
             "Lorraine Lineage\r\n\r\n" +
-            "Lorraine's attacks get +1 ATTACK for each regalia weapon card in your banishment. ", //Effect
+            "Lorraine's attacks get +1 POWER for each regalia weapon card in your banishment. ", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             28,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             LorraineCruxKnight_0)); //Image
@@ -780,12 +838,13 @@ public class CardDatabase : MonoBehaviour
             "CRUX", //Element
             "Lorraine, Crux Knight", //Name
             "Lorraine Lineage\r\n\r\n" +
-            "Lorraine's attacks get +1 ATTACK for each regalia weapon card in your banishment. ", //Effect
+            "Lorraine's attacks get +1 POWER for each regalia weapon card in your banishment. ", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             28,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             LorraineCruxKnight_1)); //Image
@@ -798,12 +857,13 @@ public class CardDatabase : MonoBehaviour
             "CRUX", //Element
             "Lorraine, Crux Knight", //Name
             "Lorraine Lineage\r\n\r\n" +
-            "Lorraine's attacks get +1 ATTACK for each regalia weapon card in your banishment. ", //Effect
+            "Lorraine's attacks get +1 POWER for each regalia weapon card in your banishment. ", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             28,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             LorraineCruxKnight_2)); //Image
@@ -823,6 +883,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TristanHiredBlade_0)); //Image
@@ -842,6 +903,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TristanHiredBlade_1)); //Image
@@ -859,6 +921,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             AzureProtectiveTrinket)); //Image
@@ -877,6 +940,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             AssassinsMantle)); //Image
@@ -897,6 +961,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ZanderDeftExecutor_0)); //Image
@@ -917,6 +982,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ZanderDeftExecutor_1)); //Image
@@ -935,6 +1001,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaAstralZenith_0)); //Image
@@ -953,6 +1020,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaAstralZenith_1)); //Image
@@ -972,6 +1040,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             28,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             LorraineSpiritRuler_0)); //Image
@@ -991,6 +1060,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             28,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             LorraineSpiritRuler_1)); //Image
@@ -1010,6 +1080,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             CrimsonProtectiveTrinket)); //Image
@@ -1031,6 +1102,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TristanShadowreaver_0)); //Image
@@ -1052,6 +1124,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TristanShadowreaver_1)); //Image
@@ -1064,13 +1137,14 @@ public class CardDatabase : MonoBehaviour
             "ASTRA", //Element
             "Arisanna, Lucent Arbiter", //Name
             "Arisanna Lineage \r\n\r\n" +
-            "(3),TAP : Reveal the top card of your deck. " +
+            "(3),REST : Reveal the top card of your deck. " +
             "Negate target card activation if its reserve cost is equal to the reserve cost of the revealed card.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaLucentArbiter_0)); //Image
@@ -1083,13 +1157,14 @@ public class CardDatabase : MonoBehaviour
             "ASTRA", //Element
             "Arisanna, Lucent Arbiter", //Name
             "Arisanna Lineage \r\n\r\n" +
-            "(3),TAP : Reveal the top card of your deck. " +
+            "(3),REST : Reveal the top card of your deck. " +
             "Negate target card activation if its reserve cost is equal to the reserve cost of the revealed card.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             ArisannaLucentArbiter_1)); //Image
@@ -1109,6 +1184,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             19,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiSpellcrafter_0)); //Image
@@ -1128,6 +1204,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             19,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiSpellcrafter_1)); //Image
@@ -1147,6 +1224,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             Alkahest)); //Image
@@ -1168,6 +1246,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             QuicksilverGrail)); //Image
@@ -1186,6 +1265,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             19,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             DianaKeenHuntress_0)); //Image
@@ -1204,6 +1284,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             1,//level
             19,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             DianaKeenHuntress_1)); //Image
@@ -1224,6 +1305,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiArchmage_0)); //Image
@@ -1244,6 +1326,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiArchmage_1)); //Image
@@ -1262,6 +1345,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiStormSeer_0)); //Image
@@ -1280,6 +1364,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiStormSeer_1)); //Image
@@ -1298,6 +1383,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiStormSeer_2)); //Image
@@ -1317,6 +1403,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TariffRing));//Image
@@ -1334,6 +1421,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             BackupCharger));//Image
@@ -1352,6 +1440,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             KeySlimePudding));//Image
@@ -1371,6 +1460,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             DianaDeadlyDuelist_0)); //Image
@@ -1390,6 +1480,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             DianaDeadlyDuelist_1)); //Image
@@ -1409,6 +1500,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             2,//level
             22,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             DianaDeadlyDuelist_2)); //Image
@@ -1421,13 +1513,14 @@ public class CardDatabase : MonoBehaviour
             "ARCANE", //Element
             "Rai, Mana Weaver", //Name
             "Rai Lineage\r\n\r\n" +
-            "TAP, Remove four enlighten counters from Rai: Copy target Mage Spell card activation. " +
+            "REST, Remove four enlighten counters from Rai: Copy target Mage Spell card activation. " +
             "You may choose new targets for the copy.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiManaWeaver_0)); //Image
@@ -1440,13 +1533,14 @@ public class CardDatabase : MonoBehaviour
             "ARCANE", //Element
             "Rai, Mana Weaver", //Name
             "Rai Lineage\r\n\r\n" +
-            "TAP, Remove four enlighten counters from Rai: Copy target Mage Spell card activation. " +
+            "REST, Remove four enlighten counters from Rai: Copy target Mage Spell card activation. " +
             "You may choose new targets for the copy.", //Effect
             false,//isToken
             3,//CostMemory
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             RaiManaWeaver_1)); //Image
@@ -1465,6 +1559,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SilvieLovedbyAll_0)); //Image
@@ -1483,6 +1578,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             3,//level
             25,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             SilvieLovedbyAll_1)); //Image
@@ -1501,6 +1597,7 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TitheProclamation_0));//Image
@@ -1519,8 +1616,415 @@ public class CardDatabase : MonoBehaviour
             null,//CostReserve
             null,//level
             null,//Life
+            null,//Power
             null,//Durability
             null,//Speed
             TitheProclamation_1));//Image
+
+        cardList.Add(new Card(
+            78, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "GLOVE" }, //SubTypes
+            "WIND",//Element
+            "Gearstride Gloves",//Name
+            "On Enter: Put a preparation counter on your champion.\r\n\r\n" +
+            "Class Bonus Level 2+ Banish Gearstride Gloves: " +
+            "The next Reaction card you activate this turn costs 1 less to activate.",//Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            GearstrideGloves));//Image
+
+        cardList.Add(new Card(
+            79, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "ARTIFACT" }, //SubTypes
+            "NORM",//Element
+            "Clockwork Musicbox",//Name
+            "Hindered (This object enters the field rested.)\r\n\r\n" +
+            "Class BonusWhenever you activate a Harmony or Melody card from your hand, " +
+            "you may banish it as it resolves.\r\n\r\n: " +
+            "REST You may activate a card banished by Clockwork Musicbox. (You still pay its costs.)",//Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            ClockworkMusicbox));//Image
+
+        cardList.Add(new Card(
+            80, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "SPIRIT" }, //Classes
+            new List<string> { "SPIRIT" }, //SubTypes
+            "FIRE", //Element
+            "Aithne, Spirit of Fire", //Name
+            "On Enter: Draw seven cards.", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            0,//level
+            15,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            AithneSpiritofFire)); //Image
+
+        cardList.Add(new Card(
+            81, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "UMBRA", //Element
+            "Diana, Cursebreaker", //Name
+            "Diana Lineage\r\n\r\n" +
+            "Banish all Curse cards from Diana's lineage: " +
+            "Materialize two Bullet cards from your material deck. " +
+            "Until end of turn, Diana gains \"On Attack: Wake up Diana.\" " +
+            "Activate this ability only if there are four or more Curse cards in Diana's lineage. ", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            DianaCursebreaker_0)); //Image
+
+        cardList.Add(new Card(
+            82, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "UMBRA", //Element
+            "Diana, Cursebreaker", //Name
+            "Diana Lineage\r\n\r\n" +
+            "Banish all Curse cards from Diana's lineage: " +
+            "Materialize two Bullet cards from your material deck. " +
+            "Until end of turn, Diana gains \"On Attack: Wake up Diana.\" " +
+            "Activate this ability only if there are four or more Curse cards in Diana's lineage. ", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            DianaCursebreaker_1)); //Image
+
+        cardList.Add(new Card(
+            83, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Silvie, Wilds Whisperer", //Name
+            "On Enter: " +
+            "The next Animal or Beast ally card you activate this turn enters the field with an additional buff counter on it. " +
+            "(Allies get +1 power and +1 life for each buff counter on them.)", //Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            1,//level
+            19,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            SilvieWildsWhisperer_0)); //Image
+
+        cardList.Add(new Card(
+            84, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Silvie, Wilds Whisperer", //Name
+            "On Enter: " +
+            "The next Animal or Beast ally card you activate this turn enters the field with an additional buff counter on it. " +
+            "(Allies get +1 power and +1 life for each buff counter on them.)", //Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            1,//level
+            19,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            SilvieWildsWhisperer_1)); //Image
+
+        cardList.Add(new Card(
+            85, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "LUXEM", //Element
+            "Zander, Blinding Steel", //Name
+            "Zander Lineage\r\n\r\n" +
+            "At the beginning of your recollection phase, you may reveal all cards in your memory. " +
+            "For each luxem element card revealed, each opponent puts a card from their hand into their memory.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            ZanderBlindingSteel_0)); //Image
+
+        cardList.Add(new Card(
+            86, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "HUMAN" }, //SubTypes
+            "LUXEM", //Element
+            "Zander, Blinding Steel", //Name
+            "Zander Lineage\r\n\r\n" +
+            "At the beginning of your recollection phase, you may reveal all cards in your memory. " +
+            "For each luxem element card revealed, each opponent puts a card from their hand into their memory.", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            ZanderBlindingSteel_1)); //Image
+
+        cardList.Add(new Card(
+            87, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "ACCESSORY" }, //SubTypes
+            "NORM", //Element
+            "Viridian Protective Trinket", //Name
+            "Banish Viridian Protective Trinket:" +
+            "During your turn, water element cards your opponents activate cost 2 more to activat", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            ViridianProtectiveTrinket_0)); //Image
+
+        cardList.Add(new Card(
+            88, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "CLERIC" }, //Classes
+            new List<string> { "CLERIC", "ACCESSORY" }, //SubTypes
+            "NORM", //Element
+            "Viridian Protective Trinket", //Name
+            "During your turn, water element cards your opponents activate cost 2 more to activat", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            ViridianProtectiveTrinket_1)); //Image
+
+        cardList.Add(new Card(
+            89, //id
+            new List<string> { "REGALIA", "WEAPON" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "GUN" }, //SubTypes
+            "NORM", //Element
+            "Framework Sidearm", //Name
+            "(Gun — Must be loaded to use for an attack and can’t be used with an attack card.)" +
+            "\r\n\r\nClass Bonus You may pay (3) to activate this card from your material deck.", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            1,//Power
+            1,//Durability
+            null,//Speed
+            FrameworkSidearm)); //Image
+
+        cardList.Add(new Card(
+            90, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "COMPONENT" }, //SubTypes
+            "NORM", //Element
+            "Slime Nexus", //Name
+            "Banish Slime Nexus: " +
+            "The next Slime ally card you activate this turn costs 3 less to activate.", //Effect
+            false,//isToken
+            1,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            SlimeNexus)); //Image
+
+        cardList.Add(new Card(
+            91, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "ASSASSIN", "CLERIC" }, //Classes
+            new List<string> { "ASSASSIN", "CLERIC", "BAUBLE" }, //SubTypes
+            "UMBRA",//Element
+            "Dusksoul Stone",//Name
+            "As an additional cost to materialize this card, " +
+            "banish two ally cards from a single graveyard.\r\n\r\n" +
+            "Phantasias you control have spellshroud. " +
+            "(Objects with spellshroud can't be targeted by Spells.)\r\n\r\n" +
+            "Banish Dusksoul Stone: " +
+            "Banish up to two cards from a single graveyard.",//Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            DusksoulStone));//Image
+
+        cardList.Add(new Card(
+            92, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "SPIRIT" }, //Classes
+            new List<string> { "SPIRIT" }, //SubTypes
+            "NORM", //Element
+            "Morrigan, Lost Spirit", //Name
+            "On Enter: Draw seven cards.", //Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            0,//level
+            15,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            MorriganLostSpirit)); //Image
+
+        cardList.Add(new Card(
+            93, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "UMBRA", //Element
+            "Diana, Duskstalker", //Name
+            "Diana Lineage\r\n\r\n" +
+            "On Enter: Diana becomes distant. \r\n\r\n" +
+            "On Champion Hit: " +
+            "Generate a Creeping Torment card and put it on the bottom of the hit champion's lineage. " +
+            "(To generate, add that card from outside of the game.) ", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            DianaDuskstalker_0)); //Image
+
+        cardList.Add(new Card(
+            94, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "RANGER" }, //Classes
+            new List<string> { "RANGER", "HUMAN" }, //SubTypes
+            "UMBRA", //Element
+            "Diana, Duskstalker", //Name
+            "Diana Lineage\r\n\r\n" +
+            "On Enter: Diana becomes distant. \r\n\r\n" +
+            "On Champion Hit: " +
+            "Generate a Creeping Torment card and put it on the bottom of the hit champion's lineage. " +
+            "(To generate, add that card from outside of the game.) ", //Effect
+            false,//isToken
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            DianaDuskstalker_1)); //Image
+
+        cardList.Add(new Card(
+            95,//id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Silvie, With the Pack", //Name
+            "Silvie Lineage\r\n\r\n" +
+            "On Enter: " +
+            "If you control an Animal ally, draw a card. " +
+            "If you control a Beast ally, draw a card.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            SilvieWiththePack_0)); //Image
+
+        cardList.Add(new Card(
+            96,//id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Silvie, With the Pack", //Name
+            "Silvie Lineage\r\n\r\n" +
+            "On Enter: " +
+            "If you control an Animal ally, draw a card. " +
+            "If you control a Beast ally, draw a card.", //Effect
+            false,//isToken
+            2,//CostMemory
+            null,//CostReserve
+            2,//level
+            22,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            SilvieWiththePack_1)); //Image
+
+        cardList.Add(new Card(
+            97,//id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "ACCESSORY" }, //SubTypes
+            "FIRE",//Element
+            "Beastsoul Visage",//Name
+            "Ally Link" +
+            "This object enters the field linked to target ally. " +
+            "If the link is broken, sacrifice this object.)" +
+            "\r\n\r\nLinked ally gets +2, POWER has pride 3, and is a Beast in addition to its other types.",//Effect
+            false,//isToken
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            BeastsoulVisage));//Image
     }
 }
