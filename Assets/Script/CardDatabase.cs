@@ -117,7 +117,7 @@ public class CardDatabase : MonoBehaviour
             "Apotheosis Rite",//Name
             "Divine Relic\r\n\r\nBanish Apotheosis Rite: " +
             "Your champion becomes an Ascendant in addition to its other types. Draw a card.",//Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -136,7 +136,7 @@ public class CardDatabase : MonoBehaviour
             "FIRE", //Element
             "Spirit of Fire", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -154,7 +154,7 @@ public class CardDatabase : MonoBehaviour
             "FIRE", //Element
             "Spirit of Fire", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -172,7 +172,7 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Lost Spirit", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -191,7 +191,7 @@ public class CardDatabase : MonoBehaviour
             "Spirit of SLime", //Name
             "On Enter: Draw seven cards.\r\n\r\nInherited Effect: " +
             "Ignore the elemental requirements of basic element Slime cards you activate", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -210,7 +210,7 @@ public class CardDatabase : MonoBehaviour
             "Spirit of Serene Fire", //Name
             "On Enter: Glimpse 6. Draw six cards.\r\n\r\nLineage Release — Recover 6. " +
             "(Activate this ability by banishing this card from your champion's inner lineage.)", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -228,7 +228,7 @@ public class CardDatabase : MonoBehaviour
             "FIRE", //Element
             "Fragmented Spirit of Fire", //Name
             "On Enter: Glimpse 6. Draw six cards. Then summon a Spirit Shard token.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -248,7 +248,7 @@ public class CardDatabase : MonoBehaviour
             "As long as each player controls a water element champion, you may activate this card from your material deck. " +
             "(You still pay its costs.)\r\n\r\nWhenever your champion levels up, deal 4 damage to target champion you don't control." +
             "\r\n\r\n(5), Banish Scepter of Lumina: Draw two cards.", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             null,//level
@@ -266,7 +266,7 @@ public class CardDatabase : MonoBehaviour
             "WATER", //Element
             "Spirit of Water", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -284,7 +284,7 @@ public class CardDatabase : MonoBehaviour
             "WATER", //Element
             "Spirit of Water", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -303,7 +303,7 @@ public class CardDatabase : MonoBehaviour
             "Spirit of Serene Water", //Name
             "On Enter: Glimpse 6. Draw six cards.\r\n\r\nLineage Release — Recover 6. " +
             "(Activate this ability by banishing this card from your champion's inner lineage.)", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -321,7 +321,7 @@ public class CardDatabase : MonoBehaviour
             "WATER", //Element
             "Fragmented Spirit of Water", //Name
             "On Enter: Glimpse 6. Draw six cards. Then summon a Spirit Shard token.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -340,7 +340,7 @@ public class CardDatabase : MonoBehaviour
             "Stonescale Band", //Name
             "Class BonusOn Enter: Discard up to three ally cards from your hand and/or memory, then draw that many cards." +
             "\r\n\r\n(1),REST : Until end of turn, you may activate ally cards as though they had fast activation.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -358,7 +358,7 @@ public class CardDatabase : MonoBehaviour
             "WIND", //Element
             "Spirit of Wind", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -376,7 +376,7 @@ public class CardDatabase : MonoBehaviour
             "WIND", //Element
             "Spirit of Wind", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -395,7 +395,7 @@ public class CardDatabase : MonoBehaviour
             "Spirit of Serene Wind", //Name
             "On Enter: Glimpse 6. Draw six cards.\r\n\r\nLineage Release — Recover 6. " +
             "(Activate this ability by banishing this card from your champion's inner lineage.)", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -413,7 +413,7 @@ public class CardDatabase : MonoBehaviour
             "WIND", //Element
             "Fragmented Spirit of Wind", //Name
             "On Enter: Glimpse 6. Draw six cards. Then summon a Spirit Shard token.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -432,7 +432,7 @@ public class CardDatabase : MonoBehaviour
             "Insignia of the Corhazi", //Name
             "(3),REST : Put a preparation counter on your champion.\r\n\r\n" +
             "Class BonusWhenever you activate a prepared card while your influence is six or less, draw a card into your memory.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -451,7 +451,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna, Herbalist Prodigy", //Name
             "On Enter: Gather twice. " +
             "(To gather, summon a Blightroot, Manaroot, Silvershine, Fraysia, Razorvine, or Springleaf token, chosen at random.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -470,7 +470,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna, Herbalist Prodigy", //Name
             "On Enter: Gather twice. " +
             "(To gather, summon a Blightroot, Manaroot, Silvershine, Fraysia, Razorvine, or Springleaf token, chosen at random.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -488,7 +488,7 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Lorraine, Wandering Warrior", //Name
             "On Enter: Materialize a weapon card with memory cost 0 from your material deck.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -506,7 +506,7 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Lorraine, Wandering Warrior", //Name
             "On Enter: Materialize a weapon card with memory cost 0 from your material deck.", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -525,7 +525,7 @@ public class CardDatabase : MonoBehaviour
             "Tristan, Underhanded", //Name
             "On Enter: You may put a preparation  counter on Tristan. If you don’t, you gain agility 3 for this turn. " +
             "(Agility 3 — Return three cards from your memory to your hand at the beginning of the end phase.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -544,7 +544,7 @@ public class CardDatabase : MonoBehaviour
             "Tristan, Underhanded", //Name
             "On Enter: You may put a preparation  counter on Tristan. If you don’t, you gain agility 3 for this turn. " +
             "(Agility 3 — Return three cards from your memory to your hand at the beginning of the end phase.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -564,7 +564,7 @@ public class CardDatabase : MonoBehaviour
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
             "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 POWER until end of turn.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -584,7 +584,7 @@ public class CardDatabase : MonoBehaviour
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
             "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 POWER until end of turn.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -604,7 +604,7 @@ public class CardDatabase : MonoBehaviour
             "Merlin Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, put a level counter on Merlin. " +
             "Then, if there's an even amount of level counters on Merlin, draw a card and Merlin's attacks get +2 POWER until end of turn.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -624,7 +624,7 @@ public class CardDatabase : MonoBehaviour
             "Tristan Lineage\r\n\r\n" +
             "On Enter: Summon two Ominous Shadow tokens and put a preparation counter on Tristan.\r\n\r\n" +
             "Remove two preparation counters from Tristan: Change the target of an attack that targets Tristan to a phantasia ally you control.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -644,7 +644,7 @@ public class CardDatabase : MonoBehaviour
             "Tristan Lineage\r\n\r\n" +
             "On Enter: Summon two Ominous Shadow tokens and put a preparation counter on Tristan.\r\n\r\n" +
             "Remove two preparation counters from Tristan: Change the target of an attack that targets Tristan to a phantasia ally you control.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -664,7 +664,7 @@ public class CardDatabase : MonoBehaviour
             "Silvie Lineage\r\n\r\n" +
             "On Enter: The next Slime ally card you activate this turn costs 2 less to activate and enters the field with two additional buff counters on it." +
             "\r\n\r\nIgnore the elemental requirements of advanced element Slime cards you activate.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -684,7 +684,7 @@ public class CardDatabase : MonoBehaviour
             "Silvie Lineage\r\n\r\n" +
             "On Enter: The next Slime ally card you activate this turn costs 2 less to activate and enters the field with two additional buff counters on it." +
             "\r\n\r\nIgnore the elemental requirements of advanced element Slime cards you activate.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -704,7 +704,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna Lineage\r\n\r\n" +
             "On Enter: Gather twice.\r\n\r\n" +
             "Inherited Effect: At the beginning of your end phase, you may sacrifice two Herbs with the same name. If you do, draw a card.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -724,7 +724,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna Lineage\r\n\r\n" +
             "On Enter: Gather twice.\r\n\r\n" +
             "Inherited Effect: At the beginning of your end phase, you may sacrifice two Herbs with the same name. If you do, draw a card.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -744,7 +744,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna Lineage\r\n\r\n" +
             "On Enter: Gather twice.\r\n\r\n" +
             "Inherited Effect: At the beginning of your end phase, you may sacrifice two Herbs with the same name. If you do, draw a card.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -763,7 +763,7 @@ public class CardDatabase : MonoBehaviour
             "Lorraine, Blademaster", //Name
             "Lorraine Lineage\r\n\r\n" +
             "On Enter: Until end of turn, Lorraine's attacks get +2 POWER and gain \"On Kill: Draw a car\"", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -782,7 +782,7 @@ public class CardDatabase : MonoBehaviour
             "Lorraine, Blademaster", //Name
             "Lorraine Lineage\r\n\r\n" +
             "On Enter: Until end of turn, Lorraine's attacks get +2 POWER and gain \"On Kill: Draw a car\"", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -801,7 +801,7 @@ public class CardDatabase : MonoBehaviour
             "Lorraine, Blademaster", //Name
             "Lorraine Lineage\r\n\r\n" +
             "On Enter: Until end of turn, Lorraine's attacks get +2 POWER and gain \"On Kill: Draw a car\"", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -820,7 +820,7 @@ public class CardDatabase : MonoBehaviour
             "Lorraine, Crux Knight", //Name
             "Lorraine Lineage\r\n\r\n" +
             "Lorraine's attacks get +1 POWER for each regalia weapon card in your banishment. ", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -839,7 +839,7 @@ public class CardDatabase : MonoBehaviour
             "Lorraine, Crux Knight", //Name
             "Lorraine Lineage\r\n\r\n" +
             "Lorraine's attacks get +1 POWER for each regalia weapon card in your banishment. ", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -858,7 +858,7 @@ public class CardDatabase : MonoBehaviour
             "Lorraine, Crux Knight", //Name
             "Lorraine Lineage\r\n\r\n" +
             "Lorraine's attacks get +1 POWER for each regalia weapon card in your banishment. ", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -878,7 +878,7 @@ public class CardDatabase : MonoBehaviour
             "Tristan Lineage\r\n\r\n" +
             "On Enter: If Tristan has two or more preparation counters on her, draw a card. " +
             "Then if Tristan has four or more preparation counters on her, draw an additional card.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -898,7 +898,7 @@ public class CardDatabase : MonoBehaviour
             "Tristan Lineage\r\n\r\n" +
             "On Enter: If Tristan has two or more preparation counters on her, draw a card. " +
             "Then if Tristan has four or more preparation counters on her, draw an additional card.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -916,7 +916,7 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Azure Protective Trinket", //Name
             "Banish Azure Protective Trinket: Banish up to three target fire element cards from a single graveyard.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -935,7 +935,7 @@ public class CardDatabase : MonoBehaviour
             "Assassin's Mantle", //Name
             "If your champion would take damage, you may banish Assassin's Mantle. " +
             "If you do, prevent 1 of that damage. Put a preparation counter on your champion if damage was prevented this way.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -956,7 +956,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: Put two preparation counters on Zander. " +
             "Then you may remove a preparation counter from him. " +
             "If you do, return an Assassin action or an Assassin attack card from your graveyard to your hand.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -977,7 +977,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: Put two preparation counters on Zander. " +
             "Then you may remove a preparation counter from him. " +
             "If you do, return an Assassin action or an Assassin attack card from your graveyard to your hand.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -996,7 +996,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna, Astral Zenith", //Name
             "Arisanna Lineage\r\n\r\n" +
             "Once per turn, you may pay (0) rather than pay a card's starcalling costs.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1015,7 +1015,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna, Astral Zenith", //Name
             "Arisanna Lineage\r\n\r\n" +
             "Once per turn, you may pay (0) rather than pay a card's starcalling costs.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1035,7 +1035,7 @@ public class CardDatabase : MonoBehaviour
             "Lorraine Lineage\r\n\r\n" +
             "On Enter: Choose a Sword regalia card with memory cost 1 or less from your banishment and put it onto the field. " +
             "It enters the field with three additional durability counters on it.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1055,7 +1055,7 @@ public class CardDatabase : MonoBehaviour
             "Lorraine Lineage\r\n\r\n" +
             "On Enter: Choose a Sword regalia card with memory cost 1 or less from your banishment and put it onto the field. " +
             "It enters the field with three additional durability counters on it.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1075,7 +1075,7 @@ public class CardDatabase : MonoBehaviour
             "Banish Crimson Protective Trinket: " +
             "Target opponent reveals two cards at random from their memory. " +
             "Banish each wind element card revealed this way.", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             null,//level
@@ -1097,7 +1097,7 @@ public class CardDatabase : MonoBehaviour
             "When she does, draw two cards.\r\n\r\n" +
             "On Enter: Banish the top four cards of target opponent’s deck face down. " +
             "As long as they’re banished, you may play those cards, ignoring their elemental requirements.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1119,7 +1119,7 @@ public class CardDatabase : MonoBehaviour
             "When she does, draw two cards.\r\n\r\n" +
             "On Enter: Banish the top four cards of target opponent’s deck face down. " +
             "As long as they’re banished, you may play those cards, ignoring their elemental requirements.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1139,7 +1139,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna Lineage \r\n\r\n" +
             "(3),REST : Reveal the top card of your deck. " +
             "Negate target card activation if its reserve cost is equal to the reserve cost of the revealed card.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1159,7 +1159,7 @@ public class CardDatabase : MonoBehaviour
             "Arisanna Lineage \r\n\r\n" +
             "(3),REST : Reveal the top card of your deck. " +
             "Negate target card activation if its reserve cost is equal to the reserve cost of the revealed card.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1179,7 +1179,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: " +
             "Put two enlighten counters on Rai. " +
             "(You may remove three enlighten counters from your champion to draw a card.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -1199,7 +1199,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: " +
             "Put two enlighten counters on Rai. " +
             "(You may remove three enlighten counters from your champion to draw a card.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -1219,7 +1219,7 @@ public class CardDatabase : MonoBehaviour
             "At the beginning of your recollection phase, put an age counter on a Potion item you control." +
             "\r\n\r\nLevel 4+ Banish Alkahest: " +
             "Destroy target item or weapon with memory cost 0 or reserve cost 4 or less.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1241,7 +1241,7 @@ public class CardDatabase : MonoBehaviour
             "Banish a non-champion card from your material deck face down.\r\n\r\n" +
             "Banish Quicksilver Grail: You may play the banished card. " +
             "(You still pay for its costs.)", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1260,7 +1260,7 @@ public class CardDatabase : MonoBehaviour
             "Diana, Keen Huntress", //Name
             "Lineage Release — Materialize a Gun card from your material deck. " +
             "(Activate this ability by banishing this card from your champion's inner lineage.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -1279,7 +1279,7 @@ public class CardDatabase : MonoBehaviour
             "Diana, Keen Huntress", //Name
             "Lineage Release — Materialize a Gun card from your material deck. " +
             "(Activate this ability by banishing this card from your champion's inner lineage.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -1300,7 +1300,7 @@ public class CardDatabase : MonoBehaviour
             "\r\n\r\nInherited Effect: " +
             "Whenever you activate your first Mage action card each turn, put an enlighten counter on your champion. " +
             "(Your champion has this ability as long as this card is part of its lineage.)", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -1321,7 +1321,7 @@ public class CardDatabase : MonoBehaviour
             "\r\n\r\nInherited Effect: " +
             "Whenever you activate your first Mage action card each turn, put an enlighten counter on your champion. " +
             "(Your champion has this ability as long as this card is part of its lineage.)", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -1340,7 +1340,7 @@ public class CardDatabase : MonoBehaviour
             "Rai, Storm Seer", //Name
             "Rai Lineage\r\n\r\n" +
             "Rai gets +1 level for each arcane element Mage Spell card in your banishment.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1359,7 +1359,7 @@ public class CardDatabase : MonoBehaviour
             "Rai, Storm Seer", //Name
             "Rai Lineage\r\n\r\n" +
             "Rai gets +1 level for each arcane element Mage Spell card in your banishment.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1378,7 +1378,7 @@ public class CardDatabase : MonoBehaviour
             "Rai, Storm Seer", //Name
             "Rai Lineage\r\n\r\n" +
             "Rai gets +1 level for each arcane element Mage Spell card in your banishment.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1398,7 +1398,7 @@ public class CardDatabase : MonoBehaviour
             "Banish Tariff Ring: " +
             "Until end of turn, players can't declare attacks unless they pay (2)" +
             "for each attack declaration. Activate this ability only during an opponent's recollection phase.",//Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1416,7 +1416,7 @@ public class CardDatabase : MonoBehaviour
             "NORM",//Element
             "Backup Charger",//Name
             "(3), Banish Backup Charger: Summon a Powercell token rested. Draw a card into your memory.",//Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1435,7 +1435,7 @@ public class CardDatabase : MonoBehaviour
             "Key Slime Pudding",//Name
             "Banish Key Slime Pudding: " +
             "Until end of turn, Slime allies that enter the field under your control enter with an additional buff counter on them.",//Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1455,7 +1455,7 @@ public class CardDatabase : MonoBehaviour
             "Diana Lineage\r\n\r\n" +
             "On Enter: Materialize a Bullet card from your material deck." +
             "\r\n\r\nInherited Effect: Ranged 2", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -1475,7 +1475,7 @@ public class CardDatabase : MonoBehaviour
             "Diana Lineage\r\n\r\n" +
             "On Enter: Materialize a Bullet card from your material deck." +
             "\r\n\r\nInherited Effect: Ranged 2", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -1495,7 +1495,7 @@ public class CardDatabase : MonoBehaviour
             "Diana Lineage\r\n\r\n" +
             "On Enter: Materialize a Bullet card from your material deck." +
             "\r\n\r\nInherited Effect: Ranged 2", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -1515,7 +1515,7 @@ public class CardDatabase : MonoBehaviour
             "Rai Lineage\r\n\r\n" +
             "REST, Remove four enlighten counters from Rai: Copy target Mage Spell card activation. " +
             "You may choose new targets for the copy.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1535,7 +1535,7 @@ public class CardDatabase : MonoBehaviour
             "Rai Lineage\r\n\r\n" +
             "REST, Remove four enlighten counters from Rai: Copy target Mage Spell card activation. " +
             "You may choose new targets for the copy.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1554,7 +1554,7 @@ public class CardDatabase : MonoBehaviour
             "Silvie, Loved by All", //Name
             "Silvie Lineage\r\n\r\n" +
             "Animal and Beast allies you control get +1 LIFE and have intercept.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1573,7 +1573,7 @@ public class CardDatabase : MonoBehaviour
             "Silvie, Loved by All", //Name
             "Silvie Lineage\r\n\r\n" +
             "Animal and Beast allies you control get +1 LIFE and have intercept.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1592,7 +1592,7 @@ public class CardDatabase : MonoBehaviour
             "Tithe Proclamation",//Name
             "On Enter: Draw a card.\r\n\r\n" +
             "Players can't draw more than three cards each turn unless it's their first turn of the game.",//Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             null,//level
@@ -1611,7 +1611,7 @@ public class CardDatabase : MonoBehaviour
             "Tithe Proclamation",//Name
             "On Enter: Draw a card.\r\n\r\n" +
             "Each player can't draw more than three cards each turn unless it's their first turn of the game.",//Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             null,//level
@@ -1631,7 +1631,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: Put a preparation counter on your champion.\r\n\r\n" +
             "Class Bonus Level 2+ Banish Gearstride Gloves: " +
             "The next Reaction card you activate this turn costs 1 less to activate.",//Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1652,7 +1652,7 @@ public class CardDatabase : MonoBehaviour
             "Class BonusWhenever you activate a Harmony or Melody card from your hand, " +
             "you may banish it as it resolves.\r\n\r\n: " +
             "REST You may activate a card banished by Clockwork Musicbox. (You still pay its costs.)",//Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1670,7 +1670,7 @@ public class CardDatabase : MonoBehaviour
             "FIRE", //Element
             "Aithne, Spirit of Fire", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -1692,7 +1692,7 @@ public class CardDatabase : MonoBehaviour
             "Materialize two Bullet cards from your material deck. " +
             "Until end of turn, Diana gains \"On Attack: Wake up Diana.\" " +
             "Activate this ability only if there are four or more Curse cards in Diana's lineage. ", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1714,7 +1714,7 @@ public class CardDatabase : MonoBehaviour
             "Materialize two Bullet cards from your material deck. " +
             "Until end of turn, Diana gains \"On Attack: Wake up Diana.\" " +
             "Activate this ability only if there are four or more Curse cards in Diana's lineage. ", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1734,7 +1734,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: " +
             "The next Animal or Beast ally card you activate this turn enters the field with an additional buff counter on it. " +
             "(Allies get +1 power and +1 life for each buff counter on them.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -1754,7 +1754,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: " +
             "The next Animal or Beast ally card you activate this turn enters the field with an additional buff counter on it. " +
             "(Allies get +1 power and +1 life for each buff counter on them.)", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             1,//level
@@ -1774,7 +1774,7 @@ public class CardDatabase : MonoBehaviour
             "Zander Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, you may reveal all cards in your memory. " +
             "For each luxem element card revealed, each opponent puts a card from their hand into their memory.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1794,7 +1794,7 @@ public class CardDatabase : MonoBehaviour
             "Zander Lineage\r\n\r\n" +
             "At the beginning of your recollection phase, you may reveal all cards in your memory. " +
             "For each luxem element card revealed, each opponent puts a card from their hand into their memory.", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1813,7 +1813,7 @@ public class CardDatabase : MonoBehaviour
             "Viridian Protective Trinket", //Name
             "Banish Viridian Protective Trinket:" +
             "During your turn, water element cards your opponents activate cost 2 more to activat", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1831,7 +1831,7 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Viridian Protective Trinket", //Name
             "During your turn, water element cards your opponents activate cost 2 more to activat", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1850,7 +1850,7 @@ public class CardDatabase : MonoBehaviour
             "Framework Sidearm", //Name
             "(Gun — Must be loaded to use for an attack and can’t be used with an attack card.)" +
             "\r\n\r\nClass Bonus You may pay (3) to activate this card from your material deck.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1869,7 +1869,7 @@ public class CardDatabase : MonoBehaviour
             "Slime Nexus", //Name
             "Banish Slime Nexus: " +
             "The next Slime ally card you activate this turn costs 3 less to activate.", //Effect
-            false,//isToken
+            false,//Generated
             1,//CostMemory
             null,//CostReserve
             null,//level
@@ -1892,7 +1892,7 @@ public class CardDatabase : MonoBehaviour
             "(Objects with spellshroud can't be targeted by Spells.)\r\n\r\n" +
             "Banish Dusksoul Stone: " +
             "Banish up to two cards from a single graveyard.",//Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
@@ -1910,7 +1910,7 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Morrigan, Lost Spirit", //Name
             "On Enter: Draw seven cards.", //Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             0,//level
@@ -1932,7 +1932,7 @@ public class CardDatabase : MonoBehaviour
             "On Champion Hit: " +
             "Generate a Creeping Torment card and put it on the bottom of the hit champion's lineage. " +
             "(To generate, add that card from outside of the game.) ", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1954,7 +1954,7 @@ public class CardDatabase : MonoBehaviour
             "On Champion Hit: " +
             "Generate a Creeping Torment card and put it on the bottom of the hit champion's lineage. " +
             "(To generate, add that card from outside of the game.) ", //Effect
-            false,//isToken
+            false,//Generated
             3,//CostMemory
             null,//CostReserve
             3,//level
@@ -1975,7 +1975,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: " +
             "If you control an Animal ally, draw a card. " +
             "If you control a Beast ally, draw a card.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -1996,7 +1996,7 @@ public class CardDatabase : MonoBehaviour
             "On Enter: " +
             "If you control an Animal ally, draw a card. " +
             "If you control a Beast ally, draw a card.", //Effect
-            false,//isToken
+            false,//Generated
             2,//CostMemory
             null,//CostReserve
             2,//level
@@ -2017,7 +2017,7 @@ public class CardDatabase : MonoBehaviour
             "This object enters the field linked to target ally. " +
             "If the link is broken, sacrifice this object.)" +
             "\r\n\r\nLinked ally gets +2, POWER has pride 3, and is a Beast in addition to its other types.",//Effect
-            false,//isToken
+            false,//Generated
             0,//CostMemory
             null,//CostReserve
             null,//level
