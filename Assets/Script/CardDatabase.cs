@@ -107,6 +107,19 @@ public class CardDatabase : MonoBehaviour
         Sprite SilvieWiththePack_0 = Resources.Load<Sprite>("Images/ga_id_59");
         Sprite SilvieWiththePack_1 = Resources.Load<Sprite>("Images/ga_id_59a");
         Sprite BeastsoulVisage = Resources.Load<Sprite>("Images/ga_id_60");
+        Sprite MercenarysBlade = Resources.Load<Sprite>("Images/ga_id_61");
+        Sprite MalignantAthame = Resources.Load<Sprite>("Images/ga_id_62");
+        Sprite SlimeTotem = Resources.Load<Sprite>("Images/ga_id_63");
+        Sprite PrismaticSpirit = Resources.Load<Sprite>("Images/ga_id_64");
+        Sprite TonorisLoneMercenary_0 = Resources.Load<Sprite>("Images/ga_id_65");
+        Sprite TonorisLoneMercenary_1 = Resources.Load<Sprite>("Images/ga_id_65a");
+        Sprite SilvieEarthTune_0 = Resources.Load<Sprite>("Images/ga_id_66");
+        Sprite SilvieEarthTune_1 = Resources.Load<Sprite>("Images/ga_id_66a");
+        Sprite ClarentSwordofPeace = Resources.Load<Sprite>("Images/ga_id_67");
+        Sprite ExplosiveRune = Resources.Load<Sprite>("Images/ga_id_68");
+        Sprite ShadebloodCoating = Resources.Load<Sprite>("Images/ga_id_69");
+        Sprite VerdantScepter = Resources.Load<Sprite>("Images/ga_id_70");
+        Sprite MercurialHeart = Resources.Load<Sprite>("Images/ga_id_71");
 
         cardList.Add(new Card(
             0, //id
@@ -338,7 +351,7 @@ public class CardDatabase : MonoBehaviour
             new List<string> { "TAMER", "ARTIFACT" }, //SubTypes
             "TERA", //Element
             "Stonescale Band", //Name
-            "Class BonusOn Enter: Discard up to three ally cards from your hand and/or memory, then draw that many cards." +
+            "(Class Bonus) On Enter: Discard up to three ally cards from your hand and/or memory, then draw that many cards." +
             "\r\n\r\n(1),REST : Until end of turn, you may activate ally cards as though they had fast activation.", //Effect
             false,//Generated
             0,//CostMemory
@@ -431,7 +444,7 @@ public class CardDatabase : MonoBehaviour
             "LUXEM", //Element
             "Insignia of the Corhazi", //Name
             "(3),REST : Put a preparation counter on your champion.\r\n\r\n" +
-            "Class BonusWhenever you activate a prepared card while your influence is six or less, draw a card into your memory.", //Effect
+            "(Class Bonus) Whenever you activate a prepared card while your influence is six or less, draw a card into your memory.", //Effect
             false,//Generated
             0,//CostMemory
             null,//CostReserve
@@ -1629,7 +1642,7 @@ public class CardDatabase : MonoBehaviour
             "WIND",//Element
             "Gearstride Gloves",//Name
             "On Enter: Put a preparation counter on your champion.\r\n\r\n" +
-            "Class Bonus Level 2+ Banish Gearstride Gloves: " +
+            "(Class Bonus) Level 2+ Banish Gearstride Gloves: " +
             "The next Reaction card you activate this turn costs 1 less to activate.",//Effect
             false,//Generated
             0,//CostMemory
@@ -1649,7 +1662,7 @@ public class CardDatabase : MonoBehaviour
             "NORM",//Element
             "Clockwork Musicbox",//Name
             "Hindered (This object enters the field rested.)\r\n\r\n" +
-            "Class BonusWhenever you activate a Harmony or Melody card from your hand, " +
+            "(Class Bonus) Whenever you activate a Harmony or Melody card from your hand, " +
             "you may banish it as it resolves.\r\n\r\n: " +
             "REST You may activate a card banished by Clockwork Musicbox. (You still pay its costs.)",//Effect
             false,//Generated
@@ -1849,7 +1862,7 @@ public class CardDatabase : MonoBehaviour
             "NORM", //Element
             "Framework Sidearm", //Name
             "(Gun — Must be loaded to use for an attack and can’t be used with an attack card.)" +
-            "\r\n\r\nClass Bonus You may pay (3) to activate this card from your material deck.", //Effect
+            "\r\n\r\n(Class Bonus) You may pay (3) to activate this card from your material deck.", //Effect
             false,//Generated
             0,//CostMemory
             null,//CostReserve
@@ -2026,5 +2039,268 @@ public class CardDatabase : MonoBehaviour
             null,//Durability
             null,//Speed
             BeastsoulVisage));//Image
+
+        cardList.Add(new Card(
+            98, //id
+            new List<string> { "REGALIA", "WEAPON" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "DAGGER" }, //SubTypes
+            "NORM", //Element
+            "Mercenary's Blade", //Name
+            "(Class Bonus) " +
+            "You may remove a preparation counter from your champion to activate this card from your material deck. " +
+            "(Apply this effect only if your champion’s class matches this card’s class.)", //Effect
+            false,//Generated
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            1,//Power
+            1,//Durability
+            null,//Speed
+            MercenarysBlade)); //Image
+
+        cardList.Add(new Card(
+            99, //id
+            new List<string> { "REGALIA", "WEAPON" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "DAGGER" }, //SubTypes
+            "UMBRA", //Element
+            "Malignant Athame", //Name
+            "(Class Bonus) " +
+            "On Champion Hit: " +
+            "You may have that opponent swap the cards in their hand and memory. " +
+            "Then if there are four or more cards in their memory, deal 2 unpreventable damage to the hit champion.", //Effect
+            false,//Generated
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            1,//Power
+            2,//Durability
+            null,//Speed
+            MalignantAthame)); //Image
+
+        cardList.Add(new Card(
+            100, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "ARTIFACT" }, //SubTypes
+            "TERA",//Element
+            "Slime Totem",//Name
+            "Slime allies you control have vigor. (These units wake up at the beginning of your end phase.)",//Effect
+            false,//Generated
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            SlimeTotem));//Image
+
+        cardList.Add(new Card(
+            101, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "SPIRIT" }, //Classes
+            new List<string> { "SPIRIT" }, //SubTypes
+            "NORM", //Element
+            "Prismatic Spirit", //Name
+            "On Enter: " +
+            "Draw six cards then choose two basic elements. " +
+            "Prismatic Spirit gains \"Inherited Effect: This object is each of the chosen elements in addition to its other elements.\"", //Effect
+            false,//Generated
+            0,//CostMemory
+            null,//CostReserve
+            0,//level
+            15,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            PrismaticSpirit)); //Image
+
+        cardList.Add(new Card(
+            102, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "GUARDIAN" }, //Classes
+            new List<string> { "GUARDIAN", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Tonoris, Lone Mercenary", //Name
+            "On Enter: " +
+            "Tonoris gains taunt until the beginning of your next turn. " +
+            "(While awake, this unit must be targeted before other units you control during your opponents' attack declarations if able.)", //Effect
+            false,//Generated
+            1,//CostMemory
+            null,//CostReserve
+            1,//level
+            20,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            TonorisLoneMercenary_0)); //Image
+
+        cardList.Add(new Card(
+            103, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "GUARDIAN" }, //Classes
+            new List<string> { "GUARDIAN", "HUMAN" }, //SubTypes
+            "NORM", //Element
+            "Tonoris, Lone Mercenary", //Name
+            "On Enter: " +
+            "Tonoris gains taunt until the beginning of your next turn. " +
+            "(While awake, this unit must be targeted before other units you control during your opponents' attack declarations if able.)", //Effect
+            false,//Generated
+            1,//CostMemory
+            null,//CostReserve
+            1,//level
+            20,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            TonorisLoneMercenary_1)); //Image
+
+        cardList.Add(new Card(
+            104, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "TERA", //Element
+            "Silvie, Earth's Tune", //Name
+            "Silvie Lineage\r\n\r\n" +
+            "On Enter: " +
+            "Reveal cards from the top of your deck until you reveal a tera element Animal or Beast ally card. " +
+            "Put that card into your hand and the rest on the bottom of your deck in a random order.", //Effect
+            false,//Generated
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            SilvieEarthTune_0)); //Image
+
+        cardList.Add(new Card(
+            105, //id
+            new List<string> { "CHAMPION" }, //Types
+            new List<string> { "TAMER" }, //Classes
+            new List<string> { "TAMER", "HUMAN" }, //SubTypes
+            "TERA", //Element
+            "Silvie, Earth's Tune", //Name
+            "Silvie Lineage\r\n\r\n" +
+            "On Enter: " +
+            "Reveal cards from the top of your deck until you reveal a tera element Animal or Beast ally card. " +
+            "Put that card into your hand and the rest on the bottom of your deck in a random order.", //Effect
+            false,//Generated
+            3,//CostMemory
+            null,//CostReserve
+            3,//level
+            25,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            SilvieEarthTune_1)); //Image
+
+        cardList.Add(new Card(
+            106, //id
+            new List<string> { "REGALIA", "WEAPON" }, //Types
+            new List<string> { "WARRIOR" }, //Classes
+            new List<string> { "WARRIOR", "SWORD" }, //SubTypes
+            "NORM", //Element
+            "Clarent, Sword of Peace", //Name
+            "(Class Bonus) " +
+            "Remove a durability counter from Clarent: " +
+            "Prevent the next 1 non-combat damage that would be dealt to each unit you control this turn. " +
+            "(Activate this ability only if your champion's class matches this card's class.)", //Effect
+            false,//Generated
+            1,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            1,//Power
+            2,//Durability
+            null,//Speed
+            ClarentSwordofPeace)); //Image
+
+        cardList.Add(new Card(
+            107, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "MAGE" }, //Classes
+            new List<string> { "MAGE", "ARTIFACT" }, //SubTypes
+            "FIRE", //Element
+            "Explosive Rune", //Name
+            "Banish Explosive Rune: " +
+            "Deal 1 damage to target ally. Class Bonus: If that ally is attacking, deal 2 damage to it instead.", //Effect
+            false,//Generated
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            ExplosiveRune)); //Image
+
+        cardList.Add(new Card(
+            108, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "ASSASSIN" }, //Classes
+            new List<string> { "ASSASSIN", "ACCESSORY" }, //SubTypes
+            "UMBRA", //Element
+            "Shadeblood Coating", //Name
+            "Banish Shadeblood Coating: " +
+            "Up to three target units you control gain " +
+            "\"On Hit: Put a preparation counter on your champion\" until end of turn.", //Effect
+            false,//Generated
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            ShadebloodCoating)); //Image
+
+        cardList.Add(new Card(
+            109, //id
+            new List<string> { "REGALIA", "ITEM" }, //Types
+            new List<string> { "TAMER", "MAGE" }, //Classes
+            new List<string> { "TAMER", "MAGE", "SCEPTER" }, //SubTypes
+            "TERA", //Element
+            "Verdant Scepter", //Name
+            "(Class Bonus)" +
+            "On Enter: " +
+            "You may banish a Slime ally you control. " +
+            "If you do, put an amount of refinement counters on Verdant Scepter equal to the banished ally's power plus 1." +
+            "\r\n\r\nREST, Remove a refinement counter from Verdant Scepter: " +
+            "Put a buff counter on each of up to two Slime allies you control then draw a card.", //Effect
+            false,//Generated
+            1,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            VerdantScepter)); //Image
+
+        cardList.Add(new Card(
+            110, //id
+            new List<string> { "REGALIA", "ITEM" },//Types
+            new List<string> { "CLERIC", "GUARDIAN" }, //Classes
+            new List<string> { "CLERIC", "GUARDIAN", "ARTIFACT", "POWERCELL" }, //SubTypes
+            "NORM",//Element
+            "Mercurial Heart",//Name
+            "Divine Relic\r\n\r\n" +
+            "On Enter: Put a buff counter on target Automaton ally you control.",//Effect
+            false,//Generated
+            0,//CostMemory
+            null,//CostReserve
+            null,//level
+            null,//Life
+            null,//Power
+            null,//Durability
+            null,//Speed
+            MercurialHeart));//Image
     }
 }
