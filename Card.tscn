@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bdq4b32kkn1di"]
+
+[ext_resource type="Texture2D" uid="uid://bv6bffthlo66q" path="res://cardtest.png" id="1_dd2wi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hael8"]
+size = Vector2(246, 344)
+
+[node name="Card" type="Node2D"]
+
+[node name="CardImage" type="Sprite2D" parent="."]
+scale = Vector2(0.492, 0.492)
+texture = ExtResource("1_dd2wi")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_hael8")
