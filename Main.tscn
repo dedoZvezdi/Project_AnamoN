@@ -9,9 +9,9 @@
 script = ExtResource("1_uu6xs")
 
 [node name="Card" parent="CardManager" instance=ExtResource("2_r0du0")]
-position = Vector2(508, 514)
-scale = Vector2(0.574166, 0.574166)
+position = Vector2(625, 518)
+scale = Vector2(0.23811, 0.23811)
 
 [node name="Card2" parent="CardManager" instance=ExtResource("2_r0du0")]
-position = Vector2(824, 516)
-scale = Vector2(0.574166, 0.574166)
+position = Vector2(819.724, 526.141)
+scale = Vector2(0.23811, 0.23811)

@@ -6,9 +6,13 @@ var screen_size
 var card_being_dragged
 
 func _ready() -> void:
+	update_screen_size()
+	get_viewport().connect("size_changed", Callable(self, "update_screen_size"))
+
+func update_screen_size():
 	screen_size = get_viewport_rect().size
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if card_being_dragged:
 		var mouse_pos = get_global_mouse_position()
 		card_being_dragged.position = Vector2(clamp(mouse_pos.x, 0, screen_size.x ),
