@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=5 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://bdq4b32kkn1di" path="res://Card.tscn" id="2_r0du0"]
+[ext_resource type="Texture2D" uid="uid://dnbkma1on2ut4" path="res://Field_mtg.png" id="3_cm0pq"]
+[ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://CardsSlotForSingleCard.tscn" id="4_fos0i"]
 
 [node name="Main" type="Node2D"]
 
@@ -9,9 +11,26 @@
 script = ExtResource("1_uu6xs")
 
 [node name="Card" parent="CardManager" instance=ExtResource("2_r0du0")]
-position = Vector2(460, 457)
-scale = Vector2(0.23811, 0.23811)
+position = Vector2(260, 309)
+scale = Vector2(0.348748, 0.348748)
 
 [node name="Card2" parent="CardManager" instance=ExtResource("2_r0du0")]
-position = Vector2(685, 453)
-scale = Vector2(0.23811, 0.23811)
+position = Vector2(380, 308)
+scale = Vector2(0.348748, 0.348748)
+
+[node name="MTGField" type="Node2D" parent="."]
+
+[node name="MTGFieldImage" type="Sprite2D" parent="MTGField"]
+z_index = -1
+position = Vector2(1007.5, 748.216)
+scale = Vector2(0.474474, 0.474474)
+texture = ExtResource("3_cm0pq")
+
+[node name="CardsSlotForSignleCard" parent="MTGField" instance=ExtResource("4_fos0i")]
+position = Vector2(1389.5, 757.216)
+
+[node name="CardsSlotForSingleCard" parent="MTGField" instance=ExtResource("4_fos0i")]
+position = Vector2(1389.5, 911.216)
+
+[node name="CardsSlotForSignleCard2" parent="MTGField" instance=ExtResource("4_fos0i")]
+position = Vector2(1285.5, 757.216)
