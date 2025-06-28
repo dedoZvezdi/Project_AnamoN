@@ -1,36 +1,50 @@
-[gd_scene load_steps=5 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=6 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://bdq4b32kkn1di" path="res://Card.tscn" id="2_r0du0"]
-[ext_resource type="Texture2D" uid="uid://dnbkma1on2ut4" path="res://Field_mtg.png" id="3_cm0pq"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://CardsSlotForSingleCard.tscn" id="4_fos0i"]
+[ext_resource type="PackedScene" uid="uid://bibopkgjli11i" path="res://90DegreesCardSlot.tscn" id="5_3dxm6"]
+[ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Field_ga.png" id="5_fos0i"]
 
 [node name="Main" type="Node2D"]
 
 [node name="CardManager" type="Node2D" parent="."]
+z_index = 1
 script = ExtResource("1_uu6xs")
 
 [node name="Card" parent="CardManager" instance=ExtResource("2_r0du0")]
-position = Vector2(260, 309)
+position = Vector2(253, 553)
 scale = Vector2(0.348748, 0.348748)
 
 [node name="Card2" parent="CardManager" instance=ExtResource("2_r0du0")]
-position = Vector2(380, 308)
+z_index = 1
+position = Vector2(253, 152)
 scale = Vector2(0.348748, 0.348748)
 
-[node name="MTGField" type="Node2D" parent="."]
+[node name="GAField" type="Node2D" parent="."]
 
-[node name="MTGFieldImage" type="Sprite2D" parent="MTGField"]
-z_index = -1
-position = Vector2(1007.5, 748.216)
-scale = Vector2(0.474474, 0.474474)
-texture = ExtResource("3_cm0pq")
+[node name="FieldGa" type="Sprite2D" parent="GAField"]
+position = Vector2(980, 805)
+scale = Vector2(0.474, 0.474)
+texture = ExtResource("5_fos0i")
 
-[node name="CardsSlotForSignleCard" parent="MTGField" instance=ExtResource("4_fos0i")]
-position = Vector2(1389.5, 757.216)
+[node name="FieldGa2" type="Sprite2D" parent="GAField"]
+position = Vector2(980, 275)
+rotation = -3.14159
+scale = Vector2(0.474, 0.474)
+texture = ExtResource("5_fos0i")
 
-[node name="CardsSlotForSingleCard" parent="MTGField" instance=ExtResource("4_fos0i")]
-position = Vector2(1389.5, 911.216)
+[node name="MAIN DECK" parent="GAField" instance=ExtResource("4_fos0i")]
+position = Vector2(1360.5, 785)
+scale = Vector2(0.974279, 0.966266)
 
-[node name="CardsSlotForSignleCard2" parent="MTGField" instance=ExtResource("4_fos0i")]
-position = Vector2(1285.5, 757.216)
+[node name="GRAVEYARD" parent="GAField" instance=ExtResource("4_fos0i")]
+position = Vector2(1362.7, 943.3)
+scale = Vector2(0.977783, 0.974084)
+
+[node name="MAT_ DECK" parent="GAField" instance=ExtResource("4_fos0i")]
+position = Vector2(599, 785.5)
+scale = Vector2(0.972429, 0.971529)
+
+[node name="BANISH" parent="GAField" instance=ExtResource("5_3dxm6")]
+position = Vector2(1342, 647)
