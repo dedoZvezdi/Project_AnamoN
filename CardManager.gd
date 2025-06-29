@@ -55,14 +55,23 @@ func start_drag(card):
 
 func finish_drag():
 	var card_slot_found = raycast_check_for_card_single_slot()
-	if card_slot_found and not card_slot_found.card_in_slot:
-		card_being_dragged.position = card_slot_found.position
-		card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
-		card_slot_found.card_in_slot = true
-		card_being_dragged.scale = hover_scale
-		card_being_dragged.z_index = base_z_index
-		if card_slot_found.name == "90DegreesCardSlot" or card_slot_found.is_in_group("rotated_slots"):
-			card_being_dragged.rotation_degrees = -90
+	if card_slot_found:
+		if card_slot_found.name == "MEMORY":
+			card_slot_found.add_card_to_memory(card_being_dragged)
+			card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
+			card_being_dragged.scale = hover_scale
+			card_being_dragged.z_index = base_z_index
+		elif not card_slot_found.card_in_slot:
+			card_being_dragged.position = card_slot_found.position
+			card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
+			card_slot_found.card_in_slot = true
+			card_being_dragged.scale = hover_scale
+			card_being_dragged.z_index = base_z_index
+			if card_slot_found.name == "90DegreesCardSlot" or card_slot_found.is_in_group("rotated_slots"):
+				card_being_dragged.rotation_degrees = -90
+		else:
+			card_being_dragged.z_index = base_z_index + card_counter
+			card_counter += 1
 	else:
 		card_being_dragged.z_index = base_z_index + card_counter
 		card_counter += 1
