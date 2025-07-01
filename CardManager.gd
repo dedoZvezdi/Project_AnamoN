@@ -12,8 +12,10 @@ var base_z_index = 0
 var hover_z_index = 10
 var drag_z_index = 20
 var card_counter = 0
+var player_hand_reference
 
 func _ready() -> void:
+	player_hand_reference = $"../PlayerHand"
 	update_screen_size()
 	get_viewport().connect("size_changed", Callable(self, "update_screen_size"))
 	for card in get_tree().get_nodes_in_group("cards"):
@@ -56,6 +58,7 @@ func start_drag(card):
 func finish_drag():
 	var card_slot_found = raycast_check_for_card_single_slot()
 	if card_slot_found:
+		player_hand_reference.remove_card_from_hand(card_being_dragged)
 		if card_slot_found.name == "MEMORY":
 			card_slot_found.add_card_to_memory(card_being_dragged)
 			card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
@@ -73,6 +76,7 @@ func finish_drag():
 			card_being_dragged.z_index = base_z_index + card_counter
 			card_counter += 1
 	else:
+		player_hand_reference.add_card_to_hand(card_being_dragged)
 		card_being_dragged.z_index = base_z_index + card_counter
 		card_counter += 1
 	card_being_dragged = null
