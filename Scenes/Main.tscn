@@ -17,33 +17,33 @@ script = ExtResource("1_uu6xs")
 [node name="GAField" type="Node2D" parent="."]
 
 [node name="FieldGa" type="Sprite2D" parent="GAField"]
-position = Vector2(980, 805)
+position = Vector2(980, 795)
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
 [node name="FieldGa2" type="Sprite2D" parent="GAField"]
-position = Vector2(980, 275)
+position = Vector2(980, 285)
 rotation = -3.14159
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
 [node name="MAIN DECK" parent="GAField" instance=ExtResource("4_fos0i")]
-position = Vector2(1360.5, 785)
+position = Vector2(1360.5, 775)
 scale = Vector2(0.974279, 0.966266)
 
 [node name="GRAVEYARD" parent="GAField" instance=ExtResource("4_fos0i")]
-position = Vector2(1362.7, 943.3)
+position = Vector2(1362.7, 933.3)
 scale = Vector2(0.977783, 0.974084)
 
 [node name="MAT_ DECK" parent="GAField" instance=ExtResource("4_fos0i")]
-position = Vector2(599, 785.5)
+position = Vector2(599, 775.5)
 scale = Vector2(0.972429, 0.971529)
 
 [node name="BANISH" parent="GAField" instance=ExtResource("5_3dxm6")]
-position = Vector2(1342, 647)
+position = Vector2(1342, 637)
 
 [node name="MEMORY" parent="GAField" instance=ExtResource("6_lgr22")]
-position = Vector2(974, 978)
+position = Vector2(975, 968)
 script = ExtResource("7_trn2v")
 
 [node name="PlayerHand" type="Node2D" parent="."]
