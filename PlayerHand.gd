@@ -77,6 +77,7 @@ func calculate_card_spacing(hand_size):
 		ideal_spacing = max(ideal_spacing, MIN_CARD_SPACING)
 	return ideal_spacing
 
+#maybe need to be updateded but for now work (no shit) but need to be more flexible
 func calculate_curve_height(hand_size):
 		return BASE_CURVE_HEIGHT  
 
