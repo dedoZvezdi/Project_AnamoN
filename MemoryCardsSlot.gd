@@ -43,7 +43,7 @@ func arrange_cards_symmetrically():
 	else:
 		var positions = []
 		if card_count == 2:
-			positions = [0.333, 0.666]
+			positions = [0.4, 0.6]
 		elif card_count == 3:
 			positions = [0.25, 0.5, 0.75]
 		elif card_count == 4:
