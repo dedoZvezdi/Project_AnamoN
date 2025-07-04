@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://cukst25b8s0nx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lv41k"]
+size = Vector2(614.25, 301)
+
+[node name="MAINFIELD" type="Node2D"]
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_lv41k")
