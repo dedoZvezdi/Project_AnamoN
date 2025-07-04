@@ -1,12 +1,14 @@
-[gd_scene load_steps=8 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=10 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
 [ext_resource type="PackedScene" uid="uid://bibopkgjli11i" path="res://Scenes/90DegreesCardSlot.tscn" id="5_3dxm6"]
 [ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Field_ga.png" id="5_fos0i"]
 [ext_resource type="PackedScene" uid="uid://d2vjqup3tyk8n" path="res://Scenes/Memory.tscn" id="6_lgr22"]
+[ext_resource type="PackedScene" uid="uid://cukst25b8s0nx" path="res://Scenes/MainField.tscn" id="7_50glp"]
 [ext_resource type="Script" uid="uid://c4b8m0yjikah3" path="res://PlayerHand.gd" id="7_lgr22"]
 [ext_resource type="Script" uid="uid://drubil22n7oyl" path="res://MemoryCardsSlot.gd" id="7_trn2v"]
+[ext_resource type="Script" uid="uid://c6mhpaese60l2" path="res://Main_Field.gd" id="8_vy5pj"]
 
 [node name="Main" type="Node2D"]
 
@@ -45,6 +47,10 @@ position = Vector2(1342, 637)
 [node name="MEMORY" parent="GAField" instance=ExtResource("6_lgr22")]
 position = Vector2(975, 968)
 script = ExtResource("7_trn2v")
+
+[node name="MAINFIELD" parent="GAField" instance=ExtResource("7_50glp")]
+position = Vector2(961, 710)
+script = ExtResource("8_vy5pj")
 
 [node name="PlayerHand" type="Node2D" parent="."]
 script = ExtResource("7_lgr22")
