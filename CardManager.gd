@@ -99,7 +99,6 @@ func raycast_check_at_position(pos):
 	parameters.collide_with_areas = true
 	parameters.collision_mask = COLLISION_MASK_CARD
 	parameters.collide_with_bodies = false
-	
 	var result = space_state.intersect_point(parameters)
 	if result.size() > 0:
 		var highest_card = null
