@@ -4,12 +4,13 @@ const HAND_COUNT = 11
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const CARD_WIDTH = 100
 const HAND_Y_POSITION = 1000
-
-var HAND_FIELD_WIDTH = 600
+const FIELD_Z_INDEX = 0
+const HAND_Z_INDEX = 100
 const MIN_CARD_SPACING = 10
 const MAX_CARD_SPACING = 60
 const BASE_CURVE_HEIGHT = 20
 
+var HAND_FIELD_WIDTH = 600
 var player_hand = []
 var center_screen_x
 var hand_field_left
@@ -25,11 +26,13 @@ func _ready() -> void:
 		var new_card = card_scene.instantiate()
 		$"../CardManager".add_child(new_card)
 		new_card.name = "Card" + str(i)
+		new_card.z_index = HAND_Z_INDEX + i
 		add_card_to_hand(new_card)
 
 func add_card_to_hand(card):
 	if card not in player_hand:
 		player_hand.append(card)
+		card.z_index = HAND_Z_INDEX + player_hand.size()
 		update_hand_position()
 	else:
 		animate_card_to_position(card, card.hand_position, calculate_card_rotation(player_hand.find(card)))
@@ -40,6 +43,7 @@ func update_hand_position():
 		var new_rotation = calculate_card_rotation(i)
 		var card = player_hand[i]
 		card.hand_position = new_position
+		card.z_index = HAND_Z_INDEX + i
 		animate_card_to_position(card, new_position, new_rotation)
 
 func calculate_card_position(index):
@@ -77,9 +81,8 @@ func calculate_card_spacing(hand_size):
 		ideal_spacing = max(ideal_spacing, MIN_CARD_SPACING)
 	return ideal_spacing
 
-#maybe need to be updateded but for now work (no shit) but need to be more flexible
 func calculate_curve_height(hand_size):
-		return BASE_CURVE_HEIGHT  
+	return BASE_CURVE_HEIGHT  
 
 func get_dynamic_max_angle(hand_size: int) -> float:
 	if hand_size <= 1:
@@ -117,6 +120,7 @@ func place_card_in_field(card, field_position, field_rotation = 0.0):
 	if card in player_hand:
 		player_hand.erase(card)
 		update_hand_position()
+	card.z_index = FIELD_Z_INDEX
 	var tween = get_tree().create_tween()
 	tween.parallel().tween_property(card, "position", field_position, 0.3)
 	tween.parallel().tween_property(card, "rotation", field_rotation, 0.3)
@@ -124,6 +128,7 @@ func place_card_in_field(card, field_position, field_rotation = 0.0):
 func return_card_to_hand(card):
 	if card not in player_hand:
 		player_hand.append(card)
+		card.z_index = HAND_Z_INDEX + player_hand.size()
 		update_hand_position()
 
 func organise_cards(cards: Array) -> void:
@@ -145,3 +150,13 @@ func get_hand_info():
 		"current_spacing": calculate_card_spacing(player_hand.size()),
 		"current_curve_height": calculate_curve_height(player_hand.size())
 	}
+
+func bring_card_to_front(card):
+	var max_z = HAND_Z_INDEX
+	for hand_card in player_hand:
+		if hand_card.z_index > max_z:
+			max_z = hand_card.z_index
+	card.z_index = max_z + 1
+
+func set_card_z_index(card, z_value: int):
+	card.z_index = z_value

@@ -49,6 +49,7 @@ func start_drag(card):
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.z_index = drag_z_index
 	card.scale = normal_scale
+	card.rotation = 0.0
 	if last_hovered_card and last_hovered_card != card:
 		if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
 			last_hovered_card.scale = normal_scale
