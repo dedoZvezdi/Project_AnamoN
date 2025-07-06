@@ -1,5 +1,8 @@
 extends Node2D
 
+signal animation_started
+signal animation_finished
+
 const HAND_COUNT = 11
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const CARD_WIDTH = 100
@@ -15,6 +18,7 @@ var player_hand = []
 var center_screen_x
 var hand_field_left
 var hand_field_right
+var active_tweens = 0
 
 func _ready() -> void:
 	center_screen_x = get_viewport().size.x / 2
@@ -38,6 +42,7 @@ func add_card_to_hand(card):
 		animate_card_to_position(card, card.hand_position, calculate_card_rotation(player_hand.find(card)))
 
 func update_hand_position():
+	start_animation()
 	for i in range(player_hand.size()):
 		var new_position = calculate_card_position(i)
 		var new_rotation = calculate_card_rotation(i)
@@ -102,9 +107,23 @@ func calculate_card_rotation(index):
 	return deg_to_rad(angle)
 
 func animate_card_to_position(card, new_position, new_rotation = 0.0):
+	active_tweens += 1
 	var tween = get_tree().create_tween()
 	tween.parallel().tween_property(card, "position", new_position, 0.3)
 	tween.parallel().tween_property(card, "rotation", new_rotation, 0.3)
+	tween.finished.connect(_on_tween_finished)
+
+func _on_tween_finished():
+	active_tweens -= 1
+	if active_tweens <= 0:
+		active_tweens = 0
+		end_animation()
+
+func start_animation():
+	animation_started.emit()
+
+func end_animation():
+	animation_finished.emit()
 
 func remove_card_from_hand(card):
 	if card in player_hand:

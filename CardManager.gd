@@ -13,11 +13,16 @@ var hover_z_index = 10
 var drag_z_index = 20
 var card_counter = 0
 var player_hand_reference
+var animation_in_progress = false
 
 func _ready() -> void:
 	player_hand_reference = $"../PlayerHand"
 	update_screen_size()
 	get_viewport().connect("size_changed", Callable(self, "update_screen_size"))
+	if player_hand_reference.has_signal("animation_started"):
+		player_hand_reference.connect("animation_started", _on_animation_started)
+	if player_hand_reference.has_signal("animation_finished"):
+		player_hand_reference.connect("animation_finished", _on_animation_finished)
 	for card in get_tree().get_nodes_in_group("cards"):
 		connect_card_signals(card)
 		card.z_index = base_z_index
@@ -36,13 +41,20 @@ func _process(_delta: float) -> void:
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.is_pressed():
-			var card = raycast_check_for_card()
-			if card:
-				start_drag(card)
+			if not animation_in_progress:
+				var card = raycast_check_for_card()
+				if card:
+					start_drag(card)
 		elif card_being_dragged:  
 			finish_drag()
 	if event is InputEventMouseMotion:
 		handle_hover()
+
+func _on_animation_started():
+	animation_in_progress = true
+
+func _on_animation_finished():
+	animation_in_progress = false
 
 func start_drag(card):
 	card_being_dragged = card
@@ -112,7 +124,7 @@ func raycast_check_at_position(pos):
 	return null
 
 func handle_hover():
-	if card_being_dragged: 
+	if card_being_dragged or animation_in_progress:
 		return
 	var current_card = raycast_check_for_card()
 	if current_card != last_hovered_card:
@@ -135,7 +147,7 @@ func connect_card_signals(card):
 	card.get_node("Area2D").connect("mouse_exited", Callable(self, "_on_card_unhovered").bind(card))
 
 func _on_card_hovered(card):
-	if card != card_being_dragged:
+	if card != card_being_dragged and not animation_in_progress:
 		card.get_parent().move_child(card, card.get_parent().get_child_count())
 		card.scale = hover_scale
 		card.z_index = hover_z_index
@@ -146,7 +158,7 @@ func _on_card_hovered(card):
 		last_hovered_card = card
 
 func _on_card_unhovered(card):
-	if card != card_being_dragged and card == last_hovered_card:
+	if card != card_being_dragged and card == last_hovered_card and not animation_in_progress:
 		if not card.get_node("Area2D/CollisionShape2D").disabled:
 			card.scale = normal_scale
 			card.z_index = base_z_index
