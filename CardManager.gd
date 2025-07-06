@@ -14,24 +14,40 @@ var drag_z_index = 20
 var card_counter = 0
 var player_hand_reference
 var animation_in_progress = false
+var connected_cards = []
+var signal_connections = {}
 
 func _ready() -> void:
 	player_hand_reference = $"../PlayerHand"
 	update_screen_size()
-	get_viewport().connect("size_changed", Callable(self, "update_screen_size"))
-	if player_hand_reference.has_signal("animation_started"):
-		player_hand_reference.connect("animation_started", _on_animation_started)
-	if player_hand_reference.has_signal("animation_finished"):
-		player_hand_reference.connect("animation_finished", _on_animation_finished)
+	var viewport = get_viewport()
+	if viewport:
+		if viewport.is_connected("size_changed", Callable(self, "update_screen_size")):
+			viewport.disconnect("size_changed", Callable(self, "update_screen_size"))
+		viewport.connect("size_changed", Callable(self, "update_screen_size"))
+	if player_hand_reference and player_hand_reference.has_signal("animation_started"):
+		if not player_hand_reference.is_connected("animation_started", _on_animation_started):
+			player_hand_reference.connect("animation_started", _on_animation_started)
+	if player_hand_reference and player_hand_reference.has_signal("animation_finished"):
+		if not player_hand_reference.is_connected("animation_finished", _on_animation_finished):
+			player_hand_reference.connect("animation_finished", _on_animation_finished)
 	for card in get_tree().get_nodes_in_group("cards"):
-		connect_card_signals(card)
-		card.z_index = base_z_index
+		if is_instance_valid(card):
+			connect_card_signals(card)
+			card.z_index = base_z_index
+
+func _notification(what):
+	if what == NOTIFICATION_PREDELETE:
+		cleanup()
+
+func _exit_tree():
+	cleanup()
 		
 func update_screen_size():
 	screen_size = get_viewport_rect().size
 
 func _process(_delta: float) -> void:
-	if card_being_dragged:
+	if card_being_dragged and is_instance_valid(card_being_dragged):
 		var mouse_pos = get_global_mouse_position()
 		card_being_dragged.position = Vector2(
 			clamp(mouse_pos.x, 0, screen_size.x),
@@ -42,13 +58,24 @@ func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.is_pressed():
 			if not animation_in_progress:
+				validate_references()
 				var card = raycast_check_for_card()
-				if card:
+				if card and can_drag_card(card):  # Нова проверка
 					start_drag(card)
 		elif card_being_dragged:  
 			finish_drag()
 	if event is InputEventMouseMotion:
+		validate_references()
 		handle_hover()
+
+func can_drag_card(card) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	if card.has_node("Area2D/CollisionShape2D"):
+		var collision_shape = card.get_node("Area2D/CollisionShape2D")
+		if collision_shape.disabled:
+			return false
+	return true
 
 func _on_animation_started():
 	animation_in_progress = true
@@ -57,29 +84,39 @@ func _on_animation_finished():
 	animation_in_progress = false
 
 func start_drag(card):
+	if not card or not is_instance_valid(card):
+		return
 	card_being_dragged = card
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.z_index = drag_z_index
 	card.scale = normal_scale
 	card.rotation = 0.0
-	if last_hovered_card and last_hovered_card != card:
-		if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
-			last_hovered_card.scale = normal_scale
-			last_hovered_card.z_index = base_z_index
+	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
+		if last_hovered_card.has_node("Area2D/CollisionShape2D"):
+			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
+				last_hovered_card.scale = normal_scale
+				last_hovered_card.z_index = base_z_index
 		last_hovered_card = null
 
 func finish_drag():
+	if not card_being_dragged or not is_instance_valid(card_being_dragged):
+		card_being_dragged = null
+		return
+	free_card_from_slot(card_being_dragged)
 	var card_slot_found = raycast_check_for_card_single_slot()
 	if card_slot_found:
-		player_hand_reference.remove_card_from_hand(card_being_dragged)
+		if player_hand_reference and card_being_dragged in player_hand_reference.player_hand:
+			player_hand_reference.remove_card_from_hand(card_being_dragged)
 		if card_slot_found.name == "MEMORY":
 			card_slot_found.add_card_to_memory(card_being_dragged)
-			card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
+			if card_being_dragged.has_node("Area2D/CollisionShape2D"):
+				card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
 			card_being_dragged.scale = hover_scale
 			card_being_dragged.z_index = base_z_index
 		elif not card_slot_found.card_in_slot:
 			card_being_dragged.position = card_slot_found.position
-			card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
+			if card_being_dragged.has_node("Area2D/CollisionShape2D"):
+				card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
 			card_slot_found.card_in_slot = true
 			card_being_dragged.scale = hover_scale
 			card_being_dragged.z_index = base_z_index
@@ -89,17 +126,35 @@ func finish_drag():
 			card_being_dragged.z_index = base_z_index + card_counter
 			card_counter += 1
 	else:
-		player_hand_reference.add_card_to_hand(card_being_dragged)
+		if player_hand_reference:
+			player_hand_reference.add_card_to_hand(card_being_dragged)
 		card_being_dragged.z_index = base_z_index + card_counter
 		card_counter += 1
 	card_being_dragged = null
 	call_deferred("force_hover_check")
 
+func free_card_from_slot(card):
+	if not card or not is_instance_valid(card):
+		return
+	if card.has_node("Area2D/CollisionShape2D"):
+		var collision_shape = card.get_node("Area2D/CollisionShape2D")
+		if collision_shape.disabled:
+			collision_shape.disabled = false
+			var all_slots = get_tree().get_nodes_in_group("card_slots")
+			for slot in all_slots:
+				if is_instance_valid(slot) and slot.has_method("get_card_position"):
+					var slot_pos = slot.get_card_position()
+					if card.position.distance_to(slot_pos) < 50:  
+						if slot.has_property("card_in_slot"):
+							slot.card_in_slot = false
+						break
+
 func force_hover_check():
+	validate_references()
 	handle_hover()
 	var mouse_pos = get_global_mouse_position()
 	var card = raycast_check_at_position(mouse_pos)
-	if card:
+	if card and is_instance_valid(card):
 		_on_card_hovered(card)
 
 func raycast_check_at_position(pos):
@@ -117,7 +172,7 @@ func raycast_check_at_position(pos):
 		var highest_z = -9999
 		for collision in result:
 			var card = collision.collider.get_parent()
-			if card.z_index > highest_z:
+			if card and is_instance_valid(card) and card.z_index > highest_z:
 				highest_card = card
 				highest_z = card.z_index
 		return highest_card
@@ -126,43 +181,75 @@ func raycast_check_at_position(pos):
 func handle_hover():
 	if card_being_dragged or animation_in_progress:
 		return
+	validate_references()
 	var current_card = raycast_check_for_card()
 	if current_card != last_hovered_card:
-		if last_hovered_card:
-			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
+		if last_hovered_card and is_instance_valid(last_hovered_card):
+			if can_drag_card(last_hovered_card):
 				last_hovered_card.scale = normal_scale
 				last_hovered_card.z_index = base_z_index
-		if current_card:
-			current_card.get_parent().move_child(current_card, current_card.get_parent().get_child_count())
-			current_card.scale = hover_scale
-			current_card.z_index = hover_z_index
+		if current_card and is_instance_valid(current_card):
+			if can_drag_card(current_card):
+				current_card.get_parent().move_child(current_card, current_card.get_parent().get_child_count())
+				current_card.scale = hover_scale
+				current_card.z_index = hover_z_index
 		last_hovered_card = current_card
-
+		
 func connect_card_signals(card):
-	if card.get_node("Area2D").is_connected("mouse_entered", Callable(self, "_on_card_hovered")):
-		card.get_node("Area2D").disconnect("mouse_entered", Callable(self, "_on_card_hovered"))
-	if card.get_node("Area2D").is_connected("mouse_exited", Callable(self, "_on_card_unhovered")):
-		card.get_node("Area2D").disconnect("mouse_exited", Callable(self, "_on_card_unhovered"))
-	card.get_node("Area2D").connect("mouse_entered", Callable(self, "_on_card_hovered").bind(card))
-	card.get_node("Area2D").connect("mouse_exited", Callable(self, "_on_card_unhovered").bind(card))
+	if not card or not is_instance_valid(card) or not card.has_node("Area2D"):
+		return
+	var area = card.get_node("Area2D")
+	var card_id = card.get_instance_id()
+	disconnect_card_signals(card)
+	var callable_hovered = Callable(self, "_on_card_hovered").bind(card)
+	var callable_unhovered = Callable(self, "_on_card_unhovered").bind(card)
+	area.connect("mouse_entered", callable_hovered)
+	area.connect("mouse_exited", callable_unhovered)
+	signal_connections[card_id] = {
+		"area": area,
+		"mouse_entered": callable_hovered,
+		"mouse_exited": callable_unhovered
+	}
+	if card not in connected_cards:
+		connected_cards.append(card)
+
+func disconnect_card_signals(card):
+	if not card or not is_instance_valid(card):
+		return
+	var card_id = card.get_instance_id()
+	if card_id in signal_connections:
+		var connection_data = signal_connections[card_id]
+		var area = connection_data["area"]
+		if is_instance_valid(area):
+			if area.is_connected("mouse_entered", connection_data["mouse_entered"]):
+				area.disconnect("mouse_entered", connection_data["mouse_entered"])
+			if area.is_connected("mouse_exited", connection_data["mouse_exited"]):
+				area.disconnect("mouse_exited", connection_data["mouse_exited"])
+		signal_connections.erase(card_id)
+	if card in connected_cards:
+		connected_cards.erase(card)
 
 func _on_card_hovered(card):
-	if card != card_being_dragged and not animation_in_progress:
-		card.get_parent().move_child(card, card.get_parent().get_child_count())
-		card.scale = hover_scale
-		card.z_index = hover_z_index
-		if last_hovered_card and last_hovered_card != card:
-			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
-				last_hovered_card.scale = normal_scale
-				last_hovered_card.z_index = base_z_index
-		last_hovered_card = card
+	if not card or not is_instance_valid(card) or card == card_being_dragged or animation_in_progress:
+		return
+	if not can_drag_card(card):
+		return
+	card.get_parent().move_child(card, card.get_parent().get_child_count())
+	card.scale = hover_scale
+	card.z_index = hover_z_index
+	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
+		if can_drag_card(last_hovered_card):
+			last_hovered_card.scale = normal_scale
+			last_hovered_card.z_index = base_z_index
+	last_hovered_card = card
 
 func _on_card_unhovered(card):
-	if card != card_being_dragged and card == last_hovered_card and not animation_in_progress:
-		if not card.get_node("Area2D/CollisionShape2D").disabled:
-			card.scale = normal_scale
-			card.z_index = base_z_index
-		last_hovered_card = null
+	if not card or not is_instance_valid(card) or card == card_being_dragged or card != last_hovered_card or animation_in_progress:
+		return
+	if can_drag_card(card):
+		card.scale = normal_scale
+		card.z_index = base_z_index
+	last_hovered_card = null
 
 func raycast_check_for_card_single_slot():
 	var space_state = get_world_2d().direct_space_state
@@ -173,7 +260,6 @@ func raycast_check_for_card_single_slot():
 	parameters.collide_with_areas = true
 	parameters.collision_mask = COLLISION_MASK_CARD_SINGLE_SLOT
 	parameters.collide_with_bodies = false
-	
 	var result = space_state.intersect_point(parameters, 1)
 	if result.size() > 0:
 		return result[0].collider.get_parent()
@@ -181,3 +267,42 @@ func raycast_check_for_card_single_slot():
 
 func raycast_check_for_card():
 	return raycast_check_at_position(get_global_mouse_position())
+
+func validate_references():
+	if last_hovered_card and not is_instance_valid(last_hovered_card):
+		last_hovered_card = null
+	if card_being_dragged and not is_instance_valid(card_being_dragged):
+		card_being_dragged = null
+	if player_hand_reference and not is_instance_valid(player_hand_reference):
+		player_hand_reference = null
+	var invalid_cards = []
+	for card in connected_cards:
+		if not card or not is_instance_valid(card):
+			invalid_cards.append(card)
+	for invalid_card in invalid_cards:
+		connected_cards.erase(invalid_card)
+	var invalid_connections = []
+	for card_id in signal_connections.keys():
+		var connection_data = signal_connections[card_id]
+		if not is_instance_valid(connection_data["area"]):
+			invalid_connections.append(card_id)
+	for invalid_id in invalid_connections:
+		signal_connections.erase(invalid_id)
+
+func cleanup():
+	card_being_dragged = null
+	last_hovered_card = null
+	var viewport = get_viewport()
+	if viewport and viewport.is_connected("size_changed", Callable(self, "update_screen_size")):
+		viewport.disconnect("size_changed", Callable(self, "update_screen_size"))
+	if player_hand_reference and is_instance_valid(player_hand_reference):
+		if player_hand_reference.is_connected("animation_started", _on_animation_started):
+			player_hand_reference.disconnect("animation_started", _on_animation_started)
+		if player_hand_reference.is_connected("animation_finished", _on_animation_finished):
+			player_hand_reference.disconnect("animation_finished", _on_animation_finished)
+	for card in connected_cards.duplicate():
+		if is_instance_valid(card):
+			disconnect_card_signals(card)
+	connected_cards.clear()
+	signal_connections.clear()
+	player_hand_reference = null
