@@ -13,39 +13,40 @@
 [node name="Main" type="Node2D"]
 
 [node name="CardManager" type="Node2D" parent="."]
-z_index = 1
 script = ExtResource("1_uu6xs")
 
 [node name="GAField" type="Node2D" parent="."]
 
 [node name="FieldGa" type="Sprite2D" parent="GAField"]
-position = Vector2(980, 795)
+z_index = -1
+position = Vector2(980, 800)
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
 [node name="FieldGa2" type="Sprite2D" parent="GAField"]
-position = Vector2(980, 285)
+z_index = -1
+position = Vector2(980, 280)
 rotation = -3.14159
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
 [node name="MAIN DECK" parent="GAField" instance=ExtResource("4_fos0i")]
-position = Vector2(1360.5, 775)
+position = Vector2(1360.5, 780)
 scale = Vector2(0.974279, 0.966266)
 
 [node name="GRAVEYARD" parent="GAField" instance=ExtResource("4_fos0i")]
-position = Vector2(1362.7, 933.3)
+position = Vector2(1362.7, 938.3)
 scale = Vector2(0.977783, 0.974084)
 
 [node name="MAT_ DECK" parent="GAField" instance=ExtResource("4_fos0i")]
-position = Vector2(599, 775.5)
+position = Vector2(599, 780.5)
 scale = Vector2(0.972429, 0.971529)
 
 [node name="BANISH" parent="GAField" instance=ExtResource("5_3dxm6")]
-position = Vector2(1342, 637)
+position = Vector2(1342, 642)
 
 [node name="MEMORY" parent="GAField" instance=ExtResource("6_lgr22")]
-position = Vector2(975, 968)
+position = Vector2(975, 973)
 script = ExtResource("7_trn2v")
 
 [node name="MAINFIELD" parent="GAField" instance=ExtResource("7_50glp")]
