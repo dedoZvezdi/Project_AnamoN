@@ -60,7 +60,7 @@ func _input(event):
 			if not animation_in_progress:
 				validate_references()
 				var card = raycast_check_for_card()
-				if card and can_drag_card(card):  # Нова проверка
+				if card and can_drag_card(card):
 					start_drag(card)
 		elif card_being_dragged:  
 			finish_drag()
@@ -144,11 +144,11 @@ func free_card_from_slot(card):
 			for slot in all_slots:
 				if is_instance_valid(slot) and slot.has_method("get_card_position"):
 					var slot_pos = slot.get_card_position()
-					if card.position.distance_to(slot_pos) < 50:  
+					if card.position.distance_to(slot_pos) < 50:
 						if slot.has_property("card_in_slot"):
 							slot.card_in_slot = false
 						break
-
+						
 func force_hover_check():
 	validate_references()
 	handle_hover()
@@ -194,7 +194,7 @@ func handle_hover():
 				current_card.scale = hover_scale
 				current_card.z_index = hover_z_index
 		last_hovered_card = current_card
-		
+
 func connect_card_signals(card):
 	if not card or not is_instance_valid(card) or not card.has_node("Area2D"):
 		return
@@ -230,8 +230,12 @@ func disconnect_card_signals(card):
 		connected_cards.erase(card)
 
 func _on_card_hovered(card):
-	if not card or not is_instance_valid(card) or card == card_being_dragged or animation_in_progress:
+	if not card or not is_instance_valid(card) or animation_in_progress:
 		return
+	if card == card_being_dragged:
+		return
+	if card_being_dragged:
+		return 
 	if not can_drag_card(card):
 		return
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
