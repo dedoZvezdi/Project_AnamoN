@@ -26,3 +26,7 @@ window/stretch/mode="canvas_items"
 [dotnet]
 
 project/assembly_name="New Game Project"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
