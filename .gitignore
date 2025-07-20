@@ -5,4 +5,8 @@ Project_AnamoN.console.exe
 rcedit-x64.exe
 .uid
 *.import
-*.godot
+project.godot
+.github/workflows
+icon.svg
+export_presets.cfg
+.gitattributes
