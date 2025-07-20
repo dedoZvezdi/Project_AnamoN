@@ -4,3 +4,5 @@
 Project_AnamoN.console.exe
 rcedit-x64.exe
 .uid
+*.import
+*.godot

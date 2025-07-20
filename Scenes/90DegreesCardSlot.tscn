@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bibopkgjli11i"]
 
-[ext_resource type="Script" uid="uid://wnj3l1f3q2kj" path="res://90DegreesCardSlot.gd" id="1_xluvn"]
+[ext_resource type="Script" uid="uid://wnj3l1f3q2kj" path="res://Scripts/90DegreesCardSlot.gd" id="1_xluvn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cm0pq"]
 size = Vector2(128, 90)
