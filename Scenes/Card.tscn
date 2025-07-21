@@ -7,14 +7,16 @@
 size = Vector2(246, 344)
 
 [node name="Card" type="Node2D"]
+z_index = -2
+position = Vector2(1360.5, 780)
+scale = Vector2(0.387084, 0.388501)
 script = ExtResource("1_hael8")
 
-[node name="Area2D" type="Area2D" parent="."]
-
-[node name="GaBack" type="Sprite2D" parent="Area2D"]
-position = Vector2(-6.02007e-06, -0.100017)
+[node name="GaBack" type="Sprite2D" parent="."]
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_3p273")
+
+[node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("RectangleShape2D_hael8")
