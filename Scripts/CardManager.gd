@@ -18,6 +18,7 @@ var connected_cards = []
 var signal_connections = {}
 
 func _ready() -> void:
+	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
 	player_hand_reference = $"../PlayerHand"
 	update_screen_size()
 	var viewport = get_viewport()
@@ -54,19 +55,19 @@ func _process(_delta: float) -> void:
 			clamp(mouse_pos.y, 0, screen_size.y)
 		)
 
-func _input(event):
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.is_pressed():
-			if not animation_in_progress:
-				validate_references()
-				var card = raycast_check_for_card()
-				if card and can_drag_card(card):
-					start_drag(card)
-		elif card_being_dragged:  
-			finish_drag()
-	if event is InputEventMouseMotion:
-		validate_references()
-		handle_hover()
+#func _input(event):
+	#if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		#if event.is_pressed():
+			#if not animation_in_progress:
+				#validate_references()
+				#var card = raycast_check_for_card()
+				#if card and can_drag_card(card):
+					#start_drag(card)
+		#elif card_being_dragged:  
+			#finish_drag()
+	#if event is InputEventMouseMotion:
+		#validate_references()
+		#handle_hover()
 
 func can_drag_card(card) -> bool:
 	if not card or not is_instance_valid(card):
@@ -212,6 +213,10 @@ func connect_card_signals(card):
 	}
 	if card not in connected_cards:
 		connected_cards.append(card)
+
+func on_left_click_released():
+	if card_being_dragged:  
+		finish_drag()
 
 func disconnect_card_signals(card):
 	if not card or not is_instance_valid(card):

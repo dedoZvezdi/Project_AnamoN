@@ -10,3 +10,5 @@ project.godot
 icon.svg
 export_presets.cfg
 .gitattributes
+project.godot
+*.uid

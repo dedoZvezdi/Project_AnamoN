@@ -3,8 +3,6 @@ extends Node2D
 signal animation_started
 signal animation_finished
 
-const HAND_COUNT = 11
-const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const CARD_WIDTH = 100
 const HAND_Y_POSITION = 1000
 const FIELD_Z_INDEX = 0
@@ -26,13 +24,6 @@ func _ready() -> void:
 	center_screen_x = get_viewport().size.x / 2
 	hand_field_left = center_screen_x - HAND_FIELD_WIDTH / 2.0
 	hand_field_right = center_screen_x + HAND_FIELD_WIDTH / 2.0
-	var card_scene = preload(CARD_SCENE_PATH)
-	for i in range(HAND_COUNT):
-		var new_card = card_scene.instantiate()
-		$"../CardManager".add_child(new_card)
-		new_card.name = "Card" + str(i)
-		new_card.z_index = HAND_Z_INDEX + i
-		add_card_to_hand(new_card)
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:

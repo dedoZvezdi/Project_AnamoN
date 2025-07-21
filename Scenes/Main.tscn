@@ -1,25 +1,23 @@
-[gd_scene load_steps=11 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=14 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
 [ext_resource type="PackedScene" uid="uid://bibopkgjli11i" path="res://Scenes/90DegreesCardSlot.tscn" id="5_3dxm6"]
 [ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Grand Archive/Field_ga.png" id="5_fos0i"]
+[ext_resource type="Script" uid="uid://dhexhmgxdwua4" path="res://Scripts/GA_DECK.gd" id="5_grg3l"]
 [ext_resource type="PackedScene" uid="uid://d2vjqup3tyk8n" path="res://Scenes/Memory.tscn" id="6_lgr22"]
 [ext_resource type="PackedScene" uid="uid://cukst25b8s0nx" path="res://Scenes/MainField.tscn" id="7_50glp"]
 [ext_resource type="Script" uid="uid://c4b8m0yjikah3" path="res://Scripts/PlayerHand.gd" id="7_lgr22"]
 [ext_resource type="Script" uid="uid://drubil22n7oyl" path="res://Scripts/MemoryCardsSlot.gd" id="7_trn2v"]
 [ext_resource type="Script" uid="uid://c6mhpaese60l2" path="res://Scripts/Main_Field.gd" id="8_vy5pj"]
+[ext_resource type="PackedScene" uid="uid://bhhjuuiiuqcoi" path="res://Scenes/ga_deck.tscn" id="10_4kpch"]
 [ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/background.png" id="10_bmxlf"]
+[ext_resource type="Script" uid="uid://bp1qbo2oxuy1p" path="res://Scenes/InputManager.gd" id="13_frkhe"]
 
 [node name="Main" type="Node2D"]
 
 [node name="CardManager" type="Node2D" parent="."]
 script = ExtResource("1_uu6xs")
-
-[node name="Background" type="Sprite2D" parent="."]
-z_index = -2
-position = Vector2(960, 541)
-texture = ExtResource("10_bmxlf")
 
 [node name="GAField" type="Node2D" parent="."]
 modulate = Color(1, 1, 1, 0.647059)
@@ -37,28 +35,37 @@ rotation = -3.14159
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
-[node name="MAIN DECK" parent="GAField" instance=ExtResource("4_fos0i")]
-position = Vector2(1360.5, 780)
-scale = Vector2(0.974279, 0.966266)
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -2
+position = Vector2(960, 541)
+texture = ExtResource("10_bmxlf")
 
-[node name="GRAVEYARD" parent="GAField" instance=ExtResource("4_fos0i")]
+[node name="GA_DECK" parent="." instance=ExtResource("10_4kpch")]
+position = Vector2(1360.5, 780)
+scale = Vector2(0.192, 0.192)
+script = ExtResource("5_grg3l")
+
+[node name="GRAVEYARD" parent="." instance=ExtResource("4_fos0i")]
 position = Vector2(1362.7, 938.3)
 scale = Vector2(0.977783, 0.974084)
 
-[node name="MAT_ DECK" parent="GAField" instance=ExtResource("4_fos0i")]
+[node name="MAT_ DECK" parent="." instance=ExtResource("4_fos0i")]
 position = Vector2(599, 780.5)
 scale = Vector2(0.972429, 0.971529)
 
-[node name="BANISH" parent="GAField" instance=ExtResource("5_3dxm6")]
+[node name="BANISH" parent="." instance=ExtResource("5_3dxm6")]
 position = Vector2(1342, 642)
 
-[node name="MEMORY" parent="GAField" instance=ExtResource("6_lgr22")]
+[node name="MEMORY" parent="." instance=ExtResource("6_lgr22")]
 position = Vector2(975, 973)
 script = ExtResource("7_trn2v")
 
-[node name="MAINFIELD" parent="GAField" instance=ExtResource("7_50glp")]
+[node name="MAINFIELD" parent="." instance=ExtResource("7_50glp")]
 position = Vector2(961, 710)
 script = ExtResource("8_vy5pj")
 
 [node name="PlayerHand" type="Node2D" parent="."]
 script = ExtResource("7_lgr22")
+
+[node name="InputManager" type="Node2D" parent="."]
+script = ExtResource("13_frkhe")
