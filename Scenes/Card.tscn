@@ -12,7 +12,7 @@ position = Vector2(1360.5, 780)
 scale = Vector2(0.387084, 0.388501)
 script = ExtResource("1_hael8")
 
-[node name="GaBack" type="Sprite2D" parent="."]
+[node name="CardImage" type="Sprite2D" parent="."]
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_3p273")
 
