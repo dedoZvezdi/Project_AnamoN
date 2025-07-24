@@ -4,12 +4,12 @@ signal animation_started
 signal animation_finished
 
 const CARD_WIDTH = 100
-const HAND_Y_POSITION = 1030
+const HAND_Y_POSITION = 1010
 const FIELD_Z_INDEX = 0
 const HAND_Z_INDEX = 100
 const MIN_CARD_SPACING = 10
 const MAX_CARD_SPACING = 60
-const BASE_CURVE_HEIGHT = 20
+const BASE_CURVE_HEIGHT = 10
 
 var HAND_FIELD_WIDTH = 600
 var player_hand = []
@@ -19,6 +19,7 @@ var hand_field_right
 var active_tweens = 0
 var animation_in_progress = false
 var active_tween_objects = []
+var hovered_card = null
 
 func _ready() -> void:
 	center_screen_x = get_viewport().size.x / 2
@@ -56,13 +57,11 @@ func update_hand_position():
 			var new_position = calculate_card_position(i)
 			var new_rotation = calculate_card_rotation(i)
 			card.hand_position = new_position
-			card.z_index = HAND_Z_INDEX + i
+			card.z_index = HAND_Z_INDEX + i + 1
 			animate_card_to_position(card, new_position, new_rotation)
 
 func calculate_card_position(index):
 	var hand_size = player_hand.size()
-	if hand_size == 0:
-		return Vector2(center_screen_x, HAND_Y_POSITION)
 	if hand_size == 1:
 		return Vector2(center_screen_x, HAND_Y_POSITION)
 	var card_spacing = calculate_card_spacing(hand_size)
@@ -81,7 +80,7 @@ func calculate_card_position(index):
 	var ratio = 0.0
 	if hand_size > 1:
 		ratio = float(index) / float(hand_size - 1)
-	var curve_height = BASE_CURVE_HEIGHT
+	var curve_height = calculate_curve_height(hand_size)
 	var curve_factor = 4 * ratio * (1.0 - ratio)
 	var y_position = HAND_Y_POSITION - curve_factor * curve_height
 	return Vector2(x_position, y_position)
@@ -96,22 +95,23 @@ func calculate_card_spacing(hand_size):
 		ideal_spacing = max(ideal_spacing, MIN_CARD_SPACING)
 	return ideal_spacing
 
-#TODO
-#func calculate_curve_height(hand_size):
-	#if hand_size == 3:
-		#return 10
-	#elif hand_size == 4:
-		#return 15
-	#else:
-		#return BASE_CURVE_HEIGHT  
+func calculate_curve_height(hand_size):
+	if hand_size == 3:
+		return 4
+	elif hand_size == 4:
+		return 6
+	elif hand_size == 5:
+		return 8
+	else:
+		return BASE_CURVE_HEIGHT  
 
 func get_dynamic_max_angle(hand_size: int) -> float:
 	if hand_size <= 1:
 		return 0.0
-	elif hand_size <= 5:
-		return lerp(0.0, 15.0, (hand_size - 1) / 4.0)
+	elif hand_size <= 3:
+		return lerp(0.0, 6.0, (hand_size - 1) / 4.0)
 	else:
-		return clamp(30.0 / sqrt(hand_size), 4.0, 15.0)
+		return clamp(30.0 / sqrt(hand_size), 4.0, 6.0)
 
 func calculate_card_rotation(index):
 	var hand_size = player_hand.size()
@@ -183,7 +183,6 @@ func place_card_in_field(card, field_position, field_rotation = 0.0):
 			update_hand_position()
 		else:
 			end_animation()
-	
 	card.z_index = FIELD_Z_INDEX
 	var tween = create_tween()
 	active_tween_objects.append(tween)
@@ -216,11 +215,26 @@ func set_hand_field_width(new_width: float):
 func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):
 		return
-	var max_z = HAND_Z_INDEX
-	for hand_card in player_hand:
-		if hand_card and is_instance_valid(hand_card) and hand_card.z_index > max_z:
-			max_z = hand_card.z_index
-	card.z_index = max_z + 1
+	hovered_card = card
+	var hovered_card_index = player_hand.find(card)
+	if hovered_card_index == -1:
+		return
+	var hand_size = player_hand.size()
+	for i in range(hand_size):
+		var current_card = player_hand[i]
+		if current_card and is_instance_valid(current_card):
+			if i >= hovered_card_index:
+				current_card.z_index = HAND_Z_INDEX + i + 100
+			else:
+				current_card.z_index = HAND_Z_INDEX + i + 1
+
+func clear_hovered_card():
+	hovered_card = null
+	var hand_size = player_hand.size()
+	for i in range(hand_size):
+		var card = player_hand[i]
+		if card and is_instance_valid(card):
+			card.z_index = HAND_Z_INDEX + i + 1
 
 func set_card_z_index(card, z_value: int):
 	if card and is_instance_valid(card):

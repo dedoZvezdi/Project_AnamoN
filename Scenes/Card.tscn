@@ -8,6 +8,7 @@ size = Vector2(246, 344)
 
 [node name="Card" type="Node2D"]
 z_index = -2
+texture_filter = 2
 position = Vector2(1360.5, 780)
 scale = Vector2(0.39, 0.39)
 script = ExtResource("1_hael8")
