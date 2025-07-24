@@ -4,7 +4,7 @@ signal animation_started
 signal animation_finished
 
 const CARD_WIDTH = 100
-const HAND_Y_POSITION = 1000
+const HAND_Y_POSITION = 1030
 const FIELD_Z_INDEX = 0
 const HAND_Z_INDEX = 100
 const MIN_CARD_SPACING = 10
@@ -96,9 +96,14 @@ func calculate_card_spacing(hand_size):
 		ideal_spacing = max(ideal_spacing, MIN_CARD_SPACING)
 	return ideal_spacing
 
-#TODO(maybe i can thing of a better algoritm but for now this...)
+#TODO
 #func calculate_curve_height(hand_size):
-#	return BASE_CURVE_HEIGHT  
+	#if hand_size == 3:
+		#return 10
+	#elif hand_size == 4:
+		#return 15
+	#else:
+		#return BASE_CURVE_HEIGHT  
 
 func get_dynamic_max_angle(hand_size: int) -> float:
 	if hand_size <= 1:

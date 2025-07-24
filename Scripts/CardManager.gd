@@ -6,8 +6,8 @@ const COLLISION_MASK_CARD_SINGLE_SLOT = 2
 var screen_size
 var card_being_dragged = null
 var last_hovered_card = null
-var normal_scale = Vector2(0.349, 0.349)
-var hover_scale = Vector2(0.39, 0.39)
+var normal_scale = Vector2(0.39, 0.39)
+var hover_scale = Vector2(0.46, 0.46)
 var base_z_index = 0
 var hover_z_index = 10
 var drag_z_index = 20
@@ -112,14 +112,14 @@ func finish_drag():
 			card_slot_found.add_card_to_memory(card_being_dragged)
 			if card_being_dragged.has_node("Area2D/CollisionShape2D"):
 				card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
-			card_being_dragged.scale = hover_scale
+			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
 		elif not card_slot_found.card_in_slot:
 			card_being_dragged.position = card_slot_found.position
 			if card_being_dragged.has_node("Area2D/CollisionShape2D"):
 				card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
 			card_slot_found.card_in_slot = true
-			card_being_dragged.scale = hover_scale
+			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
 			if card_slot_found.name == "90DegreesCardSlot" or card_slot_found.is_in_group("rotated_slots"):
 				card_being_dragged.rotation_degrees = -90
