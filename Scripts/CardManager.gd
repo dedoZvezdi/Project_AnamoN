@@ -55,20 +55,6 @@ func _process(_delta: float) -> void:
 			clamp(mouse_pos.y, 0, screen_size.y)
 		)
 
-#func _input(event):
-	#if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		#if event.is_pressed():
-			#if not animation_in_progress:
-				#validate_references()
-				#var card = raycast_check_for_card()
-				#if card and can_drag_card(card):
-					#start_drag(card)
-		#elif card_being_dragged:  
-			#finish_drag()
-	#if event is InputEventMouseMotion:
-		#validate_references()
-		#handle_hover()
-
 func can_drag_card(card) -> bool:
 	if not card or not is_instance_valid(card):
 		return false
@@ -96,7 +82,6 @@ func start_drag(card):
 		if last_hovered_card.has_node("Area2D/CollisionShape2D"):
 			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
 				last_hovered_card.scale = normal_scale
-				last_hovered_card.z_index = base_z_index
 		last_hovered_card = null
 
 func finish_drag():
@@ -129,8 +114,6 @@ func finish_drag():
 	else:
 		if player_hand_reference:
 			player_hand_reference.add_card_to_hand(card_being_dragged)
-		card_being_dragged.z_index = base_z_index + card_counter
-		card_counter += 1
 	card_being_dragged = null
 	call_deferred("force_hover_check")
 
@@ -152,11 +135,36 @@ func free_card_from_slot(card):
 						
 func force_hover_check():
 	validate_references()
+	await get_tree().process_frame
 	handle_hover()
 	var mouse_pos = get_global_mouse_position()
 	var card = raycast_check_at_position(mouse_pos)
 	if card and is_instance_valid(card):
 		_on_card_hovered(card)
+
+func is_card_truly_hovered(card) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	var mouse_pos = get_global_mouse_position()
+	var space_state = get_world_2d().direct_space_state
+	if !space_state:
+		return false
+	var parameters = PhysicsPointQueryParameters2D.new()
+	parameters.position = mouse_pos
+	parameters.collide_with_areas = true
+	parameters.collision_mask = COLLISION_MASK_CARD
+	parameters.collide_with_bodies = false
+	var result = space_state.intersect_point(parameters)
+	if result.size() == 0:
+		return false
+	var highest_card = null
+	var highest_z = -9999
+	for collision in result:
+		var detected_card = collision.collider.get_parent()
+		if detected_card and is_instance_valid(detected_card) and detected_card.z_index > highest_z:
+			highest_card = detected_card
+			highest_z = detected_card.z_index
+	return highest_card == card
 
 func raycast_check_at_position(pos):
 	var space_state = get_world_2d().direct_space_state
@@ -184,16 +192,25 @@ func handle_hover():
 		return
 	validate_references()
 	var current_card = raycast_check_for_card()
+	if current_card and is_instance_valid(current_card):
+		if not is_card_truly_hovered(current_card):
+			current_card = null
 	if current_card != last_hovered_card:
 		if last_hovered_card and is_instance_valid(last_hovered_card):
 			if can_drag_card(last_hovered_card):
 				last_hovered_card.scale = normal_scale
-				last_hovered_card.z_index = base_z_index
+				if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
+					player_hand_reference.clear_hovered_card()
+				else:
+					last_hovered_card.z_index = base_z_index
 		if current_card and is_instance_valid(current_card):
 			if can_drag_card(current_card):
 				current_card.get_parent().move_child(current_card, current_card.get_parent().get_child_count())
 				current_card.scale = hover_scale
-				current_card.z_index = hover_z_index
+				if player_hand_reference and current_card in player_hand_reference.player_hand:
+					player_hand_reference.bring_card_to_front(current_card)
+				else:
+					current_card.z_index = hover_z_index
 		last_hovered_card = current_card
 
 func connect_card_signals(card):
@@ -243,13 +260,24 @@ func _on_card_hovered(card):
 		return 
 	if not can_drag_card(card):
 		return
+	if card == last_hovered_card:
+		return
+	if not is_card_truly_hovered(card):
+		return
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.scale = hover_scale
-	card.z_index = hover_z_index
+	if player_hand_reference and card in player_hand_reference.player_hand:
+		player_hand_reference.bring_card_to_front(card)
+	else:
+		card.z_index = hover_z_index
 	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
 		if can_drag_card(last_hovered_card):
 			last_hovered_card.scale = normal_scale
-			last_hovered_card.z_index = base_z_index
+			# Само за карти в ръката
+			if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
+				player_hand_reference.clear_hovered_card()
+			else:
+				last_hovered_card.z_index = base_z_index
 	last_hovered_card = card
 
 func _on_card_unhovered(card):
@@ -257,7 +285,10 @@ func _on_card_unhovered(card):
 		return
 	if can_drag_card(card):
 		card.scale = normal_scale
-		card.z_index = base_z_index
+		if player_hand_reference and card in player_hand_reference.player_hand:
+			player_hand_reference.clear_hovered_card()
+		else:
+			card.z_index = base_z_index
 	last_hovered_card = null
 
 func raycast_check_for_card_single_slot():

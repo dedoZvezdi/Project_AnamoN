@@ -1,6 +1,8 @@
 extends Node2D
 
-var player_deck = ["academy-guide-p24", "absolving-flames-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb"]
+var player_deck = ["academy-guide-p24", "absolving-flames-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb"
+,"acolyte-of-cultivation-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb"
+,"acolyte-of-cultivation-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb"]
 var card_database_reference
 
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
