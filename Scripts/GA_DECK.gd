@@ -25,3 +25,4 @@ func draw_card():
 	$"../CardManager".add_child(new_card)
 	new_card.name = "Card"
 	$"../PlayerHand".add_card_to_hand(new_card)
+	new_card.get_node("AnimationPlayer").play("card_flip")
