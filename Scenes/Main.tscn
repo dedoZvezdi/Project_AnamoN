@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=15 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
@@ -12,7 +12,8 @@
 [ext_resource type="Script" uid="uid://c6mhpaese60l2" path="res://Scripts/Main_Field.gd" id="8_vy5pj"]
 [ext_resource type="PackedScene" uid="uid://bhhjuuiiuqcoi" path="res://Scenes/ga_deck.tscn" id="10_4kpch"]
 [ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/background.png" id="10_bmxlf"]
-[ext_resource type="Script" uid="uid://bp1qbo2oxuy1p" path="res://Scenes/InputManager.gd" id="13_frkhe"]
+[ext_resource type="Script" uid="uid://bp1qbo2oxuy1p" path="res://Scripts/InputManager.gd" id="13_frkhe"]
+[ext_resource type="PackedScene" uid="uid://db2eqitvw1e27" path="res://Scenes/CardInformation.tscn" id="14_1p5hy"]
 
 [node name="Main" type="Node2D"]
 
@@ -69,3 +70,5 @@ script = ExtResource("7_lgr22")
 
 [node name="InputManager" type="Node2D" parent="."]
 script = ExtResource("13_frkhe")
+
+[node name="CardInformation" parent="." instance=ExtResource("14_1p5hy")]
