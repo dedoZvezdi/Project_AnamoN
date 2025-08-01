@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://8t1wk8td74mg"]
+
+[ext_resource type="Texture2D" uid="uid://dp13akpgvpavm" path="res://Assets/Grand Archive/Elements/neos.png" id="1_b7xm6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3cf0d"]
+radius = 31.0161
+
+[node name="Neos" type="Node2D"]
+scale = Vector2(0.42, 0.42)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.498039)
+texture = ExtResource("1_b7xm6")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_3cf0d")
