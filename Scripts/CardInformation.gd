@@ -1,7 +1,8 @@
 extends Node2D
 
 @onready var preview_sprite = $Sprite2D
-@onready var card_name_label = $RichTextLabel
+@onready var card_name_label = $Name
+@onready var card_effect_lable = $Effect
 var card_database_reference = null
 var default_texture = null
 var card_manager_reference = null
@@ -44,35 +45,45 @@ func show_card_preview(card):
 func show_card_info(slug: String):
 	if not slug or not card_name_label:
 		return
-	
+
 	card_name_label.clear()
+	card_effect_lable.clear()  # 🆕 Почисти ефекта
+
 	var name_to_display = ""
-	
+	var effect_to_display = ""
+
 	if card_database_reference and card_database_reference.cards_db.has(slug):
 		var data = card_database_reference.cards_db[slug]
 		
-		# 1. Проверка за EDITION (заредено от load_editions)
 		if data.has("edition_id") and not data.has("parent_orientation_slug"):
 			var base_slug = find_base_card_for_edition(data["edition_id"])
 			if base_slug and card_database_reference.cards_db.has(base_slug):
-				name_to_display = card_database_reference.cards_db[base_slug].get("name", "")
+				var base_data = card_database_reference.cards_db[base_slug]
+				name_to_display = base_data.get("name", "")
+				effect_to_display = base_data.get("effect_raw", "")
 		
-		# 2. Проверка за ORIENTATION EDITION (заредено от load_orientation_editions)
 		elif data.has("parent_orientation_slug"):
 			var parent_slug = data["parent_orientation_slug"]
 			if card_database_reference.cards_db.has(parent_slug):
-				name_to_display = card_database_reference.cards_db[parent_slug].get("name", "")
-		elif data.has("name"):
+				var parent_data = card_database_reference.cards_db[parent_slug]
+				name_to_display = parent_data.get("name", "")
+				effect_to_display = parent_data.get("effect_raw", "")
+		
+		else:
 			name_to_display = data.get("name", "")
+			effect_to_display = data.get("effect_raw", "")
 	
 	if name_to_display != "":
-		card_name_label.append_text("[center][b]%s[/b][/center]" % name_to_display.strip_edges())
+		var cleaned_name = fix_weird_quotes_and_dashes(name_to_display.strip_edges())
+		card_name_label.append_text("[center][b]%s[/b][/center]" % cleaned_name)
+
+	if effect_to_display != "":
+		var cleaned_effect = fix_weird_quotes_and_dashes(effect_to_display.strip_edges())
+		card_effect_lable.append_text(cleaned_effect)
 
 func find_parent_orientation_for_edition(edition_slug: String):
-	# Търси в orientation editions
 	for card_slug in card_database_reference.cards_db:
 		var card_data = card_database_reference.cards_db[card_slug]
-		# Проверява дали има editions и търси в тях
 		if card_data.has("editions"):
 			for edition in card_data.get("editions", []):
 				if edition.get("slug") == edition_slug:
@@ -99,3 +110,16 @@ func get_slug_from_card(card) -> String:
 	if card.has_meta("slug"):
 		return card.get_meta("slug")
 	return ""
+	
+func fix_weird_quotes_and_dashes(text: String) -> String:
+	var replacements = {
+		"вЂ™": "'",
+		"вЂ”": "-",
+		"вЂњ": "\"",
+		"вЂќ": "\"",
+		"вЂ“": "-",
+		"вЂ¦": "..."
+	}
+	for weird_char in replacements:
+		text = text.replace(weird_char, replacements[weird_char])
+	return text

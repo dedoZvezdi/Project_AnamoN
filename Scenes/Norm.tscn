@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://cw3lmoyxw8aue"]
+
+[ext_resource type="Texture2D" uid="uid://452iukjgd5fw" path="res://Assets/Grand Archive/Elements/norm.png" id="1_vmwgn"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_spcua"]
+radius = 26.0
+
+[node name="Norm" type="Node2D"]
+scale = Vector2(0.5, 0.5)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_vmwgn")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_spcua")

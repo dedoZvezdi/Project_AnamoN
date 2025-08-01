@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2q27vj536tlk"]
+
+[ext_resource type="Texture2D" uid="uid://bstwac16wwl37" path="res://Assets/Grand Archive/Elements/fire.png" id="1_t8fvv"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_j8afo"]
+radius = 25.0799
+
+[node name="Fire" type="Node2D"]
+scale = Vector2(0.5, 0.5)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.498039)
+texture = ExtResource("1_t8fvv")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_j8afo")

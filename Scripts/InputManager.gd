@@ -35,7 +35,7 @@ func raycast_for_card():
 	var parameters = PhysicsPointQueryParameters2D.new()
 	parameters.position = get_global_mouse_position()
 	parameters.collide_with_areas = true
-	parameters.collision_mask = COLLISION_MASK_CARD | COLLISION_MASK_CARD_DECK  # Проверява и двете
+	parameters.collision_mask = COLLISION_MASK_CARD | COLLISION_MASK_CARD_DECK
 	parameters.collide_with_bodies = false
 	var result = space_state.intersect_point(parameters)
 	if result.size() > 0:
