@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=3 uid="uid://drxl81ccnmul4"]
+
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="1_61nlp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4n42c"]
+size = Vector2(500, 700)
+
+[node name="MAT_DECK" type="Node2D"]
+scale = Vector2(0.192, 0.192)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_61nlp")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_4n42c")
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+size = Vector2i(100, 50)
+
+[node name="MAT_DECK_VIEW_WINDOW" type="Window" parent="."]
+size = Vector2i(600, 190)
+visible = false
+unresizable = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MAT_DECK_VIEW_WINDOW"]
+offset_right = 600.0
+offset_bottom = 190.0
+
+[node name="GridContainer" type="GridContainer" parent="MAT_DECK_VIEW_WINDOW/ScrollContainer"]
+custom_minimum_size = Vector2(600, 190)
+layout_mode = 2
+columns = 1024

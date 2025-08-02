@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=30 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
@@ -27,6 +27,8 @@
 [ext_resource type="PackedScene" uid="uid://htnh4dr1pgp7" path="res://Scenes/Tera.tscn" id="24_3tgeq"]
 [ext_resource type="PackedScene" uid="uid://8t1wk8td74mg" path="res://Scenes/Neos.tscn" id="25_c4ay3"]
 [ext_resource type="PackedScene" uid="uid://cagxgk4egqvqv" path="res://Scenes/Luxem.tscn" id="26_aht7i"]
+[ext_resource type="PackedScene" uid="uid://drxl81ccnmul4" path="res://Scenes/mat_deck.tscn" id="28_kpo4j"]
+[ext_resource type="Script" uid="uid://o72rawju557" path="res://Scripts/MAT_DECK.gd" id="29_4n42c"]
 
 [node name="Main" type="Node2D"]
 
@@ -55,17 +57,17 @@ position = Vector2(960, 541)
 texture = ExtResource("10_bmxlf")
 
 [node name="GA_DECK" parent="." instance=ExtResource("10_4kpch")]
-position = Vector2(1360.5, 780)
+position = Vector2(1360.5, 780.5)
 scale = Vector2(0.192, 0.192)
 script = ExtResource("5_grg3l")
+
+[node name="MAT_DECK" parent="." instance=ExtResource("28_kpo4j")]
+position = Vector2(599, 780.5)
+script = ExtResource("29_4n42c")
 
 [node name="GRAVEYARD" parent="." instance=ExtResource("4_fos0i")]
 position = Vector2(1362.7, 938.3)
 scale = Vector2(0.977783, 0.974084)
-
-[node name="MAT_ DECK" parent="." instance=ExtResource("4_fos0i")]
-position = Vector2(599, 780.5)
-scale = Vector2(0.972429, 0.971529)
 
 [node name="BANISH" parent="." instance=ExtResource("5_3dxm6")]
 position = Vector2(1342, 642)
