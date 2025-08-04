@@ -31,48 +31,56 @@ func show_card_preview(card):
 	var card_slug = get_slug_from_card(card)
 	if not card or not is_instance_valid(card) or not preview_sprite:
 		return
-	var card_image_node = card.get_node_or_null("CardImage")
-	if card_image_node and card_image_node.texture:
-		preview_sprite.texture = card_image_node.texture
+	var is_in_memory_slot = false
+	var memory_slots = get_tree().get_nodes_in_group("memory_slots")
+	for memory_slot in memory_slots:
+		if is_instance_valid(memory_slot) and card in memory_slot.cards_in_slot:
+			is_in_memory_slot = true
+			break
+	if not is_in_memory_slot:
+		var all_nodes = get_tree().get_nodes_in_group("")
+		for node in all_nodes:
+			if node.name == "MEMORY" and is_instance_valid(node) and card in node.cards_in_slot:
+				is_in_memory_slot = true
+				break
+	if is_in_memory_slot and card.has_meta("original_card_texture"):
+		preview_sprite.texture = card.get_meta("original_card_texture")
 	else:
-		if card_slug != "":
-			var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
-			if ResourceLoader.exists(card_image_path):
-				preview_sprite.texture = load(card_image_path)
+		var card_image_node = card.get_node_or_null("CardImage")
+		if card_image_node and card_image_node.texture:
+			preview_sprite.texture = card_image_node.texture
+		else:
+			if card_slug != "":
+				var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
+				if ResourceLoader.exists(card_image_path):
+					preview_sprite.texture = load(card_image_path)
 	if card_name_label:
 		show_card_info(card_slug)
-
+		
 func show_card_info(slug: String):
 	if not slug or not card_name_label:
 		return
-
 	card_name_label.clear()
-	card_effect_lable.clear()  # 🆕 Почисти ефекта
-
+	card_effect_lable.clear()
 	var name_to_display = ""
 	var effect_to_display = ""
-
 	if card_database_reference and card_database_reference.cards_db.has(slug):
 		var data = card_database_reference.cards_db[slug]
-		
 		if data.has("edition_id") and not data.has("parent_orientation_slug"):
 			var base_slug = find_base_card_for_edition(data["edition_id"])
 			if base_slug and card_database_reference.cards_db.has(base_slug):
 				var base_data = card_database_reference.cards_db[base_slug]
 				name_to_display = base_data.get("name", "")
 				effect_to_display = base_data.get("effect_raw", "")
-		
 		elif data.has("parent_orientation_slug"):
 			var parent_slug = data["parent_orientation_slug"]
 			if card_database_reference.cards_db.has(parent_slug):
 				var parent_data = card_database_reference.cards_db[parent_slug]
 				name_to_display = parent_data.get("name", "")
 				effect_to_display = parent_data.get("effect_raw", "")
-		
 		else:
 			name_to_display = data.get("name", "")
 			effect_to_display = data.get("effect_raw", "")
-	
 	if name_to_display != "":
 		var cleaned_name = fix_weird_quotes_and_dashes(name_to_display.strip_edges())
 		card_name_label.append_text("[center][b]%s[/b][/center]" % cleaned_name)

@@ -14,3 +14,20 @@ collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("RectangleShape2D_3muqk")
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+size = Vector2i(100, 50)
+
+[node name="GraveyardViewWindow" type="Window" parent="."]
+size = Vector2i(600, 190)
+visible = false
+unresizable = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="GraveyardViewWindow"]
+offset_right = 600.0
+offset_bottom = 190.0
+
+[node name="GridContainer" type="GridContainer" parent="GraveyardViewWindow/ScrollContainer"]
+custom_minimum_size = Vector2(600, 190)
+layout_mode = 2
+columns = 1024
