@@ -10,7 +10,7 @@ var normal_scale = Vector2(0.39, 0.39)
 var hover_scale = Vector2(0.46, 0.46)
 var base_z_index = 0
 var hover_z_index = 10
-var drag_z_index = 20
+var drag_z_index = 1000
 var card_counter = 0
 var player_hand_reference
 var animation_in_progress = false
@@ -78,6 +78,25 @@ func start_drag(card):
 	card.z_index = drag_z_index
 	card.scale = normal_scale
 	card.rotation = 0.0
+	remove_card_from_rotated_slot(card)
+	remove_card_from_memory_slot(card)
+	remove_card_from_main_field(card)
+	remove_card_from_single_card_slot(card)
+	var graveyard_slot = get_graveyard_slot_for_card(card)
+	var banish_slot = get_banish_slot_for_card(card)
+	if graveyard_slot and graveyard_slot.has_method("get_top_card"):
+		var top_card = graveyard_slot.get_top_card()
+		if top_card and top_card != card:
+			card = top_card
+	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
+		if last_hovered_card.has_node("Area2D/CollisionShape2D"):
+			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
+				last_hovered_card.scale = normal_scale
+		last_hovered_card = null
+	if banish_slot and banish_slot.has_method("get_top_card"):
+		var top_card = banish_slot.get_top_card()
+		if top_card and top_card != card:
+			card = top_card
 	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
 		if last_hovered_card.has_node("Area2D/CollisionShape2D"):
 			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
@@ -95,19 +114,35 @@ func finish_drag():
 			player_hand_reference.remove_card_from_hand(card_being_dragged)
 		if card_slot_found.name == "MEMORY":
 			card_slot_found.add_card_to_memory(card_being_dragged)
-			if card_being_dragged.has_node("Area2D/CollisionShape2D"):
-				card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
 			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
-		elif not card_slot_found.card_in_slot:
-			card_being_dragged.position = card_slot_found.position
-			if card_being_dragged.has_node("Area2D/CollisionShape2D"):
-				card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
-			card_slot_found.card_in_slot = true
+		elif card_slot_found.name == "MAINFIELD":
+			var is_first_card = card_slot_found.cards_in_field.is_empty()
+			var drop_position = null
+			if not is_first_card:
+				drop_position = card_being_dragged.global_position
+			card_slot_found.add_card_to_field(card_being_dragged, drop_position)
 			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
-			if card_slot_found.name == "90DegreesCardSlot" or card_slot_found.is_in_group("rotated_slots"):
-				card_being_dragged.rotation_degrees = -90
+		elif card_slot_found.name == "CardsSlotForSignleCard" or card_slot_found.name == "GRAVEYARD":
+			card_slot_found.add_card_to_slot(card_being_dragged)
+			card_being_dragged.scale = normal_scale
+			card_being_dragged.z_index = base_z_index
+		elif card_slot_found.name == "90DegreesCardSlot" or card_slot_found.name == "BANISH":
+			card_slot_found.add_card_to_slot(card_being_dragged)
+			card_being_dragged.scale = normal_scale
+			card_being_dragged.z_index = base_z_index
+			card_being_dragged.rotation_degrees = -90
+			#TODO see if it's needed (i am lazy now)
+		#elif not card_slot_found.card_in_slot:
+			#card_being_dragged.position = card_slot_found.position
+			#if card_being_dragged.has_node("Area2D/CollisionShape2D"):
+				#card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
+			#card_slot_found.card_in_slot = true
+			#card_being_dragged.scale = normal_scale
+			#card_being_dragged.z_index = base_z_index
+			#if card_slot_found.name == "90DegreesCardSlot" or card_slot_found.is_in_group("rotated_slots"):
+				#card_being_dragged.rotation_degrees = -90
 		else:
 			card_being_dragged.z_index = base_z_index + card_counter
 			card_counter += 1
@@ -132,7 +167,77 @@ func free_card_from_slot(card):
 						if slot.has_property("card_in_slot"):
 							slot.card_in_slot = false
 						break
-						
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "MAINFIELD" and is_instance_valid(node) and node.has_method("remove_card_from_field"):
+			if card in node.cards_in_field:
+				node.remove_card_from_field(card)
+				break
+	var single_card_slots = get_tree().get_nodes_in_group("single_card_slots")
+	for slot in single_card_slots:
+		if is_instance_valid(slot) and slot.has_method("remove_card_from_slot"):
+			if slot.card_in_slot:
+				slot.remove_card_from_slot(card)
+				break
+	var rotated_slots = get_tree().get_nodes_in_group("rotated_slots")
+	for slot in rotated_slots:
+		if is_instance_valid(slot) and slot.has_method("remove_card_from_slot"):
+			if slot.card_in_slot:
+				slot.remove_card_from_slot(card)
+				break
+	var all_nodes_graveyard = get_tree().get_nodes_in_group("")
+	for node in all_nodes_graveyard:
+		if node.name == "GRAVEYARD" and is_instance_valid(node) and node.has_method("remove_card_from_slot"):
+			if card in node.cards_in_graveyard:
+				node.remove_card_from_slot(card)
+				break
+	var all_nodes_banish = get_tree().get_nodes_in_group("")
+	for node in all_nodes_banish:
+		if node.name == "BANISH" and is_instance_valid(node) and node.has_method("remove_card_from_slot"):
+			if card in node.cards_in_banish:
+				node.remove_card_from_slot(card)
+				break
+
+func is_card_in_graveyard(card):
+	if not card or not is_instance_valid(card):
+		return false
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "GRAVEYARD" and is_instance_valid(node) and node.has_method("bring_card_to_front"):
+			if card in node.cards_in_graveyard:
+				return true
+	return false
+
+func is_card_in_banish(card):
+	if not card or not is_instance_valid(card):
+		return false
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "BANISH" and is_instance_valid(node) and node.has_method("bring_card_to_front"):
+			if card in node.cards_in_banish:
+				return true
+	return false
+
+func get_graveyard_slot_for_card(card):
+	if not card or not is_instance_valid(card):
+		return null
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "GRAVEYARD" and is_instance_valid(node) and node.has_method("bring_card_to_front"):
+			if card in node.cards_in_graveyard:
+				return node
+	return null
+
+func get_banish_slot_for_card(card):
+	if not card or not is_instance_valid(card):
+		return null
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "BANISH" and is_instance_valid(node) and node.has_method("bring_card_to_front"):
+			if card in node.cards_in_banish:
+				return node
+	return null
+
 func force_hover_check():
 	validate_references()
 	await get_tree().process_frame
@@ -193,7 +298,24 @@ func handle_hover():
 	validate_references()
 	var current_card = raycast_check_for_card()
 	if current_card and is_instance_valid(current_card):
-		if not is_card_truly_hovered(current_card):
+		if current_card.get_parent() and current_card.get_parent().is_in_group("rotated_slots"):
+			current_card = null
+		else:
+			for slot in get_tree().get_nodes_in_group("rotated_slots"):
+				if current_card in slot.cards_in_banish:
+					current_card = null
+					break
+		if current_card and is_instance_valid(current_card) and not is_card_truly_hovered(current_card):
+			current_card = null
+	if current_card and is_instance_valid(current_card):
+		if current_card.get_parent() and current_card.get_parent().is_in_group("single_card_slots"):
+			current_card = null
+		else:
+			for slot in get_tree().get_nodes_in_group("single_card_slots"):
+				if current_card in slot.cards_in_graveyard:
+					current_card = null
+					break
+		if current_card and is_instance_valid(current_card) and not is_card_truly_hovered(current_card):
 			current_card = null
 	if current_card != last_hovered_card:
 		if last_hovered_card and is_instance_valid(last_hovered_card):
@@ -201,6 +323,12 @@ func handle_hover():
 				last_hovered_card.scale = normal_scale
 				if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
 					player_hand_reference.clear_hovered_card()
+				elif is_card_in_memory_slot(last_hovered_card):
+					get_memory_slot_for_card(last_hovered_card).clear_hovered_card()
+				elif is_card_in_graveyard(last_hovered_card):
+					get_graveyard_slot_for_card(last_hovered_card).clear_hovered_card()
+				elif is_card_in_banish(last_hovered_card):
+					get_banish_slot_for_card(last_hovered_card).clear_hovered_card()
 				else:
 					last_hovered_card.z_index = base_z_index
 		if current_card and is_instance_valid(current_card):
@@ -209,6 +337,12 @@ func handle_hover():
 				current_card.scale = hover_scale
 				if player_hand_reference and current_card in player_hand_reference.player_hand:
 					player_hand_reference.bring_card_to_front(current_card)
+				elif is_card_in_memory_slot(current_card):
+					get_memory_slot_for_card(current_card).bring_card_to_front(current_card)
+				elif is_card_in_graveyard(current_card):
+					get_graveyard_slot_for_card(current_card).bring_card_to_front(current_card)
+				elif is_card_in_banish(current_card):
+					get_banish_slot_for_card(current_card).bring_card_to_front(current_card)
 				else:
 					current_card.z_index = hover_z_index
 		last_hovered_card = current_card
@@ -254,6 +388,16 @@ func disconnect_card_signals(card):
 func _on_card_hovered(card):
 	if not card or not is_instance_valid(card) or animation_in_progress:
 		return
+	if card.get_parent() and card.get_parent().is_in_group("single_card_slots"):
+		return
+	for slot in get_tree().get_nodes_in_group("single_card_slots"):
+		if card in slot.cards_in_graveyard:
+			return
+	if card.get_parent() and card.get_parent().is_in_group("rotated_slots"):
+		return
+	for slot in get_tree().get_nodes_in_group("rotated_slots"):
+		if card in slot.cards_in_banish:
+			return
 	if card == card_being_dragged:
 		return
 	if card_being_dragged:
@@ -268,12 +412,17 @@ func _on_card_hovered(card):
 	card.scale = hover_scale
 	if player_hand_reference and card in player_hand_reference.player_hand:
 		player_hand_reference.bring_card_to_front(card)
+	elif is_card_in_memory_slot(card):
+		get_memory_slot_for_card(card).bring_card_to_front(card)
+	elif is_card_in_graveyard(card):
+		get_graveyard_slot_for_card(card).bring_card_to_front(card)
+	elif is_card_in_banish(card):
+		get_banish_slot_for_card(card).bring_card_to_front(card)
 	else:
 		card.z_index = hover_z_index
 	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
 		if can_drag_card(last_hovered_card):
 			last_hovered_card.scale = normal_scale
-			# Само за карти в ръката
 			if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
 				player_hand_reference.clear_hovered_card()
 			else:
@@ -287,6 +436,12 @@ func _on_card_unhovered(card):
 		card.scale = normal_scale
 		if player_hand_reference and card in player_hand_reference.player_hand:
 			player_hand_reference.clear_hovered_card()
+		elif is_card_in_memory_slot(card):
+			get_memory_slot_for_card(card).clear_hovered_card()
+		elif is_card_in_graveyard(card):
+			get_graveyard_slot_for_card(card).clear_hovered_card()
+		elif is_card_in_banish(card):
+			get_banish_slot_for_card(card).clear_hovered_card()
 		else:
 			card.z_index = base_z_index
 	last_hovered_card = null
@@ -346,3 +501,87 @@ func cleanup():
 	connected_cards.clear()
 	signal_connections.clear()
 	player_hand_reference = null
+
+func remove_card_from_main_field(card):
+	if not card or not is_instance_valid(card):
+		return
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "MAINFIELD" and is_instance_valid(node) and node.has_method("remove_card_from_field"):
+			if card in node.cards_in_field:
+				node.remove_card_from_field(card)
+				break
+
+func remove_card_from_single_card_slot(card):
+	if not card or not is_instance_valid(card):
+		return
+	var single_card_slots = get_tree().get_nodes_in_group("single_card_slots")
+	for slot in single_card_slots:
+		if is_instance_valid(slot) and slot.has_method("remove_card_from_slot"):
+			if slot.card_in_slot:
+				slot.remove_card_from_slot(card)
+				break
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "GRAVEYARD" and is_instance_valid(node) and node.has_method("remove_card_from_slot"):
+			if node.card_in_slot:
+				node.remove_card_from_slot(card)
+				break
+				
+func remove_card_from_rotated_slot(card):
+	if not card or not is_instance_valid(card):
+		return
+	var rotated_slot = get_tree().get_nodes_in_group("rotated_slots")
+	for slot in rotated_slot:
+		if is_instance_valid(slot) and slot.has_method("remove_card_from_slot"):
+			if slot.card_in_slot:
+				slot.remove_card_from_slot(card)
+				break
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "BANISH" and is_instance_valid(node) and node.has_method("remove_card_from_slot"):
+			if node.card_in_slot:
+				node.remove_card_from_slot(card)
+				break
+
+func remove_card_from_memory_slot(card):
+	if not card or not is_instance_valid(card):
+		return
+	var memory_slots = get_tree().get_nodes_in_group("memory_slots")
+	for memory_slot in memory_slots:
+		if is_instance_valid(memory_slot) and memory_slot.has_method("remove_card_from_memory"):
+			if card in memory_slot.cards_in_slot:
+				memory_slot.remove_card_from_memory(card)
+				break
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "MEMORY" and is_instance_valid(node) and node.has_method("remove_card_from_memory"):
+			if card in node.cards_in_slot:
+				node.remove_card_from_memory(card)
+				break
+
+func is_card_in_memory_slot(card):
+	if not card or not is_instance_valid(card):
+		return false
+	var memory_slots = get_tree().get_nodes_in_group("memory_slots")
+	for memory_slot in memory_slots:
+		if is_instance_valid(memory_slot) and card in memory_slot.cards_in_slot:
+			return true
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "MEMORY" and is_instance_valid(node) and card in node.cards_in_slot:
+			return true
+	return false
+
+func get_memory_slot_for_card(card):
+	if not card or not is_instance_valid(card):
+		return null
+	var memory_slots = get_tree().get_nodes_in_group("memory_slots")
+	for memory_slot in memory_slots:
+		if is_instance_valid(memory_slot) and card in memory_slot.cards_in_slot:
+			return memory_slot
+	var all_nodes = get_tree().get_nodes_in_group("")
+	for node in all_nodes:
+		if node.name == "MEMORY" and is_instance_valid(node) and card in node.cards_in_slot:
+			return node
+	return null
