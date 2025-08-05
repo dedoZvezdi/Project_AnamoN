@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://c3x07o1r7glog"]
+
+[node name="Logo" type="Node2D"]
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D"]
+position = Vector2(648.162, 962.881)
+scale = Vector2(5.24897, 1.67304)
+polygon = PackedVector2Array(-11.6523, -22.642, -10.6997, -19.0557, -4.9843, -13.6763, -3.6507, -14.8717, -4.03173, -6.50372, -1.55505, 7.84143, -2.88865, 13.8186, -5.74635, 16.8071, -10.6997, 13.2209, -11.6523, 19.7957, -12.7954, 13.2209, -17.5582, 16.8071, -20.4159, 13.2209, -21.7495, 7.84143, -19.4633, -5.30829, -19.6539, -14.8717, -18.3203, -13.6763, -12.9859, -19.0557)
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+auto_translate_mode = 1
+size = Vector2i(100, 50)

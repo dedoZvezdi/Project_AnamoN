@@ -19,8 +19,8 @@ func update_deck_view():
 	for child in grid_container.get_children():
 		child.queue_free()
 	for card in cards_in_banish:
-		var card_name = card.card_name if card.has_method("card_name") else card.name
-		var card_display = create_card_display(card_name)
+		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+		var card_display = create_card_display(card_slug)
 		grid_container.add_child(card_display)
 		grid_container.move_child(card_display, 0)
 
