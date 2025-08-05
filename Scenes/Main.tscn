@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=32 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
@@ -29,6 +29,8 @@
 [ext_resource type="PackedScene" uid="uid://cagxgk4egqvqv" path="res://Scenes/Luxem.tscn" id="26_aht7i"]
 [ext_resource type="PackedScene" uid="uid://drxl81ccnmul4" path="res://Scenes/mat_deck.tscn" id="28_kpo4j"]
 [ext_resource type="Script" uid="uid://o72rawju557" path="res://Scripts/MAT_DECK.gd" id="29_4n42c"]
+[ext_resource type="PackedScene" uid="uid://c3x07o1r7glog" path="res://Scenes/Logo.tscn" id="30_c5snn"]
+[ext_resource type="Script" uid="uid://dqf5rgxwib1bk" path="res://Scripts/Logo.gd" id="31_xvtyr"]
 
 [node name="Main" type="Node2D"]
 
@@ -134,3 +136,6 @@ script = ExtResource("16_5jffn")
 [node name="Luxem" parent="." instance=ExtResource("26_aht7i")]
 position = Vector2(630, 650)
 script = ExtResource("16_5jffn")
+
+[node name="Logo" parent="." instance=ExtResource("30_c5snn")]
+script = ExtResource("31_xvtyr")

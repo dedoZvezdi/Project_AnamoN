@@ -275,3 +275,18 @@ func cleanup():
 	player_hand.clear()
 	active_tweens = 0
 	animation_in_progress = false
+
+#func hide_all_cards():
+	#for card in player_hand:
+		#if card and is_instance_valid(card):
+			#card.visible = false
+#
+#func show_all_cards():
+	#for card in player_hand:
+		#if card and is_instance_valid(card):
+			#card.visible = true
+#
+#func toggle_cards_visibility():
+	#for card in player_hand:
+		#if card and is_instance_valid(card):
+			#card.visible = !card.visible

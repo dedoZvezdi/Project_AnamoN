@@ -55,6 +55,8 @@ func show_deck_view():
 	for card_name in player_deck:
 		var card_display = create_card_display(card_name)
 		grid_container.add_child(card_display)
+	if has_node("Sprite2D"):
+		$Sprite2D.modulate = Color(1, 0, 0, 1)
 	deck_view_window.popup_centered()
 
 func create_card_display(card_name: String):
@@ -72,6 +74,8 @@ func create_card_display(card_name: String):
 
 func _on_deck_view_close():
 	deck_view_window.hide()
+	if has_node("Sprite2D"):
+		$Sprite2D.modulate = Color(1, 1, 1, 1)
 
 func shuffle_deck():
 	player_deck.shuffle()

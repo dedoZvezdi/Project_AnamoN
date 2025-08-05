@@ -58,6 +58,14 @@ func _process(_delta: float) -> void:
 func can_drag_card(card) -> bool:
 	if not card or not is_instance_valid(card):
 		return false
+	if card.get_parent() and (card.get_parent().is_in_group("single_card_slots") or card.get_parent().is_in_group("rotated_slots")):
+		return false
+	for slot in get_tree().get_nodes_in_group("single_card_slots"):
+		if card in slot.cards_in_graveyard:
+			return false
+	for slot in get_tree().get_nodes_in_group("rotated_slots"):
+		if card in slot.cards_in_banish:
+			return false
 	if card.has_node("Area2D/CollisionShape2D"):
 		var collision_shape = card.get_node("Area2D/CollisionShape2D")
 		if collision_shape.disabled:
