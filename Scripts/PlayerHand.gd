@@ -20,6 +20,7 @@ var active_tweens = 0
 var animation_in_progress = false
 var active_tween_objects = []
 var hovered_card = null
+var hand_hidden := false
 
 func _ready() -> void:
 	center_screen_x = get_viewport().size.x / 2
@@ -40,6 +41,19 @@ func add_card_to_hand(card):
 		player_hand.append(card)
 		card.z_index = HAND_Z_INDEX + player_hand.size()
 		update_hand_position()
+		if hand_hidden:
+			show_card(card)
+			var start_pos = card.position
+			var logo_pos = Vector2(590, 960)
+			var offscreen_pos = Vector2(2500, 1200)
+			card.position = start_pos
+			var tween = create_tween()
+			tween.tween_property(card, "position", logo_pos, 0.3)
+			tween.tween_callback(Callable(self, "_move_card_offscreen").bind(card, offscreen_pos))
+			if card.has_node("Area2D"):
+				card.get_node("Area2D").set_deferred("input_pickable", false)
+		else:
+			show_card(card)
 	else:
 		var card_index = player_hand.find(card)
 		if card_index >= 0:
@@ -235,6 +249,57 @@ func clear_hovered_card():
 		var card = player_hand[i]
 		if card and is_instance_valid(card):
 			card.z_index = HAND_Z_INDEX + i + 1
+
+func hide_hand():
+	hand_hidden = true
+	for card in player_hand:
+		hide_card_with_animation(card)
+
+func show_hand():
+	hand_hidden = false
+	var logo_pos = Vector2(590, 960)
+	for i in range(player_hand.size()):
+		var card = player_hand[i]
+		if card and is_instance_valid(card):
+			card.position = logo_pos
+			card.visible = true
+			if card.has_node("Area2D"):
+				card.get_node("Area2D").set_deferred("input_pickable", true)
+	update_hand_position()
+
+func hide_card_with_animation(card):
+	if card and is_instance_valid(card):
+		var logo_pos = Vector2(590, 960)
+		var offscreen_pos = Vector2(2500, 1200)
+		var tween = create_tween()
+		tween.tween_property(card, "position", logo_pos, 0.3)
+		tween.tween_callback(Callable(self, "_move_card_offscreen").bind(card, offscreen_pos))
+		if card.has_node("Area2D"):
+			card.get_node("Area2D").set_deferred("input_pickable", false)
+
+func _move_card_offscreen(card, offscreen_pos):
+	if card and is_instance_valid(card):
+		card.position = offscreen_pos
+		card.visible = false
+
+func hide_card(card):
+	if card and is_instance_valid(card):
+		card.position = Vector2(2500, 1200)
+		card.visible = false
+		if card.has_node("Area2D"):
+			card.get_node("Area2D").set_deferred("input_pickable", false)
+
+func show_card(card):
+	if card and is_instance_valid(card):
+		card.visible = true
+		if card.has_node("Area2D"):
+			card.get_node("Area2D").set_deferred("input_pickable", true)
+
+func toggle_hand_visibility():
+	if hand_hidden:
+		show_hand()
+	else:
+		hide_hand()
 
 func set_card_z_index(card, z_value: int):
 	if card and is_instance_valid(card):
