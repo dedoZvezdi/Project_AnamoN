@@ -270,7 +270,7 @@ func show_hand():
 func hide_card_with_animation(card):
 	if card and is_instance_valid(card):
 		var logo_pos = Vector2(590, 960)
-		var offscreen_pos = Vector2(2500, 1200)
+		var offscreen_pos = Vector2(3300, 3300)
 		var tween = create_tween()
 		tween.tween_property(card, "position", logo_pos, 0.3)
 		tween.tween_callback(Callable(self, "_move_card_offscreen").bind(card, offscreen_pos))
