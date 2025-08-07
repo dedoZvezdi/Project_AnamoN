@@ -13,7 +13,7 @@ func find_node_recursive(node, target_name):
 			return found
 	return null
 
-func _on_Area2D_input_event(viewport, event, shape_idx):
+func _on_Area2D_input_event(viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var player_hand_node = find_node_recursive(get_tree().get_root(), "PlayerHand")
 		if player_hand_node:

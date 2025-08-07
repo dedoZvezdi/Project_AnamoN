@@ -6,7 +6,8 @@ signal hovered_off
 var hand_position
 
 func _ready() -> void:
-	get_parent().connect_card_signals(self)
+	if get_parent() and get_parent().has_method("connect_card_signals"):
+		get_parent().connect_card_signals(self)
 
 func _on_area_2d_mouse_entered() -> void:
 	emit_signal("hovered", self)
