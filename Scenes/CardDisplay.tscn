@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bjmf6g1notrh7"]
+
+[ext_resource type="Script" uid="uid://bkfty1dvgnjap" path="res://Scripts/CardDisplay.gd" id="1_bcrn8"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_bcrn8")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(0.192, 0.192)

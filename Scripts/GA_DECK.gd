@@ -48,29 +48,30 @@ func update_deck_view():
 	for card_name in player_deck:
 		var card_display = create_card_display(card_name)
 		grid_container.add_child(card_display)
+	grid_container.call_deferred("queue_sort")
 
 func show_deck_view():
-	update_deck_view()
 	deck_view_window.popup_centered()
-	for card_name in player_deck:
-		var card_display = create_card_display(card_name)
-		grid_container.add_child(card_display)
+	update_deck_view()
+	$DeckViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
+	$DeckViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 	if has_node("Sprite2D"):
 		$Sprite2D.modulate = Color(1, 0, 0, 1)
-	deck_view_window.popup_centered()
 
 func create_card_display(card_name: String):
-	var card_control = Control.new()
-	card_control.custom_minimum_size = Vector2(125, 180)
-	var texture_rect = TextureRect.new()
-	texture_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	texture_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-	texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_name + ".png"
-	if ResourceLoader.exists(card_image_path):
-		texture_rect.texture = load(card_image_path)
-	card_control.add_child(texture_rect)
-	return card_control
+	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+	var card_display = card_display_scene.instantiate()
+	card_display.set_meta("slug", card_name)
+	card_display.set_meta("zone", "ga_deck")
+	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
+	return card_display
+
+func _on_card_display_popup_menu(slug):
+	var popup_menu = $DeckViewWindow/PopupMenu
+	popup_menu.clear()
+	popup_menu.add_item("test5")
+	popup_menu.add_item("test6")
+	popup_menu.popup(Rect2(get_viewport().get_mouse_position(), Vector2(0, 0)))
 
 func _on_deck_view_close():
 	deck_view_window.hide()

@@ -10,12 +10,9 @@ func _ready() -> void:
 
 func add_card_to_field(card, position = null):
 	if position == null:
-		# Първата карта отива в центъра на Main_Field
 		card.global_position = global_position
 	else:
-		# Останалите карти отиват там където са поставени
 		card.global_position = position
-	
 	cards_in_field.append(card)
 	card_in_slot = true
 
@@ -36,7 +33,7 @@ func bring_card_to_front(card):
 		var current_card = cards_in_field[i]
 		if current_card and is_instance_valid(current_card):
 			if i >= card_index:
-				current_card.z_index = 200 + i + 50  # По-висок от ръката
+				current_card.z_index = 200 + i + 50
 			else:
 				current_card.z_index = 200 + i + 1
 

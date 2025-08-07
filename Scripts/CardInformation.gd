@@ -62,6 +62,10 @@ func show_card_info(slug: String):
 		return
 	card_name_label.clear()
 	card_effect_lable.clear()
+	if preview_sprite and slug != "":
+		var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+		if ResourceLoader.exists(card_image_path):
+			preview_sprite.texture = load(card_image_path)
 	var name_to_display = ""
 	var effect_to_display = ""
 	if card_database_reference and card_database_reference.cards_db.has(slug):
@@ -84,7 +88,6 @@ func show_card_info(slug: String):
 	if name_to_display != "":
 		var cleaned_name = fix_weird_quotes_and_dashes(name_to_display.strip_edges())
 		card_name_label.append_text("[center][b]%s[/b][/center]" % cleaned_name)
-
 	if effect_to_display != "":
 		var cleaned_effect = fix_weird_quotes_and_dashes(effect_to_display.strip_edges())
 		card_effect_lable.append_text(cleaned_effect)
