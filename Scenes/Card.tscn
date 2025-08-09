@@ -140,5 +140,8 @@ libraries = {
 &"": SubResource("AnimationLibrary_h8wm0")
 }
 
+[node name="PopupMenu" type="PopupMenu" parent="."]
+size = Vector2i(100, 50)
+
 [connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]
