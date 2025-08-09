@@ -24,6 +24,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 			$PopupMenu.add_item("Rotate", 5)
 			$PopupMenu.add_item("Show", 6)
 			$PopupMenu.add_item("Transform", 7)
+			$PopupMenu.add_item("Give to your opponent", 8)
 			$PopupMenu.position = get_global_mouse_position()
 			$PopupMenu.popup()
 
@@ -45,3 +46,4 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		5: print("Rotate selected")
 		6: print("Show selected")
 		7: print("Transform")
+		7: print("Give to your opponent")
