@@ -19,7 +19,6 @@ func _ready() -> void:
 
 func setup_context_menu():
 	context_menu.add_item("View Deck", 0)
-	context_menu.add_item("Shuffle Deck", 1)
 	context_menu.id_pressed.connect(_on_context_menu_pressed)
 
 func setup_deck_view():
@@ -35,7 +34,6 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 func _on_context_menu_pressed(id):
 	match id:
 		0:view_deck()
-		1:shuffle_deck()
 
 func view_deck():
 	show_deck_view()
@@ -72,7 +70,3 @@ func _on_card_display_popup_menu(slug):
 
 func _on_deck_view_close():
 	deck_view_window.hide()
-
-func shuffle_deck():
-	player_deck.shuffle()
-	update_deck_view()
