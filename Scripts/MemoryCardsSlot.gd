@@ -6,10 +6,26 @@ var base_z_index = 0
 var hover_z_index = 10
 var memory_z_index_offset = 10
 var memory_max_z_index = 49
+var highlighted_card: Node = null
+var steps_left = 0
+var is_roulette_running = false
+var roulette_timer: Timer
+var current_highlight_index = 0
+var target_card_index = -1
+var roulette_speed = 0.2
+var roulette_elapsed_time = 0.0
+var total_roulette_time = 0.0
+var final_slowdown_started = false
 
-func _ready() -> void:
+func _ready():
+	randomize()
 	base_position = Vector2.ZERO
 	add_to_group("memory_slots")
+	roulette_timer = Timer.new()
+	roulette_timer.wait_time = roulette_speed
+	roulette_timer.timeout.connect(_on_roulette_tick)
+	roulette_timer.one_shot = false
+	add_child(roulette_timer)
 
 func add_card_to_memory(card):
 	cards_in_slot.append(card)
@@ -141,3 +157,79 @@ func get_slot_height():
 		if collision_shape and collision_shape.shape:
 			return collision_shape.shape.size.y
 	return 100
+func highlight_random_card():
+	if cards_in_slot.is_empty() or is_roulette_running:
+		return
+	start_roulette()
+
+func start_roulette():
+	is_roulette_running = true
+	current_highlight_index = 0
+	roulette_elapsed_time = 0.0
+	final_slowdown_started = false
+	target_card_index = randi() % cards_in_slot.size()
+	total_roulette_time = randf_range(2.7, 3.5)
+	roulette_speed = 0.1
+	roulette_timer.wait_time = roulette_speed
+	roulette_timer.start()
+	_highlight_card_at_index(current_highlight_index)
+
+func _on_roulette_tick():
+	if not is_roulette_running:
+		return
+	roulette_elapsed_time += roulette_timer.wait_time
+	_clear_current_highlight()
+	current_highlight_index = (current_highlight_index + 1) % cards_in_slot.size()
+	_highlight_card_at_index(current_highlight_index)
+	var progress = roulette_elapsed_time / total_roulette_time
+	if progress >= 0.85 and not final_slowdown_started:
+		final_slowdown_started = true
+		roulette_speed = 0.3
+		roulette_timer.wait_time = roulette_speed
+	elif progress >= 0.7 and not final_slowdown_started:
+		roulette_speed = lerp(0.1, 0.25, (progress - 0.7) / 0.15)
+		roulette_timer.wait_time = roulette_speed
+	if roulette_elapsed_time >= total_roulette_time:
+		if current_highlight_index == target_card_index:
+			_stop_roulette()
+
+func _stop_roulette():
+	roulette_timer.stop()
+	is_roulette_running = false
+	_highlight_card_at_index(target_card_index)
+	highlighted_card = cards_in_slot[target_card_index]
+	var final_timer = Timer.new()
+	final_timer.wait_time = 0.5
+	final_timer.one_shot = true
+	final_timer.timeout.connect(_on_final_highlight_finished.bind(final_timer))
+	add_child(final_timer)
+	final_timer.start()
+
+func _on_final_highlight_finished(timer: Timer):
+	timer.queue_free()
+
+func _highlight_card_at_index(index: int):
+	for i in range(cards_in_slot.size()):
+		var card = cards_in_slot[i]
+		if card and is_instance_valid(card):
+			card.modulate = Color(1, 1, 1, 1)
+	if index >= 0 and index < cards_in_slot.size():
+		var card = cards_in_slot[index]
+		if card and is_instance_valid(card):
+			card.modulate = Color(0.5, 0.5, 1.9, 1)
+
+func _clear_current_highlight():
+	for i in range(cards_in_slot.size()):
+		var card = cards_in_slot[i]
+		if card and is_instance_valid(card):
+			card.modulate = Color(1, 1, 1, 1)
+
+func reset_card_colors():
+	_clear_current_highlight()
+	highlighted_card = null
+
+func _unhandled_input(event):
+	if highlighted_card and (
+		event is InputEventMouseButton
+	):
+		reset_card_colors()
