@@ -8,3 +8,5 @@ collision_mask = 32
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D"]
 polygon = PackedVector2Array(-3, -35, -9, -29, -38, -19, -45, -23, -44, -7, -56, 15, -50, 24, -34, 30, -8, 25, -4, 36, 1, 25, 27, 31, 43, 26, 50, 16, 38, -7, 39, -22, 31, -20, 3, -29)
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
