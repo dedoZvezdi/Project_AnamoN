@@ -140,7 +140,6 @@ func finish_drag():
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
-			card_being_dragged.rotation_degrees = -90
 		else:
 			card_being_dragged.z_index = base_z_index + card_counter
 			card_counter += 1
