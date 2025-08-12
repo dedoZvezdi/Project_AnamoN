@@ -61,13 +61,13 @@ func clear_hovered_card():
 			card.z_index = memory_z_index_offset + i + 1
 
 func show_card_back(card):
+	var card_image = card.get_node_or_null("CardImage")
 	if not card or not is_instance_valid(card):
 		return
 	if not card.has_meta("original_card_texture"):
-		var card_image = card.get_node_or_null("CardImage")
+
 		if card_image and card_image.texture:
 			card.set_meta("original_card_texture", card_image.texture)
-	var card_image = card.get_node_or_null("CardImage")
 	var card_image_back = card.get_node_or_null("CardImageBack")
 	if card_image and card_image_back:
 		card_image_back.z_index = 0

@@ -1,0 +1,180 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpn7rtonc8qd4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xvtyr"]
+size = Vector2(105, 63)
+
+[node name="Phases" type="Node2D"]
+
+[node name="WakeUpArea2D" type="Area2D" parent="."]
+position = Vector2(1532.5, 66.5)
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WakeUpArea2D"]
+shape = SubResource("RectangleShape2D_xvtyr")
+
+[node name="MaterializeArea2D" type="Area2D" parent="."]
+position = Vector2(1682.5, 66.5)
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MaterializeArea2D"]
+shape = SubResource("RectangleShape2D_xvtyr")
+
+[node name="RecollectionArea2D" type="Area2D" parent="."]
+position = Vector2(1832.5, 66.5)
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RecollectionArea2D"]
+shape = SubResource("RectangleShape2D_xvtyr")
+
+[node name="DrawArea2D" type="Area2D" parent="."]
+position = Vector2(1532.5, 141.5)
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DrawArea2D"]
+shape = SubResource("RectangleShape2D_xvtyr")
+
+[node name="MainArea2D" type="Area2D" parent="."]
+position = Vector2(1682.5, 141.5)
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MainArea2D"]
+shape = SubResource("RectangleShape2D_xvtyr")
+
+[node name="EndArea2D" type="Area2D" parent="."]
+position = Vector2(1832.5, 141.5)
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EndArea2D"]
+shape = SubResource("RectangleShape2D_xvtyr")
+
+[node name="Wake Up Phase" type="RichTextLabel" parent="."]
+offset_left = 1474.0
+offset_top = 44.0
+offset_right = 1591.0
+offset_bottom = 90.0
+text = "Wake Up Phase"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="Materialize Phase" type="RichTextLabel" parent="."]
+offset_left = 1624.0
+offset_top = 44.0
+offset_right = 1745.0
+offset_bottom = 90.0
+text = "Materialize Phase"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="Recollection Phase" type="RichTextLabel" parent="."]
+offset_left = 1774.0
+offset_top = 44.0
+offset_right = 1891.0
+offset_bottom = 90.0
+text = "Recollection Phase"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="Draw Phase" type="RichTextLabel" parent="."]
+offset_left = 1492.0
+offset_top = 113.0
+offset_right = 1574.0
+offset_bottom = 159.0
+text = "Draw Phase"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="Main Phase" type="RichTextLabel" parent="."]
+offset_left = 1643.0
+offset_top = 113.0
+offset_right = 1726.0
+offset_bottom = 159.0
+text = "Main Phase"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="End Phase" type="RichTextLabel" parent="."]
+offset_left = 1795.0
+offset_top = 113.0
+offset_right = 1870.0
+offset_bottom = 159.0
+text = "End Phase"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="LineWakeUpR" type="Line2D" parent="."]
+position = Vector2(1587.57, 101.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineWakeUpL" type="Line2D" parent="."]
+position = Vector2(1482.57, 101.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineDrawR" type="Line2D" parent="."]
+position = Vector2(1587.57, 176.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineDrawL" type="Line2D" parent="."]
+position = Vector2(1482.57, 176.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineMaterializeL" type="Line2D" parent="."]
+position = Vector2(1632.57, 101.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineMaterializeR" type="Line2D" parent="."]
+position = Vector2(1737.57, 101.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineMainL" type="Line2D" parent="."]
+position = Vector2(1632.57, 176.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineMainR" type="Line2D" parent="."]
+position = Vector2(1737.57, 176.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineEndL" type="Line2D" parent="."]
+position = Vector2(1782.57, 176.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineEndR" type="Line2D" parent="."]
+position = Vector2(1887.57, 176.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineRecollectionL" type="Line2D" parent="."]
+position = Vector2(1782.57, 101.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
+
+[node name="LineRecollectionR" type="Line2D" parent="."]
+position = Vector2(1887.57, 101.204)
+scale = Vector2(0.573752, 4.41176)
+points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
+width = 2.0
