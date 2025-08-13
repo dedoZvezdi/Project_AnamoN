@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=34 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
@@ -32,6 +32,7 @@
 [ext_resource type="PackedScene" uid="uid://c3x07o1r7glog" path="res://Scenes/Logo.tscn" id="30_c5snn"]
 [ext_resource type="Script" uid="uid://coysovnn26kgf" path="res://Scripts/Logo.gd" id="31_xvtyr"]
 [ext_resource type="PackedScene" uid="uid://cpn7rtonc8qd4" path="res://Scenes/Phases.tscn" id="32_u7mjy"]
+[ext_resource type="Script" uid="uid://cjdv252o1hnhq" path="res://Scripts/Phases.gd" id="33_4yxf6"]
 
 [node name="Main" type="Node2D"]
 
@@ -143,3 +144,4 @@ position = Vector2(590, 960)
 script = ExtResource("31_xvtyr")
 
 [node name="Phases" parent="." instance=ExtResource("32_u7mjy")]
+script = ExtResource("33_4yxf6")
