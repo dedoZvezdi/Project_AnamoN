@@ -26,6 +26,12 @@ func _ready():
 	roulette_timer.timeout.connect(_on_roulette_tick)
 	roulette_timer.one_shot = false
 	add_child(roulette_timer)
+	var im = get_node_or_null("../InputManager")
+	if im and not im.is_connected("left_mouse_button_released", Callable(self, "_on_global_lmb_released")):
+		im.connect("left_mouse_button_released", Callable(self, "_on_global_lmb_released"))
+
+func _on_global_lmb_released():
+	reset_card_colors()
 
 func add_card_to_memory(card):
 	cards_in_slot.append(card)
@@ -37,9 +43,13 @@ func remove_card_from_memory(card):
 		cards_in_slot.erase(card)
 		show_card_front(card)
 		arrange_cards_symmetrically()
+		if highlighted_card == card:
+			reset_card_colors()
 
 func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):
+		return
+	if is_roulette_running:
 		return
 	var card_index = cards_in_slot.find(card)
 	if card_index == -1:
@@ -54,18 +64,22 @@ func bring_card_to_front(card):
 				current_card.z_index = memory_z_index_offset + i + 1
 
 func clear_hovered_card():
+	if is_roulette_running:
+		return
 	var slot_size = cards_in_slot.size()
 	for i in range(slot_size):
 		var card = cards_in_slot[i]
 		if card and is_instance_valid(card):
 			card.z_index = memory_z_index_offset + i + 1
 
+func are_cards_blocked() -> bool:
+	return is_roulette_running
+
 func show_card_back(card):
 	var card_image = card.get_node_or_null("CardImage")
 	if not card or not is_instance_valid(card):
 		return
 	if not card.has_meta("original_card_texture"):
-
 		if card_image and card_image.texture:
 			card.set_meta("original_card_texture", card_image.texture)
 	var card_image_back = card.get_node_or_null("CardImageBack")
@@ -157,6 +171,7 @@ func get_slot_height():
 		if collision_shape and collision_shape.shape:
 			return collision_shape.shape.size.y
 	return 100
+
 func highlight_random_card():
 	if cards_in_slot.is_empty() or is_roulette_running:
 		return
@@ -173,6 +188,7 @@ func start_roulette():
 	roulette_timer.wait_time = roulette_speed
 	roulette_timer.start()
 	_highlight_card_at_index(current_highlight_index)
+	_set_cards_collision_disabled(true)
 
 func _on_roulette_tick():
 	if not is_roulette_running:
@@ -198,12 +214,19 @@ func _stop_roulette():
 	is_roulette_running = false
 	_highlight_card_at_index(target_card_index)
 	highlighted_card = cards_in_slot[target_card_index]
+	_set_cards_collision_disabled(false)
 	var final_timer = Timer.new()
 	final_timer.wait_time = 0.5
 	final_timer.one_shot = true
 	final_timer.timeout.connect(_on_final_highlight_finished.bind(final_timer))
 	add_child(final_timer)
 	final_timer.start()
+
+func _set_cards_collision_disabled(disabled: bool):
+	for card in cards_in_slot:
+		if card and is_instance_valid(card) and card.has_node("Area2D/CollisionShape2D"):
+			var collision_shape = card.get_node("Area2D/CollisionShape2D")
+			collision_shape.disabled = disabled
 
 func _on_final_highlight_finished(timer: Timer):
 	timer.queue_free()
@@ -230,6 +253,9 @@ func reset_card_colors():
 
 func _unhandled_input(event):
 	if highlighted_card and (
-		event is InputEventMouseButton
+		event is InputEventMouseButton or event is InputEventMouseMotion
 	):
-		reset_card_colors()
+		if event is InputEventMouseButton and event.pressed:
+			reset_card_colors()
+		elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			reset_card_colors()

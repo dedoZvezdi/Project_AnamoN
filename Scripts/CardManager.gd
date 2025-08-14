@@ -46,6 +46,11 @@ func _exit_tree():
 		
 func update_screen_size():
 	screen_size = get_viewport_rect().size
+	
+func _clear_memory_highlights():
+	for slot in get_tree().get_nodes_in_group("memory_slots"):
+		if is_instance_valid(slot) and slot.has_method("reset_card_colors"):
+			slot.reset_card_colors()
 
 func _process(_delta: float) -> void:
 	if card_being_dragged and is_instance_valid(card_being_dragged):
@@ -58,6 +63,10 @@ func _process(_delta: float) -> void:
 func can_drag_card(card) -> bool:
 	if not card or not is_instance_valid(card):
 		return false
+	if is_card_in_memory_slot(card):
+		var memory_slot = get_memory_slot_for_card(card)
+		if memory_slot and memory_slot.has_method("are_cards_blocked") and memory_slot.are_cards_blocked():
+			return false
 	if card.get_parent() and (card.get_parent().is_in_group("single_card_slots") or card.get_parent().is_in_group("rotated_slots")):
 		return false
 	for slot in get_tree().get_nodes_in_group("single_card_slots"):
@@ -81,6 +90,9 @@ func _on_animation_finished():
 func start_drag(card):
 	if not card or not is_instance_valid(card):
 		return
+	if not can_drag_card(card):
+		return
+	_clear_memory_highlights()
 	card_being_dragged = card
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.z_index = drag_z_index
@@ -115,6 +127,7 @@ func finish_drag():
 	if not card_being_dragged or not is_instance_valid(card_being_dragged):
 		card_being_dragged = null
 		return
+	_clear_memory_highlights()
 	free_card_from_slot(card_being_dragged)
 	var card_slot_found = raycast_check_for_card_single_slot()
 	if card_slot_found:
