@@ -7,6 +7,7 @@ var card_database_reference = null
 var default_texture = null
 var card_manager_reference = null
 var last_displayed_card = null
+var current_displayed_slug = ""
 
 func _ready() -> void:
 	if preview_sprite:
@@ -26,11 +27,16 @@ func _process(_delta: float) -> void:
 		if current_hovered_card != last_displayed_card:
 			show_card_preview(current_hovered_card)
 			last_displayed_card = current_hovered_card
+func show_card_info(slug: String):
+	current_displayed_slug = slug
+	last_displayed_card = null
+	_update_card_display(slug)
 
 func show_card_preview(card):
 	var card_slug = get_slug_from_card(card)
 	if not card or not is_instance_valid(card) or not preview_sprite:
 		return
+	current_displayed_slug = card_slug
 	var is_in_memory_slot = false
 	var memory_slots = get_tree().get_nodes_in_group("memory_slots")
 	for memory_slot in memory_slots:
@@ -55,9 +61,9 @@ func show_card_preview(card):
 				if ResourceLoader.exists(card_image_path):
 					preview_sprite.texture = load(card_image_path)
 	if card_name_label:
-		show_card_info(card_slug)
-		
-func show_card_info(slug: String):
+		_update_card_display(card_slug)
+
+func _update_card_display(slug: String):
 	if not slug or not card_name_label:
 		return
 	card_name_label.clear()
@@ -91,6 +97,15 @@ func show_card_info(slug: String):
 	if effect_to_display != "":
 		var cleaned_effect = fix_weird_quotes_and_dashes(effect_to_display.strip_edges())
 		card_effect_lable.append_text(cleaned_effect)
+
+func clear_preview():
+	if card_name_label:
+		card_name_label.clear()
+	if card_effect_lable:
+		card_effect_lable.clear()
+	if preview_sprite and default_texture:
+		preview_sprite.texture = default_texture
+	current_displayed_slug = ""
 
 func find_parent_orientation_for_edition(edition_slug: String):
 	for card_slug in card_database_reference.cards_db:
