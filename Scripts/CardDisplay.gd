@@ -3,11 +3,8 @@ extends Control
 var card_slug = ""
 var card_image_path = ""
 var zone = ""
-
 signal request_popup_menu(slug)
-
 @onready var texture_rect = $TextureRect
-
 const CARD_DISPLAY_SIZE = Vector2(98, 98)
 
 func _ready():
