@@ -1,6 +1,7 @@
 extends Node2D
 
 var cards_in_slot = []
+var roulette_cards = []
 var base_position
 var base_z_index = 0
 var hover_z_index = 10
@@ -182,7 +183,8 @@ func start_roulette():
 	current_highlight_index = 0
 	roulette_elapsed_time = 0.0
 	final_slowdown_started = false
-	target_card_index = randi() % cards_in_slot.size()
+	roulette_cards = cards_in_slot.duplicate()  
+	target_card_index = randi() % roulette_cards.size()
 	total_roulette_time = randf_range(2.7, 3.5)
 	roulette_speed = 0.1
 	roulette_timer.wait_time = roulette_speed
@@ -191,11 +193,11 @@ func start_roulette():
 	_set_cards_collision_disabled(true)
 
 func _on_roulette_tick():
-	if not is_roulette_running:
+	if not is_roulette_running or roulette_cards.is_empty():
 		return
 	roulette_elapsed_time += roulette_timer.wait_time
 	_clear_current_highlight()
-	current_highlight_index = (current_highlight_index + 1) % cards_in_slot.size()
+	current_highlight_index = (current_highlight_index + 1) % roulette_cards.size()
 	_highlight_card_at_index(current_highlight_index)
 	var progress = roulette_elapsed_time / total_roulette_time
 	if progress >= 0.85 and not final_slowdown_started:
@@ -213,7 +215,7 @@ func _stop_roulette():
 	roulette_timer.stop()
 	is_roulette_running = false
 	_highlight_card_at_index(target_card_index)
-	highlighted_card = cards_in_slot[target_card_index]
+	highlighted_card = roulette_cards[target_card_index]   # вместо cards_in_slot
 	_set_cards_collision_disabled(false)
 	var final_timer = Timer.new()
 	final_timer.wait_time = 0.5

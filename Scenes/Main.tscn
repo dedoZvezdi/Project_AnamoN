@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=35 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://d2q27vj536tlk" path="res://Scenes/Fire.tscn" id="16_2w5on"]
 [ext_resource type="Script" uid="uid://c57bimiwmr0yp" path="res://Scripts/Element.gd" id="16_5jffn"]
 [ext_resource type="PackedScene" uid="uid://cxd2mvn6wykfl" path="res://Scenes/Water.tscn" id="17_346fj"]
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="17_qta6b"]
 [ext_resource type="PackedScene" uid="uid://8bexacpcoqme" path="res://Scenes/Wind.tscn" id="18_0sclb"]
 [ext_resource type="PackedScene" uid="uid://dykyungnxlstu" path="res://Scenes/Astra.tscn" id="19_sxkr1"]
 [ext_resource type="PackedScene" uid="uid://d1fe3gik6qku8" path="res://Scenes/Umbra.tscn" id="20_hwpts"]
@@ -48,7 +49,7 @@ position = Vector2(980, 800)
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
-[node name="FieldGa2" type="Sprite2D" parent="GAField"]
+[node name="FieldGaOpponent" type="Sprite2D" parent="GAField"]
 z_index = -1
 position = Vector2(980, 280)
 rotation = -3.14159
@@ -91,6 +92,26 @@ script = ExtResource("7_lgr22")
 script = ExtResource("13_frkhe")
 
 [node name="CardInformation" parent="." instance=ExtResource("14_1p5hy")]
+
+[node name="OpponentDeck" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="OpponentDeck"]
+position = Vector2(599.5, 300)
+rotation = 3.14159
+scale = Vector2(0.192, 0.192)
+texture = ExtResource("17_qta6b")
+
+[node name="OpponentMatDeck" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="OpponentMatDeck"]
+position = Vector2(1361, 300)
+rotation = 3.14159
+scale = Vector2(0.192, 0.192)
+texture = ExtResource("17_qta6b")
+
+[node name="OpponentBanish" type="Node2D" parent="."]
+
+[node name="OpponentGraveyard" type="Node2D" parent="."]
 
 [node name="Norm" parent="." instance=ExtResource("15_h1m7h")]
 position = Vector2(560, 580)
