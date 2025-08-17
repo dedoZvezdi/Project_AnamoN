@@ -61,7 +61,7 @@ func create_card_display(card_name: String):
 	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
 	return card_display
 
-func _on_card_display_popup_menu(slug):
+func _on_card_display_popup_menu(_slug):
 	var popup_menu = $MAT_DECK_VIEW_WINDOW/PopupMenu
 	popup_menu.clear()
 	popup_menu.add_item("test7")
