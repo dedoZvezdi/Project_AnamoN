@@ -23,6 +23,12 @@ offset_top = 573.0
 offset_right = 436.0
 offset_bottom = 616.0
 
+[node name="Level" type="RichTextLabel" parent="."]
+offset_left = 62.0
+offset_top = 607.0
+offset_right = 146.0
+offset_bottom = 647.0
+
 [node name="Effect" type="RichTextLabel" parent="."]
 offset_left = 57.0
 offset_top = 660.0
