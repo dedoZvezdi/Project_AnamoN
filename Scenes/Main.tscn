@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=38 format=3 uid="uid://dqt16mao7lo7t"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
@@ -15,13 +15,16 @@
 [ext_resource type="Script" uid="uid://bp1qbo2oxuy1p" path="res://Scripts/InputManager.gd" id="13_frkhe"]
 [ext_resource type="PackedScene" uid="uid://db2eqitvw1e27" path="res://Scenes/CardInformation.tscn" id="14_1p5hy"]
 [ext_resource type="PackedScene" uid="uid://cw3lmoyxw8aue" path="res://Scenes/Norm.tscn" id="15_h1m7h"]
+[ext_resource type="Script" uid="uid://bfjq0vc84eui2" path="res://Scripts/OpponentHand.gd" id="15_vvnwx"]
 [ext_resource type="PackedScene" uid="uid://d2q27vj536tlk" path="res://Scenes/Fire.tscn" id="16_2w5on"]
 [ext_resource type="Script" uid="uid://c57bimiwmr0yp" path="res://Scripts/Element.gd" id="16_5jffn"]
 [ext_resource type="PackedScene" uid="uid://cxd2mvn6wykfl" path="res://Scenes/Water.tscn" id="17_346fj"]
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="17_qta6b"]
 [ext_resource type="PackedScene" uid="uid://8bexacpcoqme" path="res://Scenes/Wind.tscn" id="18_0sclb"]
+[ext_resource type="Script" uid="uid://bwyxwauuywjcq" path="res://Scripts/Opponent_GA_DECK.gd" id="18_btbly"]
 [ext_resource type="PackedScene" uid="uid://dykyungnxlstu" path="res://Scenes/Astra.tscn" id="19_sxkr1"]
 [ext_resource type="PackedScene" uid="uid://d1fe3gik6qku8" path="res://Scenes/Umbra.tscn" id="20_hwpts"]
+[ext_resource type="Script" uid="uid://cf80o7nhfih73" path="res://Scripts/Opponent_MAT_DECK.gd" id="20_vs04g"]
 [ext_resource type="PackedScene" uid="uid://barb5envijoxc" path="res://Scenes/Arcane.tscn" id="21_jyqft"]
 [ext_resource type="PackedScene" uid="uid://c65iuybt2dxtw" path="res://Scenes/Exia.tscn" id="22_hwpts"]
 [ext_resource type="PackedScene" uid="uid://c324fwephddgy" path="res://Scenes/Crux.tscn" id="23_3tgeq"]
@@ -88,23 +91,28 @@ script = ExtResource("8_vy5pj")
 [node name="PlayerHand" type="Node2D" parent="."]
 script = ExtResource("7_lgr22")
 
+[node name="EnemyHand" type="Node2D" parent="."]
+script = ExtResource("15_vvnwx")
+
 [node name="InputManager" type="Node2D" parent="."]
 script = ExtResource("13_frkhe")
 
 [node name="CardInformation" parent="." instance=ExtResource("14_1p5hy")]
 
 [node name="OpponentDeck" type="Node2D" parent="."]
+position = Vector2(599.5, 300)
+script = ExtResource("18_btbly")
 
 [node name="Sprite2D" type="Sprite2D" parent="OpponentDeck"]
-position = Vector2(599.5, 300)
 rotation = 3.14159
 scale = Vector2(0.192, 0.192)
 texture = ExtResource("17_qta6b")
 
 [node name="OpponentMatDeck" type="Node2D" parent="."]
+position = Vector2(1361, 300)
+script = ExtResource("20_vs04g")
 
 [node name="Sprite2D" type="Sprite2D" parent="OpponentMatDeck"]
-position = Vector2(1361, 300)
 rotation = 3.14159
 scale = Vector2(0.192, 0.192)
 texture = ExtResource("17_qta6b")
