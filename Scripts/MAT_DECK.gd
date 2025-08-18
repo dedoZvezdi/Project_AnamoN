@@ -11,7 +11,6 @@ const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 @onready var grid_container = $MAT_DECK_VIEW_WINDOW/ScrollContainer/GridContainer
 
 func _ready() -> void:
-	player_deck.shuffle()
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
 	setup_context_menu()
 	setup_deck_view()

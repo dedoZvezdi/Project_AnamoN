@@ -17,8 +17,14 @@ offset_top = 542.0
 offset_right = 408.0
 offset_bottom = 595.0
 
+[node name="Types and Suptypes" type="RichTextLabel" parent="."]
+offset_left = 36.0
+offset_top = 573.0
+offset_right = 436.0
+offset_bottom = 616.0
+
 [node name="Effect" type="RichTextLabel" parent="."]
 offset_left = 57.0
-offset_top = 602.0
+offset_top = 660.0
 offset_right = 408.0
-offset_bottom = 953.0
+offset_bottom = 1011.0
