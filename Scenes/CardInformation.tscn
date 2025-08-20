@@ -24,13 +24,31 @@ offset_right = 436.0
 offset_bottom = 616.0
 
 [node name="Level" type="RichTextLabel" parent="."]
-offset_left = 62.0
+offset_left = 57.0
 offset_top = 607.0
-offset_right = 146.0
+offset_right = 141.0
+offset_bottom = 647.0
+
+[node name="Element" type="RichTextLabel" parent="."]
+offset_left = 100.0
+offset_top = 607.0
+offset_right = 184.0
+offset_bottom = 647.0
+
+[node name="Cost" type="RichTextLabel" parent="."]
+offset_left = 193.0
+offset_top = 607.0
+offset_right = 328.0
 offset_bottom = 647.0
 
 [node name="Effect" type="RichTextLabel" parent="."]
 offset_left = 57.0
-offset_top = 660.0
+offset_top = 642.0
 offset_right = 408.0
-offset_bottom = 1011.0
+offset_bottom = 1027.0
+
+[node name="PowerLifeDurSpeed" type="RichTextLabel" parent="."]
+offset_left = 299.0
+offset_top = 607.0
+offset_right = 455.0
+offset_bottom = 647.0

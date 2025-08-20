@@ -4,6 +4,10 @@ extends Node2D
 @onready var card_name_label = $Name
 @onready var card_effect_lable = $Effect
 @onready var card_types_lable = $"Types and Suptypes"
+@onready var card_level_lable = $Level
+@onready var card_element_lable = $Element
+@onready var card_cost_lable = $Cost
+@onready var card_PLDS_lable = $PowerLifeDurSpeed
 
 var card_database_reference = null
 var default_texture = null
@@ -91,6 +95,10 @@ func _update_card_display(slug: String):
 	card_name_label.clear()
 	card_effect_lable.clear()
 	card_types_lable.clear()
+	card_level_lable.clear()
+	card_element_lable.clear()
+	card_cost_lable.clear()
+	card_PLDS_lable.clear()
 	if preview_sprite and slug != "":
 		var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
 		if ResourceLoader.exists(card_image_path):
@@ -98,8 +106,21 @@ func _update_card_display(slug: String):
 	var name_to_display = ""
 	var effect_to_display = ""
 	var types_to_display = ""
+	var level_to_display = null
+	var element_to_display = null
+	var cost_text_to_display = ""
+	var plds_text_to_display = ""
 	if card_database_reference and card_database_reference.cards_db.has(slug):
 		var data = card_database_reference.cards_db[slug]
+		if data.has("level") and data["level"] != null:
+			level_to_display = data["level"]
+		if data.has("element") and data["element"] != null:
+			element_to_display = data["element"]
+		if data.has("cost_memory") and data["cost_memory"] != null:
+			cost_text_to_display = "MEMORY %s" % str(data["cost_memory"])
+		elif data.has("cost_reserve") and data["cost_reserve"] != null:
+			cost_text_to_display = "RESERVE %s" % str(data["cost_reserve"])
+		plds_text_to_display = _build_plds_text(data)
 		if data.has("edition_id") and not data.has("parent_orientation_slug"):
 			var base_slug = find_base_card_for_edition(data["edition_id"])
 			if base_slug and card_database_reference.cards_db.has(base_slug):
@@ -107,6 +128,16 @@ func _update_card_display(slug: String):
 				name_to_display = base_data.get("name", "")
 				effect_to_display = base_data.get("effect_raw", "")
 				types_to_display = _format_types(base_data)
+				if base_data.has("level") and base_data["level"] != null:
+					level_to_display = base_data["level"]
+				if base_data.has("element") and base_data["element"] != null:
+					element_to_display = base_data["element"]
+				if base_data.has("cost_memory") and base_data["cost_memory"] != null:
+					cost_text_to_display = "MEMORY %s" % str(base_data["cost_memory"])
+				elif base_data.has("cost_reserve") and base_data["cost_reserve"] != null:
+					cost_text_to_display = "RESERVE %s" % str(base_data["cost_reserve"])
+				if plds_text_to_display == "":
+					plds_text_to_display = _build_plds_text(base_data)
 				if (effect_to_display == null or effect_to_display.strip_edges() == "") and base_data.get("flavor"):
 					effect_to_display = base_data["flavor"]
 				elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -122,6 +153,16 @@ func _update_card_display(slug: String):
 				name_to_display = parent_data.get("name", "")
 				effect_to_display = parent_data.get("effect_raw", "")
 				types_to_display = _format_types(parent_data)
+				if parent_data.has("level") and parent_data["level"] != null:
+					level_to_display = parent_data["level"]
+				if parent_data.has("element") and parent_data["element"] != null:
+					element_to_display = parent_data["element"]
+				if parent_data.has("cost_memory") and parent_data["cost_memory"] != null:
+					cost_text_to_display = "MEMORY %s" % str(parent_data["cost_memory"])
+				elif parent_data.has("cost_reserve") and parent_data["cost_reserve"] != null:
+					cost_text_to_display = "RESERVE %s" % str(parent_data["cost_reserve"])
+				if plds_text_to_display == "":
+					plds_text_to_display = _build_plds_text(parent_data)
 				if (effect_to_display == null or effect_to_display.strip_edges() == "") and parent_data.get("flavor"):
 					effect_to_display = parent_data["flavor"]
 				elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -134,6 +175,8 @@ func _update_card_display(slug: String):
 			name_to_display = data.get("name", "")
 			effect_to_display = data.get("effect_raw", "")
 			types_to_display = _format_types(data)
+			if plds_text_to_display == "":
+				plds_text_to_display = _build_plds_text(data)
 			if (effect_to_display == null or effect_to_display.strip_edges() == "") and data.get("flavor"):
 				effect_to_display = data["flavor"]
 			elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -150,6 +193,36 @@ func _update_card_display(slug: String):
 		card_effect_lable.append_text(cleaned_effect)
 	if types_to_display and types_to_display.strip_edges() != "":
 		card_types_lable.append_text("[center]%s[/center]" % types_to_display)
+	if level_to_display != null:
+		card_level_lable.append_text("[left]LV. %s[/left]" % str(level_to_display))
+	if element_to_display != null:
+		card_element_lable.append_text("[center]%s[/center]" % str(element_to_display))
+	if cost_text_to_display != "":
+		card_cost_lable.append_text("[left]%s[/left]" % cost_text_to_display)
+	if plds_text_to_display != "":
+		card_PLDS_lable.append_text("[left]%s[/left]" % plds_text_to_display)
+
+func _build_plds_text(data: Dictionary) -> String:
+	var parts: Array[String] = []
+	if data.has("power") and data["power"] != null:
+		parts.append("POW. %s" % str(data["power"]))
+	if data.has("life") and data["life"] != null:
+		parts.append("LIFE %s" % str(data["life"]))
+	if data.has("durability") and data["durability"] != null:
+		parts.append("DUR. %s" % str(data["durability"]))
+	if data.has("speed") and data["speed"] != null:
+		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
+			if data["speed"] == 1:
+				parts.append("SPD. FAST")
+			elif data["speed"] == 0:
+				parts.append("SPD. SLOW")
+			else:
+				parts.append("SPEED %s" % str(data["speed"]))
+		elif typeof(data["speed"]) == TYPE_BOOL:
+			parts.append("FAST" if data["speed"] else "SLOW")
+		else:
+			parts.append("SPEED ?")
+	return " - ".join(parts)
 
 func clear_preview():
 	if card_name_label:
