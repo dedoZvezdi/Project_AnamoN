@@ -8,6 +8,7 @@ var original_rotation = 0.0
 var is_rotated = false
 var hand_position
 var mouse_inside = false
+var was_rotated_before_drag = false
 
 func _ready() -> void:
 	if get_parent() and get_parent().has_method("connect_card_signals"):
@@ -68,6 +69,14 @@ func rotate_card():
 	else:
 		rotation_degrees = original_rotation + 90
 		is_rotated = true
+
+func on_drag_start():
+	was_rotated_before_drag = is_rotated
+	rotation_degrees = original_rotation
+
+func on_drag_end():
+	is_rotated = false
+	rotation_degrees = original_rotation
 
 func set_current_field(field):
 	current_field = field

@@ -97,7 +97,10 @@ func start_drag(card):
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.z_index = drag_z_index
 	card.scale = normal_scale
-	card.rotation = 0.0
+	if card.has_method("on_drag_start"):
+		card.on_drag_start()
+	else:
+		card.rotation = 0.0
 	remove_card_from_rotated_slot(card)
 	remove_card_from_memory_slot(card)
 	remove_card_from_main_field(card)
@@ -129,6 +132,8 @@ func finish_drag():
 		return
 	_clear_memory_highlights()
 	free_card_from_slot(card_being_dragged)
+	if card_being_dragged.has_method("on_drag_end"):
+		card_being_dragged.on_drag_end()
 	var card_slot_found = raycast_check_for_card_single_slot()
 	if card_slot_found:
 		if player_hand_reference and card_being_dragged in player_hand_reference.player_hand:
