@@ -71,6 +71,8 @@ func _on_deck_view_close():
 	banish_view_window.hide()
 
 func add_card_to_slot(card):
+	if card.has_method("set_current_field"):
+		card.set_current_field(self)
 	cards_in_banish.append(card)
 	card.global_position = global_position
 	card.z_index = base_z_index + cards_in_banish.size()
@@ -81,6 +83,8 @@ func add_card_to_slot(card):
 
 func remove_card_from_slot(card):
 	if card in cards_in_banish:
+		if card.has_method("set_current_field"):
+			card.set_current_field(null)
 		cards_in_banish.erase(card)
 		if cards_in_banish.is_empty():
 			card_in_slot = false

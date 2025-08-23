@@ -15,12 +15,20 @@ func add_card_to_field(card, position = null):
 		card.global_position = position
 	cards_in_field.append(card)
 	card_in_slot = true
+	
+	# Сетваме референцията към field-а в картата
+	if card.has_method("set_current_field"):
+		card.set_current_field(self)
 
 func remove_card_from_field(card):
 	if card in cards_in_field:
 		cards_in_field.erase(card)
 		if cards_in_field.is_empty():
 			card_in_slot = false
+		
+		# Премахваме referencer към field-а
+		if card.has_method("set_current_field"):
+			card.set_current_field(null)
 
 func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):
