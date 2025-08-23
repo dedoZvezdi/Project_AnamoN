@@ -35,12 +35,17 @@ func _on_global_lmb_released():
 	reset_card_colors()
 
 func add_card_to_memory(card):
+	if card.has_method("set_current_field"):
+		card.set_current_field(self)
+
 	cards_in_slot.append(card)
 	show_card_back(card)
 	arrange_cards_symmetrically()
 
 func remove_card_from_memory(card):
 	if card in cards_in_slot:
+		if card.has_method("set_current_field"):
+			card.set_current_field(null)
 		cards_in_slot.erase(card)
 		show_card_front(card)
 		arrange_cards_symmetrically()
@@ -104,6 +109,8 @@ func show_card_front(card):
 			card_image.texture = card.get_meta("original_card_texture")
 
 func insert_card_at_position(card, index):
+	if card.has_method("set_current_field"):
+		card.set_current_field(self)
 	if index < 0:
 		index = 0
 	elif index > cards_in_slot.size():

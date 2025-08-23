@@ -37,6 +37,8 @@ func _exit_tree():
 func add_card_to_hand(card):
 	if not card or not is_instance_valid(card):
 		return
+	if card.has_method("set_current_field"):
+		card.set_current_field(self)
 	if card not in player_hand:
 		player_hand.append(card)
 		card.z_index = HAND_Z_INDEX + player_hand.size()
@@ -207,6 +209,8 @@ func place_card_in_field(card, field_position, field_rotation = 0.0):
 func return_card_to_hand(card):
 	if not card or not is_instance_valid(card):
 		return
+	if card.has_method("set_current_field"):
+		card.set_current_field(self)
 	if card not in player_hand:
 		player_hand.append(card)
 		card.z_index = HAND_Z_INDEX + player_hand.size()
