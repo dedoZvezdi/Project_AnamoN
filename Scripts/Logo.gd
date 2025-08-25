@@ -5,7 +5,6 @@ extends Node2D
 func _ready():
 	$Area2D.input_pickable = true
 	$Area2D.connect("input_event", Callable(self, "_on_Area2D_input_event"))
-	
 	popup_menu.clear()
 	popup_menu.add_item("Memory Random", 0)
 	popup_menu.connect("id_pressed", Callable(self, "_on_popup_menu_id_pressed"))
@@ -24,10 +23,10 @@ func _on_Area2D_input_event(_viewport, event, _shape_idx):
 		var player_hand_node = find_node_recursive(get_tree().get_root(), "PlayerHand")
 		if player_hand_node:
 			player_hand_node.toggle_hand_visibility()
-
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		popup_menu.set_position(get_global_mouse_position())
 		popup_menu.popup()
+		$PopupMenu.reset_size()
 
 func _on_popup_menu_id_pressed(id):
 	if id == 0:
