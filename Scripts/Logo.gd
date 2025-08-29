@@ -16,10 +16,11 @@ var power_value := 0
 var life_value := 0
 
 func _ready():
+	add_to_group("logo")
 	$Area2D.input_pickable = true
-	$Area2D.connect("input_event", Callable(self, "_on_Area2D_input_event"))
+	$Area2D.input_event.connect(_on_Area2D_input_event)
 	build_main_menu()
-	popup_menu.connect("id_pressed", Callable(self, "_on_popup_menu_id_pressed"))
+	popup_menu.id_pressed.connect(_on_popup_menu_id_pressed)
 	setup_status_label()
 	update_status_display()
 
@@ -31,7 +32,7 @@ func setup_status_label():
 	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	status_label.add_theme_font_size_override("font_size", 16)
-	status_label.modulate = Color.WHITE
+	status_label.modulate = Color.GREEN
 	status_label.z_index = 1000
 
 func update_status_display():
@@ -56,10 +57,15 @@ func update_status_display():
 		var mouse_pos = get_local_mouse_position()
 		status_label.position = mouse_pos + Vector2(15, -15)
 
-func _process(_delta):
+func _process(delta: float) -> void:
 	if status_label.visible:
 		var mouse_pos = get_local_mouse_position()
 		status_label.position = mouse_pos + Vector2(15, -15)
+	if popup_menu.visible:
+		var mouse_pos_global = get_global_mouse_position()
+		var area_pos_global = $Area2D.global_position
+		if mouse_pos_global.distance_to(area_pos_global) > 150:
+			popup_menu.hide()
 
 func build_main_menu():
 	showing_dice_menu = false
@@ -78,6 +84,7 @@ func build_main_menu():
 	popup_menu.add_separator()
 	popup_menu.add_item("Surrender", 103)
 	$PopupMenu.reset_size()
+	adjust_popup_position()
 
 func build_dice_menu():
 	showing_dice_menu = true
@@ -94,6 +101,7 @@ func build_dice_menu():
 	popup_menu.add_separator()
 	popup_menu.add_item("Back", 999)
 	$PopupMenu.reset_size()
+	adjust_popup_position()
 
 func build_rps_menu():
 	showing_dice_menu = false
@@ -110,6 +118,7 @@ func build_rps_menu():
 	popup_menu.add_separator()
 	popup_menu.add_item("Back", 999)
 	$PopupMenu.reset_size()
+	adjust_popup_position()
 
 func build_status_menu():
 	showing_dice_menu = false
@@ -127,6 +136,7 @@ func build_status_menu():
 	popup_menu.add_separator()
 	popup_menu.add_item("Back", 999)
 	$PopupMenu.reset_size()
+	adjust_popup_position()
 
 func build_level_menu():
 	showing_dice_menu = false
@@ -142,6 +152,7 @@ func build_level_menu():
 	popup_menu.add_separator()
 	popup_menu.add_item("Back", 999)
 	$PopupMenu.reset_size()
+	adjust_popup_position()
 
 func build_durability_menu():
 	showing_dice_menu = false
@@ -157,6 +168,7 @@ func build_durability_menu():
 	popup_menu.add_separator()
 	popup_menu.add_item("Back", 999)
 	$PopupMenu.reset_size()
+	adjust_popup_position()
 
 func build_power_menu():
 	showing_dice_menu = false
@@ -172,6 +184,7 @@ func build_power_menu():
 	popup_menu.add_separator()
 	popup_menu.add_item("Back", 999)
 	$PopupMenu.reset_size()
+	adjust_popup_position()
 
 func build_life_menu():
 	showing_dice_menu = false
@@ -187,6 +200,7 @@ func build_life_menu():
 	popup_menu.add_separator()
 	popup_menu.add_item("Back", 999)
 	$PopupMenu.reset_size()
+	adjust_popup_position()
 
 func _on_Area2D_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -294,6 +308,20 @@ func _on_popup_menu_id_pressed(id):
 			life_value -= 1
 			update_status_display()
 	$PopupMenu.reset_size()
+
+func adjust_popup_position():
+	var screen_size = get_viewport().get_visible_rect().size
+	var menu_size = popup_menu.get_contents_minimum_size()
+	var pos = popup_menu.position
+	if pos.x + menu_size.x > screen_size.x:
+		pos.x = screen_size.x - menu_size.x
+	if pos.x < 0:
+		pos.x = 0
+	if pos.y + menu_size.y > screen_size.y:
+		pos.y = screen_size.y - menu_size.y
+	if pos.y < 0:
+		pos.y = 0
+	popup_menu.set_position(pos)
 
 func has_active_status() -> bool:
 	return level_value != 0 or durability_value != 0 or power_value != 0 or life_value != 0

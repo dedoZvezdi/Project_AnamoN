@@ -3,6 +3,9 @@ extends Node2D
 signal hovered
 signal hovered_off
 
+@onready var popup_menu: PopupMenu = $PopupMenu
+@onready var area: Area2D = $Area2D
+
 var current_field = null
 var original_rotation = 0.0
 var is_rotated = false
@@ -13,31 +16,35 @@ var was_rotated_before_drag = false
 func _ready() -> void:
 	if get_parent() and get_parent().has_method("connect_card_signals"):
 		get_parent().connect_card_signals(self)
-	$PopupMenu.id_pressed.connect(_on_PopupMenu_id_pressed)
-	$Area2D.input_event.connect(_on_area_2d_input_event)
+	popup_menu.id_pressed.connect(_on_PopupMenu_id_pressed)
+	area.input_event.connect(_on_area_2d_input_event)
 
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if mouse_inside:
-			$PopupMenu.clear()
-			if $PopupMenu.has_theme_constant_override("separation"):
-				$PopupMenu.add_theme_constant_override("separation", 1)
-			$PopupMenu.add_item("Go to Graveyard", 0)
-			$PopupMenu.add_item("Go to Banish FU", 1)
-			$PopupMenu.add_item("Go to Banish FD", 2)
-			$PopupMenu.add_item("Go to TD", 3)
-			$PopupMenu.add_item("Go to BD", 4)
+			var logo_nodes = get_tree().get_nodes_in_group("logo")
+			if logo_nodes.size() > 0:
+				var logo_node = logo_nodes[0]
+				if logo_node.has_method("has_active_status") and logo_node.has_active_status():
+					logo_node.reset_all_status_values()
+					return
+			popup_menu.clear()
+			popup_menu.add_item("Go to Graveyard", 0)
+			popup_menu.add_item("Go to Banish FU", 1)
+			popup_menu.add_item("Go to Banish FD", 2)
+			popup_menu.add_item("Go to TD", 3)
+			popup_menu.add_item("Go to BD", 4)
 			if is_in_main_field():
 				if is_rotated:
-					$PopupMenu.add_item("Awake", 5)
+					popup_menu.add_item("Awake", 5)
 				else:
-					$PopupMenu.add_item("Rest", 5)
-			$PopupMenu.add_item("Show", 6)
-			$PopupMenu.add_item("Transform", 7)
-			$PopupMenu.add_item("Give to your opponent", 8)
-			$PopupMenu.reset_size()
-			$PopupMenu.position = get_global_mouse_position()
-			$PopupMenu.popup()
+					popup_menu.add_item("Rest", 5)
+			popup_menu.add_item("Show", 6)
+			popup_menu.add_item("Transform", 7)
+			popup_menu.add_item("Give to your opponent", 8)
+			popup_menu.reset_size()
+			popup_menu.position = get_global_mouse_position()
+			popup_menu.popup()
 
 func _on_area_2d_mouse_entered() -> void:
 	mouse_inside = true
@@ -54,8 +61,7 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		2: print("Go to Banish FD selected")
 		3: print("Go to TD selected")
 		4: print("Go to BD selected")
-		5: if is_in_main_field():
-			rotate_card()
+		5: if is_in_main_field(): rotate_card()
 		6: print("Show selected")
 		7: print("Transform selected")
 		8: print("Give to your opponent")
