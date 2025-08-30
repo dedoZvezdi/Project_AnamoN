@@ -15,8 +15,6 @@ func add_card_to_field(card, position = null):
 		card.global_position = position
 	cards_in_field.append(card)
 	card_in_slot = true
-	
-	# Сетваме референцията към field-а в картата
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 
