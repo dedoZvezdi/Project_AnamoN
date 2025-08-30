@@ -130,6 +130,20 @@ z_index = -1
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_3p273")
 
+[node name="Level" type="RichTextLabel" parent="."]
+offset_left = -219.231
+offset_top = -171.795
+offset_right = -75.2307
+offset_bottom = -117.795
+
+[node name="PowerLifeDurSpeed" type="RichTextLabel" parent="."]
+offset_left = -122.0
+offset_top = 172.0
+offset_right = 122.0
+offset_bottom = 228.0
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]

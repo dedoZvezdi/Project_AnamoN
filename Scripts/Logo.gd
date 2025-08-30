@@ -2,7 +2,10 @@ extends Node2D
 
 @onready var popup_menu: PopupMenu = $PopupMenu
 
-var status_label: Label
+var level_label: Label
+var durability_label: Label
+var power_label: Label
+var life_label: Label
 var showing_dice_menu := false
 var showing_rps_menu := false
 var showing_status_menu := false
@@ -21,46 +24,84 @@ func _ready():
 	$Area2D.input_event.connect(_on_Area2D_input_event)
 	build_main_menu()
 	popup_menu.id_pressed.connect(_on_popup_menu_id_pressed)
-	setup_status_label()
+	setup_status_labels()
 	update_status_display()
 
-func setup_status_label():
-	if not has_node("StatusLabel"):
-		status_label = Label.new()
-		status_label.name = "StatusLabel"
-		add_child(status_label)
-	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	status_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	status_label.add_theme_font_size_override("font_size", 16)
-	status_label.modulate = Color.GREEN
-	status_label.z_index = 1000
+func setup_status_labels():
+	if not has_node("LevelLabel"):
+		level_label = Label.new()
+		level_label.name = "LevelLabel"
+		add_child(level_label)
+	else:
+		level_label = $LevelLabel
+	if not has_node("DurabilityLabel"):
+		durability_label = Label.new()
+		durability_label.name = "DurabilityLabel"
+		add_child(durability_label)
+	else:
+		durability_label = $DurabilityLabel
+	if not has_node("PowerLabel"):
+		power_label = Label.new()
+		power_label.name = "PowerLabel"
+		add_child(power_label)
+	else:
+		power_label = $PowerLabel
+	if not has_node("LifeLabel"):
+		life_label = Label.new()
+		life_label.name = "LifeLabel"
+		add_child(life_label)
+	else:
+		life_label = $LifeLabel
+	var labels = [level_label, durability_label, power_label, life_label]
+	for label in labels:
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override("font_size", 16)
+		label.z_index = 1000
 
 func update_status_display():
-	var status_parts = []
+	var mouse_pos = get_local_mouse_position()
+	var offset_y = 0
+	var line_height = 20
 	if level_value != 0:
 		var level_text = "Level " + ("+" if level_value > 0 else "") + str(level_value)
-		status_parts.append(level_text)
+		level_label.text = level_text
+		level_label.modulate = Color.GREEN if level_value > 0 else Color.RED
+		level_label.position = mouse_pos + Vector2(15, -15 + offset_y)
+		level_label.visible = true
+		offset_y += line_height
+	else:
+		level_label.visible = false
 	if durability_value != 0:
 		var durability_text = "Durability " + ("+" if durability_value > 0 else "") + str(durability_value)
-		status_parts.append(durability_text)
+		durability_label.text = durability_text
+		durability_label.modulate = Color.GREEN if durability_value > 0 else Color.RED
+		durability_label.position = mouse_pos + Vector2(15, -15 + offset_y)
+		durability_label.visible = true
+		offset_y += line_height
+	else:
+		durability_label.visible = false
 	if power_value != 0:
 		var power_text = "Power " + ("+" if power_value > 0 else "") + str(power_value)
-		status_parts.append(power_text)
+		power_label.text = power_text
+		power_label.modulate = Color.GREEN if power_value > 0 else Color.RED
+		power_label.position = mouse_pos + Vector2(15, -15 + offset_y)
+		power_label.visible = true
+		offset_y += line_height
+	else:
+		power_label.visible = false
 	if life_value != 0:
 		var life_text = "Life " + ("+" if life_value > 0 else "") + str(life_value)
-		status_parts.append(life_text)
-	if status_parts.size() == 0:
-		status_label.visible = false
+		life_label.text = life_text
+		life_label.modulate = Color.GREEN if life_value > 0 else Color.RED
+		life_label.position = mouse_pos + Vector2(15, -15 + offset_y)
+		life_label.visible = true
 	else:
-		status_label.visible = true
-		status_label.text = "\n".join(status_parts)
-		var mouse_pos = get_local_mouse_position()
-		status_label.position = mouse_pos + Vector2(15, -15)
+		life_label.visible = false
 
 func _process(delta: float) -> void:
-	if status_label.visible:
-		var mouse_pos = get_local_mouse_position()
-		status_label.position = mouse_pos + Vector2(15, -15)
+	if has_active_status():
+		update_status_display()
 	if popup_menu.visible:
 		var mouse_pos_global = get_global_mouse_position()
 		var area_pos_global = $Area2D.global_position
