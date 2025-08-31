@@ -187,6 +187,9 @@ func rotate_card():
 func on_drag_start():
 	was_rotated_before_drag = is_rotated
 	rotation_degrees = original_rotation
+	if is_in_main_field():
+		hide_card_info()
+		emit_signal("hovered_off", self)
 
 func on_drag_end():
 	is_rotated = false
