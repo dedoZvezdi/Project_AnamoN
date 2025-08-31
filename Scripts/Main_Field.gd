@@ -23,8 +23,6 @@ func remove_card_from_field(card):
 		cards_in_field.erase(card)
 		if cards_in_field.is_empty():
 			card_in_slot = false
-		
-		# Премахваме referencer към field-а
 		if card.has_method("set_current_field"):
 			card.set_current_field(null)
 
