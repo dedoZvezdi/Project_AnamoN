@@ -30,7 +30,8 @@ func _process(_delta: float) -> void:
 		return
 	var current_hovered_card = card_manager_reference.last_hovered_card
 	if current_hovered_card and is_instance_valid(current_hovered_card):
-		if current_hovered_card != last_displayed_card:
+		var current_slug = get_slug_from_card(current_hovered_card)
+		if current_hovered_card != last_displayed_card or current_slug != current_displayed_slug:
 			show_card_preview(current_hovered_card)
 			last_displayed_card = current_hovered_card
 
