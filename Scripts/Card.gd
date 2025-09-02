@@ -180,19 +180,17 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					logo_node.reset_all_status_values()
 					return
 			popup_menu.clear()
-			popup_menu.add_item("Go to Graveyard", 0)
-			popup_menu.add_item("Go to Banish FU", 1)
-			popup_menu.add_item("Go to Banish FD", 2)
-			popup_menu.add_item("Go to TD", 3)
-			popup_menu.add_item("Go to BD", 4)
+			popup_menu.add_item("Go to Banish Face Down", 1)
+			popup_menu.add_item("Go to Top Deck", 2)
+			popup_menu.add_item("Go to Bottom Deck", 3)
 			if is_in_main_field():
 				if is_rotated:
-					popup_menu.add_item("Awake", 5)
+					popup_menu.add_item("Awake", 4)
 				else:
-					popup_menu.add_item("Rest", 5)
+					popup_menu.add_item("Rest", 4)
 			var slug = get_slug_from_card()
 			if slug in TRANSFORMABLE_SLUGS:
-				popup_menu.add_item("Transform", 6)
+				popup_menu.add_item("Transform", 5)
 			var mouse_pos = get_global_mouse_position()
 			popup_menu.reset_size()
 			var screen_size = get_viewport().get_visible_rect().size
@@ -331,13 +329,11 @@ func find_base_card_for_edition(edition_id, card_database):
 
 func _on_PopupMenu_id_pressed(id: int) -> void:
 	match id:
-		0: print("Go to Graveyard selected")
-		1: print("Go to Banish FU selected")
-		2: print("Go to Banish FD selected")
-		3: print("Go to TD selected")
-		4: print("Go to BD selected")
-		5: if is_in_main_field(): rotate_card()
-		6: transform_card()
+		1: print("Go to Banish FD selected")
+		2: print("Go to TD selected")
+		3: print("Go to BD selected")
+		4: if is_in_main_field(): rotate_card()
+		5: transform_card()
 
 func rotate_card():
 	if not is_in_main_field():
