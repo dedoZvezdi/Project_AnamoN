@@ -17,6 +17,7 @@ var level_value := 0
 var durability_value := 0
 var power_value := 0
 var life_value := 0
+var chat_node = null
 
 func _ready():
 	add_to_group("logo")
@@ -26,6 +27,27 @@ func _ready():
 	popup_menu.id_pressed.connect(_on_popup_menu_id_pressed)
 	setup_status_labels()
 	update_status_display()
+	find_chat_node()
+
+func find_chat_node():
+	chat_node = find_node_recursive(get_tree().get_root(), "Chat")
+	if not chat_node:
+		chat_node = find_node_by_script(get_tree().get_root())
+
+func find_node_by_script(node):
+	if node.has_method("send_system_message"):
+		return node
+	for child in node.get_children():
+		var found = find_node_by_script(child)
+		if found:
+			return found
+	return null
+
+func send_to_chat(message: String):
+	if chat_node and chat_node.has_method("send_system_message"):
+		chat_node.send_system_message(message)
+	else:
+		print("SYSTEM: " + message)
 
 func setup_status_labels():
 	if not has_node("LevelLabel"):
@@ -271,7 +293,7 @@ func _on_popup_menu_id_pressed(id):
 		elif id == 101:
 			popup_menu.hide()
 			var result = ["HEAD", "TAIL"].pick_random()
-			print("SYSTEM: COIN - " + result)
+			send_to_chat("COIN - " + result)
 		elif id == 102:
 			build_dice_menu()
 		elif id == 104:
@@ -280,14 +302,14 @@ func _on_popup_menu_id_pressed(id):
 			build_status_menu()
 		elif id == 103:
 			popup_menu.hide()
-			print("SYSTEM: Player surrendered")
+			send_to_chat("Player surrendered")
 	elif showing_dice_menu:
 		if id == 999:
 			build_main_menu()
 		else:
 			popup_menu.hide()
 			var roll = randi_range(1, id)
-			print("SYSTEM: D" + str(id) + " - " + str(roll))
+			send_to_chat("D" + str(id) + " - " + str(roll))
 	elif showing_rps_menu:
 		if id == 999:
 			build_main_menu()
@@ -300,7 +322,7 @@ func _on_popup_menu_id_pressed(id):
 				choice = "Paper"
 			elif id == 203:
 				choice = "Scissors"
-			print("SYSTEM: RPS - " + choice)
+			send_to_chat("RPS - " + choice)
 	elif showing_status_menu:
 		if id == 999:
 			build_main_menu()

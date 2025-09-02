@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3 uid="uid://kv77quhf6roj"]
+
+[ext_resource type="Script" uid="uid://dddogrjplyi36" path="res://Scripts/Chat.gd" id="1_yc4ao"]
+
+[node name="Chat" type="Node2D"]
+script = ExtResource("1_yc4ao")
+
+[node name="Send" type="Button" parent="."]
+offset_left = 1806.0
+offset_top = 1007.0
+offset_right = 1885.0
+offset_bottom = 1055.0
+text = "SEND"
+
+[node name="Message" type="LineEdit" parent="."]
+offset_left = 1502.0
+offset_top = 1007.0
+offset_right = 1805.0
+offset_bottom = 1057.0
+placeholder_text = "Message"
+
+[node name="TextEdit" type="TextEdit" parent="."]
+offset_left = 1502.0
+offset_top = 581.0
+offset_right = 1884.0
+offset_bottom = 1007.0
