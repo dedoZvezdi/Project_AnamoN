@@ -14,6 +14,7 @@ var is_rotated = false
 var hand_position
 var mouse_inside = false
 var was_rotated_before_drag = false
+var is_dragging = false
 var card_information_reference = null
 
 const TRANSFORMABLE_SLUGS := [
@@ -169,6 +170,8 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 	return null
 
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if is_dragging:
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if mouse_inside:
 			if is_in_graveyard() or is_in_banish():
@@ -209,7 +212,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 func _on_area_2d_mouse_entered() -> void:
 	mouse_inside = true
 	emit_signal("hovered", self)
-	if is_in_main_field():
+	if is_in_main_field() and not is_dragging:
 		show_card_info()
 
 func _on_area_2d_mouse_exited() -> void:
@@ -238,7 +241,7 @@ func transform_card():
 			current_field.current_champion_card = self
 			global_position = current_field.global_position
 			z_index = 400
-	if card_information_reference and mouse_inside:
+	if card_information_reference and mouse_inside and not is_dragging:
 		hide_card_info()
 		show_card_info()
 		card_information_reference.show_card_preview(self)
@@ -346,13 +349,14 @@ func rotate_card():
 		is_rotated = true
 
 func on_drag_start():
+	is_dragging = true
 	was_rotated_before_drag = is_rotated
 	rotation_degrees = original_rotation
-	if is_in_main_field():
-		hide_card_info()
-		emit_signal("hovered_off", self)
+	hide_card_info()
+	emit_signal("hovered_off", self)
 
 func on_drag_end():
+	is_dragging = false
 	is_rotated = false
 	rotation_degrees = original_rotation
 
