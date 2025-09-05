@@ -309,6 +309,9 @@ func raycast_check_at_position(pos):
 
 func handle_hover():
 	if card_being_dragged or animation_in_progress:
+		for c in connected_cards:
+			if is_instance_valid(c) and c.has_node("Area2D"):
+				c.get_node("Area2D").input_pickable = false
 		return
 	validate_references()
 	var current_card = raycast_check_for_card()
@@ -332,6 +335,9 @@ func handle_hover():
 					break
 		if current_card and is_instance_valid(current_card) and not is_card_truly_hovered(current_card):
 			current_card = null
+	for c in connected_cards:
+		if is_instance_valid(c) and c.has_node("Area2D"):
+			c.get_node("Area2D").input_pickable = (current_card != null and c == current_card)
 	if current_card != last_hovered_card:
 		if last_hovered_card and is_instance_valid(last_hovered_card):
 			if can_drag_card(last_hovered_card):
@@ -346,6 +352,10 @@ func handle_hover():
 					get_banish_slot_for_card(last_hovered_card).clear_hovered_card()
 				else:
 					last_hovered_card.z_index = base_z_index
+			if last_hovered_card.has_node("Area2D"):
+				last_hovered_card.get_node("Area2D").input_pickable = false
+			if last_hovered_card.has_method("hide_card_info"):
+				last_hovered_card.hide_card_info()
 		if current_card and is_instance_valid(current_card):
 			if can_drag_card(current_card):
 				current_card.get_parent().move_child(current_card, current_card.get_parent().get_child_count())
@@ -360,6 +370,10 @@ func handle_hover():
 					get_banish_slot_for_card(current_card).bring_card_to_front(current_card)
 				else:
 					current_card.z_index = hover_z_index
+				if current_card.has_node("Area2D"):
+					current_card.get_node("Area2D").input_pickable = true
+				if current_card.has_method("is_in_main_field") and current_card.is_in_main_field() and not current_card.get("is_dragging"):
+					current_card.show_card_info()
 		last_hovered_card = current_card
 
 func connect_card_signals(card):
