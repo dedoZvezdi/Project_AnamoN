@@ -64,6 +64,7 @@ func show_card_preview(card):
 	if not card or not is_instance_valid(card) or not preview_sprite:
 		return
 	current_displayed_slug = card_slug
+	last_displayed_card = card
 	var is_in_memory_slot = false
 	var memory_slots = get_tree().get_nodes_in_group("memory_slots")
 	for memory_slot in memory_slots:
@@ -111,6 +112,7 @@ func _update_card_display(slug: String):
 	var element_to_display = null
 	var cost_text_to_display = ""
 	var plds_text_to_display = ""
+	var mods = get_effective_mods_for_card()
 	if card_database_reference and card_database_reference.cards_db.has(slug):
 		var data = card_database_reference.cards_db[slug]
 		if data.has("level") and data["level"] != null:
@@ -121,7 +123,7 @@ func _update_card_display(slug: String):
 			cost_text_to_display = "MEMORY %s" % str(data["cost_memory"])
 		elif data.has("cost_reserve") and data["cost_reserve"] != null:
 			cost_text_to_display = "RESERVE %s" % str(data["cost_reserve"])
-		plds_text_to_display = _build_plds_text(data)
+		plds_text_to_display = _build_plds_text_effective(data, mods)
 		if data.has("edition_id") and not data.has("parent_orientation_slug"):
 			var base_slug = find_base_card_for_edition(data["edition_id"])
 			if base_slug and card_database_reference.cards_db.has(base_slug):
@@ -138,7 +140,7 @@ func _update_card_display(slug: String):
 				elif base_data.has("cost_reserve") and base_data["cost_reserve"] != null:
 					cost_text_to_display = "RESERVE %s" % str(base_data["cost_reserve"])
 				if plds_text_to_display == "":
-					plds_text_to_display = _build_plds_text(base_data)
+					plds_text_to_display = _build_plds_text_effective(base_data, mods)
 				if (effect_to_display == null or effect_to_display.strip_edges() == "") and base_data.get("flavor"):
 					effect_to_display = base_data["flavor"]
 				elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -163,7 +165,7 @@ func _update_card_display(slug: String):
 				elif parent_data.has("cost_reserve") and parent_data["cost_reserve"] != null:
 					cost_text_to_display = "RESERVE %s" % str(parent_data["cost_reserve"])
 				if plds_text_to_display == "":
-					plds_text_to_display = _build_plds_text(parent_data)
+					plds_text_to_display = _build_plds_text_effective(parent_data, mods)
 				if (effect_to_display == null or effect_to_display.strip_edges() == "") and parent_data.get("flavor"):
 					effect_to_display = parent_data["flavor"]
 				elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -177,7 +179,7 @@ func _update_card_display(slug: String):
 			effect_to_display = data.get("effect_raw", "")
 			types_to_display = _format_types(data)
 			if plds_text_to_display == "":
-				plds_text_to_display = _build_plds_text(data)
+				plds_text_to_display = _build_plds_text_effective(data, mods)
 			if (effect_to_display == null or effect_to_display.strip_edges() == "") and data.get("flavor"):
 				effect_to_display = data["flavor"]
 			elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -195,6 +197,8 @@ func _update_card_display(slug: String):
 	if types_to_display and types_to_display.strip_edges() != "":
 		card_types_lable.append_text("[center]%s[/center]" % types_to_display)
 	if level_to_display != null:
+		var lvl_eff = int(level_to_display) + int(mods.get("level", 0))
+		level_to_display = max(0, lvl_eff)
 		card_level_lable.append_text("[left]LV. %s[/left]" % str(level_to_display))
 	if element_to_display != null:
 		card_element_lable.append_text("[center]%s[/center]" % str(element_to_display))
@@ -224,6 +228,42 @@ func _build_plds_text(data: Dictionary) -> String:
 		else:
 			parts.append("SPEED ?")
 	return " - ".join(parts)
+
+func _build_plds_text_effective(data: Dictionary, mods: Dictionary) -> String:
+	var parts: Array[String] = []
+	if data.has("power") and data["power"] != null:
+		var p = int(data["power"]) + int(mods.get("power", 0))
+		p = max(0, p)
+		parts.append("POW. %s" % str(p))
+	if data.has("life") and data["life"] != null:
+		var l = int(data["life"]) + int(mods.get("life", 0))
+		l = max(0, l)
+		parts.append("LIFE %s" % str(l))
+	if data.has("durability") and data["durability"] != null:
+		var d = int(data["durability"]) + int(mods.get("durability", 0))
+		d = max(0, d)
+		parts.append("DUR. %s" % str(d))
+	if data.has("speed") and data["speed"] != null:
+		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
+			if data["speed"] == 1:
+				parts.append("SPD. FAST")
+			elif data["speed"] == 0:
+				parts.append("SPD. SLOW")
+			else:
+				parts.append("SPEED %s" % str(data["speed"]))
+		elif typeof(data["speed"]) == TYPE_BOOL:
+			parts.append("FAST" if data["speed"] else "SLOW")
+		else:
+			parts.append("SPEED ?")
+	return " - ".join(parts)
+
+func get_effective_mods_for_card() -> Dictionary:
+	var zero = {"level": 0, "power": 0, "life": 0, "durability": 0}
+	if last_displayed_card and is_instance_valid(last_displayed_card):
+		if last_displayed_card.has_method("is_in_main_field") and last_displayed_card.is_in_main_field():
+			if last_displayed_card.has_method("get_runtime_modifiers"):
+				return last_displayed_card.get_runtime_modifiers()
+	return zero
 
 func clear_preview():
 	if card_name_label:

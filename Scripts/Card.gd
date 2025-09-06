@@ -16,6 +16,7 @@ var mouse_inside = false
 var was_rotated_before_drag = false
 var is_dragging = false
 var card_information_reference = null
+var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
 
 const TRANSFORMABLE_SLUGS := [
 	"huaji-of-heavens-rise-hvn1e","huaji-of-abyssal-fall-hvn1e","fatestone-of-balance-hvn",
@@ -180,7 +181,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 			if logo_nodes.size() > 0:
 				var logo_node = logo_nodes[0]
 				if logo_node.has_method("has_active_status") and logo_node.has_active_status():
-					logo_node.reset_all_status_values()
+					apply_logo_status_to_self(logo_node)
 					return
 			popup_menu.clear()
 			popup_menu.add_item("Go to Banish Face Down", 1)
@@ -241,6 +242,8 @@ func transform_card():
 			current_field.current_champion_card = self
 			global_position = current_field.global_position
 			z_index = 400
+	if is_in_main_field():
+		clear_runtime_modifiers()
 	if card_information_reference and mouse_inside and not is_dragging:
 		hide_card_info()
 		show_card_info()
@@ -264,7 +267,7 @@ func show_card_info():
 	var data = card_database.cards_db[card_slug]
 	if data.has("level") and data["level"] != null:
 		level_to_display = data["level"]
-	plds_text_to_display = _build_plds_text(data)
+	plds_text_to_display = _build_plds_text_effective(data)
 	if data.has("edition_id") and not data.has("parent_orientation_slug"):
 		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
 		if base_slug and card_database.cards_db.has(base_slug):
@@ -272,7 +275,7 @@ func show_card_info():
 			if base_data.has("level") and base_data["level"] != null:
 				level_to_display = base_data["level"]
 			if plds_text_to_display == "":
-				plds_text_to_display = _build_plds_text(base_data)
+				plds_text_to_display = _build_plds_text_effective(base_data)
 	elif data.has("parent_orientation_slug"):
 		var parent_slug = data["parent_orientation_slug"]
 		if card_database.cards_db.has(parent_slug):
@@ -280,9 +283,13 @@ func show_card_info():
 			if parent_data.has("level") and parent_data["level"] != null:
 				level_to_display = parent_data["level"]
 			if plds_text_to_display == "":
-				plds_text_to_display = _build_plds_text(parent_data)
-	if level_to_display != null and card_level_lable:
-		card_level_lable.append_text("[left][font_size=32]LV. %s[/font_size][/left]" % str(level_to_display))
+				plds_text_to_display = _build_plds_text_effective(parent_data)
+	if level_to_display != null:
+		if is_in_main_field():
+			var lvl_eff = int(level_to_display) + int(runtime_modifiers.get("level", 0))
+			level_to_display = max(0, lvl_eff)
+		if card_level_lable:
+			card_level_lable.append_text("[left][font_size=32]LV. %s[/font_size][/left]" % str(level_to_display))
 	if plds_text_to_display != "" and card_PLDS_lable:
 		card_PLDS_lable.append_text("[right][font_size=26]%s[/font_size][/right]" % plds_text_to_display)
 
@@ -300,6 +307,35 @@ func _build_plds_text(data: Dictionary) -> String:
 		parts.append("LIFE %s" % str(data["life"]))
 	if data.has("durability") and data["durability"] != null:
 		parts.append("DUR. %s" % str(data["durability"]))
+	if data.has("speed") and data["speed"] != null:
+		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
+			if data["speed"] == 1:
+				parts.append("SPD. FAST")
+			elif data["speed"] == 0:
+				parts.append("SPD. SLOW")
+			else:
+				parts.append("SPEED %s" % str(data["speed"]))
+		elif typeof(data["speed"]) == TYPE_BOOL:
+			parts.append("FAST" if data["speed"] else "SLOW")
+		else:
+			parts.append("SPEED ?")
+	return " - ".join(parts)
+
+func _build_plds_text_effective(data: Dictionary) -> String:
+	var parts: Array[String] = []
+	var mods = runtime_modifiers if is_in_main_field() else {"level": 0, "power": 0, "life": 0, "durability": 0}
+	if data.has("power") and data["power"] != null:
+		var val = int(data["power"]) + int(mods.get("power", 0))
+		val = max(0, val)
+		parts.append("POW. %s" % str(val))
+	if data.has("life") and data["life"] != null:
+		var val2 = int(data["life"]) + int(mods.get("life", 0))
+		val2 = max(0, val2)
+		parts.append("LIFE %s" % str(val2))
+	if data.has("durability") and data["durability"] != null:
+		var val3 = int(data["durability"]) + int(mods.get("durability", 0))
+		val3 = max(0, val3)
+		parts.append("DUR. %s" % str(val3))
 	if data.has("speed") and data["speed"] != null:
 		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
 			if data["speed"] == 1:
@@ -361,7 +397,11 @@ func on_drag_end():
 	rotation_degrees = original_rotation
 
 func set_current_field(field):
+	var was_in_main = is_in_main_field()
 	current_field = field
+	var now_in_main = is_in_main_field()
+	if was_in_main and not now_in_main:
+		clear_runtime_modifiers()
 
 func is_in_main_field() -> bool:
 	return current_field != null and current_field.is_in_group("main_fields")
@@ -371,6 +411,94 @@ func is_in_memory_slot() -> bool:
 
 func is_in_graveyard() -> bool:
 	return current_field != null and current_field.is_in_group("single_card_slots")
+
+func clear_runtime_modifiers():
+	runtime_modifiers["level"] = 0
+	runtime_modifiers["power"] = 0
+	runtime_modifiers["life"] = 0
+	runtime_modifiers["durability"] = 0
+
+func get_runtime_modifiers() -> Dictionary:
+	return runtime_modifiers.duplicate()
+
+func _resolve_data_for_stats() -> Dictionary:
+	if not card_information_reference:
+		return {}
+	var card_database = card_information_reference.card_database_reference
+	var slug = get_slug_from_card()
+	if not card_database or not card_database.cards_db.has(slug):
+		return {}
+	var data = card_database.cards_db[slug]
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
+		if base_slug and card_database.cards_db.has(base_slug):
+			return card_database.cards_db[base_slug]
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database.cards_db.has(parent_slug):
+			return card_database.cards_db[parent_slug]
+	return data
+
+func apply_logo_status_to_self(logo_node):
+	if not is_in_main_field():
+		logo_node.reset_all_status_values()
+		return
+	var data = _resolve_data_for_stats()
+	if data.size() == 0:
+		logo_node.reset_all_status_values()
+		return
+	if data.has("level") and data["level"] != null and logo_node.level_value != 0:
+		var base_lvl = int(data["level"]) 
+		var old = int(runtime_modifiers.get("level", 0))
+		var proposed = old + int(logo_node.level_value)
+		var new_mod = max(-base_lvl, proposed)
+		runtime_modifiers["level"] = new_mod
+	if data.has("durability") and data["durability"] != null and logo_node.durability_value != 0:
+		var base_dur = int(data["durability"]) 
+		var oldd = int(runtime_modifiers.get("durability", 0))
+		var proposedd = oldd + int(logo_node.durability_value)
+		var new_modd = max(-base_dur, proposedd)
+		runtime_modifiers["durability"] = new_modd
+	if data.has("power") and data["power"] != null and logo_node.power_value != 0:
+		var base_pow = int(data["power"]) 
+		var oldp = int(runtime_modifiers.get("power", 0))
+		var proposedp = oldp + int(logo_node.power_value)
+		var new_modp = max(-base_pow, proposedp)
+		runtime_modifiers["power"] = new_modp
+	if data.has("life") and data["life"] != null and logo_node.life_value != 0:
+		var base_life = int(data["life"]) 
+		var oldl = int(runtime_modifiers.get("life", 0))
+		var proposedl = oldl + int(logo_node.life_value)
+		var new_modl = max(-base_life, proposedl)
+		runtime_modifiers["life"] = new_modl
+		var applied_delta = new_modl - oldl
+		if applied_delta != 0 and current_field and current_field.has_method("is_champion_card") and current_field.is_champion_card(self):
+			if current_field.has_method("adjust_champion_life_delta"):
+				current_field.adjust_champion_life_delta(applied_delta)
+	logo_node.reset_all_status_values()
+	if card_level_lable:
+		card_level_lable.clear()
+	if card_PLDS_lable:
+		card_PLDS_lable.clear()
+	show_card_info()
+	if card_information_reference and mouse_inside and not is_dragging:
+		card_information_reference.show_card_preview(self)
+
+func apply_champion_life_delta(delta):
+	var data = _resolve_data_for_stats()
+	if data.size() == 0:
+		return
+	if data.has("life") and data["life"] != null:
+		var base_life = int(data["life"]) 
+		var new_modl = max(-base_life, int(delta))
+		runtime_modifiers["life"] = new_modl
+		if card_level_lable:
+			card_level_lable.clear()
+		if card_PLDS_lable:
+			card_PLDS_lable.clear()
+		show_card_info()
+		if card_information_reference and mouse_inside and not is_dragging:
+			card_information_reference.show_card_preview(self)
 
 func is_in_banish() -> bool:
 	return current_field != null and current_field.is_in_group("rotated_slots")
