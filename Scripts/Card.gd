@@ -242,6 +242,9 @@ func transform_card():
 			current_field.current_champion_card = self
 			global_position = current_field.global_position
 			z_index = 400
+			current_field.champion_life_delta = 0
+			if has_method("apply_champion_life_delta"):
+				apply_champion_life_delta(0)
 	if is_in_main_field():
 		clear_runtime_modifiers()
 	if card_information_reference and mouse_inside and not is_dragging:
