@@ -4,6 +4,10 @@ var cards_in_field = []
 var base_position
 var card_in_slot = false
 var current_champion_card = null
+var champion_life_delta := 0
+
+func adjust_champion_life_delta(delta):
+	champion_life_delta += int(delta)
 
 func _ready() -> void:
 	base_position = Vector2.ZERO
@@ -18,10 +22,17 @@ func add_card_to_field(card, position = null):
 			current_champion_card = card
 			cards_in_field.append(card)
 			card_in_slot = true
+		if card and is_instance_valid(card) and card.has_method("apply_champion_life_delta"):
+			card.apply_champion_life_delta(champion_life_delta)
 		card.global_position = global_position
 		card.z_index = 400
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
+		if card.has_method("show_card_info"):
+			card.show_card_info()
+		var card_info_ref = find_card_information_reference()
+		if card_info_ref and card_info_ref.has_method("show_card_preview"):
+			card_info_ref.show_card_preview(card)
 	else:
 		if not (card in cards_in_field):
 			cards_in_field.append(card)

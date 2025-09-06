@@ -248,7 +248,7 @@ func _highlight_card_at_index(index: int):
 	if index >= 0 and index < cards_in_slot.size():
 		var card = cards_in_slot[index]
 		if card and is_instance_valid(card):
-			card.modulate = Color(0.5, 0.5, 1.9, 1)
+			card.modulate = Color(0.7, 1.3, 0.7, 1)
 
 func _clear_current_highlight():
 	for i in range(cards_in_slot.size()):
