@@ -192,9 +192,10 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					popup_menu.add_item("Awake", 4)
 				else:
 					popup_menu.add_item("Rest", 4)
-			var slug = get_slug_from_card()
-			if slug in TRANSFORMABLE_SLUGS:
-				popup_menu.add_item("Transform", 5)
+			if is_in_main_field():
+				var slug = get_slug_from_card()
+				if slug in TRANSFORMABLE_SLUGS:
+					popup_menu.add_item("Transform", 5)
 			var mouse_pos = get_global_mouse_position()
 			popup_menu.reset_size()
 			var screen_size = get_viewport().get_visible_rect().size
@@ -371,7 +372,7 @@ func find_base_card_for_edition(edition_id, card_database):
 
 func _on_PopupMenu_id_pressed(id: int) -> void:
 	match id:
-		1: print("Go to Banish FD selected")
+		1: go_to_banish_face_down()
 		2: print("Go to TD selected")
 		3: print("Go to BD selected")
 		4: if is_in_main_field(): rotate_card()
@@ -505,3 +506,30 @@ func apply_champion_life_delta(delta):
 
 func is_in_banish() -> bool:
 	return current_field != null and current_field.is_in_group("rotated_slots")
+
+func go_to_banish_face_down():
+	var scene = get_tree().get_current_scene()
+	if scene == null:
+		return
+	var banish_node = scene.find_child("BANISH", true, false)
+	if banish_node == null:
+		return
+	var player_hand_node = scene.find_child("PlayerHand", true, false)
+	if player_hand_node and player_hand_node.has_method("remove_card_from_hand"):
+		player_hand_node.remove_card_from_hand(self)
+	if current_field:
+		if current_field.is_in_group("main_fields") and current_field.has_method("remove_card_from_field"):
+			current_field.remove_card_from_field(self)
+		elif current_field.is_in_group("memory_slots") and current_field.has_method("remove_card_from_memory"):
+			current_field.remove_card_from_memory(self)
+		elif current_field.has_method("remove_card_from_slot"):
+			current_field.remove_card_from_slot(self)
+	# Add to banish slot
+	if banish_node.has_method("add_card_to_slot"):
+		banish_node.add_card_to_slot(self)
+	if has_node("AnimationPlayer"):
+		var anim: AnimationPlayer = $AnimationPlayer
+		if anim and anim.has_animation("card_flip"):
+			anim.play("card_flip")
+	if banish_node.has_method("show_card_back"):
+		banish_node.show_card_back(self)

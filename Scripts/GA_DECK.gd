@@ -5,6 +5,7 @@ var player_deck = ["fabled-ruby-fatestone-hvn1e","excalibur-reflected-edge-dtr1e
 
 var card_database_reference
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
+var selected_card_slug: String = ""
 
 @onready var context_menu = $PopupMenu
 @onready var deck_view_window = $DeckViewWindow
@@ -26,6 +27,7 @@ func setup_context_menu():
 func setup_deck_view():
 	deck_view_window.close_requested.connect(_on_deck_view_close)
 	deck_view_window.hide()
+	$DeckViewWindow/PopupMenu.id_pressed.connect(_on_deck_view_popup_menu_pressed)
 
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
@@ -67,17 +69,48 @@ func create_card_display(card_name: String):
 	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
 	return card_display
 
-func _on_card_display_popup_menu(_slug):
+func _on_card_display_popup_menu(slug):
+	selected_card_slug = slug
 	var popup_menu = $DeckViewWindow/PopupMenu
 	popup_menu.clear()
-	popup_menu.add_item("test5")
-	popup_menu.add_item("test6")
+	popup_menu.add_item("Go Top Deck", 0)
+	popup_menu.add_item("Go Bottom Deck", 1)
 	popup_menu.popup(Rect2(get_viewport().get_mouse_position(), Vector2(0, 0)))
+
+func _on_deck_view_popup_menu_pressed(id):
+	match id:
+		0: move_card_to_top()
+		1: move_card_to_bottom()
+
+func move_card_to_top():
+	if selected_card_slug == "":
+		return
+	var card_index = player_deck.find(selected_card_slug)
+	if card_index == -1:
+		return
+	var card_name = player_deck[card_index]
+	player_deck.remove_at(card_index)
+	player_deck.insert(0, card_name)
+	update_deck_view()
+	selected_card_slug = ""
+
+func move_card_to_bottom():
+	if selected_card_slug == "":
+		return
+	var card_index = player_deck.find(selected_card_slug)
+	if card_index == -1:
+		return
+	var card_name = player_deck[card_index]
+	player_deck.remove_at(card_index)
+	player_deck.append(card_name)
+	update_deck_view()
+	selected_card_slug = ""
 
 func _on_deck_view_close():
 	deck_view_window.hide()
 	if has_node("Sprite2D"):
 		$Sprite2D.modulate = Color(1, 1, 1, 1)
+	selected_card_slug = ""
 
 func shuffle_deck():
 	player_deck.shuffle()

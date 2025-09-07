@@ -153,11 +153,9 @@ func finish_drag():
 		elif card_slot_found.name == "CardsSlotForSignleCard" or card_slot_found.name == "GRAVEYARD":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
-			card_being_dragged.z_index = base_z_index
 		elif card_slot_found.name == "90DegreesCardSlot" or card_slot_found.name == "BANISH":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
-			card_being_dragged.z_index = base_z_index
 		else:
 			card_being_dragged.z_index = base_z_index + card_counter
 			card_counter += 1
