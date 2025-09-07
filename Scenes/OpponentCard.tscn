@@ -133,6 +133,3 @@ texture = ExtResource("2_qrb68")
 libraries = {
 &"": SubResource("AnimationLibrary_h8wm0")
 }
-
-[node name="PopupMenu" type="PopupMenu" parent="."]
-size = Vector2i(100, 50)
