@@ -20,7 +20,7 @@ collision_mask = 16
 shape = SubResource("RectangleShape2D_4n42c")
 
 [node name="PopupMenu" type="PopupMenu" parent="."]
-size = Vector2i(100, 50)
+size = Vector2i(20, 10)
 
 [node name="MAT_DECK_VIEW_WINDOW" type="Window" parent="."]
 size = Vector2i(600, 142)

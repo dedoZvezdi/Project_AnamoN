@@ -3,6 +3,8 @@ extends Node2D
 var cards_in_banish = []
 var card_in_slot = false
 var base_z_index = 0
+var selected_card_slug: String = ""
+
 @onready var context_menu = $PopupMenu
 @onready var banish_view_window = $BanishViewWindow
 @onready var grid_container = $BanishViewWindow/ScrollContainer/GridContainer
@@ -14,6 +16,7 @@ func _ready() -> void:
 	setup_deck_view()
 	if area2d and not area2d.input_event.is_connected(_on_area_2d_input_event):
 		area2d.input_event.connect(_on_area_2d_input_event)
+	$BanishViewWindow/PopupMenu.id_pressed.connect(_on_banish_view_popup_menu_pressed)
 
 func update_deck_view():
 	for child in grid_container.get_children():
@@ -22,6 +25,14 @@ func update_deck_view():
 		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
 		var card_display = create_card_display(card_slug)
 		grid_container.add_child(card_display)
+		# Ensure the grid display matches the face-up/face-down state
+		var tex_rect = card_display.get_node_or_null("TextureRect")
+		if tex_rect:
+			var image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
+			if card.has_meta("is_face_down") and card.get_meta("is_face_down") == true:
+				image_path = "res://Assets/Grand Archive/ga_back.png"
+			if ResourceLoader.exists(image_path):
+				tex_rect.texture = load(image_path)
 		grid_container.move_child(card_display, 0)
 
 func setup_context_menu():
@@ -54,12 +65,69 @@ func create_card_display(card_name: String):
 	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
 	return card_display
 
-func _on_card_display_popup_menu(_slug):
+func _on_card_display_popup_menu(slug):
+	selected_card_slug = slug
 	var popup_menu = $BanishViewWindow/PopupMenu
 	popup_menu.clear()
-	popup_menu.add_item("test3")
-	popup_menu.add_item("test4")
+	popup_menu.add_item("Flip", 0)
 	popup_menu.popup(Rect2(get_viewport().get_mouse_position(), Vector2(0, 0)))
+
+func _on_banish_view_popup_menu_pressed(id):
+	match id:
+		0: flip_card()
+
+func flip_card():
+	if selected_card_slug == "":
+		return
+	var target_card = null
+	for card in cards_in_banish:
+		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+		if card_slug == selected_card_slug:
+			target_card = card
+			break
+	if not target_card:
+		return
+	var card_image = target_card.get_node_or_null("CardImage")
+	var card_image_back = target_card.get_node_or_null("CardImageBack")
+	
+	if not card_image or not card_image_back:
+		return
+	if card_image.visible:
+		show_card_back(target_card)
+	else:
+		show_card_front(target_card)
+	if banish_view_window.visible:
+		update_deck_view()
+	selected_card_slug = ""
+
+func show_card_back(card):
+	if not card or not is_instance_valid(card):
+		return
+	var card_image = card.get_node_or_null("CardImage")
+	var card_image_back = card.get_node_or_null("CardImageBack")
+	if not card.has_meta("original_card_texture"):
+		if card_image and card_image.texture:
+			card.set_meta("original_card_texture", card_image.texture)
+	if card_image and card_image_back:
+		card_image_back.z_index = 0
+		card_image.z_index = -1
+		card_image_back.visible = true
+		card_image.visible = false
+		card.set_meta("is_face_down", true)
+
+func show_card_front(card):
+	if not card or not is_instance_valid(card):
+		return
+	var card_image = card.get_node_or_null("CardImage")
+	var card_image_back = card.get_node_or_null("CardImageBack")
+	if card_image and card_image_back:
+		card_image_back.z_index = -1
+		card_image.z_index = 0
+		card_image_back.visible = false
+		card_image.visible = true
+		if card.has_meta("original_card_texture"):
+			card_image.texture = card.get_meta("original_card_texture")
+		card.set_meta("is_face_down", false)
 
 func show_deck_view():
 	update_deck_view()
@@ -69,15 +137,16 @@ func show_deck_view():
 
 func _on_deck_view_close():
 	banish_view_window.hide()
+	selected_card_slug = ""
 
 func add_card_to_slot(card):
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	cards_in_banish.append(card)
 	card.global_position = global_position
-	card.z_index = base_z_index + cards_in_banish.size()
 	card.rotation_degrees = 90
 	card_in_slot = true
+	reorder_z_indices()
 	if banish_view_window.visible:
 		update_deck_view()
 
@@ -88,14 +157,16 @@ func remove_card_from_slot(card):
 		cards_in_banish.erase(card)
 		if cards_in_banish.is_empty():
 			card_in_slot = false
+		reorder_z_indices()
 		if banish_view_window.visible:
 			update_deck_view()
 
+func reorder_z_indices():
+	var idx := 0
+	for c in cards_in_banish:
+		if c and is_instance_valid(c):
+			c.z_index = base_z_index + idx + 1
+			idx += 1
+
 func get_top_card():
 	return null
-
-#func bring_card_to_front(card):
-	#pass
-#
-#func clear_hovered_card():
-	#pass

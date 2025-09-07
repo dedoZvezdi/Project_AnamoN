@@ -17,7 +17,7 @@ collision_mask = 2
 shape = SubResource("RectangleShape2D_cm0pq")
 
 [node name="PopupMenu" type="PopupMenu" parent="."]
-size = Vector2i(100, 50)
+size = Vector2i(20, 10)
 
 [node name="BanishViewWindow" type="Window" parent="."]
 size = Vector2i(600, 142)

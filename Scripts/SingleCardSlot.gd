@@ -90,9 +90,3 @@ func remove_card_from_slot(card):
 
 func get_top_card():
 	return null
-
-#func bring_card_to_front(card):
-	#pass
-#
-#func clear_hovered_card():
-	#pass
