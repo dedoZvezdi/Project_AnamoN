@@ -22,5 +22,5 @@ placeholder_text = "Message"
 [node name="TextEdit" type="TextEdit" parent="."]
 offset_left = 1502.0
 offset_top = 581.0
-offset_right = 1884.0
+offset_right = 1885.0
 offset_bottom = 1007.0
