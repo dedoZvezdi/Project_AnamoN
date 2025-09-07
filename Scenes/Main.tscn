@@ -91,7 +91,7 @@ script = ExtResource("8_vy5pj")
 [node name="PlayerHand" type="Node2D" parent="."]
 script = ExtResource("7_lgr22")
 
-[node name="EnemyHand" type="Node2D" parent="."]
+[node name="OpponentHand" type="Node2D" parent="."]
 script = ExtResource("15_vvnwx")
 
 [node name="InputManager" type="Node2D" parent="."]

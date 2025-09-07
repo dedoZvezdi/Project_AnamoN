@@ -4,7 +4,7 @@ signal animation_started
 signal animation_finished
 
 const CARD_WIDTH = 100
-const HAND_Y_POSITION = 0
+const HAND_Y_POSITION = 10
 const FIELD_Z_INDEX = 0
 const HAND_Z_INDEX = 100
 const MIN_CARD_SPACING = 10
@@ -38,8 +38,9 @@ func add_card_to_hand(card):
 	if not card or not is_instance_valid(card):
 		return
 	if card not in opponent_hand:
-		opponent_hand.append(card)
-		card.z_index = HAND_Z_INDEX + opponent_hand.size()
+		opponent_hand.insert(0, card)
+		for i in range(opponent_hand.size()):
+			opponent_hand[i].z_index = HAND_Z_INDEX + i + 1
 		update_hand_position()
 		if hand_hidden:
 			show_card(card)
@@ -96,7 +97,7 @@ func calculate_card_position(index):
 		ratio = float(index) / float(hand_size - 1)
 	var curve_height = calculate_curve_height(hand_size)
 	var curve_factor = 4 * ratio * (1.0 - ratio)
-	var y_position = HAND_Y_POSITION - curve_factor * curve_height
+	var y_position = HAND_Y_POSITION + curve_factor * curve_height
 	return Vector2(x_position, y_position)
 
 func calculate_card_spacing(hand_size):
@@ -133,7 +134,7 @@ func calculate_card_rotation(index):
 		return 0.0
 	var dynamic_max_angle = get_dynamic_max_angle(hand_size)
 	var ratio = float(index) / (float(hand_size) - 1)
-	var angle = lerp(-dynamic_max_angle, dynamic_max_angle, ratio)
+	var angle = lerp(dynamic_max_angle, -dynamic_max_angle, ratio)
 	return deg_to_rad(angle)
 
 func animate_card_to_position(card, new_position, new_rotation = 0.0):

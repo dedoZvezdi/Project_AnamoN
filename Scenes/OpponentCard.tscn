@@ -119,11 +119,13 @@ scale = Vector2(0.39, 0.39)
 script = ExtResource("1_mv32a")
 
 [node name="CardImageBack" type="Sprite2D" parent="."]
+rotation = 3.14159
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_qrb68")
 
 [node name="CardImage" type="Sprite2D" parent="."]
 z_index = -1
+rotation = 3.14159
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_qrb68")
 
