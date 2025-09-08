@@ -524,7 +524,6 @@ func go_to_banish_face_down():
 			current_field.remove_card_from_memory(self)
 		elif current_field.has_method("remove_card_from_slot"):
 			current_field.remove_card_from_slot(self)
-	# Add to banish slot
 	if banish_node.has_method("add_card_to_slot"):
 		banish_node.add_card_to_slot(self)
 	if has_node("AnimationPlayer"):
