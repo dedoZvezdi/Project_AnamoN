@@ -116,6 +116,25 @@ func shuffle_deck():
 	player_deck.shuffle()
 	update_deck_view()
 
+func update_deck_state():
+	if player_deck.size() > 0:
+		$Area2D/CollisionShape2D.disabled = false
+		$Sprite2D.visible = true
+
+func add_to_top(slug: String):
+	if slug == "":
+		return
+	player_deck.insert(0, slug)
+	update_deck_view()
+	update_deck_state()
+
+func add_to_bottom(slug: String):
+	if slug == "":
+		return
+	player_deck.append(slug)
+	update_deck_view()
+	update_deck_state()
+
 func draw_card():
 	if player_deck.size() == 0:
 		return

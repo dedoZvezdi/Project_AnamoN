@@ -373,8 +373,8 @@ func find_base_card_for_edition(edition_id, card_database):
 func _on_PopupMenu_id_pressed(id: int) -> void:
 	match id:
 		1: go_to_banish_face_down()
-		2: print("Go to TD selected")
-		3: print("Go to BD selected")
+		2: go_to_top_deck()
+		3: go_to_bottom_deck()
 		4: if is_in_main_field(): rotate_card()
 		5: transform_card()
 
@@ -532,3 +532,48 @@ func go_to_banish_face_down():
 			anim.play("card_flip")
 	if banish_node.has_method("show_card_back"):
 		banish_node.show_card_back(self)
+
+func remove_from_current_position():
+	var scene = get_tree().get_current_scene()
+	if scene == null:
+		return
+	var was_removed = false
+	var player_hand_node = scene.find_child("PlayerHand", true, false)
+	if player_hand_node and player_hand_node.has_method("remove_card_from_hand"):
+		player_hand_node.remove_card_from_hand(self)
+		was_removed = true
+	if current_field:
+		if current_field.is_in_group("main_fields") and current_field.has_method("remove_card_from_field"):
+			current_field.remove_card_from_field(self)
+			was_removed = true
+		elif current_field.is_in_group("memory_slots") and current_field.has_method("remove_card_from_memory"):
+			current_field.remove_card_from_memory(self)
+			was_removed = true
+		elif current_field.has_method("remove_card_from_slot"):
+			current_field.remove_card_from_slot(self)
+			was_removed = true
+	queue_free()
+
+func go_to_top_deck():
+	var slug = get_slug_from_card()
+	if slug == "":
+		return
+	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
+	if deck_nodes.size() == 0:
+		return
+	var deck_node = deck_nodes[0]
+	if deck_node.has_method("add_to_top"):
+		remove_from_current_position()
+		deck_node.add_to_top(slug)
+
+func go_to_bottom_deck():
+	var slug = get_slug_from_card()
+	if slug == "":
+		return
+	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
+	if deck_nodes.size() == 0:
+		return
+	var deck_node = deck_nodes[0]
+	if deck_node.has_method("add_to_bottom"):
+		remove_from_current_position()
+		deck_node.add_to_bottom(slug)
