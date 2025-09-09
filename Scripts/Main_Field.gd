@@ -42,6 +42,10 @@ func add_card_to_field(card, position = null):
 		if position != null:
 			card.global_position = position
 
+func notify_card_transformed(card):
+	if card == current_champion_card and not is_champion_card(card):
+		current_champion_card = null
+
 func remove_previous_champions():
 	if current_champion_card and is_instance_valid(current_champion_card):
 		cards_in_field.erase(current_champion_card)

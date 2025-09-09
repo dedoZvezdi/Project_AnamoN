@@ -70,11 +70,15 @@ func _on_card_display_popup_menu(slug):
 	var popup_menu = $BanishViewWindow/PopupMenu
 	popup_menu.clear()
 	popup_menu.add_item("Flip", 0)
+	popup_menu.add_item("To Top Deck", 1)
+	popup_menu.add_item("To Bottom Deck", 2)
 	popup_menu.popup(Rect2(get_viewport().get_mouse_position(), Vector2(0, 0)))
 
 func _on_banish_view_popup_menu_pressed(id):
 	match id:
 		0: flip_card()
+		1: go_to_top_deck()
+		2: go_to_bottom_deck()
 
 func flip_card():
 	if selected_card_slug == "":
@@ -89,13 +93,60 @@ func flip_card():
 		return
 	var card_image = target_card.get_node_or_null("CardImage")
 	var card_image_back = target_card.get_node_or_null("CardImageBack")
-	
 	if not card_image or not card_image_back:
 		return
 	if card_image.visible:
 		show_card_back(target_card)
 	else:
 		show_card_front(target_card)
+	if banish_view_window.visible:
+		update_deck_view()
+	selected_card_slug = ""
+
+func go_to_top_deck():
+	if selected_card_slug == "":
+		return
+	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
+	if deck_nodes.size() == 0:
+		return
+	var deck_node = deck_nodes[0]
+	if not deck_node.has_method("add_to_top"):
+		return
+	var target_card = null
+	for card in cards_in_banish:
+		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+		if card_slug == selected_card_slug:
+			target_card = card
+			break
+	if not target_card:
+		return
+	remove_card_from_slot(target_card)
+	target_card.queue_free()
+	deck_node.add_to_top(selected_card_slug)
+	if banish_view_window.visible:
+		update_deck_view()
+	selected_card_slug = ""
+
+func go_to_bottom_deck():
+	if selected_card_slug == "":
+		return
+	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
+	if deck_nodes.size() == 0:
+		return
+	var deck_node = deck_nodes[0]
+	if not deck_node.has_method("add_to_bottom"):
+		return
+	var target_card = null
+	for card in cards_in_banish:
+		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+		if card_slug == selected_card_slug:
+			target_card = card
+			break
+	if not target_card:
+		return
+	remove_card_from_slot(target_card)
+	target_card.queue_free()
+	deck_node.add_to_bottom(selected_card_slug)
 	if banish_view_window.visible:
 		update_deck_view()
 	selected_card_slug = ""

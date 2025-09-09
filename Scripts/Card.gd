@@ -184,7 +184,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					apply_logo_status_to_self(logo_node)
 					return
 			popup_menu.clear()
-			popup_menu.add_item("Go to Banish Face Down", 1)
+			popup_menu.add_item("Banish Face Down", 1)
 			popup_menu.add_item("Go to Top Deck", 2)
 			popup_menu.add_item("Go to Bottom Deck", 3)
 			if is_in_main_field():
@@ -232,6 +232,8 @@ func transform_card():
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + new_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		$CardImage.texture = load(card_image_path)
+	if current_field and current_field.has_method("notify_card_transformed"):
+		current_field.notify_card_transformed(self)
 	if has_node("AnimationPlayer"):
 		var anim: AnimationPlayer = $AnimationPlayer
 		if anim.has_animation("card_flip"):
@@ -526,10 +528,10 @@ func go_to_banish_face_down():
 			current_field.remove_card_from_slot(self)
 	if banish_node.has_method("add_card_to_slot"):
 		banish_node.add_card_to_slot(self)
-	if has_node("AnimationPlayer"):
-		var anim: AnimationPlayer = $AnimationPlayer
-		if anim and anim.has_animation("card_flip"):
-			anim.play("card_flip")
+	#if has_node("AnimationPlayer"):
+		#var anim: AnimationPlayer = $AnimationPlayer
+		#if anim and anim.has_animation("card_flip"):
+			#anim.play("card_flip")
 	if banish_node.has_method("show_card_back"):
 		banish_node.show_card_back(self)
 
