@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://c3x07o1r7glog"]
+[gd_scene load_steps=2 format=3 uid="uid://c3x07o1r7glog"]
+
+[ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="1_gukjj"]
 
 [node name="Logo" type="Node2D"]
 
@@ -11,3 +13,25 @@ polygon = PackedVector2Array(-3, -35, -9, -29, -38, -19, -45, -23, -44, -7, -56,
 
 [node name="PopupMenu" type="PopupMenu" parent="."]
 hide_on_item_selection = false
+
+[node name="LogoViewWindow" type="Window" parent="."]
+auto_translate_mode = 1
+size = Vector2i(600, 142)
+visible = false
+unresizable = true
+
+[node name="PopupMenu" type="PopupMenu" parent="LogoViewWindow"]
+auto_translate_mode = 1
+size = Vector2i(100, 50)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LogoViewWindow"]
+offset_right = 600.0
+offset_bottom = 142.0
+
+[node name="GridContainer" type="GridContainer" parent="LogoViewWindow/ScrollContainer"]
+custom_minimum_size = Vector2(600, 142)
+layout_mode = 2
+columns = 1024
+
+[node name="Control" parent="LogoViewWindow/ScrollContainer/GridContainer" instance=ExtResource("1_gukjj")]
+layout_mode = 2
