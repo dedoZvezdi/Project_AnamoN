@@ -55,6 +55,7 @@ func remove_previous_champions():
 			current_champion_card.get_parent().remove_child(current_champion_card)
 		current_champion_card.queue_free()
 		current_champion_card = null
+		
 func is_champion_card(card) -> bool:
 	if not card or not is_instance_valid(card):
 		return false
