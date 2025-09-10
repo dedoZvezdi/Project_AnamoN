@@ -1,6 +1,8 @@
 extends Node2D
 
 @onready var popup_menu: PopupMenu = $PopupMenu
+@onready var Logo_view_window = $LogoViewWindow
+@onready var grid_container = $LogoViewWindow/ScrollContainer/GridContainer
 
 var level_label: Label
 var durability_label: Label
@@ -28,17 +30,29 @@ func _ready():
 	setup_status_labels()
 	update_status_display()
 	find_chat_node()
+	Logo_view_window.close_requested.connect(_on_logo_view_close)
+	Logo_view_window.visibility_changed.connect(_on_logo_view_visibility_changed)
+	populate_tokens()
+	Logo_view_window.hide()
+
+func _on_logo_view_close():
+	Logo_view_window.hide()
+
+func _on_logo_view_visibility_changed():
+	if Logo_view_window.visible:
+		$LogoViewWindow/ScrollContainer.scroll_horizontal = 0
+		$LogoViewWindow/ScrollContainer.scroll_vertical = 0
 
 func find_chat_node():
 	chat_node = find_node_recursive(get_tree().get_root(), "Chat")
 	if not chat_node:
-		chat_node = find_node_by_script(get_tree().get_root())
+		chat_node = find_node_by_script(get_tree().get_root(), "res://Scripts/Chat.gd")
 
-func find_node_by_script(node):
-	if node.has_method("send_system_message"):
+func find_node_by_script(node, script_path: String):
+	if node.get_script() and node.get_script().resource_path == script_path:
 		return node
 	for child in node.get_children():
-		var found = find_node_by_script(child)
+		var found = find_node_by_script(child, script_path)
 		if found:
 			return found
 	return null
@@ -121,7 +135,7 @@ func update_status_display():
 	else:
 		life_label.visible = false
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if has_active_status():
 		update_status_display()
 	if popup_menu.visible:
@@ -144,6 +158,7 @@ func build_main_menu():
 	popup_menu.add_item("Roll Dice", 102)
 	popup_menu.add_item("RPS", 104)
 	popup_menu.add_item("Status Modification", 105)
+	popup_menu.add_item("Summon Token", 106)
 	popup_menu.add_separator()
 	popup_menu.add_item("Surrender", 103)
 	$PopupMenu.reset_size()
@@ -300,6 +315,11 @@ func _on_popup_menu_id_pressed(id):
 			build_rps_menu()
 		elif id == 105:
 			build_status_menu()
+		elif id == 106:
+			popup_menu.hide()
+			Logo_view_window.popup_centered()
+			$LogoViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
+			$LogoViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 		elif id == 103:
 			popup_menu.hide()
 			send_to_chat("Player surrendered")
@@ -371,6 +391,61 @@ func _on_popup_menu_id_pressed(id):
 			life_value -= 1
 			update_status_display()
 	$PopupMenu.reset_size()
+
+func populate_tokens():
+	for child in grid_container.get_children():
+		child.queue_free()
+	var token_slugs = [
+	"acerbica-hvn","astral-shard-dtr","astral-shard-dtrsd","atmos-shield-mrc",
+	"atmos-shield-sp2","aurousteel-greatsword-alc","aurousteel-greatsword-alcsd","aurousteel-greatsword-sp2",
+	"automaton-drone-alc","automaton-drone-alcsd","automaton-drone-mrc","automaton-drone-sp2",
+	"baihua-hvn","baihua-rec-idy","blightroot-alc","blightroot-alcsd",
+	"blightroot-mrc","blightroot-sp2","direwolf-hvn","fledgling-hvn",
+	"floodbloom-hvn","floodbloom-rec-idy","flowerbud-hvn","flowerbud-rec-idy",
+	"fraysia-alc","fraysia-alcsd","fraysia-mrc","fraysia-sp2","lycoria-hvn",
+	"lycoria-rec-idy","manaroot-alc","manaroot-alcsd","manaroot-mrc","manaroot-sp2",
+	"nightshade-hvn","nightshade-rec-idy","obelisk-of-armaments-alc","obelisk-of-armaments-alcsd",
+	"obelisk-of-armaments-sp2","obelisk-of-fabrication-alc","obelisk-of-fabrication-alcsd",
+	"obelisk-of-fabrication-sp2","obelisk-of-protection-alc","obelisk-of-protection-alcsd","obelisk-of-protection-sp2",
+	"ominous-shadow-evp","ominous-shadow-mrc","ominous-shadow-rec-shd",
+	"ominous-shadow-sp2","powercell-mrc-a","powercell-mrc-b","powercell-sp2",
+	"razorvine-alc","razorvine-alcsd","razorvine-mrc","razorvine-sp2",
+	"silvershine-alc","silvershine-alcsd","silvershine-mrc","silvershine-sp2",
+	"spirit-shard-mrc","spirit-shard-sp2","springleaf-alc","springleaf-alcsd",
+	"springleaf-mrc","springleaf-sp2","vacuous-servant-dtr","washuru-hvn"]
+	token_slugs.sort()
+	for slug in token_slugs:
+		var card_display = create_card_display(slug)
+		grid_container.add_child(card_display)
+	grid_container.anchor_left = 0
+	grid_container.anchor_top = 0
+	grid_container.anchor_right = 1
+	grid_container.anchor_bottom = 1
+	grid_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+func find_card_information_reference():
+	var root = get_tree().current_scene
+	if root:
+		return find_node_by_script(root, "res://Scripts/CardInformation.gd")
+	return null
+
+func find_base_card_for_edition(edition_id, card_database):
+	if not card_database:
+		return null
+	for slug in card_database.cards_db:
+		var data = card_database.cards_db[slug]
+		if data.has("editions"):
+			for edition in data["editions"]:
+				if edition.get("edition_id") == edition_id:
+					return slug
+	return null
+
+func create_card_display(card_name: String):
+	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+	var card_display = card_display_scene.instantiate()
+	card_display.set_meta("slug", card_name)
+	return card_display
 
 func adjust_popup_position():
 	var screen_size = get_viewport().get_visible_rect().size

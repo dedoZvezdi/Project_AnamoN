@@ -29,6 +29,6 @@ func send_system_message(system_msg: String):
 	text_edit.text += "System: " + system_msg + "\n"
 	text_edit.scroll_vertical = text_edit.get_line_count()
 
-func add_message(sender: String, content: String, color: Color = Color.WHITE):
+func add_message(sender: String, content: String, _color: Color = Color.WHITE):
 	text_edit.text += sender + ": " + content + "\n"
 	text_edit.scroll_vertical = text_edit.get_line_count()
