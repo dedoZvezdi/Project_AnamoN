@@ -248,7 +248,7 @@ func _process(_delta: float) -> void:
 	if popup_menu.visible:
 		var mouse_pos_global = get_global_mouse_position()
 		var area_pos_global = $Area2D.global_position
-		if mouse_pos_global.distance_to(area_pos_global) > 150:
+		if mouse_pos_global.distance_to(area_pos_global) > 200:
 			popup_menu.hide()
 
 func build_main_menu():

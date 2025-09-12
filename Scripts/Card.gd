@@ -17,6 +17,8 @@ var was_rotated_before_drag = false
 var is_dragging = false
 var card_information_reference = null
 var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
+var attached_markers := {}
+var attached_counters := {}
 
 const TRANSFORMABLE_SLUGS := [
 	"huaji-of-heavens-rise-hvn1e","huaji-of-abyssal-fall-hvn1e","fatestone-of-balance-hvn",
@@ -232,6 +234,8 @@ func transform_card():
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + new_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		$CardImage.texture = load(card_image_path)
+	attached_markers.clear()
+	attached_counters.clear()
 	if current_field and current_field.has_method("notify_card_transformed"):
 		current_field.notify_card_transformed(self)
 	if has_node("AnimationPlayer"):
@@ -405,6 +409,9 @@ func on_drag_end():
 func set_current_field(field):
 	var was_in_main = is_in_main_field()
 	current_field = field
+	if _is_hand_field(current_field):
+		attached_markers.clear()
+		attached_counters.clear()
 	var now_in_main = is_in_main_field()
 	if was_in_main and not now_in_main:
 		clear_runtime_modifiers()
@@ -417,6 +424,9 @@ func is_in_memory_slot() -> bool:
 
 func is_in_graveyard() -> bool:
 	return current_field != null and current_field.is_in_group("single_card_slots")
+
+func is_in_hand() -> bool:
+	return _is_hand_field(current_field)
 
 func clear_runtime_modifiers():
 	runtime_modifiers["level"] = 0
@@ -481,6 +491,22 @@ func apply_logo_status_to_self(logo_node):
 		if applied_delta != 0 and current_field and current_field.has_method("is_champion_card") and current_field.is_champion_card(self):
 			if current_field.has_method("adjust_champion_life_delta"):
 				current_field.adjust_champion_life_delta(applied_delta)
+	if logo_node.custom_markers.size() > 0:
+		for marker_name in logo_node.custom_markers.keys():
+			var delta_val = int(logo_node.custom_markers[marker_name])
+			if delta_val == 0:
+				continue
+			if not attached_markers.has(marker_name):
+				attached_markers[marker_name] = 0
+			attached_markers[marker_name] = int(attached_markers[marker_name]) + delta_val
+	if logo_node.custom_counters.size() > 0:
+		for counter_name in logo_node.custom_counters.keys():
+			var delta_valc = int(logo_node.custom_counters[counter_name])
+			if delta_valc == 0:
+				continue
+			if not attached_counters.has(counter_name):
+				attached_counters[counter_name] = 0
+			attached_counters[counter_name] = int(attached_counters[counter_name]) + delta_valc
 	logo_node.reset_all_status_values()
 	if card_level_lable:
 		card_level_lable.clear()
@@ -489,6 +515,12 @@ func apply_logo_status_to_self(logo_node):
 	show_card_info()
 	if card_information_reference and mouse_inside and not is_dragging:
 		card_information_reference.show_card_preview(self)
+
+func get_attached_markers() -> Dictionary:
+	return attached_markers.duplicate()
+
+func get_attached_counters() -> Dictionary:
+	return attached_counters.duplicate()
 
 func apply_champion_life_delta(delta):
 	var data = _resolve_data_for_stats()
@@ -579,3 +611,11 @@ func go_to_bottom_deck():
 	if deck_node.has_method("add_to_bottom"):
 		remove_from_current_position()
 		deck_node.add_to_bottom(slug)
+
+func _is_hand_field(field) -> bool:
+	if field == null:
+		return false
+	var s = field.get_script()
+	if s and s.resource_path.find("PlayerHand.gd") != -1:
+		return true
+	return false
