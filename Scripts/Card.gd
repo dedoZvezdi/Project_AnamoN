@@ -615,7 +615,4 @@ func go_to_bottom_deck():
 func _is_hand_field(field) -> bool:
 	if field == null:
 		return false
-	var s = field.get_script()
-	if s and s.resource_path.find("PlayerHand.gd") != -1:
-		return true
-	return false
+	return field.is_in_group("player_hand")
