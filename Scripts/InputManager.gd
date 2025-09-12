@@ -5,6 +5,7 @@ signal left_mouse_button_released
 
 const COLLISION_MASK_CARD = 1
 const COLLISION_MASK_CARD_DECK = 4
+const COLLISION_MASK_OPPONENT_CARD = 64
 
 var card_manager_reference
 var deck_reference

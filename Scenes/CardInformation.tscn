@@ -52,3 +52,17 @@ offset_left = 299.0
 offset_top = 607.0
 offset_right = 455.0
 offset_bottom = 647.0
+
+[node name="Markers" type="RichTextLabel" parent="."]
+offset_left = 1459.0
+offset_top = 195.0
+offset_right = 1643.0
+offset_bottom = 541.0
+horizontal_alignment = 1
+
+[node name="Counters" type="RichTextLabel" parent="."]
+offset_left = 1728.0
+offset_top = 195.0
+offset_right = 1912.0
+offset_bottom = 541.0
+horizontal_alignment = 1

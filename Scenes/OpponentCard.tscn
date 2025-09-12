@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://jo76eg2ytpyo"]
+[gd_scene load_steps=7 format=3 uid="uid://jo76eg2ytpyo"]
 
 [ext_resource type="Script" uid="uid://b855tn1schyyc" path="res://Scripts/OpponentCard.gd" id="1_mv32a"]
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="2_qrb68"]
@@ -111,6 +111,9 @@ _data = {
 &"card_flip": SubResource("Animation_3p273")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mv32a"]
+size = Vector2(245.613, 344.672)
+
 [node name="Card" type="Node2D"]
 z_index = -2
 texture_filter = 2
@@ -133,3 +136,10 @@ texture = ExtResource("2_qrb68")
 libraries = {
 &"": SubResource("AnimationLibrary_h8wm0")
 }
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_mv32a")

@@ -43,16 +43,15 @@
 [node name="CardManager" type="Node2D" parent="."]
 script = ExtResource("1_uu6xs")
 
-[node name="GAField" type="Node2D" parent="."]
+[node name="FieldGa" type="Sprite2D" parent="."]
 modulate = Color(1, 1, 1, 0.647059)
-
-[node name="FieldGa" type="Sprite2D" parent="GAField"]
 z_index = -1
 position = Vector2(980, 800)
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
-[node name="FieldGaOpponent" type="Sprite2D" parent="GAField"]
+[node name="FieldGaOpponent" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.647059)
 z_index = -1
 position = Vector2(980, 280)
 rotation = -3.14159

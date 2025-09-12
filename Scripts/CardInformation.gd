@@ -8,6 +8,8 @@ extends Node2D
 @onready var card_element_lable = $Element
 @onready var card_cost_lable = $Cost
 @onready var card_PLDS_lable = $PowerLifeDurSpeed
+@onready var card_Markers_lable = $Markers
+@onready var card_Counters_lable = $Counters
 
 var card_database_reference = null
 var default_texture = null
