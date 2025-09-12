@@ -33,7 +33,15 @@ func _process(_delta: float) -> void:
 	var current_hovered_card = card_manager_reference.last_hovered_card
 	if current_hovered_card and is_instance_valid(current_hovered_card):
 		var current_slug = get_slug_from_card(current_hovered_card)
+		var need_refresh := false
 		if current_hovered_card != last_displayed_card or current_slug != current_displayed_slug:
+			need_refresh = true
+		elif last_displayed_card and is_instance_valid(last_displayed_card):
+			var prev_show_custom = _should_show_custom(last_displayed_card)
+			var now_show_custom = _should_show_custom(current_hovered_card)
+			if prev_show_custom != now_show_custom:
+				need_refresh = true
+		if need_refresh:
 			show_card_preview(current_hovered_card)
 			last_displayed_card = current_hovered_card
 
@@ -103,6 +111,10 @@ func _update_card_display(slug: String):
 	card_element_lable.clear()
 	card_cost_lable.clear()
 	card_PLDS_lable.clear()
+	if card_Markers_lable:
+		card_Markers_lable.clear()
+	if card_Counters_lable:
+		card_Counters_lable.clear()
 	if preview_sprite and slug != "":
 		var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
 		if ResourceLoader.exists(card_image_path):
@@ -208,6 +220,48 @@ func _update_card_display(slug: String):
 		card_cost_lable.append_text("[left]%s[/left]" % cost_text_to_display)
 	if plds_text_to_display != "":
 		card_PLDS_lable.append_text("[left]%s[/left]" % plds_text_to_display)
+	if last_displayed_card and is_instance_valid(last_displayed_card):
+		var markers_text_lines: Array[String] = []
+		var counters_text_lines: Array[String] = []
+		var show_custom = _should_show_custom(last_displayed_card)
+		if show_custom:
+			var any_markers := false
+			var any_counters := false
+			if last_displayed_card.has_method("get_attached_markers"):
+				var mk = last_displayed_card.get_attached_markers()
+				for marker_name in mk.keys():
+					var v = int(mk[marker_name])
+					var sign = "+" if v > 0 else ""
+					markers_text_lines.append("%s %s%s" % [str(marker_name), sign, str(v)])
+				if mk.size() > 0:
+					any_markers = true
+			if last_displayed_card.has_method("get_attached_counters"):
+				var cn = last_displayed_card.get_attached_counters()
+				for counter_name in cn.keys():
+					var v2 = int(cn[counter_name])
+					var sign2 = "+" if v2 > 0 else ""
+					counters_text_lines.append("%s %s%s" % [str(counter_name), sign2, str(v2)])
+				if cn.size() > 0:
+					any_counters = true
+			if card_Markers_lable and any_markers:
+				card_Markers_lable.append_text("[left][b]Markers:[/b]\n%s[/left]" % "\n".join(markers_text_lines))
+			if card_Counters_lable and any_counters:
+				card_Counters_lable.append_text("[left][b]Counters:[/b]\n%s[/left]" % "\n".join(counters_text_lines))
+
+func _should_show_custom(card) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	if card.has_method("is_in_main_field") and card.is_in_main_field():
+		return true
+	if card.has_method("is_in_graveyard") and card.is_in_graveyard():
+		return true
+	if card.has_method("is_in_banish") and card.is_in_banish():
+		return true
+	if card.has_method("is_in_memory_slot") and card.is_in_memory_slot():
+		return false
+	if card.has_method("is_in_hand") and card.is_in_hand():
+		return false
+	return false
 
 func _build_plds_text(data: Dictionary) -> String:
 	var parts: Array[String] = []

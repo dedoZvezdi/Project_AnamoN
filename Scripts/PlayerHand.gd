@@ -26,6 +26,7 @@ func _ready() -> void:
 	center_screen_x = get_viewport().size.x / 2
 	hand_field_left = center_screen_x - HAND_FIELD_WIDTH / 2.0
 	hand_field_right = center_screen_x + HAND_FIELD_WIDTH / 2.0
+	add_to_group("player_hand")
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
