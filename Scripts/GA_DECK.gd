@@ -135,6 +135,13 @@ func add_to_bottom(slug: String):
 	update_deck_view()
 	update_deck_state()
 
+func remove_card_by_slug(slug: String):
+	var card_index = player_deck.find(slug)
+	if card_index != -1:
+		player_deck.remove_at(card_index)
+		update_deck_view()
+		update_deck_state()
+
 func draw_card():
 	if player_deck.size() == 0:
 		return

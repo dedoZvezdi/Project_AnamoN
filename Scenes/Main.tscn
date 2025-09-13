@@ -45,21 +45,21 @@ script = ExtResource("1_uu6xs")
 
 [node name="FieldGa" type="Sprite2D" parent="."]
 modulate = Color(1, 1, 1, 0.647059)
-z_index = -1
+z_index = -2
 position = Vector2(980, 800)
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
 [node name="FieldGaOpponent" type="Sprite2D" parent="."]
 modulate = Color(1, 1, 1, 0.647059)
-z_index = -1
+z_index = -2
 position = Vector2(980, 280)
 rotation = -3.14159
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("5_fos0i")
 
 [node name="Background" type="Sprite2D" parent="."]
-z_index = -2
+z_index = -3
 position = Vector2(960, 541)
 texture = ExtResource("10_bmxlf")
 

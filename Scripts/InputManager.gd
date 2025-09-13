@@ -25,6 +25,8 @@ func _input(event):
 					card_manager_reference.start_drag(card)
 		else:
 			emit_signal("left_mouse_button_released")
+			if card_manager_reference.card_being_dragged:
+				card_manager_reference.finish_drag()
 	if event is InputEventMouseMotion:
 		card_manager_reference.validate_references()
 		card_manager_reference.handle_hover()

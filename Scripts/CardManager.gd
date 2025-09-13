@@ -16,6 +16,10 @@ var player_hand_reference
 var animation_in_progress = false
 var connected_cards = []
 var signal_connections = {}
+var dragged_from_grid = false
+var original_slug = ""
+var original_zone = ""
+var original_card_display = null
 
 func _ready() -> void:
 	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
@@ -87,6 +91,43 @@ func _on_animation_started():
 func _on_animation_finished():
 	animation_in_progress = false
 
+func set_dragged_from_grid_info(slug: String, zone: String, card_display):
+	dragged_from_grid = true
+	original_slug = slug
+	original_zone = zone
+	original_card_display = card_display
+
+func remove_card_from_original_slot():
+	if not original_slug or not original_zone:
+		return
+	match original_zone:
+		"banish":
+			var banish_slots = get_tree().get_nodes_in_group("rotated_slots")
+			for slot in banish_slots:
+				if slot and is_instance_valid(slot) and slot.has_method("remove_card_by_slug"):
+					slot.remove_card_by_slug(original_slug)
+					break
+		"graveyard":
+			var graveyard_slots = get_tree().get_nodes_in_group("single_card_slots")
+			for slot in graveyard_slots:
+				if slot and is_instance_valid(slot) and slot.has_method("remove_card_by_slug"):
+					slot.remove_card_by_slug(original_slug)
+					break
+		"ga_deck":
+			var deck_slots = get_tree().get_nodes_in_group("deck_zones")
+			for slot in deck_slots:
+				if slot and is_instance_valid(slot) and slot.has_method("remove_card_by_slug"):
+					slot.remove_card_by_slug(original_slug)
+					break
+		"mat_deck":
+			var mat_deck_slots = get_tree().get_nodes_in_group("mat_deck_zones")
+			for slot in mat_deck_slots:
+				if slot and is_instance_valid(slot) and slot.has_method("remove_card_by_slug"):
+					slot.remove_card_by_slug(original_slug)
+					break
+		"logo_tokens":
+			pass
+
 func start_drag(card):
 	if not card or not is_instance_valid(card):
 		return
@@ -126,6 +167,7 @@ func start_drag(card):
 				last_hovered_card.scale = normal_scale
 		last_hovered_card = null
 
+#TODO Слотът сам НЕ задава правилния z_index
 func finish_drag():
 	if not card_being_dragged or not is_instance_valid(card_being_dragged):
 		card_being_dragged = null
@@ -136,12 +178,17 @@ func finish_drag():
 		card_being_dragged.on_drag_end()
 	var card_slot_found = raycast_check_for_card_single_slot()
 	if card_slot_found:
+		if dragged_from_grid:
+			remove_card_from_original_slot()
+			dragged_from_grid = false
+			original_slug = ""
+			original_zone = ""
+			original_card_display = null
 		if player_hand_reference and card_being_dragged in player_hand_reference.player_hand:
 			player_hand_reference.remove_card_from_hand(card_being_dragged)
 		if card_slot_found.name == "MEMORY":
 			card_slot_found.add_card_to_memory(card_being_dragged)
 			card_being_dragged.scale = normal_scale
-			card_being_dragged.z_index = base_z_index
 		elif card_slot_found.name == "MAINFIELD":
 			var is_first_card = card_slot_found.cards_in_field.is_empty()
 			var drop_position = null
@@ -149,19 +196,30 @@ func finish_drag():
 				drop_position = card_being_dragged.global_position
 			card_slot_found.add_card_to_field(card_being_dragged, drop_position)
 			card_being_dragged.scale = normal_scale
-			card_being_dragged.z_index = base_z_index
+			# Слотът сам ще зададе правилния z_index
 		elif card_slot_found.name == "CardsSlotForSignleCard" or card_slot_found.name == "GRAVEYARD":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
+			# Слотът сам ще зададе правилния z_index
 		elif card_slot_found.name == "90DegreesCardSlot" or card_slot_found.name == "BANISH":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
+			# Слотът сам ще зададе правилния z_index
 		else:
+			# Стандартен z_index за други случаи
 			card_being_dragged.z_index = base_z_index + card_counter
 			card_counter += 1
 	else:
+		# Ако картата се връща в ръката, премахваме я от оригиналния слот
+		if dragged_from_grid:
+			remove_card_from_original_slot()
+			dragged_from_grid = false
+			original_slug = ""
+			original_zone = ""
+			original_card_display = null
 		if player_hand_reference:
 			player_hand_reference.add_card_to_hand(card_being_dragged)
+			# PlayerHand сам ще зададе правилния z_index според позицията в ръката
 	card_being_dragged = null
 	call_deferred("force_hover_check")
 
