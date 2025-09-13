@@ -71,7 +71,7 @@ func start_drag_from_grid():
 			card_manager.set_dragged_from_grid_info(card_slug, zone, self)
 			update_grid_immediately()
 			emit_signal("card_drag_started", self)
-		card_slug = ""
+		#card_slug = ""
 		card_image_path = ""
 		texture_rect.texture = null
 		custom_minimum_size = Vector2.ZERO
