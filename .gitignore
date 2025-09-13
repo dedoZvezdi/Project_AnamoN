@@ -13,3 +13,4 @@ export_presets.cfg
 project.godot
 *.uid
 /addons
+.vscode/settings.json
