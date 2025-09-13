@@ -71,6 +71,10 @@ func start_drag_from_grid():
 			card_manager.set_dragged_from_grid_info(card_slug, zone, self)
 			update_grid_immediately()
 			emit_signal("card_drag_started", self)
+		card_slug = ""
+		card_image_path = ""
+		texture_rect.texture = null
+		custom_minimum_size = Vector2.ZERO
 
 func finish_drag_from_grid():
 	if not is_holding or not dragged_card:
@@ -103,7 +107,7 @@ func create_real_card_for_drag():
 	real_card.set_meta("slug", card_slug)
 	real_card.set_meta("is_dragged_from_grid", true)
 	real_card.set_meta("original_zone", zone)
-	var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
+	card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		real_card.get_node("CardImage").texture = load(card_image_path)
 		real_card.get_node("CardImage").visible = true

@@ -44,6 +44,9 @@ func update_deck_view():
 	for card_name in player_deck:
 		var card_display = create_card_display(card_name)
 		grid_container.add_child(card_display)
+	if player_deck.size() == 0:
+		$Area2D/CollisionShape2D.disabled = true
+		$Sprite2D.visible = false
 
 func show_deck_view():
 	deck_view_window.popup_centered()
