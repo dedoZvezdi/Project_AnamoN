@@ -41,6 +41,10 @@ func _process(_delta: float) -> void:
 			var now_show_custom = _should_show_custom(current_hovered_card)
 			if prev_show_custom != now_show_custom:
 				need_refresh = true
+			if current_hovered_card == last_displayed_card:
+				var current_mods = get_effective_mods_for_card()
+				if Engine.get_process_frames() % 10 == 0:
+					need_refresh = true
 		if need_refresh:
 			show_card_preview(current_hovered_card)
 			last_displayed_card = current_hovered_card

@@ -164,6 +164,8 @@ func show_card_back(card):
 		card_image_back.visible = true
 		card_image.visible = false
 		card.set_meta("is_face_down", true)
+	if banish_view_window.visible:
+		update_deck_view()
 
 func show_card_front(card):
 	if not card or not is_instance_valid(card):
@@ -198,7 +200,7 @@ func add_card_to_slot(card):
 	card_in_slot = true
 	reorder_z_indices()
 	if banish_view_window.visible:
-		update_deck_view()
+		call_deferred("update_deck_view")
 
 func remove_card_from_slot(card):
 	if card in cards_in_banish:
