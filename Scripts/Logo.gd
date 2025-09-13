@@ -692,6 +692,7 @@ func create_card_display(card_name: String):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
 	var card_display = card_display_scene.instantiate()
 	card_display.set_meta("slug", card_name)
+	card_display.set_meta("zone", "logo_tokens")
 	return card_display
 
 func adjust_popup_position():

@@ -58,5 +58,11 @@ func create_card_display(card_name: String):
 	card_display.set_meta("zone", "mat_deck")
 	return card_display
 
+func remove_card_by_slug(slug: String):
+	var card_index = player_deck.find(slug)
+	if card_index != -1:
+		player_deck.remove_at(card_index)
+		update_deck_view()
+
 func _on_deck_view_close():
 	deck_view_window.hide()

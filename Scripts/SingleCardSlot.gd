@@ -178,3 +178,16 @@ func remove_card_from_slot(card):
 
 func get_top_card():
 	return null
+
+func remove_card_by_slug(slug: String):
+	var target_card = null
+	for card in cards_in_graveyard:
+		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+		if card_slug == slug:
+			target_card = card
+			break
+	if target_card:
+		remove_card_from_slot(target_card)
+		target_card.queue_free()
+		if graveyard_view_window.visible:
+			update_deck_view()
