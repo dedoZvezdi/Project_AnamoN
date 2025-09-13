@@ -222,7 +222,7 @@ func _stop_roulette():
 	roulette_timer.stop()
 	is_roulette_running = false
 	_highlight_card_at_index(target_card_index)
-	highlighted_card = roulette_cards[target_card_index]   # вместо cards_in_slot
+	highlighted_card = roulette_cards[target_card_index]
 	_set_cards_collision_disabled(false)
 	var final_timer = Timer.new()
 	final_timer.wait_time = 0.5
