@@ -69,12 +69,13 @@ func start_drag_from_grid():
 		if card_manager and card_manager.has_method("start_drag"):
 			card_manager.start_drag(real_card)
 			card_manager.set_dragged_from_grid_info(card_slug, zone, self)
-			update_grid_immediately()
-			emit_signal("card_drag_started", self)
-		#card_slug = ""
-		card_image_path = ""
-		texture_rect.texture = null
-		custom_minimum_size = Vector2.ZERO
+			if zone != "logo_tokens":
+				update_grid_immediately()
+				emit_signal("card_drag_started", self)
+				#card_slug = ""
+				card_image_path = ""
+				texture_rect.texture = null
+				custom_minimum_size = Vector2.ZERO
 
 func finish_drag_from_grid():
 	if not is_holding or not dragged_card:
