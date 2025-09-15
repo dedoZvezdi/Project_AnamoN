@@ -72,7 +72,6 @@ func start_drag_from_grid():
 			if zone != "logo_tokens":
 				update_grid_immediately()
 				emit_signal("card_drag_started", self)
-				#card_slug = ""
 				card_image_path = ""
 				texture_rect.texture = null
 				custom_minimum_size = Vector2.ZERO
@@ -110,12 +109,19 @@ func create_real_card_for_drag():
 	real_card.set_meta("original_zone", zone)
 	card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
-		real_card.get_node("CardImage").texture = load(card_image_path)
-		real_card.get_node("CardImage").visible = true
-		real_card.get_node("CardImageBack").visible = false
-	get_tree().current_scene.get_node("CardManager").add_child(real_card)
+		var card_image = real_card.get_node("CardImage")
+		var card_image_back = real_card.get_node("CardImageBack")
+		card_image.texture = load(card_image_path)
+		card_image.visible = true
+		card_image_back.visible = false
+		card_image.z_index = 0
+	var card_manager = get_tree().current_scene.get_node("CardManager")
+	card_manager.add_child(real_card)
 	real_card.global_position = get_global_mouse_position()
 	real_card.z_index = 1000
+	real_card.add_to_group("cards")
+	if card_manager.has_method("connect_card_signals"):
+		card_manager.connect_card_signals(real_card)
 	return real_card
 
 func can_drop_data(_pos, data):

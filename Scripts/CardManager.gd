@@ -167,7 +167,6 @@ func start_drag(card):
 				last_hovered_card.scale = normal_scale
 		last_hovered_card = null
 
-#TODO Слотът сам НЕ задава правилния z_index
 func finish_drag():
 	if not card_being_dragged or not is_instance_valid(card_being_dragged):
 		card_being_dragged = null
@@ -196,21 +195,16 @@ func finish_drag():
 				drop_position = card_being_dragged.global_position
 			card_slot_found.add_card_to_field(card_being_dragged, drop_position)
 			card_being_dragged.scale = normal_scale
-			# Слотът сам ще зададе правилния z_index
 		elif card_slot_found.name == "CardsSlotForSignleCard" or card_slot_found.name == "GRAVEYARD":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
-			# Слотът сам ще зададе правилния z_index
 		elif card_slot_found.name == "90DegreesCardSlot" or card_slot_found.name == "BANISH":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
-			# Слотът сам ще зададе правилния z_index
 		else:
-			# Стандартен z_index за други случаи
 			card_being_dragged.z_index = base_z_index + card_counter
 			card_counter += 1
 	else:
-		# Ако картата се връща в ръката, премахваме я от оригиналния слот
 		if dragged_from_grid:
 			remove_card_from_original_slot()
 			dragged_from_grid = false
@@ -219,7 +213,6 @@ func finish_drag():
 			original_card_display = null
 		if player_hand_reference:
 			player_hand_reference.add_card_to_hand(card_being_dragged)
-			# PlayerHand сам ще зададе правилния z_index според позицията в ръката
 	card_being_dragged = null
 	call_deferred("force_hover_check")
 
