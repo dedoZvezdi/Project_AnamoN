@@ -20,6 +20,7 @@ var dragged_from_grid = false
 var original_slug = ""
 var original_zone = ""
 var original_card_display = null
+var card_information_reference = null
 
 func _ready() -> void:
 	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
@@ -40,6 +41,7 @@ func _ready() -> void:
 		if is_instance_valid(card):
 			connect_card_signals(card)
 			card.z_index = base_z_index
+	card_information_reference = find_card_information_reference()
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
@@ -47,10 +49,10 @@ func _notification(what):
 
 func _exit_tree():
 	cleanup()
-		
+
 func update_screen_size():
 	screen_size = get_viewport_rect().size
-	
+
 func _clear_memory_highlights():
 	for slot in get_tree().get_nodes_in_group("memory_slots"):
 		if is_instance_valid(slot) and slot.has_method("reset_card_colors"):
@@ -63,6 +65,27 @@ func _process(_delta: float) -> void:
 			clamp(mouse_pos.x, 0, screen_size.x),
 			clamp(mouse_pos.y, 0, screen_size.y)
 		)
+
+func can_hover_card(card) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	if is_card_in_memory_slot(card):
+		var memory_slot = get_memory_slot_for_card(card)
+		if memory_slot and memory_slot.has_method("are_cards_blocked") and memory_slot.are_cards_blocked():
+			return false
+	if card.get_parent() and (card.get_parent().is_in_group("single_card_slots") or card.get_parent().is_in_group("rotated_slots")):
+		return false
+	for slot in get_tree().get_nodes_in_group("single_card_slots"):
+		if card in slot.cards_in_graveyard:
+			return false
+	for slot in get_tree().get_nodes_in_group("rotated_slots"):
+		if card in slot.cards_in_banish:
+			return false
+	if card.has_node("Area2D/CollisionShape2D"):
+		var collision_shape = card.get_node("Area2D/CollisionShape2D")
+		if collision_shape.disabled:
+			return false
+	return true
 
 func can_drag_card(card) -> bool:
 	if not card or not is_instance_valid(card):
@@ -83,6 +106,8 @@ func can_drag_card(card) -> bool:
 		var collision_shape = card.get_node("Area2D/CollisionShape2D")
 		if collision_shape.disabled:
 			return false
+	if is_champion_card(card) and card.has_method("is_in_main_field") and card.is_in_main_field():
+		return false
 	return true
 
 func _on_animation_started():
@@ -156,6 +181,7 @@ func start_drag(card):
 		if last_hovered_card.has_node("Area2D/CollisionShape2D"):
 			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
 				last_hovered_card.scale = normal_scale
+				last_hovered_card.z_index = base_z_index
 		last_hovered_card = null
 	if banish_slot and banish_slot.has_method("get_top_card"):
 		var top_card = banish_slot.get_top_card()
@@ -165,6 +191,7 @@ func start_drag(card):
 		if last_hovered_card.has_node("Area2D/CollisionShape2D"):
 			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
 				last_hovered_card.scale = normal_scale
+				last_hovered_card.z_index = base_z_index
 		last_hovered_card = null
 
 func finish_drag():
@@ -188,6 +215,7 @@ func finish_drag():
 		if card_slot_found.name == "MEMORY":
 			card_slot_found.add_card_to_memory(card_being_dragged)
 			card_being_dragged.scale = normal_scale
+			card_being_dragged.z_index = base_z_index
 		elif card_slot_found.name == "MAINFIELD":
 			var is_first_card = card_slot_found.cards_in_field.is_empty()
 			var drop_position = null
@@ -195,12 +223,15 @@ func finish_drag():
 				drop_position = card_being_dragged.global_position
 			card_slot_found.add_card_to_field(card_being_dragged, drop_position)
 			card_being_dragged.scale = normal_scale
+			card_being_dragged.z_index = base_z_index
 		elif card_slot_found.name == "CardsSlotForSignleCard" or card_slot_found.name == "GRAVEYARD":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
+			card_being_dragged.z_index = base_z_index
 		elif card_slot_found.name == "90DegreesCardSlot" or card_slot_found.name == "BANISH":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			card_being_dragged.scale = normal_scale
+			card_being_dragged.z_index = base_z_index
 		else:
 			card_being_dragged.z_index = base_z_index + card_counter
 			card_counter += 1
@@ -213,6 +244,7 @@ func finish_drag():
 			original_card_display = null
 		if player_hand_reference:
 			player_hand_reference.add_card_to_hand(card_being_dragged)
+			card_being_dragged.z_index = base_z_index
 	card_being_dragged = null
 	call_deferred("force_hover_check")
 
@@ -347,12 +379,14 @@ func raycast_check_at_position(pos):
 	var result = space_state.intersect_point(parameters)
 	if result.size() > 0:
 		var highest_card = null
-		var highest_z = -9999
+		var highest_z_index = -9999
 		for collision in result:
-			var card = collision.collider.get_parent()
-			if card and is_instance_valid(card) and card.z_index > highest_z:
-				highest_card = card
-				highest_z = card.z_index
+			var collider = collision.collider
+			if collider.collision_layer & COLLISION_MASK_CARD:
+				var card = collider.get_parent()
+				if card and is_instance_valid(card) and card.z_index > highest_z_index:
+					highest_card = card
+					highest_z_index = card.z_index
 		return highest_card
 	return null
 
@@ -389,8 +423,9 @@ func handle_hover():
 			c.get_node("Area2D").input_pickable = (current_card != null and c == current_card)
 	if current_card != last_hovered_card:
 		if last_hovered_card and is_instance_valid(last_hovered_card):
-			if can_drag_card(last_hovered_card):
+			if can_hover_card(last_hovered_card):
 				last_hovered_card.scale = normal_scale
+				last_hovered_card.z_index = base_z_index
 				if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
 					player_hand_reference.clear_hovered_card()
 				elif is_card_in_memory_slot(last_hovered_card):
@@ -399,16 +434,15 @@ func handle_hover():
 					get_graveyard_slot_for_card(last_hovered_card).clear_hovered_card()
 				elif is_card_in_banish(last_hovered_card):
 					get_banish_slot_for_card(last_hovered_card).clear_hovered_card()
-				else:
-					last_hovered_card.z_index = base_z_index
 			if last_hovered_card.has_node("Area2D"):
 				last_hovered_card.get_node("Area2D").input_pickable = false
 			if last_hovered_card.has_method("hide_card_info"):
 				last_hovered_card.hide_card_info()
 		if current_card and is_instance_valid(current_card):
-			if can_drag_card(current_card):
+			if can_hover_card(current_card):
 				current_card.get_parent().move_child(current_card, current_card.get_parent().get_child_count())
 				current_card.scale = hover_scale
+				current_card.z_index = hover_z_index
 				if player_hand_reference and current_card in player_hand_reference.player_hand:
 					player_hand_reference.bring_card_to_front(current_card)
 				elif is_card_in_memory_slot(current_card):
@@ -417,10 +451,6 @@ func handle_hover():
 					get_graveyard_slot_for_card(current_card).bring_card_to_front(current_card)
 				elif is_card_in_banish(current_card):
 					get_banish_slot_for_card(current_card).bring_card_to_front(current_card)
-				else:
-					current_card.z_index = hover_z_index
-				if current_card.has_node("Area2D"):
-					current_card.get_node("Area2D").input_pickable = true
 				if current_card.has_method("is_in_main_field") and current_card.is_in_main_field() and not current_card.get("is_dragging"):
 					current_card.show_card_info()
 		last_hovered_card = current_card
@@ -444,7 +474,7 @@ func connect_card_signals(card):
 		connected_cards.append(card)
 
 func on_left_click_released():
-	if card_being_dragged:  
+	if card_being_dragged:
 		finish_drag()
 
 func disconnect_card_signals(card):
@@ -479,8 +509,8 @@ func _on_card_hovered(card):
 	if card == card_being_dragged:
 		return
 	if card_being_dragged:
-		return 
-	if not can_drag_card(card):
+		return
+	if not can_hover_card(card):
 		return
 	if card == last_hovered_card:
 		return
@@ -488,6 +518,7 @@ func _on_card_hovered(card):
 		return
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.scale = hover_scale
+	card.z_index = hover_z_index
 	if player_hand_reference and card in player_hand_reference.player_hand:
 		player_hand_reference.bring_card_to_front(card)
 	elif is_card_in_memory_slot(card):
@@ -496,22 +527,26 @@ func _on_card_hovered(card):
 		get_graveyard_slot_for_card(card).bring_card_to_front(card)
 	elif is_card_in_banish(card):
 		get_banish_slot_for_card(card).bring_card_to_front(card)
-	else:
-		card.z_index = hover_z_index
 	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
-		if can_drag_card(last_hovered_card):
+		if can_hover_card(last_hovered_card):
 			last_hovered_card.scale = normal_scale
+			last_hovered_card.z_index = base_z_index
 			if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
 				player_hand_reference.clear_hovered_card()
-			else:
-				last_hovered_card.z_index = base_z_index
+			elif is_card_in_memory_slot(last_hovered_card):
+				get_memory_slot_for_card(last_hovered_card).clear_hovered_card()
+			elif is_card_in_graveyard(last_hovered_card):
+				get_graveyard_slot_for_card(last_hovered_card).clear_hovered_card()
+			elif is_card_in_banish(last_hovered_card):
+				get_banish_slot_for_card(last_hovered_card).clear_hovered_card()
 	last_hovered_card = card
 
 func _on_card_unhovered(card):
 	if not card or not is_instance_valid(card) or card == card_being_dragged or card != last_hovered_card or animation_in_progress:
 		return
-	if can_drag_card(card):
+	if can_hover_card(card):
 		card.scale = normal_scale
+		card.z_index = base_z_index
 		if player_hand_reference and card in player_hand_reference.player_hand:
 			player_hand_reference.clear_hovered_card()
 		elif is_card_in_memory_slot(card):
@@ -520,8 +555,6 @@ func _on_card_unhovered(card):
 			get_graveyard_slot_for_card(card).clear_hovered_card()
 		elif is_card_in_banish(card):
 			get_banish_slot_for_card(card).clear_hovered_card()
-		else:
-			card.z_index = base_z_index
 	last_hovered_card = null
 
 func raycast_check_for_card_single_slot():
@@ -605,7 +638,7 @@ func remove_card_from_single_card_slot(card):
 			if node.card_in_slot:
 				node.remove_card_from_slot(card)
 				break
-				
+
 func remove_card_from_rotated_slot(card):
 	if not card or not is_instance_valid(card):
 		return
@@ -663,3 +696,68 @@ func get_memory_slot_for_card(card):
 		if node.name == "MEMORY" and is_instance_valid(node) and card in node.cards_in_slot:
 			return node
 	return null
+
+func find_card_information_reference():
+	var root = get_tree().current_scene
+	if root:
+		return find_node_by_script(root, "res://Scripts/CardInformation.gd")
+	return null
+
+func find_node_by_script(node: Node, script_path: String) -> Node:
+	if node.get_script() and node.get_script().resource_path == script_path:
+		return node
+	for child in node.get_children():
+		var result = find_node_by_script(child, script_path)
+		if result:
+			return result
+	return null
+
+func find_base_card_for_edition(edition_id, card_database):
+	if not card_database:
+		return null
+	for slug in card_database.cards_db:
+		var data = card_database.cards_db[slug]
+		if data.has("editions"):
+			for edition in data["editions"]:
+				if edition.get("edition_id") == edition_id:
+					return slug
+	return null
+
+func get_card_slug(card) -> String:
+	if card.has_meta("slug"):
+		return card.get_meta("slug")
+	return ""
+
+func is_champion_card(card) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	var card_slug = get_card_slug(card)
+	if card_slug == "":
+		return false
+	if not card_information_reference or not card_information_reference.card_database_reference:
+		return false
+	var card_database = card_information_reference.card_database_reference
+	if not card_database.cards_db.has(card_slug):
+		return false
+	var data = card_database.cards_db[card_slug]
+	if data.has("types") and data["types"] is Array:
+		for card_type in data["types"]:
+			if str(card_type).to_upper() == "CHAMPION":
+				return true
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
+		if base_slug and card_database.cards_db.has(base_slug):
+			var base_data = card_database.cards_db[base_slug]
+			if base_data.has("types") and base_data["types"] is Array:
+				for card_type in base_data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database.cards_db.has(parent_slug):
+			var parent_data = card_database.cards_db[parent_slug]
+			if parent_data.has("types") and parent_data["types"] is Array:
+				for card_type in parent_data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	return false
