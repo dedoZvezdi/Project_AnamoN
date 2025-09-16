@@ -173,6 +173,38 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 			return result
 	return null
 
+func is_champion_card() -> bool:
+	var card_slug = get_slug_from_card()
+	if card_slug == "":
+		return false
+	if not card_information_reference or not card_information_reference.card_database_reference:
+		return false
+	var card_database = card_information_reference.card_database_reference
+	if not card_database.cards_db.has(card_slug):
+		return false
+	var data = card_database.cards_db[card_slug]
+	if data.has("types") and data["types"] is Array:
+		for card_type in data["types"]:
+			if str(card_type).to_upper() == "CHAMPION":
+				return true
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
+		if base_slug and card_database.cards_db.has(base_slug):
+			var base_data = card_database.cards_db[base_slug]
+			if base_data.has("types") and base_data["types"] is Array:
+				for card_type in base_data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database.cards_db.has(parent_slug):
+			var parent_data = card_database.cards_db[parent_slug]
+			if parent_data.has("types") and parent_data["types"] is Array:
+				for card_type in parent_data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	return false
+
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if is_dragging:
 		return
@@ -187,13 +219,6 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					apply_logo_status_to_self(logo_node)
 					return
 			popup_menu.clear()
-			var is_champion = false
-			var data = _resolve_data_for_stats()
-			if data.has("types") and data["types"] is Array:
-				for card_type in data["types"]:
-					if str(card_type).to_upper() == "CHAMPION":
-						is_champion = true
-						break
 			if is_token():
 				if is_in_main_field():
 					popup_menu.add_item("Destroy", 6)
@@ -205,7 +230,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
 			else:
-				if not is_champion:
+				if not is_champion_card():
 					popup_menu.add_item("Banish Face Down", 1)
 					popup_menu.add_item("Go to Top Deck", 2)
 					popup_menu.add_item("Go to Bottom Deck", 3)
