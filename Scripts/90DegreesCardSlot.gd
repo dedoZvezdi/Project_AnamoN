@@ -203,8 +203,8 @@ func add_card_to_slot(card):
 	cards_in_banish.append(card)
 	card.global_position = global_position
 	card.rotation_degrees = 90
+	card.z_index = base_z_index + cards_in_banish.size()
 	card_in_slot = true
-	reorder_z_indices()
 	if banish_view_window.visible:
 		call_deferred("update_deck_view")
 

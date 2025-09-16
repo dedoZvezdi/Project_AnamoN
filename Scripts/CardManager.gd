@@ -106,7 +106,7 @@ func can_drag_card(card) -> bool:
 		var collision_shape = card.get_node("Area2D/CollisionShape2D")
 		if collision_shape.disabled:
 			return false
-	if is_champion_card(card) and card.has_method("is_in_main_field") and card.is_in_main_field():
+	if card.has_method("is_champion_card") and card.is_champion_card() and card.has_method("is_in_main_field") and card.is_in_main_field():
 		return false
 	return true
 
@@ -554,7 +554,7 @@ func _on_card_unhovered(card):
 		elif is_card_in_graveyard(card):
 			get_graveyard_slot_for_card(card).clear_hovered_card()
 		elif is_card_in_banish(card):
-			get_banish_slot_for_card(card).clear_hovered_card()
+			get_banish_slot_for_card(last_hovered_card).clear_hovered_card()
 	last_hovered_card = null
 
 func raycast_check_for_card_single_slot():
@@ -727,37 +727,3 @@ func get_card_slug(card) -> String:
 	if card.has_meta("slug"):
 		return card.get_meta("slug")
 	return ""
-
-func is_champion_card(card) -> bool:
-	if not card or not is_instance_valid(card):
-		return false
-	var card_slug = get_card_slug(card)
-	if card_slug == "":
-		return false
-	if not card_information_reference or not card_information_reference.card_database_reference:
-		return false
-	var card_database = card_information_reference.card_database_reference
-	if not card_database.cards_db.has(card_slug):
-		return false
-	var data = card_database.cards_db[card_slug]
-	if data.has("types") and data["types"] is Array:
-		for card_type in data["types"]:
-			if str(card_type).to_upper() == "CHAMPION":
-				return true
-	if data.has("edition_id") and not data.has("parent_orientation_slug"):
-		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
-		if base_slug and card_database.cards_db.has(base_slug):
-			var base_data = card_database.cards_db[base_slug]
-			if base_data.has("types") and base_data["types"] is Array:
-				for card_type in base_data["types"]:
-					if str(card_type).to_upper() == "CHAMPION":
-						return true
-	elif data.has("parent_orientation_slug"):
-		var parent_slug = data["parent_orientation_slug"]
-		if card_database.cards_db.has(parent_slug):
-			var parent_data = card_database.cards_db[parent_slug]
-			if parent_data.has("types") and parent_data["types"] is Array:
-				for card_type in parent_data["types"]:
-					if str(card_type).to_upper() == "CHAMPION":
-						return true
-	return false
