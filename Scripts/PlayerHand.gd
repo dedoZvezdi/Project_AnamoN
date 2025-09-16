@@ -38,6 +38,10 @@ func _exit_tree():
 func add_card_to_hand(card):
 	if not card or not is_instance_valid(card):
 		return
+	if card.has_method("is_token") and card.is_token():
+		if card.has_method("destroy_token"):
+			card.destroy_token()
+		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in player_hand:
