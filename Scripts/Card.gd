@@ -187,6 +187,13 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					apply_logo_status_to_self(logo_node)
 					return
 			popup_menu.clear()
+			var is_champion = false
+			var data = _resolve_data_for_stats()
+			if data.has("types") and data["types"] is Array:
+				for card_type in data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						is_champion = true
+						break
 			if is_token():
 				if is_in_main_field():
 					popup_menu.add_item("Destroy", 6)
@@ -198,9 +205,10 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
 			else:
-				popup_menu.add_item("Banish Face Down", 1)
-				popup_menu.add_item("Go to Top Deck", 2)
-				popup_menu.add_item("Go to Bottom Deck", 3)
+				if not is_champion:
+					popup_menu.add_item("Banish Face Down", 1)
+					popup_menu.add_item("Go to Top Deck", 2)
+					popup_menu.add_item("Go to Bottom Deck", 3)
 				if is_in_main_field():
 					if is_rotated:
 						popup_menu.add_item("Awake", 4)
