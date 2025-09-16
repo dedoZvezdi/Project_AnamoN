@@ -192,6 +192,12 @@ func _on_deck_view_close():
 	selected_card_slug = ""
 
 func add_card_to_slot(card):
+	if not card or not is_instance_valid(card):
+		return
+	if card.has_method("is_token") and card.is_token():
+		if card.has_method("destroy_token"):
+			card.destroy_token()
+		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	cards_in_banish.append(card)

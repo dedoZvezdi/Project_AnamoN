@@ -34,6 +34,25 @@ var add_marker_dialog: AcceptDialog
 var marker_name_input: LineEdit
 var add_counter_dialog: AcceptDialog
 var counter_name_input: LineEdit
+var token_slugs : Array = [
+	"acerbica-hvn","astral-shard-dtr","astral-shard-dtrsd","atmos-shield-mrc",
+	"atmos-shield-sp2","aurousteel-greatsword-alc","aurousteel-greatsword-alcsd","aurousteel-greatsword-sp2",
+	"automaton-drone-alc","automaton-drone-alcsd","automaton-drone-mrc","automaton-drone-sp2",
+	"baihua-hvn","baihua-rec-idy","blightroot-alc","blightroot-alcsd",
+	"blightroot-mrc","blightroot-sp2","direwolf-hvn","fledgling-hvn",
+	"floodbloom-hvn","floodbloom-rec-idy","flowerbud-hvn","flowerbud-rec-idy",
+	"fraysia-alc","fraysia-alcsd","fraysia-mrc","fraysia-sp2","lycoria-hvn",
+	"lycoria-rec-idy","manaroot-alc","manaroot-alcsd","manaroot-mrc","manaroot-sp2",
+	"nightshade-hvn","nightshade-rec-idy","obelisk-of-armaments-alc","obelisk-of-armaments-alcsd",
+	"obelisk-of-armaments-sp2","obelisk-of-fabrication-alc","obelisk-of-fabrication-alcsd",
+	"obelisk-of-fabrication-sp2","obelisk-of-protection-alc","obelisk-of-protection-alcsd","obelisk-of-protection-sp2",
+	"ominous-shadow-evp","ominous-shadow-mrc","ominous-shadow-rec-shd",
+	"ominous-shadow-sp2","powercell-mrc-a","powercell-mrc-b","powercell-sp2",
+	"razorvine-alc","razorvine-alcsd","razorvine-mrc","razorvine-sp2",
+	"silvershine-alc","silvershine-alcsd","silvershine-mrc","silvershine-sp2",
+	"spirit-shard-mrc","spirit-shard-sp2","springleaf-alc","springleaf-alcsd",
+	"springleaf-mrc","springleaf-sp2","vacuous-servant-dtr","washuru-hvn"
+]
 
 func _ready():
 	add_to_group("logo")
@@ -642,24 +661,6 @@ func _on_popup_menu_id_pressed(id):
 func populate_tokens():
 	for child in grid_container.get_children():
 		child.queue_free()
-	var token_slugs = [
-	"acerbica-hvn","astral-shard-dtr","astral-shard-dtrsd","atmos-shield-mrc",
-	"atmos-shield-sp2","aurousteel-greatsword-alc","aurousteel-greatsword-alcsd","aurousteel-greatsword-sp2",
-	"automaton-drone-alc","automaton-drone-alcsd","automaton-drone-mrc","automaton-drone-sp2",
-	"baihua-hvn","baihua-rec-idy","blightroot-alc","blightroot-alcsd",
-	"blightroot-mrc","blightroot-sp2","direwolf-hvn","fledgling-hvn",
-	"floodbloom-hvn","floodbloom-rec-idy","flowerbud-hvn","flowerbud-rec-idy",
-	"fraysia-alc","fraysia-alcsd","fraysia-mrc","fraysia-sp2","lycoria-hvn",
-	"lycoria-rec-idy","manaroot-alc","manaroot-alcsd","manaroot-mrc","manaroot-sp2",
-	"nightshade-hvn","nightshade-rec-idy","obelisk-of-armaments-alc","obelisk-of-armaments-alcsd",
-	"obelisk-of-armaments-sp2","obelisk-of-fabrication-alc","obelisk-of-fabrication-alcsd",
-	"obelisk-of-fabrication-sp2","obelisk-of-protection-alc","obelisk-of-protection-alcsd","obelisk-of-protection-sp2",
-	"ominous-shadow-evp","ominous-shadow-mrc","ominous-shadow-rec-shd",
-	"ominous-shadow-sp2","powercell-mrc-a","powercell-mrc-b","powercell-sp2",
-	"razorvine-alc","razorvine-alcsd","razorvine-mrc","razorvine-sp2",
-	"silvershine-alc","silvershine-alcsd","silvershine-mrc","silvershine-sp2",
-	"spirit-shard-mrc","spirit-shard-sp2","springleaf-alc","springleaf-alcsd",
-	"springleaf-mrc","springleaf-sp2","vacuous-servant-dtr","washuru-hvn"]
 	token_slugs.sort()
 	for slug in token_slugs:
 		var card_display = create_card_display(slug)

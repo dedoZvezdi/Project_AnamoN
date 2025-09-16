@@ -8,6 +8,7 @@ signal hovered_off
 @onready var card_level_lable = $Level
 @onready var card_PLDS_lable = $PowerLifeDurSpeed
 
+var was_removed = false
 var current_field = null
 var original_rotation = 0.0
 var is_rotated = false
@@ -186,18 +187,29 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					apply_logo_status_to_self(logo_node)
 					return
 			popup_menu.clear()
-			popup_menu.add_item("Banish Face Down", 1)
-			popup_menu.add_item("Go to Top Deck", 2)
-			popup_menu.add_item("Go to Bottom Deck", 3)
-			if is_in_main_field():
-				if is_rotated:
-					popup_menu.add_item("Awake", 4)
-				else:
-					popup_menu.add_item("Rest", 4)
-			if is_in_main_field():
-				var slug = get_slug_from_card()
-				if slug in TRANSFORMABLE_SLUGS:
-					popup_menu.add_item("Transform", 5)
+			if is_token():
+				if is_in_main_field():
+					popup_menu.add_item("Destroy", 6)
+					if is_rotated:
+						popup_menu.add_item("Awake", 4)
+					else:
+						popup_menu.add_item("Rest", 4)
+					var slug = get_slug_from_card()
+					if slug in TRANSFORMABLE_SLUGS:
+						popup_menu.add_item("Transform", 5)
+			else:
+				popup_menu.add_item("Banish Face Down", 1)
+				popup_menu.add_item("Go to Top Deck", 2)
+				popup_menu.add_item("Go to Bottom Deck", 3)
+				if is_in_main_field():
+					if is_rotated:
+						popup_menu.add_item("Awake", 4)
+					else:
+						popup_menu.add_item("Rest", 4)
+				if is_in_main_field():
+					var slug = get_slug_from_card()
+					if slug in TRANSFORMABLE_SLUGS:
+						popup_menu.add_item("Transform", 5)
 			var mouse_pos = get_global_mouse_position()
 			popup_menu.reset_size()
 			var screen_size = get_viewport().get_visible_rect().size
@@ -383,6 +395,7 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		3: go_to_bottom_deck()
 		4: if is_in_main_field(): rotate_card()
 		5: transform_card()
+		6: destroy_token()
 
 func rotate_card():
 	if not is_in_main_field():
@@ -407,6 +420,9 @@ func on_drag_end():
 	rotation_degrees = original_rotation
 
 func set_current_field(field):
+	if is_token() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
+		destroy_token()
+		return
 	var was_in_main = is_in_main_field()
 	current_field = field
 	if _is_hand_field(current_field):
@@ -571,7 +587,6 @@ func remove_from_current_position():
 	var scene = get_tree().get_current_scene()
 	if scene == null:
 		return
-	var was_removed = false
 	var player_hand_node = scene.find_child("PlayerHand", true, false)
 	if player_hand_node and player_hand_node.has_method("remove_card_from_hand"):
 		player_hand_node.remove_card_from_hand(self)
@@ -616,3 +631,21 @@ func _is_hand_field(field) -> bool:
 	if field == null:
 		return false
 	return field.is_in_group("player_hand")
+
+func is_token() -> bool:
+	var slug = get_slug_from_card()
+	var logos = get_tree().get_nodes_in_group("logo")
+	if logos.size() > 0:
+		var logo = logos[0]
+		if logo.has_method("get") and "token_slugs" in logo:
+			return slug in logo.token_slugs
+		elif logo.get("token_slugs") != null:
+			return slug in logo.token_slugs
+	return false
+
+func destroy_token():
+	if current_field and current_field.has_method("remove_card_from_field"):
+		current_field.remove_card_from_field(self)
+	elif current_field and current_field.has_method("remove_card_from_slot"):
+		current_field.remove_card_from_slot(self)
+	queue_free()

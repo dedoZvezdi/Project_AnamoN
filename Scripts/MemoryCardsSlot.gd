@@ -35,6 +35,12 @@ func _on_global_lmb_released():
 	reset_card_colors()
 
 func add_card_to_memory(card):
+	if not card or not is_instance_valid(card):
+		return
+	if card.has_method("is_token") and card.is_token():
+		if card.has_method("destroy_token"):
+			card.destroy_token()
+		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 
@@ -109,6 +115,12 @@ func show_card_front(card):
 			card_image.texture = card.get_meta("original_card_texture")
 
 func insert_card_at_position(card, index):
+	if not card or not is_instance_valid(card):
+		return
+	if card.has_method("is_token") and card.is_token():
+		if card.has_method("destroy_token"):
+			card.destroy_token()
+		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if index < 0:
@@ -119,6 +131,12 @@ func insert_card_at_position(card, index):
 	arrange_cards_symmetrically()
 
 func add_card_near_position(card, target_x_position):
+	if not card or not is_instance_valid(card):
+		return
+	if card.has_method("is_token") and card.is_token():
+		if card.has_method("destroy_token"):
+			card.destroy_token()
+		return
 	var slot_width = get_slot_width()
 	var slot_start = global_position.x - slot_width/2
 	var slot_end = global_position.x + slot_width/2
