@@ -42,7 +42,6 @@ func _process(_delta: float) -> void:
 			if prev_show_custom != now_show_custom:
 				need_refresh = true
 			if current_hovered_card == last_displayed_card:
-				var current_mods = get_effective_mods_for_card()
 				if Engine.get_process_frames() % 10 == 0:
 					need_refresh = true
 		if need_refresh:
@@ -235,16 +234,16 @@ func _update_card_display(slug: String):
 				var mk = last_displayed_card.get_attached_markers()
 				for marker_name in mk.keys():
 					var v = int(mk[marker_name])
-					var sign = "+" if v > 0 else ""
-					markers_text_lines.append("%s %s%s" % [str(marker_name), sign, str(v)])
+					var signs = "+" if v > 0 else ""
+					markers_text_lines.append("%s %s%s" % [str(marker_name), signs, str(v)])
 				if mk.size() > 0:
 					any_markers = true
 			if last_displayed_card.has_method("get_attached_counters"):
 				var cn = last_displayed_card.get_attached_counters()
 				for counter_name in cn.keys():
 					var v2 = int(cn[counter_name])
-					var sign2 = "+" if v2 > 0 else ""
-					counters_text_lines.append("%s %s%s" % [str(counter_name), sign2, str(v2)])
+					var signs2 = "+" if v2 > 0 else ""
+					counters_text_lines.append("%s %s%s" % [str(counter_name), signs2, str(v2)])
 				if cn.size() > 0:
 					any_counters = true
 			if card_Markers_lable and any_markers:

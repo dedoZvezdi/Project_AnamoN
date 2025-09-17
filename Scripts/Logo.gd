@@ -34,6 +34,7 @@ var add_marker_dialog: AcceptDialog
 var marker_name_input: LineEdit
 var add_counter_dialog: AcceptDialog
 var counter_name_input: LineEdit
+var original_popup_pos: Vector2 = Vector2.ZERO
 var token_slugs : Array = [
 	"acerbica-hvn","astral-shard-dtr","astral-shard-dtrsd","atmos-shield-mrc",
 	"atmos-shield-sp2","aurousteel-greatsword-alc","aurousteel-greatsword-alcsd","aurousteel-greatsword-sp2",
@@ -282,6 +283,7 @@ func build_main_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Memory Random", 100)
 	popup_menu.add_item("Coin Flip", 101)
@@ -308,6 +310,7 @@ func build_markers_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Add", 500)
 	var marker_id = 600
@@ -335,6 +338,7 @@ func build_counters_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = true
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Add", 501)
 	var counter_id = 700
@@ -362,6 +366,7 @@ func build_dice_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("D6", 6)
 	popup_menu.add_item("D8", 8)
@@ -383,6 +388,7 @@ func build_rps_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Rock", 201)
 	popup_menu.add_item("Paper", 202)
@@ -404,6 +410,7 @@ func build_status_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Level", 301)
 	popup_menu.add_item("Durability", 302)
@@ -426,6 +433,7 @@ func build_level_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Level +1", 401)
 	popup_menu.add_item("Level -1", 402)
@@ -446,6 +454,7 @@ func build_durability_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Durability +1", 403)
 	popup_menu.add_item("Durability -1", 404)
@@ -466,6 +475,7 @@ func build_power_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Power +1", 405)
 	popup_menu.add_item("Power -1", 406)
@@ -486,6 +496,7 @@ func build_life_menu():
 	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
+	popup_menu.set_position(original_popup_pos)
 	popup_menu.clear()
 	popup_menu.add_item("Life +1", 407)
 	popup_menu.add_item("Life -1", 408)
@@ -500,17 +511,11 @@ func _on_Area2D_input_event(_viewport, event, _shape_idx):
 		if player_hand_node:
 			player_hand_node.toggle_hand_visibility()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-		var mouse_pos = get_global_mouse_position()
-		popup_menu.set_position(mouse_pos)
+		original_popup_pos = get_global_mouse_position()
+		popup_menu.set_position(original_popup_pos)
 		popup_menu.popup()
 		$PopupMenu.reset_size()
-		var screen_size = get_viewport().get_visible_rect().size
-		var menu_size = popup_menu.get_contents_minimum_size()
-		if mouse_pos.y + menu_size.y > screen_size.y:
-			var new_y = screen_size.y - menu_size.y
-			if new_y < 0:
-				new_y = 0
-			popup_menu.set_position(Vector2(mouse_pos.x, new_y))
+		adjust_popup_position()
 
 func _on_popup_menu_id_pressed(id):
 	if not showing_dice_menu and not showing_rps_menu and not showing_status_menu and not showing_level_menu and not showing_durability_menu and not showing_power_menu and not showing_life_menu and not showing_markers_menu and not showing_counters_menu:
