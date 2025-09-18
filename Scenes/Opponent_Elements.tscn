@@ -1,0 +1,65 @@
+[gd_scene load_steps=13 format=3 uid="uid://bbtnckf2a2use"]
+
+[ext_resource type="PackedScene" uid="uid://cw3lmoyxw8aue" path="res://Scenes/Norm.tscn" id="1_6ql4t"]
+[ext_resource type="PackedScene" uid="uid://d2q27vj536tlk" path="res://Scenes/Fire.tscn" id="2_1n4dq"]
+[ext_resource type="PackedScene" uid="uid://cxd2mvn6wykfl" path="res://Scenes/Water.tscn" id="3_j7acn"]
+[ext_resource type="PackedScene" uid="uid://8bexacpcoqme" path="res://Scenes/Wind.tscn" id="4_sec3a"]
+[ext_resource type="PackedScene" uid="uid://dykyungnxlstu" path="res://Scenes/Astra.tscn" id="5_7yc41"]
+[ext_resource type="PackedScene" uid="uid://d1fe3gik6qku8" path="res://Scenes/Umbra.tscn" id="6_xiib5"]
+[ext_resource type="PackedScene" uid="uid://barb5envijoxc" path="res://Scenes/Arcane.tscn" id="7_g3co2"]
+[ext_resource type="PackedScene" uid="uid://c65iuybt2dxtw" path="res://Scenes/Exia.tscn" id="8_y5yek"]
+[ext_resource type="PackedScene" uid="uid://c324fwephddgy" path="res://Scenes/Crux.tscn" id="9_gimyw"]
+[ext_resource type="PackedScene" uid="uid://htnh4dr1pgp7" path="res://Scenes/Tera.tscn" id="10_hldlb"]
+[ext_resource type="PackedScene" uid="uid://8t1wk8td74mg" path="res://Scenes/Neos.tscn" id="11_q7drv"]
+[ext_resource type="PackedScene" uid="uid://cagxgk4egqvqv" path="res://Scenes/Luxem.tscn" id="12_td0eo"]
+
+[node name="OpponentElements" type="Node2D"]
+
+[node name="Norm" parent="." instance=ExtResource("1_6ql4t")]
+position = Vector2(1397, 500)
+rotation = -3.14159
+
+[node name="Fire" parent="." instance=ExtResource("2_1n4dq")]
+position = Vector2(1397, 465)
+rotation = -3.14159
+
+[node name="Water" parent="." instance=ExtResource("3_j7acn")]
+position = Vector2(1397, 430)
+rotation = -3.14159
+
+[node name="Wind" parent="." instance=ExtResource("4_sec3a")]
+position = Vector2(1397, 395)
+rotation = -3.14159
+
+[node name="Astra" parent="." instance=ExtResource("5_7yc41")]
+position = Vector2(1362, 500)
+rotation = -3.14159
+
+[node name="Umbra" parent="." instance=ExtResource("6_xiib5")]
+position = Vector2(1327, 500)
+rotation = -3.14159
+
+[node name="Arcane" parent="." instance=ExtResource("7_g3co2")]
+position = Vector2(1362, 465)
+rotation = -3.14159
+
+[node name="Exia" parent="." instance=ExtResource("8_y5yek")]
+position = Vector2(1327, 465)
+rotation = -3.14159
+
+[node name="Crux" parent="." instance=ExtResource("9_gimyw")]
+position = Vector2(1362, 430)
+rotation = -3.14159
+script = null
+
+[node name="Tera" parent="." instance=ExtResource("10_hldlb")]
+position = Vector2(1362, 395)
+rotation = -3.14159
+
+[node name="Neos" parent="." instance=ExtResource("11_q7drv")]
+position = Vector2(1327, 395)
+rotation = -3.14159
+
+[node name="Luxem" parent="." instance=ExtResource("12_td0eo")]
+position = Vector2(1327, 430)
+rotation = -3.14159

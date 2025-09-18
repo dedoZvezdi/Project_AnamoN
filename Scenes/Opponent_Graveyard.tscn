@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://i02f6x7k2s0f"]
+
+[ext_resource type="Script" uid="uid://b43h5gonnvsk2" path="res://Scripts/OpponentSingleCardSlot.gd" id="1_01geu"]
+[ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="2_y5jhx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kpo4j"]
+size = Vector2(92, 132)
+
+[node name="OpponentGraveyard" type="Node2D"]
+script = ExtResource("1_01geu")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 256
+collision_mask = 256
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(597, 142)
+shape = SubResource("RectangleShape2D_kpo4j")
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+auto_translate_mode = 1
+size = Vector2i(20, 10)
+
+[node name="GraveyardViewWindow" type="Window" parent="."]
+auto_translate_mode = 1
+size = Vector2i(600, 142)
+visible = false
+unresizable = true
+
+[node name="PopupMenu" type="PopupMenu" parent="GraveyardViewWindow"]
+auto_translate_mode = 1
+size = Vector2i(100, 50)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="GraveyardViewWindow"]
+offset_right = 600.0
+offset_bottom = 142.0
+
+[node name="GridContainer" type="GridContainer" parent="GraveyardViewWindow/ScrollContainer"]
+custom_minimum_size = Vector2(600, 142)
+layout_mode = 2
+columns = 1024
+
+[node name="Control" parent="GraveyardViewWindow/ScrollContainer/GridContainer" instance=ExtResource("2_y5jhx")]
+layout_mode = 2

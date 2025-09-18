@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://dxm8fjyoldfoe"]
+
+[ext_resource type="Script" uid="uid://d1dko5gma5g52" path="res://Scripts/Opponent90DegreesCardSlot.gd" id="1_vxi04"]
+[ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="2_cnty2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_utia5"]
+size = Vector2(128, 90)
+
+[node name="OpponentBanish" type="Node2D"]
+script = ExtResource("1_vxi04")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 128
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(618, 438)
+shape = SubResource("RectangleShape2D_utia5")
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+auto_translate_mode = 1
+size = Vector2i(20, 10)
+
+[node name="BanishViewWindow" type="Window" parent="."]
+auto_translate_mode = 1
+size = Vector2i(600, 142)
+visible = false
+unresizable = true
+
+[node name="PopupMenu" type="PopupMenu" parent="BanishViewWindow"]
+auto_translate_mode = 1
+size = Vector2i(100, 50)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="BanishViewWindow"]
+offset_right = 600.0
+offset_bottom = 142.0
+
+[node name="GridContainer" type="GridContainer" parent="BanishViewWindow/ScrollContainer"]
+custom_minimum_size = Vector2(600, 142)
+layout_mode = 2
+columns = 1024
+
+[node name="Control" parent="BanishViewWindow/ScrollContainer/GridContainer" instance=ExtResource("2_cnty2")]
+layout_mode = 2
