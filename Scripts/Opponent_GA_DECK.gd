@@ -1,37 +1,17 @@
 extends Node2D
 
-var opponent_deck = ["alice-golden-queen-dtr1e-cur","aetheric-calibration-dtrsd","alice-golden-queen-dtr","academy-guide-p24", "absolving-flames-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb"
-,"suzaku-vermillion-phoenix-hvn1e-csr","acolyte-of-cultivation-amb","arcane-disposition-doap","arthur-young-heir-evp","suzaku-vermillion-phoenix-hvn1e"]
-
+var opponent_deck = ["alice-golden-queen-dtr1e-cur", "aetheric-calibration-dtrsd", "alice-golden-queen-dtr", "academy-guide-p24", "absolving-flames-amb", "acolyte-of-cultivation-amb", "acolyte-of-cultivation-amb", "suzaku-vermillion-phoenix-hvn1e-csr", "acolyte-of-cultivation-amb", "arcane-disposition-doap", "arthur-young-heir-evp", "suzaku-vermillion-phoenix-hvn1e"]
 var card_database_reference
 const CARD_SCENE_PATH = "res://Scenes/OpponentCard.tscn"
 var cards_to_draw = 0
-var draw_timer: Timer
 
 func _ready() -> void:
 	opponent_deck.shuffle()
-	setup_draw_timer()
 	draw_initial_hand()
 
-func setup_draw_timer():
-	draw_timer = Timer.new()
-	draw_timer.wait_time = 1.0
-	draw_timer.timeout.connect(_on_draw_timer_timeout)
-	add_child(draw_timer)
-
 func draw_initial_hand():
-	cards_to_draw = min(10, opponent_deck.size())
-	if cards_to_draw > 0:
-		draw_timer.start()
-
-func _on_draw_timer_timeout():
-	if cards_to_draw > 0:
+	for i in range(cards_to_draw):
 		draw_card()
-		cards_to_draw -= 1
-		if cards_to_draw > 0:
-			draw_timer.start()
-		else:
-			draw_timer.stop()
 
 func draw_card():
 	if opponent_deck.size() == 0:

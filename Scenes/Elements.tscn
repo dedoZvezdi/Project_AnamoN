@@ -1,0 +1,64 @@
+[gd_scene load_steps=14 format=3 uid="uid://dbfj2hlc71gc6"]
+
+[ext_resource type="PackedScene" uid="uid://cw3lmoyxw8aue" path="res://Scenes/Norm.tscn" id="1_4u5m1"]
+[ext_resource type="Script" uid="uid://c57bimiwmr0yp" path="res://Scripts/Element.gd" id="2_5fnqk"]
+[ext_resource type="PackedScene" uid="uid://d2q27vj536tlk" path="res://Scenes/Fire.tscn" id="3_kck3e"]
+[ext_resource type="PackedScene" uid="uid://cxd2mvn6wykfl" path="res://Scenes/Water.tscn" id="4_vlsow"]
+[ext_resource type="PackedScene" uid="uid://8bexacpcoqme" path="res://Scenes/Wind.tscn" id="5_eiivs"]
+[ext_resource type="PackedScene" uid="uid://dykyungnxlstu" path="res://Scenes/Astra.tscn" id="6_vpct8"]
+[ext_resource type="PackedScene" uid="uid://d1fe3gik6qku8" path="res://Scenes/Umbra.tscn" id="7_82vsi"]
+[ext_resource type="PackedScene" uid="uid://barb5envijoxc" path="res://Scenes/Arcane.tscn" id="8_usnql"]
+[ext_resource type="PackedScene" uid="uid://c65iuybt2dxtw" path="res://Scenes/Exia.tscn" id="9_bchgv"]
+[ext_resource type="PackedScene" uid="uid://c324fwephddgy" path="res://Scenes/Crux.tscn" id="10_tgia7"]
+[ext_resource type="PackedScene" uid="uid://htnh4dr1pgp7" path="res://Scenes/Tera.tscn" id="11_xtxi3"]
+[ext_resource type="PackedScene" uid="uid://8t1wk8td74mg" path="res://Scenes/Neos.tscn" id="12_8csf3"]
+[ext_resource type="PackedScene" uid="uid://cagxgk4egqvqv" path="res://Scenes/Luxem.tscn" id="13_0ue1h"]
+
+[node name="Elements" type="Node2D"]
+
+[node name="Norm" parent="." instance=ExtResource("1_4u5m1")]
+position = Vector2(560, 580)
+script = ExtResource("2_5fnqk")
+
+[node name="Fire" parent="." instance=ExtResource("3_kck3e")]
+position = Vector2(560, 615)
+script = ExtResource("2_5fnqk")
+
+[node name="Water" parent="." instance=ExtResource("4_vlsow")]
+position = Vector2(560, 650)
+script = ExtResource("2_5fnqk")
+
+[node name="Wind" parent="." instance=ExtResource("5_eiivs")]
+position = Vector2(560, 685)
+script = ExtResource("2_5fnqk")
+
+[node name="Astra" parent="." instance=ExtResource("6_vpct8")]
+position = Vector2(595, 580)
+script = ExtResource("2_5fnqk")
+
+[node name="Umbra" parent="." instance=ExtResource("7_82vsi")]
+position = Vector2(630, 580)
+script = ExtResource("2_5fnqk")
+
+[node name="Arcane" parent="." instance=ExtResource("8_usnql")]
+position = Vector2(595, 615)
+script = ExtResource("2_5fnqk")
+
+[node name="Exia" parent="." instance=ExtResource("9_bchgv")]
+position = Vector2(630, 615)
+script = ExtResource("2_5fnqk")
+
+[node name="Crux" parent="." instance=ExtResource("10_tgia7")]
+position = Vector2(595, 650)
+
+[node name="Tera" parent="." instance=ExtResource("11_xtxi3")]
+position = Vector2(595, 685)
+script = ExtResource("2_5fnqk")
+
+[node name="Neos" parent="." instance=ExtResource("12_8csf3")]
+position = Vector2(630, 685)
+script = ExtResource("2_5fnqk")
+
+[node name="Luxem" parent="." instance=ExtResource("13_0ue1h")]
+position = Vector2(630, 650)
+script = ExtResource("2_5fnqk")
