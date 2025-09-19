@@ -1,0 +1,36 @@
+[gd_scene load_steps=8 format=3 uid="uid://c02vjgxjinwdx"]
+
+[ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Grand Archive/Field_ga.png" id="2_we22y"]
+[ext_resource type="Script" uid="uid://bfjq0vc84eui2" path="res://Scripts/OpponentHand.gd" id="3_4t60u"]
+[ext_resource type="PackedScene" uid="uid://yxylarobbfvt" path="res://Scenes/Opponent_Deck.tscn" id="4_t0cvg"]
+[ext_resource type="PackedScene" uid="uid://cegsen886ew2h" path="res://Scenes/Opponent_Mat_Deck.tscn" id="5_ypfnt"]
+[ext_resource type="PackedScene" uid="uid://dxm8fjyoldfoe" path="res://Scenes/Opponent_Banish.tscn" id="6_admix"]
+[ext_resource type="PackedScene" uid="uid://i02f6x7k2s0f" path="res://Scenes/Opponent_Graveyard.tscn" id="7_j2155"]
+[ext_resource type="PackedScene" uid="uid://bbtnckf2a2use" path="res://Scenes/Opponent_Elements.tscn" id="8_xqfjh"]
+
+[node name="OpponentField" type="Node2D"]
+
+[node name="CardManager" type="Node2D" parent="."]
+
+[node name="FieldGaOpponent" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.647059)
+z_index = -2
+position = Vector2(980, 280)
+rotation = -3.14159
+scale = Vector2(0.474, 0.474)
+texture = ExtResource("2_we22y")
+
+[node name="OpponentHand" type="Node2D" parent="."]
+script = ExtResource("3_4t60u")
+
+[node name="OpponentDeck" parent="." instance=ExtResource("4_t0cvg")]
+position = Vector2(599.5, 300)
+
+[node name="OpponentMatDeck" parent="." instance=ExtResource("5_ypfnt")]
+position = Vector2(1361, 300)
+
+[node name="OpponentBanish" parent="." instance=ExtResource("6_admix")]
+
+[node name="OpponentGraveyard" parent="." instance=ExtResource("7_j2155")]
+
+[node name="OpponentElements" parent="." instance=ExtResource("8_xqfjh")]

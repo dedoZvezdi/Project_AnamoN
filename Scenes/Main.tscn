@@ -1,113 +1,27 @@
-[gd_scene load_steps=29 format=3 uid="uid://dqt16mao7lo7t"]
+[gd_scene load_steps=4 format=3 uid="uid://dqt16mao7lo7t"]
 
-[ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_uu6xs"]
-[ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="4_fos0i"]
-[ext_resource type="PackedScene" uid="uid://bibopkgjli11i" path="res://Scenes/90DegreesCardSlot.tscn" id="5_3dxm6"]
-[ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Grand Archive/Field_ga.png" id="5_fos0i"]
-[ext_resource type="Script" uid="uid://dhexhmgxdwua4" path="res://Scripts/GA_DECK.gd" id="5_grg3l"]
-[ext_resource type="PackedScene" uid="uid://d2vjqup3tyk8n" path="res://Scenes/Memory.tscn" id="6_lgr22"]
-[ext_resource type="PackedScene" uid="uid://cukst25b8s0nx" path="res://Scenes/MainField.tscn" id="7_50glp"]
-[ext_resource type="Script" uid="uid://c4b8m0yjikah3" path="res://Scripts/PlayerHand.gd" id="7_lgr22"]
-[ext_resource type="Script" uid="uid://drubil22n7oyl" path="res://Scripts/MemoryCardsSlot.gd" id="7_trn2v"]
-[ext_resource type="Script" uid="uid://c6mhpaese60l2" path="res://Scripts/Main_Field.gd" id="8_vy5pj"]
-[ext_resource type="PackedScene" uid="uid://bhhjuuiiuqcoi" path="res://Scenes/ga_deck.tscn" id="10_4kpch"]
-[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/background.png" id="10_bmxlf"]
-[ext_resource type="Script" uid="uid://bp1qbo2oxuy1p" path="res://Scripts/InputManager.gd" id="13_frkhe"]
-[ext_resource type="PackedScene" uid="uid://db2eqitvw1e27" path="res://Scenes/CardInformation.tscn" id="14_1p5hy"]
-[ext_resource type="Script" uid="uid://bfjq0vc84eui2" path="res://Scripts/OpponentHand.gd" id="15_vvnwx"]
-[ext_resource type="PackedScene" uid="uid://yxylarobbfvt" path="res://Scenes/Opponent_Deck.tscn" id="18_vvnwx"]
-[ext_resource type="PackedScene" uid="uid://cegsen886ew2h" path="res://Scenes/Opponent_Mat_Deck.tscn" id="19_btbly"]
-[ext_resource type="PackedScene" uid="uid://dxm8fjyoldfoe" path="res://Scenes/Opponent_Banish.tscn" id="20_btbly"]
-[ext_resource type="PackedScene" uid="uid://bbtnckf2a2use" path="res://Scenes/Opponent_Elements.tscn" id="21_5jffn"]
-[ext_resource type="PackedScene" uid="uid://dbfj2hlc71gc6" path="res://Scenes/Elements.tscn" id="21_aht7i"]
-[ext_resource type="PackedScene" uid="uid://i02f6x7k2s0f" path="res://Scenes/Opponent_Graveyard.tscn" id="21_kpo4j"]
-[ext_resource type="PackedScene" uid="uid://drxl81ccnmul4" path="res://Scenes/mat_deck.tscn" id="28_kpo4j"]
-[ext_resource type="Script" uid="uid://o72rawju557" path="res://Scripts/MAT_DECK.gd" id="29_4n42c"]
-[ext_resource type="PackedScene" uid="uid://c3x07o1r7glog" path="res://Scenes/Logo.tscn" id="30_c5snn"]
-[ext_resource type="Script" uid="uid://coysovnn26kgf" path="res://Scripts/Logo.gd" id="31_xvtyr"]
-[ext_resource type="PackedScene" uid="uid://cpn7rtonc8qd4" path="res://Scenes/Phases.tscn" id="32_u7mjy"]
-[ext_resource type="Script" uid="uid://cjdv252o1hnhq" path="res://Scripts/Phases.gd" id="33_4yxf6"]
-[ext_resource type="PackedScene" uid="uid://kv77quhf6roj" path="res://Scenes/Chat.tscn" id="37_vs04g"]
+[ext_resource type="Script" uid="uid://lobbvgacwmar" path="res://Scripts/Multyplayer.gd" id="1_r150o"]
+[ext_resource type="PackedScene" uid="uid://bhkcqcx0pu1b5" path="res://Scenes/Player_Field.tscn" id="2_idj7w"]
+[ext_resource type="PackedScene" uid="uid://c02vjgxjinwdx" path="res://Scenes/Opponent_Field.tscn" id="3_kln2b"]
 
 [node name="Main" type="Node2D"]
+script = ExtResource("1_r150o")
+player_field_scene = ExtResource("2_idj7w")
+opponent_field_scene = ExtResource("3_kln2b")
 
-[node name="CardManager" type="Node2D" parent="."]
-script = ExtResource("1_uu6xs")
+[node name="HostButton" type="Button" parent="."]
+offset_left = 247.0
+offset_top = 273.0
+offset_right = 291.0
+offset_bottom = 304.0
+text = "Host"
 
-[node name="FieldGa" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 1, 0.647059)
-z_index = -2
-position = Vector2(980, 800)
-scale = Vector2(0.474, 0.474)
-texture = ExtResource("5_fos0i")
+[node name="JoinButton" type="Button" parent="."]
+offset_left = 508.0
+offset_top = 271.0
+offset_right = 546.0
+offset_bottom = 302.0
+text = "Join"
 
-[node name="FieldGaOpponent" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 1, 0.647059)
-z_index = -2
-position = Vector2(980, 280)
-rotation = -3.14159
-scale = Vector2(0.474, 0.474)
-texture = ExtResource("5_fos0i")
-
-[node name="Background" type="Sprite2D" parent="."]
-z_index = -3
-position = Vector2(960, 541)
-texture = ExtResource("10_bmxlf")
-
-[node name="GA_DECK" parent="." instance=ExtResource("10_4kpch")]
-position = Vector2(1360.5, 780.5)
-scale = Vector2(0.192, 0.192)
-script = ExtResource("5_grg3l")
-
-[node name="MAT_DECK" parent="." instance=ExtResource("28_kpo4j")]
-position = Vector2(599, 780.5)
-script = ExtResource("29_4n42c")
-
-[node name="GRAVEYARD" parent="." instance=ExtResource("4_fos0i")]
-position = Vector2(1362.7, 938.3)
-scale = Vector2(0.977783, 0.974084)
-
-[node name="BANISH" parent="." instance=ExtResource("5_3dxm6")]
-position = Vector2(1342, 642)
-
-[node name="MEMORY" parent="." instance=ExtResource("6_lgr22")]
-position = Vector2(975, 973)
-script = ExtResource("7_trn2v")
-
-[node name="MAINFIELD" parent="." instance=ExtResource("7_50glp")]
-position = Vector2(961, 710)
-script = ExtResource("8_vy5pj")
-
-[node name="PlayerHand" type="Node2D" parent="."]
-script = ExtResource("7_lgr22")
-
-[node name="OpponentHand" type="Node2D" parent="."]
-script = ExtResource("15_vvnwx")
-
-[node name="InputManager" type="Node2D" parent="."]
-script = ExtResource("13_frkhe")
-
-[node name="CardInformation" parent="." instance=ExtResource("14_1p5hy")]
-
-[node name="OpponentDeck" parent="." instance=ExtResource("18_vvnwx")]
-position = Vector2(599.5, 300)
-
-[node name="OpponentMatDeck" parent="." instance=ExtResource("19_btbly")]
-position = Vector2(1361, 300)
-
-[node name="OpponentBanish" parent="." instance=ExtResource("20_btbly")]
-
-[node name="OpponentGraveyard" parent="." instance=ExtResource("21_kpo4j")]
-
-[node name="OpponentElements" parent="." instance=ExtResource("21_5jffn")]
-
-[node name="Elements" parent="." instance=ExtResource("21_aht7i")]
-
-[node name="Logo" parent="." instance=ExtResource("30_c5snn")]
-position = Vector2(590, 960)
-script = ExtResource("31_xvtyr")
-
-[node name="Phases" parent="." instance=ExtResource("32_u7mjy")]
-script = ExtResource("33_4yxf6")
-
-[node name="Chat" parent="." instance=ExtResource("37_vs04g")]
+[connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
+[connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]

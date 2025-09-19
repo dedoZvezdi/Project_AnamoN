@@ -65,7 +65,7 @@ func start_drag_from_grid():
 	if real_card:
 		is_holding = true
 		dragged_card = real_card
-		var card_manager = get_tree().current_scene.get_node("CardManager")
+		var card_manager = get_tree().current_scene.get_node("PlayerField/CardManager")
 		if card_manager and card_manager.has_method("start_drag"):
 			card_manager.start_drag(real_card)
 			card_manager.set_dragged_from_grid_info(card_slug, zone, self)
@@ -79,7 +79,7 @@ func start_drag_from_grid():
 func finish_drag_from_grid():
 	if not is_holding or not dragged_card:
 		return
-	var card_manager = get_tree().current_scene.get_node("CardManager")
+	var card_manager = get_tree().current_scene.get_node("PlayerField/CardManager")
 	if card_manager and card_manager.has_method("finish_drag"):
 		card_manager.finish_drag()
 	is_holding = false
@@ -115,7 +115,7 @@ func create_real_card_for_drag():
 		card_image.visible = true
 		card_image_back.visible = false
 		card_image.z_index = 0
-	var card_manager = get_tree().current_scene.get_node("CardManager")
+	var card_manager = get_tree().current_scene.get_node("PlayerField/CardManager")
 	card_manager.add_child(real_card)
 	real_card.global_position = get_global_mouse_position()
 	real_card.z_index = 1000

@@ -1,0 +1,86 @@
+[gd_scene load_steps=24 format=3 uid="uid://bhkcqcx0pu1b5"]
+
+[ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_8whdk"]
+[ext_resource type="Script" uid="uid://dn6i6yhtowm6r" path="res://Scripts/Game_SetUp.gd" id="1_uld4x"]
+[ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Grand Archive/Field_ga.png" id="2_uld4x"]
+[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/background.png" id="3_xb57x"]
+[ext_resource type="PackedScene" uid="uid://bhhjuuiiuqcoi" path="res://Scenes/ga_deck.tscn" id="4_kym08"]
+[ext_resource type="Script" uid="uid://dhexhmgxdwua4" path="res://Scripts/GA_DECK.gd" id="5_xuc2h"]
+[ext_resource type="PackedScene" uid="uid://drxl81ccnmul4" path="res://Scenes/mat_deck.tscn" id="6_g5k7o"]
+[ext_resource type="Script" uid="uid://o72rawju557" path="res://Scripts/MAT_DECK.gd" id="7_vx5jb"]
+[ext_resource type="PackedScene" uid="uid://ml3qhw1idgmk" path="res://Scenes/CardsSlotForSingleCard.tscn" id="8_ul1di"]
+[ext_resource type="PackedScene" uid="uid://bibopkgjli11i" path="res://Scenes/90DegreesCardSlot.tscn" id="9_64y2i"]
+[ext_resource type="PackedScene" uid="uid://d2vjqup3tyk8n" path="res://Scenes/Memory.tscn" id="10_tb1co"]
+[ext_resource type="Script" uid="uid://drubil22n7oyl" path="res://Scripts/MemoryCardsSlot.gd" id="11_c4sal"]
+[ext_resource type="PackedScene" uid="uid://cukst25b8s0nx" path="res://Scenes/MainField.tscn" id="12_36ctc"]
+[ext_resource type="Script" uid="uid://c6mhpaese60l2" path="res://Scripts/Main_Field.gd" id="13_3oad2"]
+[ext_resource type="Script" uid="uid://c4b8m0yjikah3" path="res://Scripts/PlayerHand.gd" id="14_1a7o5"]
+[ext_resource type="Script" uid="uid://bp1qbo2oxuy1p" path="res://Scripts/InputManager.gd" id="15_5crox"]
+[ext_resource type="PackedScene" uid="uid://db2eqitvw1e27" path="res://Scenes/CardInformation.tscn" id="16_fcs35"]
+[ext_resource type="PackedScene" uid="uid://dbfj2hlc71gc6" path="res://Scenes/Elements.tscn" id="17_0shgc"]
+[ext_resource type="PackedScene" uid="uid://c3x07o1r7glog" path="res://Scenes/Logo.tscn" id="18_awdcn"]
+[ext_resource type="Script" uid="uid://coysovnn26kgf" path="res://Scripts/Logo.gd" id="19_j2sa3"]
+[ext_resource type="PackedScene" uid="uid://cpn7rtonc8qd4" path="res://Scenes/Phases.tscn" id="20_ovfrf"]
+[ext_resource type="Script" uid="uid://cjdv252o1hnhq" path="res://Scripts/Phases.gd" id="21_h2qut"]
+[ext_resource type="PackedScene" uid="uid://kv77quhf6roj" path="res://Scenes/Chat.tscn" id="22_bg3cw"]
+
+[node name="PlayerField" type="Node2D"]
+script = ExtResource("1_uld4x")
+
+[node name="CardManager" type="Node2D" parent="."]
+script = ExtResource("1_8whdk")
+
+[node name="FieldGa" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.647059)
+z_index = -2
+position = Vector2(980, 800)
+scale = Vector2(0.474, 0.474)
+texture = ExtResource("2_uld4x")
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -3
+position = Vector2(960, 541)
+texture = ExtResource("3_xb57x")
+
+[node name="GA_DECK" parent="." instance=ExtResource("4_kym08")]
+position = Vector2(1360.5, 780.5)
+scale = Vector2(0.192, 0.192)
+script = ExtResource("5_xuc2h")
+
+[node name="MAT_DECK" parent="." instance=ExtResource("6_g5k7o")]
+position = Vector2(599, 780.5)
+script = ExtResource("7_vx5jb")
+
+[node name="GRAVEYARD" parent="." instance=ExtResource("8_ul1di")]
+position = Vector2(1362.7, 938.3)
+scale = Vector2(0.977783, 0.974084)
+
+[node name="BANISH" parent="." instance=ExtResource("9_64y2i")]
+position = Vector2(1342, 642)
+
+[node name="MEMORY" parent="." instance=ExtResource("10_tb1co")]
+position = Vector2(975, 973)
+script = ExtResource("11_c4sal")
+
+[node name="MAINFIELD" parent="." instance=ExtResource("12_36ctc")]
+position = Vector2(961, 710)
+script = ExtResource("13_3oad2")
+
+[node name="PlayerHand" type="Node2D" parent="."]
+script = ExtResource("14_1a7o5")
+
+[node name="InputManager" type="Node2D" parent="."]
+script = ExtResource("15_5crox")
+
+[node name="CardInformation" parent="." instance=ExtResource("16_fcs35")]
+
+[node name="Elements" parent="." instance=ExtResource("17_0shgc")]
+
+[node name="Logo" parent="." instance=ExtResource("18_awdcn")]
+position = Vector2(590, 960)
+script = ExtResource("19_j2sa3")
+
+[node name="Phases" parent="." instance=ExtResource("20_ovfrf")]
+script = ExtResource("21_h2qut")
+
+[node name="Chat" parent="." instance=ExtResource("22_bg3cw")]
