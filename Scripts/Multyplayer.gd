@@ -10,7 +10,6 @@ var peer = ENetMultiplayerPeer.new()
 
 func _on_host_button_pressed() -> void:
 	disable_buttons()
-	
 	peer.create_server(PORT)
 	multiplayer.multiplayer_peer = peer
 	var player_scene = player_field_scene.instantiate()
@@ -28,9 +27,10 @@ func _on_join_button_pressed() -> void:
 	player_scene.client_set_up()
 	
 func on_peer_connected(peer_id):
-	var opponent_scene = opponent_field_scene.instantiate()
-	add_child(opponent_scene)
-	get_node("PlayerField").host_set_up()
+	if not has_node("OpponentField"):
+		var opponent_scene = opponent_field_scene.instantiate()
+		add_child(opponent_scene)
+		get_node("PlayerField").host_set_up()
 
 func disable_buttons():
 	$HostButton.disabled = true

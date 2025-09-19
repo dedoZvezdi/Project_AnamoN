@@ -21,13 +21,13 @@ func _ready() -> void:
 	
 @rpc("any_peer")
 func draw_here_and_for_peer(player_id):
-	if multiplayer.get_unique_id == player_id:
+	if multiplayer.get_unique_id() == player_id:
 		draw_card()
 	else:
 		get_parent().get_parent().get_node("OpponentField/OpponentDeck").draw_card()
 
 func draw_clicked():
-	var player_id = multiplayer.get_unique_id
+	var player_id = multiplayer.get_unique_id()
 	draw_here_and_for_peer(player_id)
 	rpc("draw_here_and_for_peer", player_id)
 	
