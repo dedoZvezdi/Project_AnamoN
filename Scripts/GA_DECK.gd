@@ -1,10 +1,10 @@
 extends Node2D
 
+const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
+
 var player_deck = ["fabled-ruby-fatestone-hvn1e","excalibur-reflected-edge-dtr1e","lu-bu-indomitable-titan-hvn1e-cur","lu-bu-wrath-incarnate-hvn1e-cur","alice-golden-queen-dtr1e-cur","aetheric-calibration-dtrsd","alice-golden-queen-dtr","academy-guide-p24", "absolving-flames-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb"
 ,"suzaku-vermillion-phoenix-hvn1e-csr","acolyte-of-cultivation-amb","arcane-disposition-doap","arthur-young-heir-evp","suzaku-vermillion-phoenix-hvn1e"]
-
 var card_database_reference
-const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 var selected_card_slug: String = ""
 
 @onready var context_menu = $PopupMenu
@@ -18,7 +18,19 @@ func _ready() -> void:
 	setup_context_menu()
 	setup_deck_view()
 	$Area2D.input_event.connect(_on_area_2d_input_event)
+	
+@rpc("any_peer")
+func draw_here_and_for_peer(player_id):
+	if multiplayer.get_unique_id == player_id:
+		draw_card()
+	else:
+		get_parent().get_parent().get_node("OpponentField/OpponentDeck").draw_card()
 
+func draw_clicked():
+	var player_id = multiplayer.get_unique_id
+	draw_here_and_for_peer(player_id)
+	rpc("draw_here_and_for_peer", player_id)
+	
 func setup_context_menu():
 	context_menu.add_item("View Deck", 0)
 	context_menu.add_item("Shuffle Deck", 1)

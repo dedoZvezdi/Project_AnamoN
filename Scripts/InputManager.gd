@@ -45,7 +45,7 @@ func raycast_for_card():
 		for collision in result:
 			var collider = collision.collider
 			if collider.collision_layer & COLLISION_MASK_CARD_DECK:
-				deck_reference.draw_card()
+				deck_reference.draw_clicked()
 				return null
 		var highest_card = null
 		var highest_z_index = -9999
