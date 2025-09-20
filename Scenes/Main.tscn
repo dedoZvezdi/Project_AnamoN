@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dqt16mao7lo7t"]
 
-[ext_resource type="Script" uid="uid://lobbvgacwmar" path="res://Scripts/Multyplayer.gd" id="1_r150o"]
+[ext_resource type="Script" uid="uid://lobbvgacwmar" path="res://Scripts/Multiplayer.gd" id="1_r150o"]
 [ext_resource type="PackedScene" uid="uid://bhkcqcx0pu1b5" path="res://Scenes/Player_Field.tscn" id="2_idj7w"]
 [ext_resource type="PackedScene" uid="uid://c02vjgxjinwdx" path="res://Scenes/Opponent_Field.tscn" id="3_kln2b"]
 
@@ -22,6 +22,14 @@ offset_top = 271.0
 offset_right = 546.0
 offset_bottom = 302.0
 text = "Join"
+
+[node name="Name" type="LineEdit" parent="."]
+offset_left = 300.0
+offset_top = 341.0
+offset_right = 489.0
+offset_bottom = 372.0
+placeholder_text = "Name"
+alignment = 1
 
 [connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]

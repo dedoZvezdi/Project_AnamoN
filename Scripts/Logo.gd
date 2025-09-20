@@ -35,6 +35,7 @@ var marker_name_input: LineEdit
 var add_counter_dialog: AcceptDialog
 var counter_name_input: LineEdit
 var original_popup_pos: Vector2 = Vector2.ZERO
+var player_name: String = "Player"
 var token_slugs : Array = [
 	"acerbica-hvn","astral-shard-dtr","astral-shard-dtrsd","atmos-shield-mrc",
 	"atmos-shield-sp2","aurousteel-greatsword-alc","aurousteel-greatsword-alcsd","aurousteel-greatsword-sp2",
@@ -70,6 +71,10 @@ func _ready():
 	Logo_view_window.visibility_changed.connect(_on_logo_view_visibility_changed)
 	populate_tokens()
 	Logo_view_window.hide()
+	var config = ConfigFile.new()
+	var err = config.load("user://player_config.cfg")
+	if err == OK:
+		player_name = config.get_value("Player", "Name", "Player")
 
 func setup_marker_input_dialog():
 	add_marker_dialog = AcceptDialog.new()
@@ -163,7 +168,7 @@ func find_node_by_script(node, script_path: String):
 
 func send_to_chat(message: String):
 	if chat_node and chat_node.has_method("send_system_message"):
-		chat_node.send_system_message(message)
+		chat_node.send_system_message(player_name + " " + message)
 
 func setup_status_labels():
 	if not has_node("LevelLabel"):
@@ -527,7 +532,7 @@ func _on_popup_menu_id_pressed(id):
 		elif id == 101:
 			popup_menu.hide()
 			var result = ["HEAD", "TAIL"].pick_random()
-			send_to_chat("COIN - " + result)
+			send_to_chat("Flipped Coin - " + result)
 		elif id == 102:
 			build_dice_menu()
 		elif id == 104:
@@ -545,14 +550,14 @@ func _on_popup_menu_id_pressed(id):
 			$LogoViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 		elif id == 103:
 			popup_menu.hide()
-			send_to_chat("Player surrendered")
+			send_to_chat("Surrendered")
 	elif showing_dice_menu:
 		if id == 999:
 			build_main_menu()
 		else:
 			popup_menu.hide()
 			var roll = randi_range(1, id)
-			send_to_chat("D" + str(id) + " - " + str(roll))
+			send_to_chat("Rolled D" + str(id) + " - " + str(roll))
 	elif showing_rps_menu:
 		if id == 999:
 			build_main_menu()
@@ -565,7 +570,7 @@ func _on_popup_menu_id_pressed(id):
 				choice = "Paper"
 			elif id == 203:
 				choice = "Scissors"
-			send_to_chat("RPS - " + choice)
+			send_to_chat("Played RPS - " + choice)
 	elif showing_status_menu:
 		if id == 999:
 			build_main_menu()
