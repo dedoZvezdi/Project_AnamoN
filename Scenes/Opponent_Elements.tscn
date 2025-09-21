@@ -15,51 +15,51 @@
 
 [node name="OpponentElements" type="Node2D"]
 
-[node name="Norm" parent="." instance=ExtResource("1_6ql4t")]
+[node name="OpponentNorm" parent="." instance=ExtResource("1_6ql4t")]
 position = Vector2(1397, 500)
 rotation = -3.14159
 
-[node name="Fire" parent="." instance=ExtResource("2_1n4dq")]
+[node name="OpponentFire" parent="." instance=ExtResource("2_1n4dq")]
 position = Vector2(1397, 465)
 rotation = -3.14159
 
-[node name="Water" parent="." instance=ExtResource("3_j7acn")]
+[node name="OpponentWater" parent="." instance=ExtResource("3_j7acn")]
 position = Vector2(1397, 430)
 rotation = -3.14159
 
-[node name="Wind" parent="." instance=ExtResource("4_sec3a")]
+[node name="OpponentWind" parent="." instance=ExtResource("4_sec3a")]
 position = Vector2(1397, 395)
 rotation = -3.14159
 
-[node name="Astra" parent="." instance=ExtResource("5_7yc41")]
+[node name="OpponentAstra" parent="." instance=ExtResource("5_7yc41")]
 position = Vector2(1362, 500)
 rotation = -3.14159
 
-[node name="Umbra" parent="." instance=ExtResource("6_xiib5")]
+[node name="OpponentUmbra" parent="." instance=ExtResource("6_xiib5")]
 position = Vector2(1327, 500)
 rotation = -3.14159
 
-[node name="Arcane" parent="." instance=ExtResource("7_g3co2")]
+[node name="OpponentArcane" parent="." instance=ExtResource("7_g3co2")]
 position = Vector2(1362, 465)
 rotation = -3.14159
 
-[node name="Exia" parent="." instance=ExtResource("8_y5yek")]
+[node name="OpponentExia" parent="." instance=ExtResource("8_y5yek")]
 position = Vector2(1327, 465)
 rotation = -3.14159
 
-[node name="Crux" parent="." instance=ExtResource("9_gimyw")]
+[node name="OpponentCrux" parent="." instance=ExtResource("9_gimyw")]
 position = Vector2(1362, 430)
 rotation = -3.14159
 script = null
 
-[node name="Tera" parent="." instance=ExtResource("10_hldlb")]
+[node name="OpponentTera" parent="." instance=ExtResource("10_hldlb")]
 position = Vector2(1362, 395)
 rotation = -3.14159
 
-[node name="Neos" parent="." instance=ExtResource("11_q7drv")]
+[node name="OpponentNeos" parent="." instance=ExtResource("11_q7drv")]
 position = Vector2(1327, 395)
 rotation = -3.14159
 
-[node name="Luxem" parent="." instance=ExtResource("12_td0eo")]
+[node name="OpponentLuxem" parent="." instance=ExtResource("12_td0eo")]
 position = Vector2(1327, 430)
 rotation = -3.14159
