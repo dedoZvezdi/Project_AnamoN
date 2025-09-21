@@ -10,6 +10,7 @@ var area_line_mapping = {
 }
 var areas = {}
 var all_lines = []
+var current_phase = "MaterializeArea2D"
 
 func _ready():
 	collect_areas_and_lines()
@@ -35,7 +36,9 @@ func check_click_on_areas(click_pos: Vector2):
 	for area_name in areas:
 		var area = areas[area_name]
 		if is_point_in_area(area, click_pos):
+			current_phase = area_name
 			show_lines_for_area(area_name)
+			sync_phase_with_opponent(area_name)
 			break
 
 func is_point_in_area(area: Area2D, point: Vector2) -> bool:
@@ -57,3 +60,12 @@ func hide_all_lines():
 	for line in all_lines:
 		if line and is_instance_valid(line):
 			line.visible = false
+
+func sync_phase_with_opponent(phase_name: String):
+	var multiplayer_node = get_tree().get_root().get_node("Main")
+	if multiplayer_node:
+		multiplayer_node.rpc("sync_opponent_phase", phase_name)
+
+func receive_opponent_phase_sync(phase_name: String):
+	current_phase = phase_name
+	show_lines_for_area(phase_name)

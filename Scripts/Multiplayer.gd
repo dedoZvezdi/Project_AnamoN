@@ -78,6 +78,27 @@ func notify_host_of_join(client_name: String):
 		if host_chat_node:
 			host_chat_node.add_message("System", client_name + " joined the game")
 
+@rpc("any_peer", "reliable")
+func sync_element(element_name: String, alpha: float):
+	var opp_element_path = "OpponentField/OpponentElements/Opponent" + element_name
+	var opp_element = get_node(opp_element_path)
+	if opp_element:
+		opp_element.get_node("Sprite2D").modulate.a = alpha
+
+@rpc("any_peer", "reliable")
+func sync_opponent_phase(phase_name: String):
+	var player_field = get_node_or_null("PlayerField")
+	if player_field:
+		var player_phases = player_field.get_node_or_null("Phases")
+		if player_phases:
+			player_phases.receive_opponent_phase_sync(phase_name)
+	if multiplayer.is_server():
+		var sender_id = multiplayer.get_remote_sender_id()
+		if sender_id != 0:
+			for peer_id in multiplayer.get_peers():
+				if peer_id != sender_id:
+					rpc_id(peer_id, "sync_opponent_phase", phase_name)
+
 func disable_buttons():
 	$HostButton.disabled = true
 	$HostButton.visible = false

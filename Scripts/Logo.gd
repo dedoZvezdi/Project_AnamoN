@@ -570,7 +570,8 @@ func _on_popup_menu_id_pressed(id):
 				choice = "Paper"
 			elif id == 203:
 				choice = "Scissors"
-			send_to_chat("Played RPS - " + choice)
+			if chat_node and chat_node.has_method("handle_rps_choice"):
+				chat_node.handle_rps_choice(choice)
 	elif showing_status_menu:
 		if id == 999:
 			build_main_menu()
