@@ -17,7 +17,6 @@ func _ready():
 	if err == OK:
 		player_name = config.get_value("Player", "Name", "Player")
 	text_edit.editable = false
-	text_edit.wrap_enabled = true
 	Send_edit.pressed.connect(_on_send_pressed)
 	message.text_submitted.connect(_on_message_submitted)
 
