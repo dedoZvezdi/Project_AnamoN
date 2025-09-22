@@ -20,16 +20,17 @@ func _ready() -> void:
 	$Area2D.input_event.connect(_on_area_2d_input_event)
 	
 @rpc("any_peer")
-func draw_here_and_for_peer(player_id):
+func draw_here_and_for_peer(player_id, card_drawn_name):
 	if multiplayer.get_unique_id() == player_id:
-		draw_card()
+		draw_card(card_drawn_name)
 	else:
-		get_parent().get_parent().get_node("OpponentField/OpponentDeck").draw_card()
+		get_parent().get_parent().get_node("OpponentField/OpponentDeck").draw_card(card_drawn_name)
 
 func draw_clicked():
 	var player_id = multiplayer.get_unique_id()
-	draw_here_and_for_peer(player_id)
-	rpc("draw_here_and_for_peer", player_id)
+	var card_drawn_name = player_deck[0]
+	draw_here_and_for_peer(player_id, card_drawn_name)
+	rpc("draw_here_and_for_peer", player_id, card_drawn_name)
 	
 func setup_context_menu():
 	context_menu.add_item("View Deck", 0)
@@ -154,15 +155,15 @@ func remove_card_by_slug(slug: String):
 		update_deck_view()
 		update_deck_state()
 
-func draw_card():
+func draw_card(card_drawn_name):
 	if player_deck.size() == 0:
 		return
-	var card_drawn_name = player_deck[0]
+
 	player_deck.erase(card_drawn_name)
 	update_deck_view()
 	if player_deck.size() == 0:
 		$Area2D/CollisionShape2D.disabled = true
-		$Sprite2D.visible = false
+		visible = false
 	var card_scene = preload(CARD_SCENE_PATH)
 	var new_card = card_scene.instantiate()
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_drawn_name + ".png"
