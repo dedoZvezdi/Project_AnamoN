@@ -31,5 +31,21 @@ offset_bottom = 372.0
 placeholder_text = "Name"
 alignment = 1
 
+[node name="IP_Address" type="LineEdit" parent="."]
+offset_left = 616.0
+offset_top = 347.0
+offset_right = 864.0
+offset_bottom = 378.0
+placeholder_text = "127.0.0.1"
+alignment = 1
+
+[node name="PORT" type="LineEdit" parent="."]
+offset_left = 616.0
+offset_top = 379.0
+offset_right = 864.0
+offset_bottom = 410.0
+placeholder_text = "8000"
+alignment = 1
+
 [connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
