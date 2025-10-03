@@ -6,6 +6,4 @@ export_presets.cfg
 /.godot/exported
 /.godot/imported
 /.godot/shader_cache
-.godot/uid_cache.bin
-.gdignore
 /.godot/mono
