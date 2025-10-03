@@ -8,3 +8,4 @@ export_presets.cfg
 /.godot/shader_cache
 .godot/uid_cache.bin
 .gdignore
+/.godot/mono
