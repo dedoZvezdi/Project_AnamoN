@@ -3,3 +3,8 @@ rcedit-x64.exe
 libgdsqlite.windows.template_debug.x86_64.dll
 export_presets.cfg
 /.godot/editor
+/.godot/exported
+/.godot/imported
+/.godot/shader_cache
+.godot/uid_cache.bin
+.gdignore
