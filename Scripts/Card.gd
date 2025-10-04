@@ -230,7 +230,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
 			else:
-				if not is_champion_card():
+				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
 					popup_menu.add_item("Banish Face Down", 1)
 					popup_menu.add_item("Go to Top Deck", 2)
 					popup_menu.add_item("Go to Bottom Deck", 3)
