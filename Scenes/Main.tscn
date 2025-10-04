@@ -10,42 +10,49 @@ player_field_scene = ExtResource("2_idj7w")
 opponent_field_scene = ExtResource("3_kln2b")
 
 [node name="HostButton" type="Button" parent="."]
-offset_left = 247.0
-offset_top = 273.0
-offset_right = 291.0
-offset_bottom = 304.0
+offset_left = 1288.0
+offset_top = 826.0
+offset_right = 1417.0
+offset_bottom = 889.0
 text = "Host"
 
 [node name="JoinButton" type="Button" parent="."]
-offset_left = 508.0
-offset_top = 271.0
-offset_right = 546.0
-offset_bottom = 302.0
+offset_left = 1153.0
+offset_top = 826.0
+offset_right = 1282.0
+offset_bottom = 889.0
 text = "Join"
 
 [node name="Name" type="LineEdit" parent="."]
-offset_left = 300.0
-offset_top = 341.0
-offset_right = 489.0
-offset_bottom = 372.0
+offset_left = 639.0
+offset_top = 794.0
+offset_right = 1146.0
+offset_bottom = 825.0
 placeholder_text = "Name"
 alignment = 1
 
 [node name="IP_Address" type="LineEdit" parent="."]
-offset_left = 616.0
-offset_top = 347.0
-offset_right = 864.0
-offset_bottom = 378.0
-placeholder_text = "127.0.0.1"
+offset_left = 639.0
+offset_top = 826.0
+offset_right = 1146.0
+offset_bottom = 857.0
+placeholder_text = "PUBLIC IP"
 alignment = 1
 
 [node name="PORT" type="LineEdit" parent="."]
-offset_left = 616.0
-offset_top = 379.0
-offset_right = 864.0
-offset_bottom = 410.0
-placeholder_text = "8000"
+offset_left = 639.0
+offset_top = 858.0
+offset_right = 1146.0
+offset_bottom = 889.0
+placeholder_text = "PORT"
 alignment = 1
+
+[node name="CheckButton" type="CheckButton" parent="."]
+offset_left = 1149.0
+offset_top = 793.0
+offset_right = 1422.0
+offset_bottom = 824.0
+text = "Local/IP Mode / Tunnel Mode"
 
 [connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]

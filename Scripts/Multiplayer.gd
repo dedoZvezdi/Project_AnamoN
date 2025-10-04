@@ -5,11 +5,13 @@ extends Node2D
 
 @onready var server: LineEdit = $IP_Address
 @onready var port: LineEdit = $PORT
+@onready var check: CheckButton = $CheckButton
 
-var peer = ENetMultiplayerPeer.new()
+var peer = null
 var peer_names = {}
 var upnp: UPNP
 var connect_timer: Timer
+var use_websocket: bool = false
 
 func _ready():
 	var config = ConfigFile.new()
@@ -18,35 +20,171 @@ func _ready():
 		$Name.text = config.get_value("Player", "Name", "")
 		server.text = config.get_value("Player", "ServerIP", "localhost")
 		port.text = str(config.get_value("Player", "ServerPort", 8000))
+		check.button_pressed = config.get_value("Player", "UseWebSocket", false)
+	check.toggled.connect(_on_check_button_toggled)
+	_on_check_button_toggled(check.button_pressed)
 	if not has_node("ConnectTimer"):
 		connect_timer = Timer.new()
 		connect_timer.name = "ConnectTimer"
-		connect_timer.wait_time = 7.0
+		connect_timer.wait_time = 10.0
 		connect_timer.one_shot = true
 		connect_timer.timeout.connect(_on_connect_timeout)
 		add_child(connect_timer)
 
+func _on_check_button_toggled(is_pressed: bool):
+	use_websocket = is_pressed
+	if is_pressed:
+		server.placeholder_text = "For JOIN: https://tunnel-url.com / For HOST: leave empty"
+		port.visible = true
+	else:
+		server.placeholder_text = "localhost or IP address"
+		port.visible = true
+
 func _on_host_button_pressed() -> void:
 	var entered_name = $Name.text.strip_edges()
 	var name_to_use = "Player" if entered_name == "" else entered_name
-	if not validate_ip_and_port():
-		return
-	var config = ConfigFile.new()
-	config.set_value("Player", "Name", name_to_use)
-	config.set_value("Player", "ServerIP", server.text)
-	config.set_value("Player", "ServerPort", int(port.text))
-	config.save("user://player_config.cfg")
-	disable_buttons()
-	await setup_upnp_for_host(int(port.text))
-	peer.create_server(int(port.text))
-	multiplayer.multiplayer_peer = peer
-	var player_scene = player_field_scene.instantiate()
-	add_child(player_scene)
-	multiplayer.peer_connected.connect(on_peer_connected)
-	var chat_node = player_scene.get_node("Chat")
-	if chat_node:
-		chat_node.player_name = name_to_use
-		peer_names[multiplayer.get_unique_id()] = name_to_use
+	if use_websocket:
+		if not validate_websocket_host():
+			return
+		var config = ConfigFile.new()
+		config.set_value("Player", "Name", name_to_use)
+		config.set_value("Player", "ServerPort", int(port.text))
+		config.set_value("Player", "UseWebSocket", true)
+		config.save("user://player_config.cfg")
+		disable_buttons()
+		peer = WebSocketMultiplayerPeer.new()
+		var error = peer.create_server(int(port.text))
+		if error != OK:
+			show_popup("Failed to create WebSocket server on port " + port.text)
+			reset_ui()
+			return
+		multiplayer.multiplayer_peer = peer
+		var player_scene = player_field_scene.instantiate()
+		add_child(player_scene)
+		multiplayer.peer_connected.connect(on_peer_connected)
+		var chat_node = player_scene.get_node("Chat")
+		if chat_node:
+			chat_node.player_name = name_to_use
+			peer_names[multiplayer.get_unique_id()] = name_to_use
+		show_popup("WebSocket server started on port " + port.text + "\n\nNow run in terminal:\ncloudflared tunnel --url http://localhost:" + port.text + "\n\nThen share the https:// URL with your friend!")
+	else:
+		if not validate_ip_and_port():
+			return
+		var config = ConfigFile.new()
+		config.set_value("Player", "Name", name_to_use)
+		config.set_value("Player", "ServerIP", server.text)
+		config.set_value("Player", "ServerPort", int(port.text))
+		config.set_value("Player", "UseWebSocket", false)
+		config.save("user://player_config.cfg")
+		disable_buttons()
+		peer = ENetMultiplayerPeer.new()
+		peer.create_server(int(port.text))
+		multiplayer.multiplayer_peer = peer
+		var player_scene = player_field_scene.instantiate()
+		add_child(player_scene)
+		multiplayer.peer_connected.connect(on_peer_connected)
+		var chat_node = player_scene.get_node("Chat")
+		if chat_node:
+			chat_node.player_name = name_to_use
+			peer_names[multiplayer.get_unique_id()] = name_to_use
+
+func _on_join_button_pressed() -> void:
+	var entered_name = $Name.text.strip_edges()
+	var name_to_use = "Player" if entered_name == "" else entered_name
+	if use_websocket:
+		if not validate_websocket_url():
+			return
+		var config = ConfigFile.new()
+		config.set_value("Player", "Name", name_to_use)
+		config.set_value("Player", "ServerURL", server.text)
+		config.set_value("Player", "UseWebSocket", true)
+		config.save("user://player_config.cfg")
+		disable_buttons()
+		peer = WebSocketMultiplayerPeer.new()
+		var ws_url = server.text.replace("https://", "wss://").replace("http://", "ws://")
+		var error = peer.create_client(ws_url)
+		if error != OK:
+			show_popup("Failed to connect to WebSocket URL: " + ws_url)
+			reset_ui()
+			return
+		multiplayer.multiplayer_peer = peer
+		multiplayer.connected_to_server.connect(func():
+			if connect_timer and connect_timer.is_stopped() == false:
+				connect_timer.stop()
+			var player_scene = player_field_scene.instantiate()
+			add_child(player_scene)
+			var opponent_scene = opponent_field_scene.instantiate()
+			add_child(opponent_scene)
+			player_scene.client_set_up()
+			var chat_node = player_scene.get_node("Chat")
+			if chat_node:
+				chat_node.player_name = name_to_use
+			rpc("receive_opponent_name", name_to_use)
+			rpc_id(1, "notify_host_of_join", name_to_use)
+			peer_names[multiplayer.get_unique_id()] = name_to_use
+		)
+		multiplayer.connection_failed.connect(func():
+			if connect_timer and connect_timer.is_stopped() == false:
+				connect_timer.stop()
+			show_popup("Failed to connect to WebSocket server. Check the URL.")
+			reset_ui()
+		)
+		connect_timer.start()
+	else:
+		if not validate_ip_and_port():
+			return
+		var config = ConfigFile.new()
+		config.set_value("Player", "Name", name_to_use)
+		config.set_value("Player", "ServerIP", server.text)
+		config.set_value("Player", "ServerPort", int(port.text))
+		config.set_value("Player", "UseWebSocket", false)
+		config.save("user://player_config.cfg")
+		disable_buttons()
+		peer = ENetMultiplayerPeer.new()
+		peer.create_client(server.text, int(port.text))
+		multiplayer.multiplayer_peer = peer
+		multiplayer.connected_to_server.connect(func():
+			if connect_timer and connect_timer.is_stopped() == false:
+				connect_timer.stop()
+			var player_scene = player_field_scene.instantiate()
+			add_child(player_scene)
+			var opponent_scene = opponent_field_scene.instantiate()
+			add_child(opponent_scene)
+			player_scene.client_set_up()
+			var chat_node = player_scene.get_node("Chat")
+			if chat_node:
+				chat_node.player_name = name_to_use
+			rpc("receive_opponent_name", name_to_use)
+			rpc_id(1, "notify_host_of_join", name_to_use)
+			peer_names[multiplayer.get_unique_id()] = name_to_use
+		)
+		multiplayer.connection_failed.connect(func():
+			if connect_timer and connect_timer.is_stopped() == false:
+				connect_timer.stop()
+			show_popup("There is no host with such IP and port.")
+			reset_ui()
+		)
+		connect_timer.start()
+
+func validate_websocket_host() -> bool:
+	var port_text = port.text.strip_edges()
+	if port_text == "":
+		show_popup("Please enter a port number for WebSocket server.")
+		return false
+	if not is_valid_port(int(port_text)):
+		show_popup("Invalid port number.")
+		return false
+	return true
+
+func validate_websocket_url() -> bool:
+	var url = server.text.strip_edges()
+	if url == "":
+		show_popup("Please enter the WebSocket URL (https://...).")
+		return false
+	if not url.begins_with("https://") and not url.begins_with("http://"):
+		show_popup("URL must start with https:// or http://")
+		return false
+	return true
 
 func validate_ip_and_port() -> bool:
 	var ip_text = server.text.strip_edges()
@@ -62,11 +200,13 @@ func validate_ip_and_port() -> bool:
 func show_popup(message: String):
 	var dialog = AcceptDialog.new()
 	dialog.dialog_text = message
-	dialog.title = "ERROR"
+	dialog.title = "INFO" if message.contains("started") else "ERROR"
 	get_tree().current_scene.add_child(dialog)
 	dialog.popup_centered()
 
 func is_valid_ip(ip: String) -> bool:
+	if ip == "localhost":
+		return true
 	var parts = ip.split(".")
 	if parts.size() != 4:
 		return false
@@ -78,59 +218,9 @@ func is_valid_ip(ip: String) -> bool:
 func is_valid_port(p: int) -> bool:
 	return p >= 0 and p <= 65535
 
-func setup_upnp_for_host(host_port: int):
-	upnp = UPNP.new()
-	var discover_result = upnp.discover(5000, 4)
-	if discover_result != UPNP.UPNP_RESULT_SUCCESS:
-		show_popup("UPNP discovery failed. Try manual forwarding.")
-		return
-	var gateway = upnp.get_gateway()
-	if gateway == null or gateway == "":
-		show_popup("No UPNP gateway detected. Please manually forward port %d UDP." % host_port)
-		return
-	var add_result = upnp.add_port_mapping(host_port, 0, "Godot Multiplayer", "UDP", 0)
-	if add_result != UPNP.UPNP_RESULT_SUCCESS:
-		show_popup("Your router doesn't support UPNP. Please manually forward port %d on UDP protocol." % host_port)
-
-func _on_join_button_pressed() -> void:
-	var entered_name = $Name.text.strip_edges()
-	var name_to_use = "Player" if entered_name == "" else entered_name
-	if not validate_ip_and_port():
-		return
-	var config = ConfigFile.new()
-	config.set_value("Player", "Name", name_to_use)
-	config.set_value("Player", "ServerIP", server.text)
-	config.set_value("Player", "ServerPort", int(port.text))
-	config.save("user://player_config.cfg")
-	disable_buttons()
-	peer.create_client(server.text, int(port.text))
-	multiplayer.multiplayer_peer = peer
-	multiplayer.connected_to_server.connect(func():
-		if connect_timer and connect_timer.is_stopped() == false:
-			connect_timer.stop()
-		var player_scene = player_field_scene.instantiate()
-		add_child(player_scene)
-		var opponent_scene = opponent_field_scene.instantiate()
-		add_child(opponent_scene)
-		player_scene.client_set_up()
-		var chat_node = player_scene.get_node("Chat")
-		if chat_node:
-			chat_node.player_name = name_to_use
-		rpc("receive_opponent_name", name_to_use)
-		rpc_id(1, "notify_host_of_join", name_to_use)
-		peer_names[multiplayer.get_unique_id()] = name_to_use
-	)
-	multiplayer.connection_failed.connect(func():
-		if connect_timer and connect_timer.is_stopped() == false:
-			connect_timer.stop()
-		show_popup("There is no host with such IP and port.")
-		reset_ui()
-	)
-	connect_timer.start()
-
 func _on_connect_timeout():
 	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
-		show_popup("There is no host with such IP and port. Exit by timeout")
+		show_popup("Connection timeout. Could not reach the server.")
 		reset_ui()
 
 func on_peer_connected(peer_id):
@@ -184,11 +274,14 @@ func reset_ui():
 	$JoinButton.visible = true
 	$Name.visible = true
 	server.visible = true
-	port.visible = true
+	port.visible = not use_websocket
+	check.visible = true
 	if multiplayer.multiplayer_peer != null:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null
-	peer.close()
+	if peer:
+		peer.close()
+		peer = null
 	for child in get_children():
 		if child.name == "PlayerField" or child.name == "OpponentField":
 			child.queue_free()
@@ -204,3 +297,4 @@ func disable_buttons():
 	$Name.visible = false
 	server.visible = false
 	port.visible = false
+	check.visible = false
