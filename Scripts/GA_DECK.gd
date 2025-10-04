@@ -18,6 +18,7 @@ func _ready() -> void:
 	setup_context_menu()
 	setup_deck_view()
 	$Area2D.input_event.connect(_on_area_2d_input_event)
+	update_deck_state()
 	
 @rpc("any_peer")
 func draw_here_and_for_peer(player_id, card_drawn_name):
@@ -133,6 +134,11 @@ func update_deck_state():
 	if player_deck.size() > 0:
 		$Area2D/CollisionShape2D.disabled = false
 		$Sprite2D.visible = true
+		visible = true
+	else:
+		$Area2D/CollisionShape2D.disabled = true
+		$Sprite2D.visible = false
+		visible = false
 
 func add_to_top(slug: String):
 	if slug == "":
@@ -158,12 +164,10 @@ func remove_card_by_slug(slug: String):
 func draw_card(card_drawn_name):
 	if player_deck.size() == 0:
 		return
-
 	player_deck.erase(card_drawn_name)
 	update_deck_view()
 	if player_deck.size() == 0:
-		$Area2D/CollisionShape2D.disabled = true
-		visible = false
+		update_deck_state()
 	var card_scene = preload(CARD_SCENE_PATH)
 	var new_card = card_scene.instantiate()
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_drawn_name + ".png"

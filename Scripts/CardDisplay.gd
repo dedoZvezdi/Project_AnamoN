@@ -41,6 +41,8 @@ func _on_mouse_entered():
 	self.scale = Vector2(1, 1)
 	self.z_index = 100
 	var card_info_node = get_tree().get_current_scene().get_node_or_null("CardInformation")
+	if not card_info_node:
+		card_info_node = get_tree().get_current_scene().get_node_or_null("PlayerField/CardInformation")
 	if card_info_node and card_info_node.has_method("show_card_info"):
 		card_info_node.show_card_info(card_slug)
 
