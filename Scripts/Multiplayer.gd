@@ -80,12 +80,12 @@ func is_valid_port(p: int) -> bool:
 
 func setup_upnp_for_host(host_port: int):
 	upnp = UPNP.new()
-	var discover_result = upnp.discover()
+	var discover_result = upnp.discover(5000, 4)
 	if discover_result != UPNP.UPNP_RESULT_SUCCESS:
 		show_popup("UPNP discovery failed. Try manual forwarding.")
 		return
 	var gateway = upnp.get_gateway()
-	if gateway == null or not gateway.is_valid_gateway():
+	if gateway == null or gateway == "":
 		show_popup("No UPNP gateway detected. Please manually forward port %d UDP." % host_port)
 		return
 	var add_result = upnp.add_port_mapping(host_port, 0, "Godot Multiplayer", "UDP", 0)
