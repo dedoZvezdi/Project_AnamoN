@@ -74,7 +74,21 @@ func add_card_to_slot(card):
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	cards_in_graveyard.append(card)
-	card.global_position = global_position
+	var target_pos := Vector2()
+	if has_node("Area2D/CollisionShape2D"):
+		target_pos = $Area2D/CollisionShape2D.global_position
+	else:
+		target_pos = global_position
+	card.visible = true
+	if card.has_node("Area2D"):
+		card.get_node("Area2D").set_deferred("input_pickable", false)
+	var tween = create_tween()
+	tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
+	tween.parallel().tween_property(card, "rotation", 0.0, 0.3)
+	if card.has_node("AnimationPlayer"):
+		var ap = card.get_node("AnimationPlayer")
+		if ap.has_animation("card_flip"):
+			ap.play("card_flip")
 	card.z_index = base_z_index + cards_in_graveyard.size()
 	card_in_slot = true
 	if graveyard_view_window.visible:

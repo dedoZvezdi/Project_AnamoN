@@ -43,7 +43,6 @@ func add_card_to_memory(card):
 		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
-
 	cards_in_slot.append(card)
 	show_card_back(card)
 	arrange_cards_symmetrically()
@@ -179,7 +178,9 @@ func arrange_cards_symmetrically():
 		for i in range(card_count):
 			var normalized_x = positions[i]
 			var actual_x = global_position.x - slot_width/2 + normalized_x * slot_width
-			cards_in_slot[i].global_position = Vector2(actual_x, global_position.y)
+			var target = Vector2(actual_x, global_position.y)
+			var tween = create_tween()
+			tween.tween_property(cards_in_slot[i], "global_position", target, 0.3)
 			cards_in_slot[i].z_index = memory_z_index_offset + i + 1
 
 func get_slot_width():

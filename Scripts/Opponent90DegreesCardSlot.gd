@@ -103,7 +103,7 @@ func _on_deck_view_close():
 	banish_view_window.hide()
 	selected_card_slug = ""
 
-func add_card_to_slot(card):
+func add_card_to_slot(card, face_down := false):
 	if not card or not is_instance_valid(card):
 		return
 	if card.has_method("is_token") and card.is_token():
@@ -113,8 +113,23 @@ func add_card_to_slot(card):
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	cards_in_banish.append(card)
-	card.global_position = global_position
-	card.rotation_degrees = 90
+	var target_pos := Vector2()
+	if has_node("Area2D/CollisionShape2D"):
+		target_pos = $Area2D/CollisionShape2D.global_position
+	else:
+		target_pos = global_position
+	card.visible = true
+	if card.has_node("Area2D"):
+		card.get_node("Area2D").set_deferred("input_pickable", false)
+	if face_down:
+		if has_method("show_card_back"):
+			show_card_back(card)
+	else:
+		if has_method("show_card_front"):
+			show_card_front(card)
+	var tween = create_tween()
+	tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
+	tween.parallel().tween_property(card, "rotation_degrees", 90.0, 0.3)
 	card.z_index = base_z_index + cards_in_banish.size()
 	card_in_slot = true
 	if banish_view_window.visible:

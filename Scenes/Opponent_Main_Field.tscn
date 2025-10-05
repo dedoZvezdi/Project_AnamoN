@@ -1,10 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://nwg766vb0hw"]
+[gd_scene load_steps=3 format=3 uid="uid://nwg766vb0hw"]
+
+[ext_resource type="Script" uid="uid://cbwxbkq6clbos" path="res://Scripts/OpponentMainField.gd" id="1_omf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shnfe"]
 size = Vector2(614.25, 310.5)
 
 [node name="OpponentMainField" type="Node2D"]
 rotation = 3.14159
+script = ExtResource("1_omf")
 
 [node name="Area2D" type="Area2D" parent="."]
 collision_layer = 128

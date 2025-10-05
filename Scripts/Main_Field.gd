@@ -26,6 +26,16 @@ func add_card_to_field(card, position = null):
 			card.apply_champion_life_delta(champion_life_delta)
 		card.global_position = global_position
 		card.z_index = 400
+		var ci = card.get_node_or_null("CardImage")
+		var cib = card.get_node_or_null("CardImageBack")
+		if ci and cib:
+			cib.z_index = -1
+			ci.z_index = 0
+			cib.visible = false
+			ci.visible = true
+		var ap = card.get_node_or_null("AnimationPlayer")
+		if ap and ap.has_animation("card_flip"):
+			ap.play("card_flip")
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
 		if card.has_method("show_card_info"):
@@ -41,6 +51,16 @@ func add_card_to_field(card, position = null):
 			card.set_current_field(self)
 		if position != null:
 			card.global_position = position
+			var ci2 = card.get_node_or_null("CardImage")
+			var cib2 = card.get_node_or_null("CardImageBack")
+			if ci2 and cib2:
+				cib2.z_index = -1
+				ci2.z_index = 0
+				cib2.visible = false
+				ci2.visible = true
+			var ap2 = card.get_node_or_null("AnimationPlayer")
+			if ap2 and ap2.has_animation("card_flip"):
+				ap2.play("card_flip")
 
 func notify_card_transformed(card):
 	if card == current_champion_card and not is_champion_card(card):
