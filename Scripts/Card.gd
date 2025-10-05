@@ -608,13 +608,12 @@ func go_to_banish_face_down():
 		elif current_field.has_method("remove_card_from_slot"):
 			current_field.remove_card_from_slot(self)
 	if banish_node.has_method("add_card_to_slot"):
-		banish_node.add_card_to_slot(self)
-	#if has_node("AnimationPlayer"):
-		#var anim: AnimationPlayer = $AnimationPlayer
-		#if anim and anim.has_animation("card_flip"):
-			#anim.play("card_flip")
-	if banish_node.has_method("show_card_back"):
-		banish_node.show_card_back(self)
+		banish_node.add_card_to_slot(self, true)
+	var multiplayer_node = get_tree().get_root().get_node("Main")
+	if multiplayer_node:
+		var slug = get_slug_from_card()
+		if slug != "":
+			multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), slug, true)
 
 func remove_from_current_position():
 	var scene = get_tree().get_current_scene()
