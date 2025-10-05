@@ -18,8 +18,8 @@ func _ready():
 	var err = config.load("user://player_config.cfg")
 	if err == OK:
 		$Name.text = config.get_value("Player", "Name", "")
-		server.text = config.get_value("Player", "ServerIP", "localhost")
-		port.text = str(config.get_value("Player", "ServerPort", 8000))
+		server.text = config.get_value("Player", "ServerIP")
+		port.text = str(config.get_value("Player", "ServerPort"))
 		check.button_pressed = config.get_value("Player", "UseWebSocket", false)
 	check.toggled.connect(_on_check_button_toggled)
 	_on_check_button_toggled(check.button_pressed)
