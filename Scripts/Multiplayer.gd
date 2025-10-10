@@ -18,9 +18,6 @@ func _ready():
 	var err = config.load("user://player_config.cfg")
 	if err == OK:
 		$Name.text = config.get_value("Player", "Name", "")
-		server.text = config.get_value("Player", "ServerIP")
-		port.text = str(config.get_value("Player", "ServerPort"))
-		check.button_pressed = config.get_value("Player", "UseWebSocket", false)
 	check.toggled.connect(_on_check_button_toggled)
 	_on_check_button_toggled(check.button_pressed)
 	if not has_node("ConnectTimer"):
@@ -48,8 +45,6 @@ func _on_host_button_pressed() -> void:
 			return
 		var config = ConfigFile.new()
 		config.set_value("Player", "Name", name_to_use)
-		config.set_value("Player", "ServerPort", int(port.text))
-		config.set_value("Player", "UseWebSocket", true)
 		config.save("user://player_config.cfg")
 		disable_buttons()
 		peer = WebSocketMultiplayerPeer.new()
@@ -72,9 +67,6 @@ func _on_host_button_pressed() -> void:
 			return
 		var config = ConfigFile.new()
 		config.set_value("Player", "Name", name_to_use)
-		config.set_value("Player", "ServerIP", server.text)
-		config.set_value("Player", "ServerPort", int(port.text))
-		config.set_value("Player", "UseWebSocket", false)
 		config.save("user://player_config.cfg")
 		disable_buttons()
 		peer = ENetMultiplayerPeer.new()
@@ -96,8 +88,6 @@ func _on_join_button_pressed() -> void:
 			return
 		var config = ConfigFile.new()
 		config.set_value("Player", "Name", name_to_use)
-		config.set_value("Player", "ServerURL", server.text)
-		config.set_value("Player", "UseWebSocket", true)
 		config.save("user://player_config.cfg")
 		disable_buttons()
 		peer = WebSocketMultiplayerPeer.new()
@@ -135,9 +125,6 @@ func _on_join_button_pressed() -> void:
 			return
 		var config = ConfigFile.new()
 		config.set_value("Player", "Name", name_to_use)
-		config.set_value("Player", "ServerIP", server.text)
-		config.set_value("Player", "ServerPort", int(port.text))
-		config.set_value("Player", "UseWebSocket", false)
 		config.save("user://player_config.cfg")
 		disable_buttons()
 		peer = ENetMultiplayerPeer.new()
@@ -179,7 +166,7 @@ func validate_websocket_host() -> bool:
 func validate_websocket_url() -> bool:
 	var url = server.text.strip_edges()
 	if url == "":
-		show_popup("Please enter the WebSocket URL (https://...).")
+		show_popup("Please enter the WebSocket URL[](https://...).")
 		return false
 	if not url.begins_with("https://") and not url.begins_with("http://"):
 		show_popup("URL must start with https:// or http://")
