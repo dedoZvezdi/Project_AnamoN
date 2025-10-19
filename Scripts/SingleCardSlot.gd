@@ -115,11 +115,7 @@ func go_to_top_deck():
 			break
 	if not target_card:
 		return
-	remove_card_from_slot(target_card)
-	target_card.queue_free()
-	deck_node.add_to_top(selected_card_slug)
-	if graveyard_view_window.visible:
-		update_deck_view()
+	animate_card_to_deck_from_graveyard(target_card, deck_node.global_position, selected_card_slug, true)
 	selected_card_slug = ""
 
 func go_to_bottom_deck():
@@ -139,12 +135,34 @@ func go_to_bottom_deck():
 			break
 	if not target_card:
 		return
-	remove_card_from_slot(target_card)
-	target_card.queue_free()
-	deck_node.add_to_bottom(selected_card_slug)
+	animate_card_to_deck_from_graveyard(target_card, deck_node.global_position, selected_card_slug, false)
+	selected_card_slug = ""
+
+func animate_card_to_deck_from_graveyard(card, deck_position: Vector2, slug: String, is_top: bool):
+	remove_card_from_slot(card)
+	var original_scale = card.scale
+	if is_top:
+		card.z_index = 2
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(card, "global_position", deck_position, 0.5)
+	tween.tween_property(card, "scale", original_scale * 0.8, 0.3)
+	tween.tween_property(card, "scale", original_scale * 0.6, 0.2).set_delay(0.3)
+	tween.tween_property(card, "modulate", Color(1, 1, 1, 0.7), 0.3)
+	tween.tween_property(card, "modulate", Color(1, 1, 1, 0.3), 0.2).set_delay(0.3)
+	tween.tween_callback(_on_graveyard_deck_animation_completed.bind(card, slug, is_top)).set_delay(0.5)
+
+func _on_graveyard_deck_animation_completed(card, slug: String, is_top: bool):
+	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
+	if deck_nodes.size() > 0:
+		var deck_node = deck_nodes[0]
+		if is_top and deck_node.has_method("add_to_top"):
+			deck_node.add_to_top(slug)
+		elif not is_top and deck_node.has_method("add_to_bottom"):
+			deck_node.add_to_bottom(slug)
+	card.queue_free()
 	if graveyard_view_window.visible:
 		update_deck_view()
-	selected_card_slug = ""
 
 func show_deck_view():
 	update_deck_view()
