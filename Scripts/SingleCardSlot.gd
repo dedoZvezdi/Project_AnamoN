@@ -177,10 +177,6 @@ func add_card_to_slot(card):
 	var tween = create_tween()
 	tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
 	tween.parallel().tween_property(card, "rotation", 0.0, 0.3)
-	if card.has_node("AnimationPlayer"):
-		var ap = card.get_node("AnimationPlayer")
-		if ap.has_animation("card_flip"):
-			ap.play("card_flip")
 	card.z_index = base_z_index + cards_in_graveyard.size()
 	card_in_slot = true
 	if graveyard_view_window.visible:

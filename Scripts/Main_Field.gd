@@ -58,9 +58,7 @@ func add_card_to_field(card, position = null):
 				ci2.z_index = 0
 				cib2.visible = false
 				ci2.visible = true
-			var ap2 = card.get_node_or_null("AnimationPlayer")
-			if ap2 and ap2.has_animation("card_flip"):
-				ap2.play("card_flip")
+
 
 func notify_card_transformed(card):
 	if card == current_champion_card and not is_champion_card(card):
