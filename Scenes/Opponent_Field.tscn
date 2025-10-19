@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c02vjgxjinwdx"]
+[gd_scene load_steps=11 format=3 uid="uid://c02vjgxjinwdx"]
 
 [ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Grand Archive/Field_ga.png" id="2_we22y"]
 [ext_resource type="Script" uid="uid://bfjq0vc84eui2" path="res://Scripts/OpponentHand.gd" id="3_4t60u"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://nwg766vb0hw" path="res://Scenes/Opponent_Main_Field.tscn" id="8_we22y"]
 [ext_resource type="PackedScene" uid="uid://bbtnckf2a2use" path="res://Scenes/Opponent_Elements.tscn" id="8_xqfjh"]
 [ext_resource type="PackedScene" uid="uid://dulc360ofen1q" path="res://Scenes/Opponent_Memory.tscn" id="9_4t60u"]
+[ext_resource type="PackedScene" uid="uid://c8w8ptylfbntf" path="res://Scenes/Opponent_Logo.tscn" id="10_4t60u"]
 
 [node name="OpponentField" type="Node2D"]
 
@@ -42,3 +43,6 @@ position = Vector2(999, 370)
 
 [node name="OpponentMemory" parent="." instance=ExtResource("9_4t60u")]
 position = Vector2(985, 107)
+
+[node name="ОpponentLogo" parent="." instance=ExtResource("10_4t60u")]
+position = Vector2(1370, 120)
