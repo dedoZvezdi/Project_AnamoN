@@ -5,3 +5,5 @@ export_presets.cfg
 /.godot/editor
 
 Project_AnamoN.console.exe
+.godot/mono/metadata/ide_messaging_meta.txt
+addons/godot-sqlite/bin/~libgdsqlite.windows.template_debug.x86_64.dll

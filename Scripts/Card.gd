@@ -644,8 +644,7 @@ func go_to_top_deck():
 		return
 	var deck_node = deck_nodes[0]
 	if deck_node.has_method("add_to_top"):
-		remove_from_current_position()
-		deck_node.add_to_top(slug)
+		animate_card_to_deck(deck_node.global_position, slug, true)
 
 func go_to_bottom_deck():
 	var slug = get_slug_from_card()
@@ -656,8 +655,34 @@ func go_to_bottom_deck():
 		return
 	var deck_node = deck_nodes[0]
 	if deck_node.has_method("add_to_bottom"):
-		remove_from_current_position()
-		deck_node.add_to_bottom(slug)
+		animate_card_to_deck(deck_node.global_position, slug, false)
+
+func animate_card_to_deck(deck_position: Vector2, slug: String, is_top: bool):
+	$Area2D.input_event.disconnect(_on_area_2d_input_event)
+	$Area2D.set_deferred("monitoring", false)
+	var original_scale = scale
+	if is_top:
+		z_index = 2
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "global_position", deck_position, 0.5)
+	tween.tween_property(self, "scale", original_scale * 0.8, 0.3)
+	tween.tween_property(self, "scale", original_scale * 0.6, 0.2).set_delay(0.3)
+	tween.tween_property(self, "modulate", Color(1, 1, 1, 0.7), 0.3)
+	tween.tween_property(self, "modulate", Color(1, 1, 1, 0.3), 0.2).set_delay(0.3)
+	tween.tween_callback(_on_deck_animation_completed.bind(slug, is_top)).set_delay(0.5)
+
+func _on_deck_animation_completed(slug: String, is_top: bool):
+	$Area2D.input_event.connect(_on_area_2d_input_event)
+	$Area2D.set_deferred("monitoring", true)
+	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
+	if deck_nodes.size() > 0:
+		var deck_node = deck_nodes[0]
+		if is_top and deck_node.has_method("add_to_top"):
+			deck_node.add_to_top(slug)
+		elif not is_top and deck_node.has_method("add_to_bottom"):
+			deck_node.add_to_bottom(slug)
+	remove_from_current_position()
 
 func _is_hand_field(field) -> bool:
 	if field == null:
