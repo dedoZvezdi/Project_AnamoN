@@ -20,9 +20,6 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 		card_image.z_index = 0
 		card_image_back.visible = false
 		card_image.visible = true
-	var ap: AnimationPlayer = card.get_node_or_null("AnimationPlayer")
-	if ap and ap.has_animation("card_flip"):
-		ap.play("card_flip")
 	var tween = create_tween()
 	tween.parallel().tween_property(card, "global_position", target_pos, 0.2)
 	tween.parallel().tween_property(card, "rotation_degrees", target_rot_deg, 0.2)
