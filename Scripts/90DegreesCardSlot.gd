@@ -144,20 +144,20 @@ func go_to_bottom_deck():
 
 func animate_card_to_deck_from_banish(card, deck_position: Vector2, slug: String, is_top: bool):
 	remove_card_from_slot(card)
-	var original_scale = card.scale
+	var card_image = card.get_node("CardImage")
+	var original_texture = card_image.texture
+	card_image.texture = load("res://Assets/Grand Archive/ga_back.png")
 	if is_top:
 		card.z_index = 2
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(card, "global_position", deck_position, 0.5)
 	tween.tween_property(card, "rotation_degrees", 0.0, 0.5)
-	tween.tween_property(card, "scale", original_scale * 0.8, 0.3)
-	tween.tween_property(card, "scale", original_scale * 0.6, 0.2).set_delay(0.3)
-	tween.tween_property(card, "modulate", Color(1, 1, 1, 0.7), 0.3)
-	tween.tween_property(card, "modulate", Color(1, 1, 1, 0.3), 0.2).set_delay(0.3)
-	tween.tween_callback(_on_banish_deck_animation_completed.bind(card, slug, is_top)).set_delay(0.5)
+	tween.tween_callback(_on_banish_deck_animation_completed.bind(card, slug, is_top, original_texture)).set_delay(0.5)
 
-func _on_banish_deck_animation_completed(card, slug: String, is_top: bool):
+func _on_banish_deck_animation_completed(card, slug: String, is_top: bool, original_texture: Texture2D):
+	var card_image = card.get_node("CardImage")
+	card_image.texture = original_texture
 	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
 	if deck_nodes.size() > 0:
 		var deck_node = deck_nodes[0]

@@ -660,19 +660,18 @@ func go_to_bottom_deck():
 func animate_card_to_deck(deck_position: Vector2, slug: String, is_top: bool):
 	$Area2D.input_event.disconnect(_on_area_2d_input_event)
 	$Area2D.set_deferred("monitoring", false)
-	var original_scale = scale
-	if is_top:
-		z_index = 2
+	var original_texture = $CardImage.texture
+	$CardImage.texture = load("res://Assets/Grand Archive/ga_back.png")
+	if is_top: z_index = 2
+	else: z_index = 0
+	rotation_degrees = 0.0
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(self, "global_position", deck_position, 0.5)
-	tween.tween_property(self, "scale", original_scale * 0.8, 0.3)
-	tween.tween_property(self, "scale", original_scale * 0.6, 0.2).set_delay(0.3)
-	tween.tween_property(self, "modulate", Color(1, 1, 1, 0.7), 0.3)
-	tween.tween_property(self, "modulate", Color(1, 1, 1, 0.3), 0.2).set_delay(0.3)
-	tween.tween_callback(_on_deck_animation_completed.bind(slug, is_top)).set_delay(0.5)
+	tween.tween_callback(_on_deck_animation_completed.bind(slug, is_top, original_texture)).set_delay(0.5)
 
-func _on_deck_animation_completed(slug: String, is_top: bool):
+func _on_deck_animation_completed(slug: String, is_top: bool, original_texture: Texture2D):
+	$CardImage.texture = original_texture
 	$Area2D.input_event.connect(_on_area_2d_input_event)
 	$Area2D.set_deferred("monitoring", true)
 	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
