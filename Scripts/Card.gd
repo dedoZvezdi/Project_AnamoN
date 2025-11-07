@@ -158,6 +158,9 @@ func _ready() -> void:
 	find_card_information_reference()
 	if card_level_lable:
 		card_level_lable.clear()
+	if not has_meta("uid"):
+		var uid = str(Time.get_unix_time_from_system()) + "-" + str(randi()) + "-" + str(hash(get_slug_from_card()))
+		set_meta("uid", uid)
 
 func find_card_information_reference():
 	var root = get_tree().current_scene
@@ -662,13 +665,15 @@ func animate_card_to_deck(deck_position: Vector2, slug: String, is_top: bool):
 	$Area2D.set_deferred("monitoring", false)
 	var original_texture = $CardImage.texture
 	$CardImage.texture = load("res://Assets/Grand Archive/ga_back.png")
-	if is_top: z_index = 2
-	else: z_index = 0
 	rotation_degrees = 0.0
+	if is_top:
+		z_index = 2
+	else:
+		z_index = 0
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(self, "global_position", deck_position, 0.5)
-	tween.tween_callback(_on_deck_animation_completed.bind(slug, is_top, original_texture)).set_delay(0.5)
+	tween.tween_callback(_on_deck_animation_completed.bind(slug, is_top, original_texture)).set_delay(0.7)
 
 func _on_deck_animation_completed(slug: String, is_top: bool, original_texture: Texture2D):
 	$CardImage.texture = original_texture

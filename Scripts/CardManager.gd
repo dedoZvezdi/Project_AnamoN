@@ -215,10 +215,11 @@ func finish_drag():
 		if card_slot_found.name == "MEMORY":
 			card_slot_found.add_card_to_memory(card_being_dragged)
 			var slug = get_card_slug(card_being_dragged)
-			if slug != "":
+			var uid = card_being_dragged.get_meta("uid") if card_being_dragged.has_meta("uid") else ""
+			if slug != "" and uid != "":
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node:
-					multiplayer_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), slug)
+					multiplayer_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), uid, slug)
 			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
 		elif card_slot_found.name == "MAINFIELD":
@@ -228,21 +229,23 @@ func finish_drag():
 				drop_position = card_being_dragged.global_position
 			card_slot_found.add_card_to_field(card_being_dragged, drop_position)
 			var slug = get_card_slug(card_being_dragged)
-			if slug != "":
+			var uid = card_being_dragged.get_meta("uid") if card_being_dragged.has_meta("uid") else ""
+			if slug != "" and uid != "":
 				var pos = card_being_dragged.global_position
 				var rot = card_being_dragged.rotation_degrees
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node:
-					multiplayer_node.rpc("sync_move_to_main_field", multiplayer.get_unique_id(), slug, pos, rot)
+					multiplayer_node.rpc("sync_move_to_main_field", multiplayer.get_unique_id(), uid, slug, pos, rot)
 			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
 		elif card_slot_found.name == "CardsSlotForSignleCard" or card_slot_found.name == "GRAVEYARD":
 			card_slot_found.add_card_to_slot(card_being_dragged)
 			var slug = get_card_slug(card_being_dragged)
-			if slug != "":
+			var uid = card_being_dragged.get_meta("uid") if card_being_dragged.has_meta("uid") else ""
+			if slug != "" and uid != "":
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node:
-					multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), slug)
+					multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uid, slug)
 			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
 		elif card_slot_found.name == "90DegreesCardSlot" or card_slot_found.name == "BANISH":
@@ -251,10 +254,11 @@ func finish_drag():
 				face_down = card_being_dragged.get_meta("banish_face_down") == true
 			card_slot_found.add_card_to_slot(card_being_dragged, face_down)
 			var slug = get_card_slug(card_being_dragged)
-			if slug != "":
+			var uid = card_being_dragged.get_meta("uid") if card_being_dragged.has_meta("uid") else ""
+			if slug != "" and uid != "":
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node:
-					multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), slug, face_down)
+					multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uid, slug, face_down)
 			if card_being_dragged.has_meta("banish_face_down"):
 				card_being_dragged.set_meta("banish_face_down", false)
 			card_being_dragged.scale = normal_scale
