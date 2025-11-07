@@ -109,6 +109,8 @@ func create_real_card_for_drag():
 	real_card.set_meta("slug", card_slug)
 	real_card.set_meta("is_dragged_from_grid", true)
 	real_card.set_meta("original_zone", zone)
+	var uid = str(Time.get_unix_time_from_system()) + "-" + str(randi()) + "-" + str(hash(card_slug))
+	real_card.set_meta("uid", uid)
 	card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		var card_image = real_card.get_node("CardImage")
