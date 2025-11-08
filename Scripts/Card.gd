@@ -158,9 +158,6 @@ func _ready() -> void:
 	find_card_information_reference()
 	if card_level_lable:
 		card_level_lable.clear()
-	if not has_meta("uid"):
-		var uid = str(Time.get_unix_time_from_system()) + "-" + str(randi()) + "-" + str(hash(get_slug_from_card()))
-		set_meta("uid", uid)
 
 func find_card_information_reference():
 	var root = get_tree().current_scene
