@@ -237,7 +237,37 @@ func add_card_to_slot(card, face_down := false):
 	var tween = create_tween()
 	tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
 	tween.parallel().tween_property(card, "rotation_degrees", 90.0, 0.3)
-	card.z_index = base_z_index + cards_in_banish.size()
+	tween.tween_callback(_on_card_arrived_in_banish.bind(card, face_down))
+
+func _on_card_arrived_in_banish(original_card, face_down: bool):
+	if not original_card or not is_instance_valid(original_card):
+		return
+	var new_card = original_card.duplicate()
+	add_child(new_card)
+	if original_card.has_meta("slug"):
+		new_card.set_meta("slug", original_card.get_meta("slug"))
+	new_card.global_position = original_card.global_position
+	new_card.rotation_degrees = 90.0
+	if face_down:
+		new_card.set_meta("is_face_down", true)
+		if has_method("show_card_back"):
+			show_card_back(new_card)
+	else:
+		new_card.set_meta("is_face_down", false)
+		if has_method("show_card_front"):
+			show_card_front(new_card)
+	var card_index = cards_in_banish.find(original_card)
+	if card_index != -1:
+		cards_in_banish[card_index] = new_card
+	else:
+		cards_in_banish.append(new_card)
+	new_card.z_index = base_z_index + cards_in_banish.size()
+	if new_card.has_method("set_current_field"):
+		new_card.set_current_field(self)
+	new_card.visible = true
+	if new_card.has_node("Area2D"):
+		new_card.get_node("Area2D").set_deferred("input_pickable", false)
+	original_card.queue_free()
 	card_in_slot = true
 	if banish_view_window.visible:
 		call_deferred("update_deck_view")
