@@ -91,7 +91,7 @@ func go_to_banish_face_down():
 		return
 	remove_card_from_slot(target_card)
 	if banish_node.has_method("add_card_to_slot"):
-		banish_node.add_card_to_slot(target_card)
+		banish_node.add_card_to_slot(target_card, true)
 	if banish_node.has_method("show_card_back"):
 		banish_node.show_card_back(target_card)
 	if graveyard_view_window.visible:
