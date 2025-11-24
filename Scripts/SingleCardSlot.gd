@@ -192,9 +192,8 @@ func add_card_to_slot(card):
 	card.visible = true
 	if card.has_node("Area2D"):
 		card.get_node("Area2D").set_deferred("input_pickable", false)
-	var tween = create_tween()
-	tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
-	tween.parallel().tween_property(card, "rotation", 0.0, 0.3)
+	card.global_position = target_pos
+	card.rotation = 0.0
 	card.z_index = base_z_index + cards_in_graveyard.size()
 	card_in_slot = true
 	if graveyard_view_window.visible:

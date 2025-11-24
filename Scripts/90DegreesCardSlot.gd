@@ -234,10 +234,15 @@ func add_card_to_slot(card, face_down := false):
 	else:
 		if has_method("show_card_front"):
 			show_card_front(card)
-	var tween = create_tween()
-	tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
-	tween.parallel().tween_property(card, "rotation_degrees", 90.0, 0.3)
-	tween.tween_callback(_on_card_arrived_in_banish.bind(card, face_down))
+	if face_down:
+		var tween = create_tween()
+		tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
+		tween.parallel().tween_property(card, "rotation_degrees", 90.0, 0.3)
+		tween.tween_callback(_on_card_arrived_in_banish.bind(card, face_down))
+	else:
+		card.global_position = target_pos
+		card.rotation_degrees = 90.0
+		_on_card_arrived_in_banish(card, face_down)
 
 func _on_card_arrived_in_banish(original_card, face_down: bool):
 	if not original_card or not is_instance_valid(original_card):
