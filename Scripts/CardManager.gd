@@ -108,6 +108,8 @@ func can_drag_card(card) -> bool:
 			return false
 	if card.has_method("is_champion_card") and card.is_champion_card() and card.has_method("is_in_main_field") and card.is_in_main_field():
 		return false
+	if is_opponent_card(card):
+		return false
 	return true
 
 func _on_animation_started():
@@ -445,6 +447,8 @@ func handle_hover():
 					break
 		if current_card and is_instance_valid(current_card) and not is_card_truly_hovered(current_card):
 			current_card = null
+	if current_card and is_instance_valid(current_card) and is_opponent_card(current_card) and is_card_in_memory_slot(current_card):
+		current_card = null
 	for c in connected_cards:
 		if is_instance_valid(c) and c.has_node("Area2D"):
 			c.get_node("Area2D").input_pickable = (current_card != null and c == current_card)
@@ -467,9 +471,10 @@ func handle_hover():
 				last_hovered_card.hide_card_info()
 		if current_card and is_instance_valid(current_card):
 			if can_hover_card(current_card):
-				current_card.get_parent().move_child(current_card, current_card.get_parent().get_child_count())
-				current_card.scale = hover_scale
-				current_card.z_index = hover_z_index
+				if not is_opponent_card(current_card):
+					current_card.get_parent().move_child(current_card, current_card.get_parent().get_child_count())
+					current_card.scale = hover_scale
+					current_card.z_index = hover_z_index
 				if player_hand_reference and current_card in player_hand_reference.player_hand:
 					player_hand_reference.bring_card_to_front(current_card)
 				elif is_card_in_memory_slot(current_card):
@@ -543,6 +548,11 @@ func _on_card_hovered(card):
 		return
 	if not is_card_truly_hovered(card):
 		return
+	if is_opponent_card(card):
+		if is_card_in_memory_slot(card):
+			return
+		last_hovered_card = card
+		return
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.scale = hover_scale
 	card.z_index = hover_z_index
@@ -556,8 +566,9 @@ func _on_card_hovered(card):
 		get_banish_slot_for_card(card).bring_card_to_front(card)
 	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
 		if can_hover_card(last_hovered_card):
-			last_hovered_card.scale = normal_scale
-			last_hovered_card.z_index = base_z_index
+			if not is_opponent_card(last_hovered_card):
+				last_hovered_card.scale = normal_scale
+				last_hovered_card.z_index = base_z_index
 			if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
 				player_hand_reference.clear_hovered_card()
 			elif is_card_in_memory_slot(last_hovered_card):
@@ -572,8 +583,9 @@ func _on_card_unhovered(card):
 	if not card or not is_instance_valid(card) or card == card_being_dragged or card != last_hovered_card or animation_in_progress:
 		return
 	if can_hover_card(card):
-		card.scale = normal_scale
-		card.z_index = base_z_index
+		if not is_opponent_card(card):
+			card.scale = normal_scale
+			card.z_index = base_z_index
 		if player_hand_reference and card in player_hand_reference.player_hand:
 			player_hand_reference.clear_hovered_card()
 		elif is_card_in_memory_slot(card):
@@ -754,3 +766,11 @@ func get_card_slug(card) -> String:
 	if card.has_meta("slug"):
 		return card.get_meta("slug")
 	return ""
+
+func is_opponent_card(card) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	var script = card.get_script()
+	if script and script.resource_path.contains("OpponentCard.gd"):
+		return true
+	return false

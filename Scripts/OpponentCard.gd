@@ -6,6 +6,9 @@ signal hovered_off
 var hand_position
 var mouse_inside = false
 var card_information_reference = null
+var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
+var attached_markers := {}
+var attached_counters := {}
 
 func _ready() -> void:
 	if get_parent() and get_parent().has_method("connect_card_signals"):
@@ -57,6 +60,18 @@ func _is_card_in_restricted_zones() -> bool:
 				return true
 	
 	return false
+
+func is_in_main_field() -> bool:
+	return not _is_card_in_restricted_zones()
+
+func get_runtime_modifiers() -> Dictionary:
+	return runtime_modifiers.duplicate()
+
+func get_attached_markers() -> Dictionary:
+	return attached_markers.duplicate()
+
+func get_attached_counters() -> Dictionary:
+	return attached_counters.duplicate()
 
 func get_slug_from_card() -> String:
 	if has_meta("slug"):
