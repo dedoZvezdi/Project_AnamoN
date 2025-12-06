@@ -6,8 +6,8 @@ const COLLISION_MASK_CARD_SINGLE_SLOT = 2
 var screen_size
 var card_being_dragged = null
 var last_hovered_card = null
-var normal_scale = Vector2(0.39, 0.39)
-var hover_scale = Vector2(0.46, 0.46)
+var normal_scale = Vector2(0.35, 0.35)
+var hover_scale = Vector2(0.42, 0.42)
 var base_z_index = 0
 var hover_z_index = 10
 var drag_z_index = 1000

@@ -118,7 +118,7 @@ size = Vector2(245.613, 344.672)
 z_index = -2
 texture_filter = 2
 position = Vector2(599.5, 300)
-scale = Vector2(0.39, 0.39)
+scale = Vector2(0.35, 0.35)
 script = ExtResource("1_mv32a")
 
 [node name="CardImageBack" type="Sprite2D" parent="."]

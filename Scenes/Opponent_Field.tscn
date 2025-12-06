@@ -28,9 +28,11 @@ script = ExtResource("3_4t60u")
 
 [node name="OpponentDeck" parent="." instance=ExtResource("4_t0cvg")]
 position = Vector2(599.5, 300)
+scale = Vector2(0.9, 0.9)
 
 [node name="OpponentMatDeck" parent="." instance=ExtResource("5_ypfnt")]
 position = Vector2(1361, 300)
+scale = Vector2(0.9, 0.9)
 
 [node name="OpponentBanish" parent="." instance=ExtResource("6_admix")]
 

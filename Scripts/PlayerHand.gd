@@ -4,7 +4,7 @@ signal animation_started
 signal animation_finished
 
 const CARD_WIDTH = 100
-const HAND_Y_POSITION = 1010
+const HAND_Y_POSITION = 1050
 const FIELD_Z_INDEX = 0
 const HAND_Z_INDEX = 100
 const MIN_CARD_SPACING = 10
