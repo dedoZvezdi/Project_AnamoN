@@ -375,6 +375,27 @@ func sync_move_to_memory(player_id: int, slug: String):
 						opp_memory.add_card_to_memory(c)
 					break
 
+@rpc("any_peer", "reliable")
+func sync_card_stats(player_id: int, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return
+	var card_manager = opp_field.get_node_or_null("CardManager")
+	if card_manager:
+		for c in card_manager.get_children():
+			if c and c.has_meta("slug") and c.get_meta("slug") == slug:
+				if "runtime_modifiers" in c:
+					c.runtime_modifiers = modifiers
+				if "attached_markers" in c:
+					c.attached_markers = markers
+				if "attached_counters" in c:
+					c.attached_counters = counters
+				# Force refresh if needed, usually implicit by next hover
+				break
+
 func reset_ui():
 	$HostButton.disabled = false
 	$HostButton.visible = true

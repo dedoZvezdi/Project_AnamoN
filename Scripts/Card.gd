@@ -564,6 +564,7 @@ func apply_logo_status_to_self(logo_node):
 	show_card_info()
 	if card_information_reference and mouse_inside and not is_dragging:
 		card_information_reference.show_card_preview(self)
+	sync_stats_to_opponent()
 
 func get_attached_markers() -> Dictionary:
 	return attached_markers.duplicate()
@@ -586,6 +587,7 @@ func apply_champion_life_delta(delta):
 		show_card_info()
 		if card_information_reference and mouse_inside and not is_dragging:
 			card_information_reference.show_card_preview(self)
+		sync_stats_to_opponent()
 
 func is_in_banish() -> bool:
 	return current_field != null and current_field.is_in_group("rotated_slots")
@@ -707,3 +709,11 @@ func destroy_token():
 	elif current_field and current_field.has_method("remove_card_from_slot"):
 		current_field.remove_card_from_slot(self)
 	queue_free()
+
+func sync_stats_to_opponent():
+	var slug = get_slug_from_card()
+	if slug == "":
+		return
+	var multiplayer_node = get_tree().get_root().get_node("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_card_stats", multiplayer.get_unique_id(), slug, runtime_modifiers, attached_markers, attached_counters)
