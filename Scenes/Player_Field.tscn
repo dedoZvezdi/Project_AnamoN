@@ -44,11 +44,12 @@ texture = ExtResource("3_xb57x")
 
 [node name="GA_DECK" parent="." instance=ExtResource("4_kym08")]
 position = Vector2(1360.5, 780.5)
-scale = Vector2(0.192, 0.192)
+scale = Vector2(0.17, 0.17)
 script = ExtResource("5_xuc2h")
 
 [node name="MAT_DECK" parent="." instance=ExtResource("6_g5k7o")]
 position = Vector2(599, 780.5)
+scale = Vector2(0.17, 0.17)
 script = ExtResource("7_vx5jb")
 
 [node name="GRAVEYARD" parent="." instance=ExtResource("8_ul1di")]
