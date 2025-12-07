@@ -48,3 +48,8 @@ func clear_hovered_card() -> void:
 		var c = cards_in_field[i]
 		if c and is_instance_valid(c):
 			c.z_index = 200 + i + 1
+
+func connect_card_signals(card):
+	var card_manager = get_tree().get_root().find_child("CardManager", true, false)
+	if card_manager and card_manager.has_method("connect_card_signals"):
+		card_manager.connect_card_signals(card)
