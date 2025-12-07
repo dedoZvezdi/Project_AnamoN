@@ -546,12 +546,12 @@ func _on_card_hovered(card):
 		return
 	if card == last_hovered_card:
 		return
-	if not is_card_truly_hovered(card):
-		return
 	if is_opponent_card(card):
 		if is_card_in_memory_slot(card):
 			return
 		last_hovered_card = card
+		return
+	if not is_card_truly_hovered(card):
 		return
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.scale = hover_scale
