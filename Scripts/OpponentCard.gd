@@ -9,6 +9,7 @@ var card_information_reference = null
 var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
 var attached_markers := {}
 var attached_counters := {}
+var uuid = ""
 
 func _ready() -> void:
 	if get_parent() and get_parent().has_method("connect_card_signals"):

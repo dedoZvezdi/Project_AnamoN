@@ -255,7 +255,7 @@ func sync_opponent_phase(phase_name: String):
 					rpc_id(peer_id, "sync_opponent_phase", phase_name)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_graveyard(player_id: int, slug: String):
+func sync_move_to_graveyard(player_id: int, uuid: String, slug: String):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -265,25 +265,24 @@ func sync_move_to_graveyard(player_id: int, slug: String):
 		var opp_grave = opp_field.get_node("OpponentGraveyard")
 		var card_manager = opp_field.get_node_or_null("CardManager") if opp_field else null
 		if card_manager:
-			for c in card_manager.get_children():
-				if c and c.has_meta("slug") and c.get_meta("slug") == slug:
-					if opp_hand and opp_hand.has_method("remove_card_from_hand"):
-						opp_hand.remove_card_from_hand(c)
-					var opp_memory = opp_field.get_node_or_null("OpponentMemory")
-					if opp_memory and opp_memory.has_method("remove_card_from_memory"):
-						opp_memory.remove_card_from_memory(c)
-					var opp_banish = opp_field.get_node_or_null("OpponentBanish")
-					if opp_banish and opp_banish.has_method("remove_card_from_slot"):
-						opp_banish.remove_card_from_slot(c)
-					var opp_main = opp_field.get_node_or_null("OpponentMainField")
-					if opp_main and opp_main.has_method("remove_card_from_field"):
-						opp_main.remove_card_from_field(c)
-					if opp_grave and opp_grave.has_method("add_card_to_slot"):
-						opp_grave.add_card_to_slot(c)
-					break
+			var c = get_or_create_opponent_card(card_manager, uuid, slug)
+			if c:
+				if opp_hand and opp_hand.has_method("remove_card_from_hand"):
+					opp_hand.remove_card_from_hand(c)
+				var opp_memory = opp_field.get_node_or_null("OpponentMemory")
+				if opp_memory and opp_memory.has_method("remove_card_from_memory"):
+					opp_memory.remove_card_from_memory(c)
+				var opp_banish = opp_field.get_node_or_null("OpponentBanish")
+				if opp_banish and opp_banish.has_method("remove_card_from_slot"):
+					opp_banish.remove_card_from_slot(c)
+				var opp_main = opp_field.get_node_or_null("OpponentMainField")
+				if opp_main and opp_main.has_method("remove_card_from_field"):
+					opp_main.remove_card_from_field(c)
+				if opp_grave and opp_grave.has_method("add_card_to_slot"):
+					opp_grave.add_card_to_slot(c)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_banish(player_id: int, slug: String, face_down: bool):
+func sync_move_to_banish(player_id: int, uuid: String, slug: String, face_down: bool):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -293,25 +292,24 @@ func sync_move_to_banish(player_id: int, slug: String, face_down: bool):
 		var opp_banish = opp_field.get_node("OpponentBanish")
 		var card_manager = opp_field.get_node_or_null("CardManager") if opp_field else null
 		if card_manager:
-			for c in card_manager.get_children():
-				if c and c.has_meta("slug") and c.get_meta("slug") == slug:
-					if opp_hand and opp_hand.has_method("remove_card_from_hand"):
-						opp_hand.remove_card_from_hand(c)
-					var opp_memory = opp_field.get_node_or_null("OpponentMemory")
-					if opp_memory and opp_memory.has_method("remove_card_from_memory"):
-						opp_memory.remove_card_from_memory(c)
-					var opp_grave = opp_field.get_node_or_null("OpponentGraveyard")
-					if opp_grave and opp_grave.has_method("remove_card_from_slot"):
-						opp_grave.remove_card_from_slot(c)
-					var opp_main = opp_field.get_node_or_null("OpponentMainField")
-					if opp_main and opp_main.has_method("remove_card_from_field"):
-						opp_main.remove_card_from_field(c)
-					if opp_banish and opp_banish.has_method("add_card_to_slot"):
-						opp_banish.add_card_to_slot(c, face_down)
-					break
+			var c = get_or_create_opponent_card(card_manager, uuid, slug)
+			if c:
+				if opp_hand and opp_hand.has_method("remove_card_from_hand"):
+					opp_hand.remove_card_from_hand(c)
+				var opp_memory = opp_field.get_node_or_null("OpponentMemory")
+				if opp_memory and opp_memory.has_method("remove_card_from_memory"):
+					opp_memory.remove_card_from_memory(c)
+				var opp_grave = opp_field.get_node_or_null("OpponentGraveyard")
+				if opp_grave and opp_grave.has_method("remove_card_from_slot"):
+					opp_grave.remove_card_from_slot(c)
+				var opp_main = opp_field.get_node_or_null("OpponentMainField")
+				if opp_main and opp_main.has_method("remove_card_from_field"):
+					opp_main.remove_card_from_field(c)
+				if opp_banish and opp_banish.has_method("add_card_to_slot"):
+					opp_banish.add_card_to_slot(c, face_down)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_main_field(player_id: int, slug: String, pos: Vector2, rot_deg: float):
+func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Vector2, rot_deg: float):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -329,26 +327,25 @@ func sync_move_to_main_field(player_id: int, slug: String, pos: Vector2, rot_deg
 			var relative_pos = pos - pf_center
 			target_pos = opp_center - relative_pos
 		if card_manager:
-			for c in card_manager.get_children():
-				if c and c.has_meta("slug") and c.get_meta("slug") == slug:
-					if opp_hand and opp_hand.has_method("remove_card_from_hand"):
-						opp_hand.remove_card_from_hand(c)
-					var opp_grave = opp_field.get_node_or_null("OpponentGraveyard")
-					if opp_grave and opp_grave.has_method("remove_card_from_slot"):
-						opp_grave.remove_card_from_slot(c)
-					var opp_banish = opp_field.get_node_or_null("OpponentBanish")
-					if opp_banish and opp_banish.has_method("remove_card_from_slot"):
-						opp_banish.remove_card_from_slot(c)
-					var opp_memory = opp_field.get_node_or_null("OpponentMemory")
-					if opp_memory and opp_memory.has_method("remove_card_from_memory"):
-						opp_memory.remove_card_from_memory(c)
-					if opp_main and opp_main.has_method("add_card_to_field"):
-						opp_main.add_card_to_field(c, target_pos, rot_deg)
-					break
+			var c = get_or_create_opponent_card(card_manager, uuid, slug)
+			if c:
+				if opp_hand and opp_hand.has_method("remove_card_from_hand"):
+					opp_hand.remove_card_from_hand(c)
+				var opp_grave = opp_field.get_node_or_null("OpponentGraveyard")
+				if opp_grave and opp_grave.has_method("remove_card_from_slot"):
+					opp_grave.remove_card_from_slot(c)
+				var opp_banish = opp_field.get_node_or_null("OpponentBanish")
+				if opp_banish and opp_banish.has_method("remove_card_from_slot"):
+					opp_banish.remove_card_from_slot(c)
+				var opp_memory = opp_field.get_node_or_null("OpponentMemory")
+				if opp_memory and opp_memory.has_method("remove_card_from_memory"):
+					opp_memory.remove_card_from_memory(c)
+				if opp_main and opp_main.has_method("add_card_to_field"):
+					opp_main.add_card_to_field(c, target_pos, rot_deg)
 
 
 @rpc("any_peer", "reliable")
-func sync_move_to_memory(player_id: int, slug: String):
+func sync_move_to_memory(player_id: int, uuid: String, slug: String):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -358,25 +355,24 @@ func sync_move_to_memory(player_id: int, slug: String):
 		var opp_memory = opp_field.get_node("OpponentMemory")
 		var card_manager = opp_field.get_node_or_null("CardManager") if opp_field else null
 		if card_manager:
-			for c in card_manager.get_children():
-				if c and c.has_meta("slug") and c.get_meta("slug") == slug:
-					if opp_hand and opp_hand.has_method("remove_card_from_hand"):
-						opp_hand.remove_card_from_hand(c)
-					var opp_grave = opp_field.get_node_or_null("OpponentGraveyard")
-					if opp_grave and opp_grave.has_method("remove_card_from_slot"):
-						opp_grave.remove_card_from_slot(c)
-					var opp_banish = opp_field.get_node_or_null("OpponentBanish")
-					if opp_banish and opp_banish.has_method("remove_card_from_slot"):
-						opp_banish.remove_card_from_slot(c)
-					var opp_main = opp_field.get_node_or_null("OpponentMainField")
-					if opp_main and opp_main.has_method("remove_card_from_field"):
-						opp_main.remove_card_from_field(c)
-					if opp_memory and opp_memory.has_method("add_card_to_memory"):
-						opp_memory.add_card_to_memory(c)
-					break
+			var c = get_or_create_opponent_card(card_manager, uuid, slug)
+			if c:
+				if opp_hand and opp_hand.has_method("remove_card_from_hand"):
+					opp_hand.remove_card_from_hand(c)
+				var opp_grave = opp_field.get_node_or_null("OpponentGraveyard")
+				if opp_grave and opp_grave.has_method("remove_card_from_slot"):
+					opp_grave.remove_card_from_slot(c)
+				var opp_banish = opp_field.get_node_or_null("OpponentBanish")
+				if opp_banish and opp_banish.has_method("remove_card_from_slot"):
+					opp_banish.remove_card_from_slot(c)
+				var opp_main = opp_field.get_node_or_null("OpponentMainField")
+				if opp_main and opp_main.has_method("remove_card_from_field"):
+					opp_main.remove_card_from_field(c)
+				if opp_memory and opp_memory.has_method("add_card_to_memory"):
+					opp_memory.add_card_to_memory(c)
 
 @rpc("any_peer", "reliable")
-func sync_card_stats(player_id: int, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary):
+func sync_card_stats(player_id: int, uuid: String, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -385,16 +381,14 @@ func sync_card_stats(player_id: int, slug: String, modifiers: Dictionary, marker
 		return
 	var card_manager = opp_field.get_node_or_null("CardManager")
 	if card_manager:
-		for c in card_manager.get_children():
-			if c and c.has_meta("slug") and c.get_meta("slug") == slug:
-				if "runtime_modifiers" in c:
-					c.runtime_modifiers = modifiers
-				if "attached_markers" in c:
-					c.attached_markers = markers
-				if "attached_counters" in c:
-					c.attached_counters = counters
-				# Force refresh if needed, usually implicit by next hover
-				break
+		var c = get_or_create_opponent_card(card_manager, uuid, slug)
+		if c:
+			if "runtime_modifiers" in c:
+				c.runtime_modifiers = modifiers
+			if "attached_markers" in c:
+				c.attached_markers = markers
+			if "attached_counters" in c:
+				c.attached_counters = counters
 
 func reset_ui():
 	$HostButton.disabled = false
@@ -417,6 +411,41 @@ func reset_ui():
 	peer_names.clear()
 	if connect_timer:
 		connect_timer.stop()
+
+func get_or_create_opponent_card(card_manager, uuid: String, slug: String) -> Node:
+	if uuid != "":
+		for c in card_manager.get_children():
+			if "uuid" in c and c.uuid == uuid:
+				return c
+	if slug != "":
+		for c in card_manager.get_children():
+			if c.has_meta("slug") and c.get_meta("slug") == slug:
+				if "uuid" in c:
+					if c.uuid == "" or c.uuid == uuid:
+						if c.uuid == "" and uuid != "":
+							c.uuid = uuid
+						return c
+				else:
+					return c
+	var scene = load("res://Scenes/OpponentCard.tscn")
+	if scene:
+		var new_card = scene.instantiate()
+		new_card.set_meta("slug", slug)
+		if "uuid" in new_card:
+			new_card.uuid = uuid
+		card_manager.add_child(new_card)
+		var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+		if ResourceLoader.exists(card_image_path):
+			var card_image = new_card.get_node_or_null("CardImage")
+			var card_image_back = new_card.get_node_or_null("CardImageBack")
+			if card_image:
+				card_image.texture = load(card_image_path)
+				card_image.visible = true
+				if card_image_back:
+					card_image_back.visible = false
+					card_image.z_index = 0
+		return new_card
+	return null
 
 func disable_buttons():
 	$HostButton.disabled = true
