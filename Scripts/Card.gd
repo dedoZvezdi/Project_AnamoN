@@ -12,6 +12,7 @@ var was_removed = false
 var current_field = null
 var original_rotation = 0.0
 var is_rotated = false
+var uuid = ""
 var hand_position
 var mouse_inside = false
 var was_rotated_before_drag = false
@@ -151,6 +152,8 @@ const TRANSFORM_PAIRS := {
 }
 
 func _ready() -> void:
+	if uuid == "":
+		uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
 	if get_parent() and get_parent().has_method("connect_card_signals"):
 		get_parent().connect_card_signals(self)
 	popup_menu.id_pressed.connect(_on_PopupMenu_id_pressed)
@@ -615,7 +618,7 @@ func go_to_banish_face_down():
 	if multiplayer_node:
 		var slug = get_slug_from_card()
 		if slug != "":
-			multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), slug, true)
+			multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, true)
 
 func remove_from_current_position():
 	var scene = get_tree().get_current_scene()
@@ -716,4 +719,4 @@ func sync_stats_to_opponent():
 		return
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_card_stats", multiplayer.get_unique_id(), slug, runtime_modifiers, attached_markers, attached_counters)
+		multiplayer_node.rpc("sync_card_stats", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters)
