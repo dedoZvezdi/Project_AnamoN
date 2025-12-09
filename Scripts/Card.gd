@@ -707,6 +707,10 @@ func is_token() -> bool:
 	return false
 
 func destroy_token():
+	var slug = get_slug_from_card()
+	var multiplayer_node = get_tree().get_root().get_node("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_destroy_token", multiplayer.get_unique_id(), uuid, slug)
 	if current_field and current_field.has_method("remove_card_from_field"):
 		current_field.remove_card_from_field(self)
 	elif current_field and current_field.has_method("remove_card_from_slot"):
