@@ -220,7 +220,7 @@ func finish_drag():
 			if slug != "":
 				var uuid = get_card_uuid(card_being_dragged)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node:
+				if multiplayer_node and not card_being_dragged.is_token():
 					multiplayer_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), uuid, slug)
 			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
@@ -246,7 +246,7 @@ func finish_drag():
 			if slug != "":
 				var uuid = get_card_uuid(card_being_dragged)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node:
+				if multiplayer_node and not card_being_dragged.is_token():
 					multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug)
 			card_being_dragged.scale = normal_scale
 			card_being_dragged.z_index = base_z_index
@@ -259,7 +259,7 @@ func finish_drag():
 			if slug != "":
 				var uuid = get_card_uuid(card_being_dragged)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node:
+				if multiplayer_node and not card_being_dragged.is_token():
 					multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, face_down)
 			if card_being_dragged.has_meta("banish_face_down"):
 				card_being_dragged.set_meta("banish_face_down", false)

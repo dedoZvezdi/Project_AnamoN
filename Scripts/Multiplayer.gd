@@ -341,8 +341,23 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 				if opp_memory and opp_memory.has_method("remove_card_from_memory"):
 					opp_memory.remove_card_from_memory(c)
 				if opp_main and opp_main.has_method("add_card_to_field"):
+					var is_token = false
+					var logos = get_tree().get_nodes_in_group("logo")
+					if logos.size() > 0:
+						var local_logo = logos[0]
+						if "token_slugs" in local_logo and slug in local_logo.token_slugs:
+							is_token = true
+					if is_token:
+						var opp_logo = null
+						for child in opp_field.get_children():
+							if "Logo" in child.name:
+								opp_logo = child
+								break
+						if not opp_logo:
+							opp_logo = opp_field.find_child("OpponentLogo", true, false)
+						if opp_logo:
+							c.global_position = opp_logo.global_position
 					opp_main.add_card_to_field(c, target_pos, rot_deg)
-
 
 @rpc("any_peer", "reliable")
 func sync_move_to_memory(player_id: int, uuid: String, slug: String):
@@ -456,3 +471,28 @@ func disable_buttons():
 	server.visible = false
 	port.visible = false
 	check.visible = false
+
+@rpc("any_peer", "reliable")
+func sync_destroy_token(player_id: int, uuid: String, slug: String):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return
+	var card_manager = opp_field.get_node_or_null("CardManager")
+	if card_manager:
+		var c = get_or_create_opponent_card(card_manager, uuid, slug)
+		if c:
+			if c.get_parent():
+				if c.get_parent().has_method("remove_card_from_field"):
+					c.get_parent().remove_card_from_field(c)
+				elif c.get_parent().has_method("remove_card_from_slot"):
+					c.get_parent().remove_card_from_slot(c)
+				elif c.get_parent().has_method("remove_card_from_memory"):
+					c.get_parent().remove_card_from_memory(c)
+				elif c.get_parent().has_method("remove_card_from_hand"):
+					c.get_parent().remove_card_from_hand(c)
+				else:
+					c.get_parent().remove_child(c)
+			c.queue_free()
