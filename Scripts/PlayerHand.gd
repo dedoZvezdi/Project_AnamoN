@@ -80,6 +80,16 @@ func update_hand_position():
 			card.hand_position = new_position
 			card.z_index = HAND_Z_INDEX + i + 1
 			animate_card_to_position(card, new_position, new_rotation)
+	call_deferred("enforce_z_ordering")
+
+func enforce_z_ordering():
+	validate_hand()
+	for i in range(player_hand.size()):
+		var card = player_hand[i]
+		if card and is_instance_valid(card):
+			if card == hovered_card:
+				continue
+			card.z_index = HAND_Z_INDEX + i + 1
 
 func calculate_card_position(index):
 	var hand_size = player_hand.size()
@@ -239,25 +249,41 @@ func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):
 		return
 	hovered_card = card
-	var hovered_card_index = player_hand.find(card)
-	if hovered_card_index == -1:
-		return
-	var hand_size = player_hand.size()
-	for i in range(hand_size):
-		var current_card = player_hand[i]
-		if current_card and is_instance_valid(current_card):
-			if i >= hovered_card_index:
-				current_card.z_index = HAND_Z_INDEX + i + 100
-			else:
-				current_card.z_index = HAND_Z_INDEX + i + 1
+	card.z_index = HAND_Z_INDEX + 2000
+	var screen_height = get_viewport().size.y
+	var texture_height = 1000
+	if card.has_node("CardImage") and card.get_node("CardImage").texture:
+		texture_height = card.get_node("CardImage").texture.get_size().y
+	var current_scale_y = card.scale.y
+	var half_height = (texture_height * current_scale_y) / 2
+	var target_y = screen_height - half_height + 75
+	var target_pos = Vector2(card.position.x, target_y)
+	var tween = create_tween()
+	active_tween_objects.append(tween)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_CUBIC)
+	tween.parallel().tween_property(card, "position", target_pos, 0.25)
+	tween.parallel().tween_property(card, "rotation", 0.0, 0.25)
+	tween.finished.connect(_on_single_tween_finished.bind(tween), CONNECT_ONE_SHOT)
 
 func clear_hovered_card():
+	var card_to_restore = hovered_card
 	hovered_card = null
 	var hand_size = player_hand.size()
 	for i in range(hand_size):
 		var card = player_hand[i]
 		if card and is_instance_valid(card):
 			card.z_index = HAND_Z_INDEX + i + 1
+			if card == card_to_restore:
+				var target_pos = calculate_card_position(i)
+				var target_rot = calculate_card_rotation(i)
+				var tween = create_tween()
+				active_tween_objects.append(tween)
+				tween.set_ease(Tween.EASE_OUT)
+				tween.set_trans(Tween.TRANS_CUBIC)
+				tween.parallel().tween_property(card, "position", target_pos, 0.25)
+				tween.parallel().tween_property(card, "rotation", target_rot, 0.25)
+				tween.finished.connect(_on_single_tween_finished.bind(tween), CONNECT_ONE_SHOT)
 
 func hide_hand():
 	hand_hidden = true
