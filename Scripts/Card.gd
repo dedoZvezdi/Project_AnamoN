@@ -21,6 +21,7 @@ var card_information_reference = null
 var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
 var attached_markers := {}
 var attached_counters := {}
+var is_publicly_revealed = false
 
 const TRANSFORMABLE_SLUGS := [
 	"huaji-of-heavens-rise-hvn1e","huaji-of-abyssal-fall-hvn1e","fatestone-of-balance-hvn",
@@ -232,7 +233,20 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					var slug = get_slug_from_card()
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
+					if slug in TRANSFORMABLE_SLUGS:
+						popup_menu.add_item("Transform", 5)
 			else:
+				if is_in_memory_slot():
+					if not is_publicly_revealed:
+						popup_menu.add_item("Show", 10)
+					else:
+						popup_menu.add_item("Hide", 11)
+					var all_revealed = _are_all_memory_cards_revealed()
+					if all_revealed:
+						popup_menu.add_item("Hide All", 13)
+					else:
+						popup_menu.add_item("Show All", 12)
+				
 				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
 					popup_menu.add_item("Banish Face Down", 1)
 					popup_menu.add_item("Go to Top Deck", 2)
@@ -432,6 +446,10 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		4: if is_in_main_field(): rotate_card()
 		5: transform_card()
 		6: destroy_token()
+		10: reveal_to_opponent()
+		11: hide_from_opponent()
+		12: reveal_all_in_memory()
+		13: hide_all_in_memory()
 
 func rotate_card():
 	if not is_in_main_field():
@@ -724,3 +742,72 @@ func sync_stats_to_opponent():
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_card_stats", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters)
+
+func reveal_to_opponent():
+	if not is_in_memory_slot() or is_publicly_revealed:
+		return
+	is_publicly_revealed = true
+	_update_local_card_visuals(true)
+	sync_reveal_state(true)
+
+func hide_from_opponent():
+	if not is_in_memory_slot() or not is_publicly_revealed:
+		return
+	is_publicly_revealed = false
+	_update_local_card_visuals(false)
+	sync_reveal_state(false)
+
+func reveal_all_in_memory():
+	var memory_slot = find_parent_memory_slot()
+	if memory_slot:
+		for card in memory_slot.cards_in_slot:
+			if card.has_method("reveal_to_opponent"):
+				card.reveal_to_opponent()
+
+func hide_all_in_memory():
+	var memory_slot = find_parent_memory_slot()
+	if memory_slot:
+		for card in memory_slot.cards_in_slot:
+			if card.has_method("hide_from_opponent"):
+				card.hide_from_opponent()
+
+func find_parent_memory_slot():
+	var p = get_parent()
+	if p and p.is_in_group("memory_slots") and not p.name.contains("Opponent"):
+		return p
+	var memory_nodes = get_tree().get_nodes_in_group("memory_slots")
+	for node in memory_nodes:
+		if not node.name.contains("Opponent"):
+			if self in node.cards_in_slot:
+				return node
+	return null
+
+func sync_reveal_state(revealed: bool):
+	var main_node = get_tree().get_root().get_node_or_null("Main")
+	if main_node:
+		main_node.rpc("rpc_set_card_reveal_status", multiplayer.get_unique_id(), uuid, revealed)
+
+func _are_all_memory_cards_revealed() -> bool:
+	var memory_slot = find_parent_memory_slot()
+	if not memory_slot:
+		return false
+	for card in memory_slot.cards_in_slot:
+		if card.has_method("get") and card.get("is_publicly_revealed") != null:
+			if not card.is_publicly_revealed:
+				return false
+		elif card.has_meta("is_publicly_revealed"):
+			if not card.get_meta("is_publicly_revealed"):
+				return false
+		else:
+			return false
+	return true
+
+func _update_local_card_visuals(revealed: bool):
+	var front = get_node_or_null("CardImage")
+	var back = get_node_or_null("CardImageBack")
+	if revealed:
+		if front: front.visible = true
+		if back: back.visible = false
+	else:
+		if front: front.visible = false
+		if back: back.visible = true

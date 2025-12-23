@@ -4,9 +4,24 @@ var cards_in_slot: Array = []
 var base_z_index := 0
 var memory_z_index_offset := 10
 var memory_max_z_index := 49
+var is_roulette_running = false
+var roulette_timer: Timer
+var current_highlight_index = 0
+var target_card_index = -1
+var roulette_speed = 0.2
+var roulette_elapsed_time = 0.0
+var total_roulette_time = 0.0
+var final_slowdown_started = false
+var highlighted_card = null
+var roulette_cards = []
 
 func _ready():
 	add_to_group("memory_slots")
+	roulette_timer = Timer.new()
+	roulette_timer.wait_time = roulette_speed
+	roulette_timer.timeout.connect(_on_roulette_tick)
+	roulette_timer.one_shot = false
+	add_child(roulette_timer)
 
 func add_card_to_memory(card):
 	if not card or not is_instance_valid(card):
@@ -33,6 +48,8 @@ func remove_card_from_memory(card):
 func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):
 		return
+	if is_roulette_running:
+		return
 	var idx := cards_in_slot.find(card)
 	if idx == -1:
 		return
@@ -45,13 +62,15 @@ func bring_card_to_front(card):
 				c.z_index = memory_z_index_offset + i + 1
 
 func clear_hovered_card():
+	if is_roulette_running:
+		return
 	for i in range(cards_in_slot.size()):
 		var c = cards_in_slot[i]
 		if c and is_instance_valid(c):
 			c.z_index = memory_z_index_offset + i + 1
 
 func are_cards_blocked() -> bool:
-	return false
+	return is_roulette_running
 
 func _show_card_back(card):
 	if not card or not is_instance_valid(card):
@@ -113,7 +132,8 @@ func _arrange_cards_symmetrically():
 			var normalized_pos = min_pos + (max_pos - min_pos) * i / (card_count - 1)
 			positions.append(normalized_pos)
 	for i in range(card_count):
-		var normalized_x = positions[i]
+		var reversed_index = card_count - 1 - i
+		var normalized_x = positions[reversed_index]
 		var actual_x = global_position.x - slot_width / 2.0 + normalized_x * slot_width
 		var target = Vector2(actual_x, global_position.y)
 		var card = cards_in_slot[i]
@@ -121,3 +141,74 @@ func _arrange_cards_symmetrically():
 			var tween = create_tween()
 			tween.tween_property(card, "global_position", target, 0.3)
 			card.z_index = memory_z_index_offset + i + 1
+
+func start_synced_roulette(target_index: int, total_time: float):
+	if cards_in_slot.is_empty():
+		return
+	if is_roulette_running:
+		return
+	is_roulette_running = true
+	current_highlight_index = 0
+	roulette_elapsed_time = 0.0
+	final_slowdown_started = false
+	roulette_cards = cards_in_slot.duplicate()
+	target_card_index = target_index
+	total_roulette_time = total_time
+	roulette_speed = 0.1
+	roulette_timer.wait_time = roulette_speed
+	roulette_timer.start()
+	_highlight_card_at_index(current_highlight_index)
+
+func _on_roulette_tick():
+	if not is_roulette_running or roulette_cards.is_empty():
+		return
+	roulette_elapsed_time += roulette_timer.wait_time
+	_clear_current_highlight()
+	current_highlight_index = (current_highlight_index + 1) % roulette_cards.size()
+	_highlight_card_at_index(current_highlight_index)
+	var progress = roulette_elapsed_time / total_roulette_time
+	if progress >= 0.85 and not final_slowdown_started:
+		final_slowdown_started = true
+		roulette_speed = 0.3
+		roulette_timer.wait_time = roulette_speed
+	elif progress >= 0.7 and not final_slowdown_started:
+		roulette_speed = lerp(0.1, 0.25, (progress - 0.7) / 0.15)
+		roulette_timer.wait_time = roulette_speed
+	if roulette_elapsed_time >= total_roulette_time:
+		if current_highlight_index == target_card_index:
+			_stop_roulette()
+
+func _stop_roulette():
+	roulette_timer.stop()
+	is_roulette_running = false
+	_highlight_card_at_index(target_card_index)
+	highlighted_card = roulette_cards[target_card_index]
+	var final_timer = Timer.new()
+	final_timer.wait_time = 0.5
+	final_timer.one_shot = true
+	final_timer.timeout.connect(_on_final_highlight_finished.bind(final_timer))
+	add_child(final_timer)
+	final_timer.start()
+
+func _on_final_highlight_finished(timer: Timer):
+	timer.queue_free()
+
+func _highlight_card_at_index(index: int):
+	for i in range(cards_in_slot.size()):
+		var card = cards_in_slot[i]
+		if card and is_instance_valid(card):
+			card.modulate = Color(1, 1, 1, 1)
+	if index >= 0 and index < cards_in_slot.size():
+		var card = cards_in_slot[index]
+		if card and is_instance_valid(card):
+			card.modulate = Color(0.7, 1.3, 0.7, 1)
+
+func _clear_current_highlight():
+	for i in range(cards_in_slot.size()):
+		var card = cards_in_slot[i]
+		if card and is_instance_valid(card):
+			card.modulate = Color(1, 1, 1, 1)
+
+func reset_card_colors():
+	_clear_current_highlight()
+	highlighted_card = null

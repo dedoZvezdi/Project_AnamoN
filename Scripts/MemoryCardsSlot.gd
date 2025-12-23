@@ -212,6 +212,10 @@ func start_roulette():
 	roulette_cards = cards_in_slot.duplicate()  
 	target_card_index = randi() % roulette_cards.size()
 	total_roulette_time = randf_range(2.7, 3.5)
+	var main_node = get_tree().get_root().get_node_or_null("Main")
+	if main_node:
+		var my_id = multiplayer.get_unique_id()
+		main_node.rpc("rpc_start_memory_roulette", my_id, target_card_index, total_roulette_time)
 	roulette_speed = 0.1
 	roulette_timer.wait_time = roulette_speed
 	roulette_timer.start()
@@ -277,7 +281,11 @@ func _clear_current_highlight():
 
 func reset_card_colors():
 	_clear_current_highlight()
-	highlighted_card = null
+	if highlighted_card:
+		highlighted_card = null
+		var main_node = get_tree().get_root().get_node_or_null("Main")
+		if main_node:
+			main_node.rpc("rpc_reset_memory_roulette", multiplayer.get_unique_id())
 
 func _unhandled_input(event):
 	if highlighted_card and (

@@ -496,3 +496,47 @@ func sync_destroy_token(player_id: int, uuid: String, slug: String):
 				else:
 					c.get_parent().remove_child(c)
 			c.queue_free()
+
+@rpc("any_peer", "reliable")
+func rpc_start_memory_roulette(player_id: int, target_index: int, total_time: float):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		if opp_field.has_node("OpponentMemory"):
+			var opp_memory = opp_field.get_node("OpponentMemory")
+			if opp_memory.has_method("start_synced_roulette"):
+				opp_memory.start_synced_roulette(target_index, total_time)
+
+@rpc("any_peer", "reliable")
+func rpc_reset_memory_roulette(player_id: int):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field and opp_field.has_node("OpponentMemory"):
+		var opp_memory = opp_field.get_node("OpponentMemory")
+		if opp_memory and opp_memory.has_method("reset_card_colors"):
+			opp_memory.reset_card_colors()
+
+@rpc("any_peer", "reliable")
+func rpc_set_card_reveal_status(player_id: int, card_uuid: String, revealed: bool):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return
+	var found_card = _find_opponent_card_by_uuid(opp_field, card_uuid)
+	if found_card and found_card.has_method("set_opponent_reveal_status"):
+		found_card.set_opponent_reveal_status(revealed)
+
+func _find_opponent_card_by_uuid(root_node, target_uuid):
+	if root_node.has_method("get_uuid") and root_node.get_uuid() == target_uuid:
+		return root_node
+	for child in root_node.get_children():
+		var res = _find_opponent_card_by_uuid(child, target_uuid)
+		if res:
+			return res
+	return null
