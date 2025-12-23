@@ -10,6 +10,7 @@ var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
 var attached_markers := {}
 var attached_counters := {}
 var uuid = ""
+var is_revealed_by_opponent = false
 
 func _ready() -> void:
 	if get_parent() and get_parent().has_method("connect_card_signals"):
@@ -58,8 +59,9 @@ func _is_card_in_restricted_zones() -> bool:
 	for memory_node in opponent_memory_nodes:
 		if memory_node.name.contains("Opponent"):
 			if self in memory_node.cards_in_slot:
+				if is_revealed_by_opponent:
+					return false
 				return true
-	
 	return false
 
 func is_in_main_field() -> bool:
@@ -78,3 +80,28 @@ func get_slug_from_card() -> String:
 	if has_meta("slug"):
 		return get_meta("slug")
 	return ""
+
+func get_uuid() -> String:
+	return uuid
+
+func set_opponent_reveal_status(revealed: bool):
+	is_revealed_by_opponent = revealed
+	var anim_player = get_node_or_null("AnimationPlayer")
+	if anim_player and anim_player.has_animation("card_flip"):
+		anim_player.play("card_flip")
+		var length = anim_player.get_animation("card_flip").length
+		await get_tree().create_timer(length / 2.0).timeout
+		_update_card_visuals(revealed)
+	else:
+		_update_card_visuals(revealed)
+
+func _update_card_visuals(revealed: bool):
+	var front = get_node_or_null("CardImage")
+	var back = get_node_or_null("CardImageBack")
+	
+	if revealed:
+		if front: front.visible = true
+		if back: back.visible = false
+	else:
+		if front: front.visible = false
+		if back: back.visible = true
