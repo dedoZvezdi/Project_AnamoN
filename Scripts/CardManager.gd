@@ -154,6 +154,8 @@ func remove_card_from_original_slot():
 					break
 		"logo_tokens":
 			pass
+		"logo_mastery":
+			pass
 
 func start_drag(card):
 	if not card or not is_instance_valid(card):

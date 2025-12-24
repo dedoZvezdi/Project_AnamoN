@@ -22,7 +22,9 @@ var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
 var attached_markers := {}
 var attached_counters := {}
 var is_publicly_revealed = false
+var current_direction = "North"
 
+const SHIFTING_CURRENTS_SLUGS := ["shifting-currents-p24", "shifting-currents-ambsd"]
 const TRANSFORMABLE_SLUGS := [
 	"huaji-of-heavens-rise-hvn1e","huaji-of-abyssal-fall-hvn1e","fatestone-of-balance-hvn",
 	"woodland-shoats-hvn","fatestone-of-progress-hvn","airborne-squirrel-hvn",
@@ -48,106 +50,74 @@ const TRANSFORMABLE_SLUGS := [
 	"fabled-azurite-fatestone-rec-hvf","seiryuu-azure-dragon-rec-hvf","fabled-azurite-fatestone-p25",
 	"seiryuu-azure-dragon-p25","fabled-azurite-fatestone-hvn1e-csr","seiryuu-azure-dragon-hvn1e-csr"
 ]
+
 const TRANSFORM_PAIRS := {
 	"huaji-of-heavens-rise-hvn1e": "huaji-of-abyssal-fall-hvn1e",
 	"huaji-of-abyssal-fall-hvn1e": "huaji-of-heavens-rise-hvn1e",
-
 	"fatestone-of-balance-hvn": "woodland-shoats-hvn",
 	"woodland-shoats-hvn": "fatestone-of-balance-hvn",
-
 	"fatestone-of-progress-hvn": "airborne-squirrel-hvn",
 	"airborne-squirrel-hvn": "fatestone-of-progress-hvn",
-
 	"fluvial-fatestone-hvn": "mocking-otter-hvn",
 	"mocking-otter-hvn": "fluvial-fatestone-hvn",
-
 	"cyclonic-fatestone-hvn": "windstalker-wolf-hvn",
 	"windstalker-wolf-hvn": "cyclonic-fatestone-hvn",
-
 	"wildgrowth-fatestone-hvn": "elder-mandrill-hvn",
 	"elder-mandrill-hvn": "wildgrowth-fatestone-hvn",
-
 	"companion-fatestone-rec-hvf": "fatebound-caracal-rec-hvf",
 	"fatebound-caracal-rec-hvf": "companion-fatestone-rec-hvf",
-
 	"companion-fatestone-p25": "fatebound-caracal-p25",
 	"fatebound-caracal-p25": "companion-fatestone-p25",
-
 	"fatestone-of-revelations-rec-hvf": "young-wyrmling-rec-hvf",
 	"young-wyrmling-rec-hvf": "fatestone-of-revelations-rec-hvf",
-
 	"fatestone-of-revelations-p25": "young-wyrmling-p25",
 	"young-wyrmling-p25": "fatestone-of-revelations-p25",
-
 	"submerged-fatestone-hvn": "commanding-sea-titan-hvn",
 	"commanding-sea-titan-hvn": "submerged-fatestone-hvn",
-
 	"fatestone-of-unrelenting-rec-hvf": "cheetah-of-bound-fury-rec-hvf",
 	"cheetah-of-bound-fury-rec-hvf": "fatestone-of-unrelenting-rec-hvf",
-
 	"fatestone-of-unrelenting-p25": "cheetah-of-bound-fury-p25",
 	"cheetah-of-bound-fury-p25": "fatestone-of-unrelenting-p25",
-
 	"lavaplume-fatestone-rec-hvf": "firebird-trailblazer-rec-hvf",
 	"firebird-trailblazer-rec-hvf": "lavaplume-fatestone-rec-hvf",
-
 	"lavaplume-fatestone-p25": "firebird-trailblazer-p25",
 	"firebird-trailblazer-p25": "lavaplume-fatestone-p25",
-
 	"idle-fatestone-hvn": "bolstered-boar-hvn",
 	"bolstered-boar-hvn": "idle-fatestone-hvn",
-
 	"coiled-fatestone-hvn": "serpentine-judicator-hvn",
 	"serpentine-judicator-hvn": "coiled-fatestone-hvn",
-
 	"pelagic-fatestone-hvn": "slick-torrentrider-hvn",
 	"slick-torrentrider-hvn": "pelagic-fatestone-hvn",
-
 	"beseeched-fatestone-hvn": "daunting-panda-hvn",
 	"daunting-panda-hvn": "beseeched-fatestone-hvn",
-
 	"craggy-fatestone-rec-hvf": "obstinate-cragback-rec-hvf",
 	"obstinate-cragback-rec-hvf": "craggy-fatestone-rec-hvf",
-
 	"craggy-fatestone-p25": "obstinate-cragback-p25",
 	"obstinate-cragback-p25": "craggy-fatestone-p25",
-
 	"fatestone-of-heaven-rec-hvf": "heavenly-drake-rec-hvf",
 	"heavenly-drake-rec-hvf": "fatestone-of-heaven-rec-hvf",
-
 	"fatestone-of-heaven-p25": "heavenly-drake-p25",
 	"heavenly-drake-p25": "fatestone-of-heaven-p25",
-
 	"fabled-ruby-fatestone-hvn1e": "suzaku-vermillion-phoenix-hvn1e",
 	"suzaku-vermillion-phoenix-hvn1e": "fabled-ruby-fatestone-hvn1e",
-
 	"fabled-ruby-fatestone-hvn1e-csr": "suzaku-vermillion-phoenix-hvn1e-csr",
 	"suzaku-vermillion-phoenix-hvn1e-csr": "fabled-ruby-fatestone-hvn1e-csr",
-
 	"fabled-sapphire-fatestone-hvn1e": "genbu-black-tortoise-hvn1e",
 	"genbu-black-tortoise-hvn1e": "fabled-sapphire-fatestone-hvn1e",
-
 	"fabled-sapphire-fatestone-hvn1e-csr": "genbu-black-tortoise-hvn1e-csr",
 	"genbu-black-tortoise-hvn1e-csr": "fabled-sapphire-fatestone-hvn1e-csr",
-
 	"fabled-emerald-fatestone-hvn1e": "byakko-white-tiger-hvn1e",
 	"byakko-white-tiger-hvn1e": "fabled-emerald-fatestone-hvn1e",
-
 	"fabled-emerald-fatestone-hvn1e-csr": "byakko-white-tiger-hvn1e-csr",
 	"byakko-white-tiger-hvn1e-csr": "fabled-emerald-fatestone-hvn1e-csr",
-
 	"lu-bu-indomitable-titan-hvn1e": "lu-bu-wrath-incarnate-hvn1e",
 	"lu-bu-wrath-incarnate-hvn1e": "lu-bu-indomitable-titan-hvn1e",
-
 	"lu-bu-indomitable-titan-hvn1e-cur": "lu-bu-wrath-incarnate-hvn1e-cur",
 	"lu-bu-wrath-incarnate-hvn1e-cur": "lu-bu-indomitable-titan-hvn1e-cur",
-
 	"fabled-azurite-fatestone-rec-hvf": "seiryuu-azure-dragon-rec-hvf",
 	"seiryuu-azure-dragon-rec-hvf": "fabled-azurite-fatestone-rec-hvf",
-
 	"fabled-azurite-fatestone-p25": "seiryuu-azure-dragon-p25",
 	"seiryuu-azure-dragon-p25": "fabled-azurite-fatestone-p25",
-
 	"fabled-azurite-fatestone-hvn1e-csr": "seiryuu-azure-dragon-hvn1e-csr",
 	"seiryuu-azure-dragon-hvn1e-csr": "fabled-azurite-fatestone-hvn1e-csr"
 }
@@ -233,6 +203,17 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					var slug = get_slug_from_card()
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
+					if slug in TRANSFORMABLE_SLUGS:
+						popup_menu.add_item("Transform", 5)
+			elif is_mastery():
+				if is_in_main_field():
+					popup_menu.add_item("Destroy", 7)
+					var slug = get_slug_from_card()
+					if slug in SHIFTING_CURRENTS_SLUGS:
+						if current_direction != "North": popup_menu.add_item("North", 20)
+						if current_direction != "East": popup_menu.add_item("East", 21)
+						if current_direction != "South": popup_menu.add_item("South", 22)
+						if current_direction != "West": popup_menu.add_item("West", 23)
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
 			else:
@@ -446,10 +427,15 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		4: if is_in_main_field(): rotate_card()
 		5: transform_card()
 		6: destroy_token()
+		7: destroy_mastery()
 		10: reveal_to_opponent()
 		11: hide_from_opponent()
 		12: reveal_all_in_memory()
 		13: hide_all_in_memory()
+		20: set_direction("North")
+		21: set_direction("East")
+		22: set_direction("South")
+		23: set_direction("West")
 
 func rotate_card():
 	if not is_in_main_field():
@@ -461,21 +447,37 @@ func rotate_card():
 		rotation_degrees = original_rotation + 90
 		is_rotated = true
 
+func set_direction(dir: String):
+	current_direction = dir
+	match dir:
+		"North": rotation_degrees = original_rotation
+		"East": rotation_degrees = original_rotation + 90
+		"South": rotation_degrees = original_rotation + 180
+		"West": rotation_degrees = original_rotation + 270
+	sync_stats_to_opponent()
+
 func on_drag_start():
 	is_dragging = true
 	was_rotated_before_drag = is_rotated
-	rotation_degrees = original_rotation
+	var slug = get_slug_from_card()
+	if not (slug in SHIFTING_CURRENTS_SLUGS):
+		rotation_degrees = original_rotation
 	hide_card_info()
 	emit_signal("hovered_off", self)
 
 func on_drag_end():
 	is_dragging = false
-	is_rotated = false
-	rotation_degrees = original_rotation
+	var slug = get_slug_from_card()
+	if not (slug in SHIFTING_CURRENTS_SLUGS):
+		is_rotated = false
+		rotation_degrees = original_rotation
 
 func set_current_field(field):
 	if is_token() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
 		destroy_token()
+		return
+	if is_mastery() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
+		destroy_mastery()
 		return
 	var was_in_main = is_in_main_field()
 	current_field = field
@@ -724,11 +726,33 @@ func is_token() -> bool:
 			return slug in logo.token_slugs
 	return false
 
+func is_mastery() -> bool:
+	var slug = get_slug_from_card()
+	var logos = get_tree().get_nodes_in_group("logo")
+	if logos.size() > 0:
+		var logo = logos[0]
+		if logo.has_method("get") and "mastery_slugs" in logo:
+			return slug in logo.mastery_slugs
+		elif logo.get("mastery_slugs") != null:
+			return slug in logo.mastery_slugs
+	return false
+
 func destroy_token():
 	var slug = get_slug_from_card()
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_destroy_token", multiplayer.get_unique_id(), uuid, slug)
+	if current_field and current_field.has_method("remove_card_from_field"):
+		current_field.remove_card_from_field(self)
+	elif current_field and current_field.has_method("remove_card_from_slot"):
+		current_field.remove_card_from_slot(self)
+	queue_free()
+
+func destroy_mastery():
+	var slug = get_slug_from_card()
+	var multiplayer_node = get_tree().get_root().get_node("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_destroy_mastery", multiplayer.get_unique_id(), uuid, slug)
 	if current_field and current_field.has_method("remove_card_from_field"):
 		current_field.remove_card_from_field(self)
 	elif current_field and current_field.has_method("remove_card_from_slot"):
@@ -741,7 +765,7 @@ func sync_stats_to_opponent():
 		return
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_card_stats", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters)
+		multiplayer_node.rpc("sync_card_stats_v2", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters, current_direction)
 
 func reveal_to_opponent():
 	if not is_in_memory_slot() or is_publicly_revealed:

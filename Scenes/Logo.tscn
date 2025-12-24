@@ -35,3 +35,25 @@ columns = 1024
 
 [node name="Control" parent="LogoViewWindow/ScrollContainer/GridContainer" instance=ExtResource("1_gukjj")]
 layout_mode = 2
+
+[node name="LogoMasteryViewWindow" type="Window" parent="."]
+auto_translate_mode = 1
+size = Vector2i(600, 142)
+visible = false
+unresizable = true
+
+[node name="PopupMenu" type="PopupMenu" parent="LogoMasteryViewWindow"]
+auto_translate_mode = 1
+size = Vector2i(100, 50)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LogoMasteryViewWindow"]
+offset_right = 600.0
+offset_bottom = 142.0
+
+[node name="GridContainer" type="GridContainer" parent="LogoMasteryViewWindow/ScrollContainer"]
+custom_minimum_size = Vector2(600, 142)
+layout_mode = 2
+columns = 1024
+
+[node name="Control" parent="LogoMasteryViewWindow/ScrollContainer/GridContainer" instance=ExtResource("1_gukjj")]
+layout_mode = 2

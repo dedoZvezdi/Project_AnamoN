@@ -52,7 +52,7 @@ func _on_mouse_exited():
 
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens"]:
+		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery"]:
 			emit_signal("request_popup_menu", card_slug)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed and not is_holding:
@@ -71,7 +71,7 @@ func start_drag_from_grid():
 		if card_manager and card_manager.has_method("start_drag"):
 			card_manager.start_drag(real_card)
 			card_manager.set_dragged_from_grid_info(card_slug, zone, self)
-			if zone != "logo_tokens":
+			if zone != "logo_tokens" and zone != "logo_mastery":
 				update_grid_immediately()
 				emit_signal("card_drag_started", self)
 				card_image_path = ""

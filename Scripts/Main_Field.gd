@@ -4,6 +4,7 @@ var cards_in_field = []
 var base_position
 var card_in_slot = false
 var current_champion_card = null
+var current_mastery_card = null
 var champion_life_delta := 0
 
 func adjust_champion_life_delta(delta):
@@ -13,6 +14,7 @@ func _ready() -> void:
 	base_position = Vector2.ZERO
 	add_to_group("main_fields")
 
+@warning_ignore("shadowed_variable_base_class")
 func add_card_to_field(card, position = null):
 	if is_champion_card(card):
 		var card_already_in_field = card in cards_in_field
@@ -24,7 +26,7 @@ func add_card_to_field(card, position = null):
 			card_in_slot = true
 		if card and is_instance_valid(card) and card.has_method("apply_champion_life_delta"):
 			card.apply_champion_life_delta(champion_life_delta)
-		card.global_position = global_position
+		card.global_position = global_position + Vector2(0, -20)
 		card.z_index = 400
 		var ci = card.get_node_or_null("CardImage")
 		var cib = card.get_node_or_null("CardImageBack")
@@ -43,6 +45,28 @@ func add_card_to_field(card, position = null):
 		var card_info_ref = find_card_information_reference()
 		if card_info_ref and card_info_ref.has_method("show_card_preview"):
 			card_info_ref.show_card_preview(card)
+	elif is_mastery_card(card):
+		var card_already_in_field = card in cards_in_field
+		if not card_already_in_field:
+			if current_mastery_card != null and current_mastery_card != card:
+				remove_previous_mastery()
+			current_mastery_card = card
+			cards_in_field.append(card)
+			card_in_slot = true
+		if position != null:
+			card.global_position = position
+		else:
+			card.global_position = global_position
+		card.z_index = 350
+		var ci2 = card.get_node_or_null("CardImage")
+		var cib2 = card.get_node_or_null("CardImageBack")
+		if ci2 and cib2:
+			cib2.z_index = -1
+			ci2.z_index = 0
+			cib2.visible = false
+			ci2.visible = true
+		if card.has_method("set_current_field"):
+			card.set_current_field(self)
 	else:
 		if not (card in cards_in_field):
 			cards_in_field.append(card)
@@ -58,7 +82,6 @@ func add_card_to_field(card, position = null):
 				ci2.z_index = 0
 				cib2.visible = false
 				ci2.visible = true
-
 
 func notify_card_transformed(card):
 	if card == current_champion_card and not is_champion_card(card):
@@ -109,6 +132,23 @@ func is_champion_card(card) -> bool:
 						return true
 	return false
 
+func remove_previous_mastery():
+	if current_mastery_card and is_instance_valid(current_mastery_card):
+		cards_in_field.erase(current_mastery_card)
+		if current_mastery_card.has_method("set_current_field"):
+			current_mastery_card.set_current_field(null)
+		if current_mastery_card.get_parent():
+			current_mastery_card.get_parent().remove_child(current_mastery_card)
+		current_mastery_card.queue_free()
+		current_mastery_card = null
+
+func is_mastery_card(card) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	if card.has_method("is_mastery"):
+		return card.is_mastery()
+	return false
+
 func get_card_slug(card) -> String:
 	if card.has_meta("slug"):
 		return card.get_meta("slug")
@@ -149,6 +189,8 @@ func remove_card_from_field(card):
 			card.set_current_field(null)
 		if card == current_champion_card:
 			current_champion_card = null
+		if card == current_mastery_card:
+			current_mastery_card = null
 
 func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):

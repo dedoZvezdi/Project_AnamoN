@@ -3,6 +3,8 @@ extends Node2D
 @onready var popup_menu: PopupMenu = $PopupMenu
 @onready var Logo_view_window = $LogoViewWindow
 @onready var grid_container = $LogoViewWindow/ScrollContainer/GridContainer
+@onready var Logo_mastery_view_window = $LogoMasteryViewWindow
+@onready var mastery_grid_container = $LogoMasteryViewWindow/ScrollContainer/GridContainer
 
 var level_label: Label
 var durability_label: Label
@@ -55,6 +57,10 @@ var token_slugs : Array = [
 	"spirit-shard-mrc","spirit-shard-sp2","springleaf-alc","springleaf-alcsd",
 	"springleaf-mrc","springleaf-sp2","vacuous-servant-dtr","washuru-hvn"
 ]
+var mastery_slugs : Array = [
+"servile-possessions-p25","servile-possessions-dtrsd","phantasmagoria-ptm",
+"shifting-currents-p24","shifting-currents-ambsd"
+]
 
 func _ready():
 	add_to_group("logo")
@@ -69,8 +75,12 @@ func _ready():
 	find_chat_node()
 	Logo_view_window.close_requested.connect(_on_logo_view_close)
 	Logo_view_window.visibility_changed.connect(_on_logo_view_visibility_changed)
+	Logo_mastery_view_window.close_requested.connect(_on_logo_mastery_view_close)
+	Logo_mastery_view_window.visibility_changed.connect(_on_logo_mastery_view_visibility_changed)
 	populate_tokens()
+	populate_mastery()
 	Logo_view_window.hide()
+	Logo_mastery_view_window.hide()
 	var config = ConfigFile.new()
 	var err = config.load("user://player_config.cfg")
 	if err == OK:
@@ -151,6 +161,14 @@ func _on_logo_view_visibility_changed():
 	if Logo_view_window.visible:
 		$LogoViewWindow/ScrollContainer.scroll_horizontal = 0
 		$LogoViewWindow/ScrollContainer.scroll_vertical = 0
+
+func _on_logo_mastery_view_close():
+	Logo_mastery_view_window.hide()
+
+func _on_logo_mastery_view_visibility_changed():
+	if Logo_mastery_view_window.visible:
+		$LogoMasteryViewWindow/ScrollContainer.scroll_horizontal = 0
+		$LogoMasteryViewWindow/ScrollContainer.scroll_vertical = 0
 
 func find_chat_node():
 	chat_node = find_node_recursive(get_tree().get_root(), "Chat")
@@ -298,6 +316,7 @@ func build_main_menu():
 	popup_menu.add_item("Add Markers", 107)
 	popup_menu.add_item("Add Counters", 108)
 	popup_menu.add_item("Summon Token", 106)
+	popup_menu.add_item("Summon Mastery", 109)
 	popup_menu.add_separator()
 	popup_menu.add_item("Surrender", 103)
 	$PopupMenu.reset_size()
@@ -548,6 +567,11 @@ func _on_popup_menu_id_pressed(id):
 			Logo_view_window.popup_centered()
 			$LogoViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
 			$LogoViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
+		elif id == 109:
+			popup_menu.hide()
+			Logo_mastery_view_window.popup_centered()
+			$LogoMasteryViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
+			$LogoMasteryViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 		elif id == 103:
 			popup_menu.hide()
 			send_to_chat("Surrendered")
@@ -760,3 +784,24 @@ func find_node_recursive(node, target_name):
 		if found:
 			return found
 	return null
+
+func populate_mastery():
+	for child in mastery_grid_container.get_children():
+		child.queue_free()
+	mastery_slugs.sort()
+	for slug in mastery_slugs:
+		var card_display = create_card_display_mastery(slug)
+		mastery_grid_container.add_child(card_display)
+	mastery_grid_container.anchor_left = 0
+	mastery_grid_container.anchor_top = 0
+	mastery_grid_container.anchor_right = 1
+	mastery_grid_container.anchor_bottom = 1
+	mastery_grid_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mastery_grid_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+func create_card_display_mastery(card_name: String):
+	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+	var card_display = card_display_scene.instantiate()
+	card_display.set_meta("slug", card_name)
+	card_display.set_meta("zone", "logo_mastery")
+	return card_display
