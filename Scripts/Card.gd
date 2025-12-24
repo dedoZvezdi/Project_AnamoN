@@ -461,16 +461,14 @@ func on_drag_start():
 	was_rotated_before_drag = is_rotated
 	var slug = get_slug_from_card()
 	if not (slug in SHIFTING_CURRENTS_SLUGS):
-		rotation_degrees = original_rotation
+		if not is_in_main_field():
+			is_rotated = false
+			rotation_degrees = original_rotation
 	hide_card_info()
 	emit_signal("hovered_off", self)
 
 func on_drag_end():
 	is_dragging = false
-	var slug = get_slug_from_card()
-	if not (slug in SHIFTING_CURRENTS_SLUGS):
-		is_rotated = false
-		rotation_degrees = original_rotation
 
 func set_current_field(field):
 	if is_token() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
@@ -487,6 +485,11 @@ func set_current_field(field):
 	var now_in_main = is_in_main_field()
 	if was_in_main and not now_in_main:
 		clear_runtime_modifiers()
+	var slug = get_slug_from_card()
+	if not now_in_main and not (slug in SHIFTING_CURRENTS_SLUGS):
+		is_rotated = false
+		if field != null and not field.is_in_group("rotated_slots"):
+			rotation_degrees = original_rotation
 
 func is_in_main_field() -> bool:
 	return current_field != null and current_field.is_in_group("main_fields")
