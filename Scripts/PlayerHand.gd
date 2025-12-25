@@ -38,6 +38,7 @@ func _exit_tree():
 func add_card_to_hand(card):
 	if not card or not is_instance_valid(card):
 		return
+	_ensure_correct_parent(card)
 	if card.has_method("is_token") and card.is_token():
 		if card.has_method("destroy_token"):
 			card.destroy_token()
@@ -224,6 +225,7 @@ func place_card_in_field(card, field_position, field_rotation = 0.0):
 func return_card_to_hand(card):
 	if not card or not is_instance_valid(card):
 		return
+	_ensure_correct_parent(card)
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in player_hand:
@@ -256,7 +258,7 @@ func bring_card_to_front(card):
 		texture_height = card.get_node("CardImage").texture.get_size().y
 	var current_scale_y = card.scale.y
 	var half_height = (texture_height * current_scale_y) / 2
-	var target_y = screen_height - half_height + 75
+	var target_y = screen_height - half_height + 77
 	var target_pos = Vector2(card.position.x, target_y)
 	var tween = create_tween()
 	active_tween_objects.append(tween)
@@ -359,6 +361,13 @@ func validate_hand():
 			invalid_cards.append(card)
 	for invalid_card in invalid_cards:
 		player_hand.erase(invalid_card)
+
+func _ensure_correct_parent(card: Node2D):
+	if not card or not is_instance_valid(card):
+		return
+	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
+	if card_manager and card.get_parent() != card_manager:
+		card.reparent(card_manager)
 
 func disconnect_card_signals(card):
 	if not card or not is_instance_valid(card) or not card.has_node("Area2D"):
