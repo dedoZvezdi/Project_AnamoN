@@ -41,10 +41,22 @@ func add_card_to_memory(card):
 		if card.has_method("destroy_token"):
 			card.destroy_token()
 		return
-	if card.has_method("set_current_field"):
-		card.set_current_field(self)
-	cards_in_slot.append(card)
-	show_card_back(card)
+	var final_card = card
+	if card.get_parent() != self:
+		final_card = card.duplicate()
+		add_child(final_card)
+		if card.has_meta("slug"):
+			final_card.set_meta("slug", card.get_meta("slug"))
+		final_card.global_position = card.global_position
+		final_card.rotation = card.rotation
+		card.queue_free()
+	if final_card.has_method("set_current_field"):
+		final_card.set_current_field(self)
+	cards_in_slot.append(final_card)
+	show_card_back(final_card)
+	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
+	if card_manager and card_manager.has_method("connect_card_signals"):
+		card_manager.connect_card_signals(final_card)
 	arrange_cards_symmetrically()
 
 func remove_card_from_memory(card):
