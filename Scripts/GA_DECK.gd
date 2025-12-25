@@ -36,6 +36,10 @@ func draw_clicked():
 func setup_context_menu():
 	context_menu.add_item("View Deck", 0)
 	context_menu.add_item("Shuffle Deck", 1)
+	context_menu.add_item("Draw to Memory", 2)
+	context_menu.add_item("Sent top card to GY", 3)
+	context_menu.add_item("Banish top card FD", 4)
+	context_menu.add_item("Banish top card FU", 5)
 	context_menu.id_pressed.connect(_on_context_menu_pressed)
 
 func setup_deck_view():
@@ -51,8 +55,12 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 
 func _on_context_menu_pressed(id):
 	match id:
-		0:view_deck()
-		1:shuffle_deck()
+		0: view_deck()
+		1: shuffle_deck()
+		2: draw_to_memory()
+		3: send_top_to_gy()
+		4: banish_top_fd()
+		5: banish_top_fu()
 
 func view_deck():
 	show_deck_view()
@@ -119,6 +127,118 @@ func move_card_to_bottom():
 	player_deck.append(card_name)
 	update_deck_view()
 	selected_card_slug = ""
+
+func draw_to_memory():
+	var slug = ""
+	if selected_card_slug != "":
+		slug = selected_card_slug
+		var card_index = player_deck.find(slug)
+		if card_index != -1:
+			player_deck.remove_at(card_index)
+	elif player_deck.size() > 0:
+		slug = player_deck[0]
+		player_deck.remove_at(0)
+	if slug == "":
+		return
+		
+	var memory_node = get_tree().current_scene.find_child("MEMORY", true, false)
+	if memory_node:
+		var main_node = get_tree().get_root().get_node("Main")
+		if main_node:
+			main_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), "", slug)
+		_animate_deck_card_to_zone(slug, memory_node.global_position, memory_node, "add_card_to_memory", true, "", false)
+	update_deck_view()
+	update_deck_state()
+	selected_card_slug = ""
+
+func send_top_to_gy():
+	if player_deck.size() == 0:
+		return
+	var slug = player_deck[0]
+	player_deck.remove_at(0)
+	var gy_node = get_tree().current_scene.find_child("GRAVEYARD", true, false)
+	if gy_node:
+		var main_node = get_tree().get_root().get_node("Main")
+		if main_node:
+			main_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), "", slug)
+		_animate_deck_card_to_zone(slug, gy_node.global_position, gy_node, "add_card_to_slot", false, "", true)
+	update_deck_view()
+	update_deck_state()
+
+func banish_top_fd():
+	if player_deck.size() == 0:
+		return
+	var slug = player_deck[0]
+	player_deck.remove_at(0)
+	var banish_node = get_tree().current_scene.find_child("BANISH", true, false)
+	if banish_node:
+		var main_node = get_tree().get_root().get_node("Main")
+		if main_node:
+			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), "", slug, true)
+		_animate_deck_card_to_zone(slug, banish_node.global_position, banish_node, "add_card_to_slot", true, "", false)
+	update_deck_view()
+	update_deck_state()
+
+func banish_top_fu():
+	if player_deck.size() == 0:
+		return
+	var slug = player_deck[0]
+	player_deck.remove_at(0)
+	var banish_node = get_tree().current_scene.find_child("BANISH", true, false)
+	if banish_node:
+		var main_node = get_tree().get_root().get_node("Main")
+		if main_node:
+			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), "", slug, false)
+		_animate_deck_card_to_zone(slug, banish_node.global_position, banish_node, "add_card_to_slot", false, "", true)
+	update_deck_view()
+	update_deck_state()
+
+func _animate_deck_card_to_zone(slug: String, target_pos: Vector2, zone_node: Node, zone_method: String, face_down: bool, _sync_method: String, play_flip: bool = false):
+	var card_scene = preload(CARD_SCENE_PATH)
+	var proxy_card = card_scene.instantiate()
+	get_tree().current_scene.add_child(proxy_card)
+	proxy_card.set_meta("slug", slug)
+	proxy_card.global_position = global_position
+	proxy_card.scale = Vector2(0.35, 0.35)
+	proxy_card.z_index = 1000 
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+	if ResourceLoader.exists(card_image_path):
+		proxy_card.get_node("CardImage").texture = load(card_image_path)
+	var ci = proxy_card.get_node_or_null("CardImage")
+	var cib = proxy_card.get_node_or_null("CardImageBack")
+	if ci and cib:
+		if play_flip:
+			ci.visible = true
+			cib.visible = true
+			ci.z_index = -1
+			cib.z_index = 0
+		elif face_down:
+			ci.visible = false
+			cib.visible = true
+			ci.z_index = -1
+			cib.z_index = 0
+		else:
+			ci.visible = true
+			cib.visible = false
+			ci.z_index = 0
+			cib.z_index = -1
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(proxy_card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if zone_node.name == "BANISH":
+		tween.tween_property(proxy_card, "rotation_degrees", 90.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if play_flip:
+		var anim_player = proxy_card.get_node_or_null("AnimationPlayer")
+		if anim_player:
+			anim_player.play("card_flip")
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		if zone_node.has_method(zone_method):
+			if zone_node.name == "BANISH":
+				zone_node.call(zone_method, proxy_card, face_down)
+			else:
+				zone_node.call(zone_method, proxy_card)
+	)
 
 func _on_deck_view_close():
 	deck_view_window.hide()

@@ -181,20 +181,40 @@ func add_card_to_slot(card):
 		if card.has_method("destroy_token"):
 			card.destroy_token()
 		return
-	if card.has_method("set_current_field"):
-		card.set_current_field(self)
-	cards_in_graveyard.append(card)
+	var final_card = card
+	if card.get_parent() != self:
+		final_card = card.duplicate()
+		add_child(final_card)
+		if card.has_meta("slug"):
+			final_card.set_meta("slug", card.get_meta("slug"))
+		final_card.global_position = card.global_position
+		final_card.rotation = card.rotation
+		card.queue_free()
+	if final_card.has_method("set_current_field"):
+		final_card.set_current_field(self)
+	if final_card.has_method("show_card_front"):
+		final_card.show_card_front()
+	else:
+		var ci = final_card.get_node_or_null("CardImage")
+		var cib = final_card.get_node_or_null("CardImageBack")
+		if ci and cib:
+			ci.visible = true
+			cib.visible = false
+	cards_in_graveyard.append(final_card)
+	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
+	if card_manager and card_manager.has_method("connect_card_signals"):
+		card_manager.connect_card_signals(final_card)
 	var target_pos := Vector2()
 	if has_node("Area2D/CollisionShape2D"):
 		target_pos = $Area2D/CollisionShape2D.global_position
 	else:
 		target_pos = global_position
-	card.visible = true
-	if card.has_node("Area2D"):
-		card.get_node("Area2D").set_deferred("input_pickable", false)
-	card.global_position = target_pos
-	card.rotation = 0.0
-	card.z_index = base_z_index + cards_in_graveyard.size()
+	final_card.visible = true
+	if final_card.has_node("Area2D"):
+		final_card.get_node("Area2D").set_deferred("input_pickable", false)
+	final_card.global_position = target_pos
+	final_card.rotation = 0.0
+	final_card.z_index = base_z_index + cards_in_graveyard.size()
 	card_in_slot = true
 	if graveyard_view_window.visible:
 		update_deck_view()

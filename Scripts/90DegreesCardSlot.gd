@@ -269,6 +269,9 @@ func _on_card_arrived_in_banish(original_card, face_down: bool):
 	new_card.z_index = base_z_index + cards_in_banish.size()
 	if new_card.has_method("set_current_field"):
 		new_card.set_current_field(self)
+	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
+	if card_manager and card_manager.has_method("connect_card_signals"):
+		card_manager.connect_card_signals(new_card)
 	new_card.visible = true
 	if new_card.has_node("Area2D"):
 		new_card.get_node("Area2D").set_deferred("input_pickable", false)

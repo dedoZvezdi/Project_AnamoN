@@ -61,10 +61,7 @@ func _clear_memory_highlights():
 func _process(_delta: float) -> void:
 	if card_being_dragged and is_instance_valid(card_being_dragged):
 		var mouse_pos = get_global_mouse_position()
-		card_being_dragged.position = Vector2(
-			clamp(mouse_pos.x, 0, screen_size.x),
-			clamp(mouse_pos.y, 0, screen_size.y)
-		)
+		card_being_dragged.global_position = mouse_pos
 
 func can_hover_card(card) -> bool:
 	if not card or not is_instance_valid(card):
