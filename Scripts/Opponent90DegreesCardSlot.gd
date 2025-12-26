@@ -21,7 +21,9 @@ func update_deck_view():
 	for child in grid_container.get_children():
 		child.queue_free()
 	for card in cards_in_banish:
-		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+		if not is_instance_valid(card):
+			continue
+		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.get_name())
 		var card_display = create_card_display(card_slug)
 		grid_container.add_child(card_display)
 		var tex_rect = card_display.get_node_or_null("TextureRect")
@@ -159,11 +161,13 @@ func get_top_card():
 func remove_card_by_slug(slug: String):
 	var target_card = null
 	for card in cards_in_banish:
-		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+		if not is_instance_valid(card):
+			continue
+		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.get_name())
 		if card_slug == slug:
 			target_card = card
 			break
-	if target_card:
+	if target_card and is_instance_valid(target_card):
 		remove_card_from_slot(target_card)
 		target_card.queue_free()
 		if banish_view_window.visible:

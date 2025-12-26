@@ -21,6 +21,8 @@ var animation_in_progress = false
 var active_tween_objects = []
 var hovered_card = null
 var hand_hidden := false
+var dragging_card_from_hand = null
+var external_preview_index := -1
 
 func _ready() -> void:
 	center_screen_x = get_viewport().size.x / 2
@@ -46,7 +48,11 @@ func add_card_to_hand(card):
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in player_hand:
-		player_hand.append(card)
+		if external_preview_index != -1:
+			player_hand.insert(external_preview_index, card)
+			external_preview_index = -1
+		else:
+			player_hand.append(card)
 		card.z_index = HAND_Z_INDEX + player_hand.size()
 		update_hand_position()
 		if hand_hidden:
@@ -63,6 +69,7 @@ func add_card_to_hand(card):
 		else:
 			show_card(card)
 	else:
+		update_hand_position()
 		var card_index = player_hand.find(card)
 		if card_index >= 0:
 			var rotations = calculate_card_rotation(card_index)
@@ -70,16 +77,26 @@ func add_card_to_hand(card):
 
 func update_hand_position():
 	validate_hand()
-	if player_hand.is_empty():
-		return
 	start_animation()
-	for i in range(player_hand.size()):
+	var hand_size = player_hand.size()
+	var total_positions = hand_size
+	if external_preview_index != -1:
+		total_positions += 1
+	if hand_size == 0 and external_preview_index == -1:
+		end_animation()
+		return
+	for i in range(hand_size):
 		var card = player_hand[i]
 		if card and is_instance_valid(card):
-			var new_position = calculate_card_position(i)
-			var new_rotation = calculate_card_rotation(i)
+			var virtual_index = i
+			if external_preview_index != -1 and i >= external_preview_index:
+				virtual_index += 1
+			var new_position = calculate_card_position(virtual_index, total_positions)
+			var new_rotation = calculate_card_rotation(virtual_index, total_positions)
 			card.hand_position = new_position
 			card.z_index = HAND_Z_INDEX + i + 1
+			if card == dragging_card_from_hand:
+				continue
 			animate_card_to_position(card, new_position, new_rotation)
 	call_deferred("enforce_z_ordering")
 
@@ -92,8 +109,8 @@ func enforce_z_ordering():
 				continue
 			card.z_index = HAND_Z_INDEX + i + 1
 
-func calculate_card_position(index):
-	var hand_size = player_hand.size()
+func calculate_card_position(index, total_size = -1):
+	var hand_size = total_size if total_size != -1 else player_hand.size()
 	if hand_size == 1:
 		return Vector2(center_screen_x, HAND_Y_POSITION)
 	var card_spacing = calculate_card_spacing(hand_size)
@@ -145,8 +162,8 @@ func get_dynamic_max_angle(hand_size: int) -> float:
 	else:
 		return clamp(30.0 / sqrt(hand_size), 4.0, 6.0)
 
-func calculate_card_rotation(index):
-	var hand_size = player_hand.size()
+func calculate_card_rotation(index, total_size = -1):
+	var hand_size = total_size if total_size != -1 else player_hand.size()
 	if hand_size <= 1:
 		return 0.0
 	var dynamic_max_angle = get_dynamic_max_angle(hand_size)
@@ -230,8 +247,14 @@ func return_card_to_hand(card):
 		card.set_current_field(self)
 	if card not in player_hand:
 		player_hand.append(card)
-		card.z_index = HAND_Z_INDEX + player_hand.size()
+		card.z_index = int(HAND_Z_INDEX + player_hand.size())
 		update_hand_position()
+		if card.has_meta("slug"):
+			var slug = card.get_meta("slug")
+			var uuid = card.uuid if "uuid" in card else ""
+			var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+			if multiplayer_node and multiplayer_node.has_method("rpc"):
+				multiplayer_node.rpc("sync_return_card_to_hand", multiplayer.get_unique_id(), uuid, slug)
 
 func organise_cards(cards: Array) -> void:
 	player_hand.clear()
@@ -286,6 +309,47 @@ func clear_hovered_card():
 				tween.parallel().tween_property(card, "position", target_pos, 0.25)
 				tween.parallel().tween_property(card, "rotation", target_rot, 0.25)
 				tween.finished.connect(_on_single_tween_finished.bind(tween), CONNECT_ONE_SHOT)
+
+func is_mouse_over_hand() -> bool:
+	var mouse_pos = get_global_mouse_position()
+	return mouse_pos.y > HAND_Y_POSITION - 300 and mouse_pos.x > hand_field_left - 100 and mouse_pos.x < hand_field_right + 100
+
+func is_mouse_near_hand() -> bool:
+	var mouse_pos = get_global_mouse_position()
+	return mouse_pos.y > HAND_Y_POSITION - 50 and mouse_pos.y < HAND_Y_POSITION + 30 and \
+		   mouse_pos.x > hand_field_left - 20 and mouse_pos.x < hand_field_right + 20
+
+func preview_reorder(mouse_x: float):
+	if dragging_card_from_hand:
+		if player_hand.size() <= 1:
+			return
+		var hand_size = player_hand.size()
+		var card_spacing = calculate_card_spacing(hand_size)
+		var total_width = (hand_size - 1) * card_spacing
+		var start_x = center_screen_x - total_width / 2
+		var target_index = round((mouse_x - start_x) / card_spacing)
+		target_index = clamp(target_index, 0, hand_size - 1)
+		var current_index = player_hand.find(dragging_card_from_hand)
+		if target_index != current_index:
+			player_hand.erase(dragging_card_from_hand)
+			player_hand.insert(target_index, dragging_card_from_hand)
+			update_hand_position()
+	else:
+		var hand_size = player_hand.size()
+		var total_positions = hand_size + 1
+		var card_spacing = calculate_card_spacing(total_positions)
+		var total_width = (total_positions - 1) * card_spacing
+		var start_x = center_screen_x - total_width / 2
+		var target_index = round((mouse_x - start_x) / card_spacing)
+		target_index = clamp(target_index, 0, total_positions - 1)
+		if target_index != external_preview_index:
+			external_preview_index = target_index
+			update_hand_position()
+
+func clear_external_preview():
+	if external_preview_index != -1:
+		external_preview_index = -1
+		update_hand_position()
 
 func hide_hand():
 	hand_hidden = true

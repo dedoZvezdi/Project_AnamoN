@@ -6,7 +6,7 @@ var zone = ""
 var is_holding = false
 var dragged_card = null
 
-signal request_popup_menu(slug)
+signal request_popup_menu(slug, uuid)
 signal card_drag_started(card_display)
 
 @onready var texture_rect = $TextureRect
@@ -53,7 +53,8 @@ func _on_mouse_exited():
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery"]:
-			emit_signal("request_popup_menu", card_slug)
+			var current_uuid = get_meta("uuid") if has_meta("uuid") else ""
+			emit_signal("request_popup_menu", card_slug, current_uuid)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed and not is_holding:
 			start_drag_from_grid()
@@ -106,9 +107,13 @@ func create_real_card_for_drag():
 		return null
 	var card_scene = preload("res://Scenes/Card.tscn")
 	var real_card = card_scene.instantiate()
+	if has_meta("uuid"):
+		real_card.uuid = get_meta("uuid")
 	real_card.set_meta("slug", card_slug)
 	real_card.set_meta("is_dragged_from_grid", true)
 	real_card.set_meta("original_zone", zone)
+	if has_meta("uuid"):
+		real_card.set_meta("uuid", get_meta("uuid"))
 	card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		var card_image = real_card.get_node("CardImage")

@@ -10,6 +10,11 @@ const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 
 func _ready() -> void:
 	add_to_group("mat_deck_zones")
+	var deck_with_uuids = []
+	for slug in player_deck:
+		var card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
+		deck_with_uuids.append({"slug": slug, "uuid": card_uuid})
+	player_deck = deck_with_uuids
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
 	setup_context_menu()
 	setup_deck_view()
@@ -41,8 +46,8 @@ func update_deck_view():
 		return
 	for child in grid_container.get_children():
 		child.queue_free()
-	for card_name in player_deck:
-		var card_display = create_card_display(card_name)
+	for card_data in player_deck:
+		var card_display = create_card_display(card_data["slug"], card_data["uuid"])
 		grid_container.add_child(card_display)
 	if player_deck.size() == 0:
 		$Area2D/CollisionShape2D.disabled = true
@@ -54,15 +59,20 @@ func show_deck_view():
 	$MAT_DECK_VIEW_WINDOW/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
 	$MAT_DECK_VIEW_WINDOW/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 
-func create_card_display(card_name: String):
+func create_card_display(card_name: String, card_uuid: String):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
 	var card_display = card_display_scene.instantiate()
 	card_display.set_meta("slug", card_name)
+	card_display.set_meta("uuid", card_uuid)
 	card_display.set_meta("zone", "mat_deck")
 	return card_display
 
-func remove_card_by_slug(slug: String):
-	var card_index = player_deck.find(slug)
+func remove_card_by_uuid(target_uuid: String):
+	var card_index = -1
+	for i in range(player_deck.size()):
+		if player_deck[i]["uuid"] == target_uuid:
+			card_index = i
+			break
 	if card_index != -1:
 		player_deck.remove_at(card_index)
 		update_deck_view()

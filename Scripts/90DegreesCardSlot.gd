@@ -4,6 +4,7 @@ var cards_in_banish = []
 var card_in_slot = false
 var base_z_index = 0
 var selected_card_slug: String = ""
+var selected_card_uuid: String = ""
 
 @onready var context_menu = $PopupMenu
 @onready var banish_view_window = $BanishViewWindow
@@ -23,7 +24,8 @@ func update_deck_view():
 		child.queue_free()
 	for card in cards_in_banish:
 		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
-		var card_display = create_card_display(card_slug)
+		var card_uuid = card.uuid if "uuid" in card else ""
+		var card_display = create_card_display(card_slug, card_uuid)
 		grid_container.add_child(card_display)
 		var tex_rect = card_display.get_node_or_null("TextureRect")
 		if tex_rect:
@@ -56,16 +58,18 @@ func _on_context_menu_pressed(id):
 func view_deck():
 	show_deck_view()
 
-func create_card_display(card_name: String):
+func create_card_display(card_name: String, card_uuid: String = ""):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
 	var card_display = card_display_scene.instantiate()
 	card_display.set_meta("slug", card_name)
+	card_display.set_meta("uuid", card_uuid)
 	card_display.set_meta("zone", "banish")
 	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
 	return card_display
 
-func _on_card_display_popup_menu(slug):
+func _on_card_display_popup_menu(slug, uuid):
 	selected_card_slug = slug
+	selected_card_uuid = uuid
 	var popup_menu = $BanishViewWindow/PopupMenu
 	popup_menu.clear()
 	popup_menu.add_item("Flip", 0)
@@ -113,14 +117,23 @@ func go_to_top_deck():
 		return
 	var target_card = null
 	for card in cards_in_banish:
-		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
-		if card_slug == selected_card_slug:
+		var c_uuid = card.uuid if "uuid" in card else ""
+		if c_uuid == selected_card_uuid:
 			target_card = card
 			break
 	if not target_card:
+		for card in cards_in_banish:
+			var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+			if card_slug == selected_card_slug:
+				target_card = card
+				break
+	if not target_card:
 		return
-	animate_card_to_deck_from_banish(target_card, deck_node.global_position, selected_card_slug, true)
+	var card_uuid_to_send = target_card.uuid if "uuid" in target_card else ""
+	animate_card_to_deck_from_banish(target_card, deck_node.global_position, selected_card_slug, card_uuid_to_send, true)
+	_sync_move_to_deck(card_uuid_to_send, true)
 	selected_card_slug = ""
+	selected_card_uuid = ""
 
 func go_to_bottom_deck():
 	if selected_card_slug == "":
@@ -133,16 +146,30 @@ func go_to_bottom_deck():
 		return
 	var target_card = null
 	for card in cards_in_banish:
-		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
-		if card_slug == selected_card_slug:
+		var c_uuid = card.uuid if "uuid" in card else ""
+		if c_uuid == selected_card_uuid:
 			target_card = card
 			break
 	if not target_card:
+		for card in cards_in_banish:
+			var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+			if card_slug == selected_card_slug:
+				target_card = card
+				break
+	if not target_card:
 		return
-	animate_card_to_deck_from_banish(target_card, deck_node.global_position, selected_card_slug, false)
+	var card_uuid_to_send = target_card.uuid if "uuid" in target_card else ""
+	animate_card_to_deck_from_banish(target_card, deck_node.global_position, selected_card_slug, card_uuid_to_send, false)
+	_sync_move_to_deck(card_uuid_to_send, false)
 	selected_card_slug = ""
+	selected_card_uuid = ""
 
-func animate_card_to_deck_from_banish(card, deck_position: Vector2, slug: String, is_top: bool):
+func _sync_move_to_deck(uuid: String, is_top: bool):
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_move_to_deck", multiplayer.get_unique_id(), uuid, is_top)
+
+func animate_card_to_deck_from_banish(card, deck_position: Vector2, slug: String, card_uuid: String, is_top: bool):
 	remove_card_from_slot(card)
 	var card_image = card.get_node("CardImage")
 	var original_texture = card_image.texture
@@ -153,18 +180,18 @@ func animate_card_to_deck_from_banish(card, deck_position: Vector2, slug: String
 	tween.set_parallel(true)
 	tween.tween_property(card, "global_position", deck_position, 0.5)
 	tween.tween_property(card, "rotation_degrees", 0.0, 0.5)
-	tween.tween_callback(_on_banish_deck_animation_completed.bind(card, slug, is_top, original_texture)).set_delay(0.5)
+	tween.tween_callback(_on_banish_deck_animation_completed.bind(card, slug, card_uuid, is_top, original_texture)).set_delay(0.5)
 
-func _on_banish_deck_animation_completed(card, slug: String, is_top: bool, original_texture: Texture2D):
+func _on_banish_deck_animation_completed(card, slug: String, card_uuid: String, is_top: bool, original_texture: Texture2D):
 	var card_image = card.get_node("CardImage")
 	card_image.texture = original_texture
 	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
 	if deck_nodes.size() > 0:
 		var deck_node = deck_nodes[0]
 		if is_top and deck_node.has_method("add_to_top"):
-			deck_node.add_to_top(slug)
+			deck_node.add_to_top(slug, card_uuid)
 		elif not is_top and deck_node.has_method("add_to_bottom"):
-			deck_node.add_to_bottom(slug)
+			deck_node.add_to_bottom(slug, card_uuid)
 	card.queue_free()
 	if banish_view_window.visible:
 		update_deck_view()
@@ -247,8 +274,12 @@ func add_card_to_slot(card, face_down := false):
 func _on_card_arrived_in_banish(original_card, face_down: bool):
 	if not original_card or not is_instance_valid(original_card):
 		return
+	var saved_uuid = original_card.uuid if "uuid" in original_card else ""
 	var new_card = original_card.duplicate()
 	add_child(new_card)
+	if saved_uuid != "" and "uuid" in new_card:
+		new_card.uuid = saved_uuid
+	new_card.visible = true
 	if original_card.has_meta("slug"):
 		new_card.set_meta("slug", original_card.get_meta("slug"))
 	new_card.global_position = original_card.global_position

@@ -667,51 +667,75 @@ func go_to_top_deck():
 	var slug = get_slug_from_card()
 	if slug == "":
 		return
+	_prepare_for_deck_move()
 	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
 	if deck_nodes.size() == 0:
 		return
 	var deck_node = deck_nodes[0]
 	if deck_node.has_method("add_to_top"):
-		animate_card_to_deck(deck_node.global_position, slug, true)
+		animate_card_to_deck(deck_node.global_position, slug, uuid, true)
 
 func go_to_bottom_deck():
 	var slug = get_slug_from_card()
 	if slug == "":
 		return
+	_prepare_for_deck_move()
 	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
 	if deck_nodes.size() == 0:
 		return
 	var deck_node = deck_nodes[0]
 	if deck_node.has_method("add_to_bottom"):
-		animate_card_to_deck(deck_node.global_position, slug, false)
+		animate_card_to_deck(deck_node.global_position, slug, uuid, false)
 
-func animate_card_to_deck(deck_position: Vector2, slug: String, is_top: bool):
-	$Area2D.input_event.disconnect(_on_area_2d_input_event)
+func _prepare_for_deck_move():
+	for tween in get_tree().get_processed_tweens():
+		if tween.is_valid() and tween.is_running():
+			pass 
+	var scene = get_tree().get_current_scene()
+	var player_hand_node = scene.find_child("PlayerHand", true, false)
+	if player_hand_node and player_hand_node.has_method("remove_card_from_hand"):
+		player_hand_node.remove_card_from_hand(self)
+	if current_field:
+		if current_field.is_in_group("main_fields") and current_field.has_method("remove_card_from_field"):
+			current_field.remove_card_from_field(self)
+		elif current_field.is_in_group("memory_slots") and current_field.has_method("remove_card_from_memory"):
+			current_field.remove_card_from_memory(self)
+		elif current_field.has_method("remove_card_from_slot"):
+			current_field.remove_card_from_slot(self)
+
+func _sync_move_to_deck(is_top: bool):
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_move_to_deck", multiplayer.get_unique_id(), uuid, is_top)
+
+func animate_card_to_deck(deck_position: Vector2, slug: String, card_uuid: String, is_top: bool):
+	if $Area2D.input_event.is_connected(_on_area_2d_input_event):
+		$Area2D.input_event.disconnect(_on_area_2d_input_event)
 	$Area2D.set_deferred("monitoring", false)
-	var original_texture = $CardImage.texture
-	$CardImage.texture = load("res://Assets/Grand Archive/ga_back.png")
-	rotation_degrees = 0.0
-	if is_top:
-		z_index = 2
-	else:
-		z_index = 0
+	z_index = 1000
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(self, "global_position", deck_position, 0.5)
-	tween.tween_callback(_on_deck_animation_completed.bind(slug, is_top, original_texture)).set_delay(0.7)
+	tween.tween_property(self, "global_position", deck_position, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "rotation_degrees", 0.0, 0.3)
+	tween.tween_property(self, "scale", Vector2(0.3, 0.3), 0.4)
+	tween.set_parallel(false)
+	var mid_timer = get_tree().create_timer(0.2)
+	mid_timer.timeout.connect(func(): $CardImage.texture = load("res://Assets/Grand Archive/ga_back.png"))
+	await tween.finished
+	_on_deck_animation_completed(slug, card_uuid, is_top)
 
-func _on_deck_animation_completed(slug: String, is_top: bool, original_texture: Texture2D):
-	$CardImage.texture = original_texture
-	$Area2D.input_event.connect(_on_area_2d_input_event)
-	$Area2D.set_deferred("monitoring", true)
+func _on_deck_animation_completed(slug: String, card_uuid: String, is_top: bool):
 	var deck_nodes = get_tree().get_nodes_in_group("deck_zones")
 	if deck_nodes.size() > 0:
 		var deck_node = deck_nodes[0]
 		if is_top and deck_node.has_method("add_to_top"):
-			deck_node.add_to_top(slug)
+			deck_node.add_to_top(slug, card_uuid)
 		elif not is_top and deck_node.has_method("add_to_bottom"):
-			deck_node.add_to_bottom(slug)
-	remove_from_current_position()
+			deck_node.add_to_bottom(slug, card_uuid)
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_card_returned_to_deck", multiplayer.get_unique_id(), card_uuid, slug)
+	queue_free()
 
 func _is_hand_field(field) -> bool:
 	if field == null:
@@ -788,15 +812,19 @@ func reveal_all_in_memory():
 	var memory_slot = find_parent_memory_slot()
 	if memory_slot:
 		for card in memory_slot.cards_in_slot:
-			if card.has_method("reveal_to_opponent"):
-				card.reveal_to_opponent()
+			if card.has_method("_update_local_card_visuals"):
+				card.is_publicly_revealed = true
+				card._update_local_card_visuals(true)
+		sync_all_reveal_state(true)
 
 func hide_all_in_memory():
 	var memory_slot = find_parent_memory_slot()
 	if memory_slot:
 		for card in memory_slot.cards_in_slot:
-			if card.has_method("hide_from_opponent"):
-				card.hide_from_opponent()
+			if card.has_method("_update_local_card_visuals"):
+				card.is_publicly_revealed = false
+				card._update_local_card_visuals(false)
+		sync_all_reveal_state(false)
 
 func find_parent_memory_slot():
 	var p = get_parent()
@@ -813,6 +841,11 @@ func sync_reveal_state(revealed: bool):
 	var main_node = get_tree().get_root().get_node_or_null("Main")
 	if main_node:
 		main_node.rpc("rpc_set_card_reveal_status", multiplayer.get_unique_id(), uuid, revealed)
+
+func sync_all_reveal_state(revealed: bool):
+	var main_node = get_tree().get_root().get_node_or_null("Main")
+	if main_node:
+		main_node.rpc("rpc_set_all_cards_reveal_status", multiplayer.get_unique_id(), revealed)
 
 func _are_all_memory_cards_revealed() -> bool:
 	var memory_slot = find_parent_memory_slot()

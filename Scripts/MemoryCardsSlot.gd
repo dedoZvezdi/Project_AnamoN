@@ -5,7 +5,7 @@ var roulette_cards = []
 var base_position
 var base_z_index = 0
 var hover_z_index = 10
-var memory_z_index_offset = 10
+var memory_z_index_offset = 0
 var memory_max_z_index = 49
 var highlighted_card: Node = null
 var steps_left = 0
@@ -21,6 +21,8 @@ var final_slowdown_started = false
 func _ready():
 	randomize()
 	base_position = Vector2.ZERO
+	z_as_relative = false
+	z_index = 0
 	add_to_group("memory_slots")
 	roulette_timer = Timer.new()
 	roulette_timer.wait_time = roulette_speed
@@ -43,16 +45,23 @@ func add_card_to_memory(card):
 		return
 	var final_card = card
 	if card.get_parent() != self:
+		var saved_uuid = card.uuid if "uuid" in card else ""
 		final_card = card.duplicate()
 		add_child(final_card)
+		if saved_uuid != "" and "uuid" in final_card:
+			final_card.uuid = saved_uuid
 		if card.has_meta("slug"):
 			final_card.set_meta("slug", card.get_meta("slug"))
 		final_card.global_position = card.global_position
 		final_card.rotation = card.rotation
 		card.queue_free()
+	final_card.visible = true
+	if "is_publicly_revealed" in final_card:
+		final_card.is_publicly_revealed = false
 	if final_card.has_method("set_current_field"):
 		final_card.set_current_field(self)
 	cards_in_slot.append(final_card)
+	final_card.z_index = memory_z_index_offset + cards_in_slot.size()
 	show_card_back(final_card)
 	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
 	if card_manager and card_manager.has_method("connect_card_signals"):
@@ -139,6 +148,7 @@ func insert_card_at_position(card, index):
 	elif index > cards_in_slot.size():
 		index = cards_in_slot.size()
 	cards_in_slot.insert(index, card)
+	card.z_index = memory_z_index_offset + index + 1
 	arrange_cards_symmetrically()
 
 func add_card_near_position(card, target_x_position):
