@@ -6,6 +6,7 @@ var player_deck = ["fabled-ruby-fatestone-hvn1e","excalibur-reflected-edge-dtr1e
 ,"suzaku-vermillion-phoenix-hvn1e-csr","acolyte-of-cultivation-amb","arcane-disposition-doap","arthur-young-heir-evp","suzaku-vermillion-phoenix-hvn1e"]
 var card_database_reference
 var selected_card_slug: String = ""
+var selected_card_uuid: String = ""
 
 @onready var context_menu = $PopupMenu
 @onready var deck_view_window = $DeckViewWindow
@@ -13,6 +14,11 @@ var selected_card_slug: String = ""
 
 func _ready() -> void:
 	add_to_group("deck_zones")
+	var deck_with_uuids = []
+	for slug in player_deck:
+		var card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
+		deck_with_uuids.append({"slug": slug, "uuid": card_uuid})
+	player_deck = deck_with_uuids
 	player_deck.shuffle()
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
 	setup_context_menu()
@@ -21,17 +27,23 @@ func _ready() -> void:
 	update_deck_state()
 	
 @rpc("any_peer")
-func draw_here_and_for_peer(player_id, card_drawn_name):
+func draw_here_and_for_peer(player_id, card_drawn_name, card_uuid := ""):
 	if multiplayer.get_unique_id() == player_id:
-		draw_card(card_drawn_name)
+		draw_card(card_drawn_name, card_uuid)
 	else:
-		get_parent().get_parent().get_node("OpponentField/OpponentDeck").draw_card(card_drawn_name)
+		var opp_deck = get_parent().get_parent().get_node_or_null("OpponentField/OpponentDeck")
+		if opp_deck and opp_deck.has_method("draw_card"):
+			opp_deck.draw_card(card_drawn_name, card_uuid)
 
 func draw_clicked():
 	var player_id = multiplayer.get_unique_id()
-	var card_drawn_name = player_deck[0]
-	draw_here_and_for_peer(player_id, card_drawn_name)
-	rpc("draw_here_and_for_peer", player_id, card_drawn_name)
+	if player_deck.size() == 0:
+		return
+	var card_data = player_deck[0]
+	var slug = card_data["slug"]
+	var card_uuid = card_data["uuid"]
+	draw_here_and_for_peer(player_id, slug, card_uuid)
+	rpc("draw_here_and_for_peer", player_id, slug, card_uuid)
 	
 func setup_context_menu():
 	context_menu.add_item("View Deck", 0)
@@ -70,8 +82,8 @@ func update_deck_view():
 		return
 	for child in grid_container.get_children():
 		child.queue_free()
-	for card_name in player_deck:
-		var card_display = create_card_display(card_name)
+	for card_data in player_deck:
+		var card_display = create_card_display(card_data["slug"], card_data["uuid"])
 		grid_container.add_child(card_display)
 	grid_container.call_deferred("queue_sort")
 
@@ -83,16 +95,17 @@ func show_deck_view():
 	if has_node("Sprite2D"):
 		$Sprite2D.modulate = Color(1, 0, 0, 1)
 
-func create_card_display(card_name: String):
+func create_card_display(card_name: String, card_uuid: String):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
 	var card_display = card_display_scene.instantiate()
 	card_display.set_meta("slug", card_name)
+	card_display.set_meta("uuid", card_uuid)
 	card_display.set_meta("zone", "ga_deck")
-	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
+	card_display.request_popup_menu.connect(_on_card_display_popup_menu_v2)
 	return card_display
 
-func _on_card_display_popup_menu(slug):
-	selected_card_slug = slug
+func _on_card_display_popup_menu_v2(_slug, card_uuid):
+	selected_card_uuid = card_uuid
 	var popup_menu = $DeckViewWindow/PopupMenu
 	popup_menu.clear()
 	popup_menu.add_item("Go Top Deck", 0)
@@ -105,97 +118,115 @@ func _on_deck_view_popup_menu_pressed(id):
 		1: move_card_to_bottom()
 
 func move_card_to_top():
-	if selected_card_slug == "":
+	if selected_card_uuid == "":
 		return
-	var card_index = player_deck.find(selected_card_slug)
+	var card_index = -1
+	for i in range(player_deck.size()):
+		if player_deck[i]["uuid"] == selected_card_uuid:
+			card_index = i
+			break
 	if card_index == -1:
 		return
-	var card_name = player_deck[card_index]
+	var card_data = player_deck[card_index]
 	player_deck.remove_at(card_index)
-	player_deck.insert(0, card_name)
+	player_deck.insert(0, card_data)
 	update_deck_view()
-	selected_card_slug = ""
+	selected_card_uuid = ""
 
 func move_card_to_bottom():
-	if selected_card_slug == "":
+	if selected_card_uuid == "":
 		return
-	var card_index = player_deck.find(selected_card_slug)
+	var card_index = -1
+	for i in range(player_deck.size()):
+		if player_deck[i]["uuid"] == selected_card_uuid:
+			card_index = i
+			break
 	if card_index == -1:
 		return
-	var card_name = player_deck[card_index]
+	var card_data = player_deck[card_index]
 	player_deck.remove_at(card_index)
-	player_deck.append(card_name)
+	player_deck.append(card_data)
 	update_deck_view()
-	selected_card_slug = ""
+	selected_card_uuid = ""
 
 func draw_to_memory():
 	var slug = ""
-	if selected_card_slug != "":
-		slug = selected_card_slug
-		var card_index = player_deck.find(slug)
-		if card_index != -1:
-			player_deck.remove_at(card_index)
+	var card_uuid = ""
+	if selected_card_uuid != "":
+		for i in range(player_deck.size()):
+			if player_deck[i]["uuid"] == selected_card_uuid:
+				slug = player_deck[i]["slug"]
+				card_uuid = player_deck[i]["uuid"]
+				player_deck.remove_at(i)
+				break
 	elif player_deck.size() > 0:
-		slug = player_deck[0]
+		slug = player_deck[0]["slug"]
+		card_uuid = player_deck[0]["uuid"]
 		player_deck.remove_at(0)
 	if slug == "":
 		return
-		
 	var memory_node = get_tree().current_scene.find_child("MEMORY", true, false)
 	if memory_node:
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
-			main_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), "", slug)
-		_animate_deck_card_to_zone(slug, memory_node.global_position, memory_node, "add_card_to_memory", true, "", false)
+			main_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), card_uuid, slug)
+		_animate_deck_card_to_zone(slug, card_uuid, memory_node.global_position, memory_node, "add_card_to_memory", true, "", false)
 	update_deck_view()
 	update_deck_state()
-	selected_card_slug = ""
+	selected_card_uuid = ""
 
 func send_top_to_gy():
 	if player_deck.size() == 0:
 		return
-	var slug = player_deck[0]
+	var card_data = player_deck[0]
+	var slug = card_data["slug"]
+	var card_uuid = card_data["uuid"]
 	player_deck.remove_at(0)
 	var gy_node = get_tree().current_scene.find_child("GRAVEYARD", true, false)
 	if gy_node:
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
-			main_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), "", slug)
-		_animate_deck_card_to_zone(slug, gy_node.global_position, gy_node, "add_card_to_slot", false, "", true)
+			main_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), card_uuid, slug)
+		_animate_deck_card_to_zone(slug, card_uuid, gy_node.global_position, gy_node, "add_card_to_slot", false, "", true)
 	update_deck_view()
 	update_deck_state()
 
 func banish_top_fd():
 	if player_deck.size() == 0:
 		return
-	var slug = player_deck[0]
+	var card_data = player_deck[0]
+	var slug = card_data["slug"]
+	var card_uuid = card_data["uuid"]
 	player_deck.remove_at(0)
 	var banish_node = get_tree().current_scene.find_child("BANISH", true, false)
 	if banish_node:
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
-			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), "", slug, true)
-		_animate_deck_card_to_zone(slug, banish_node.global_position, banish_node, "add_card_to_slot", true, "", false)
+			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), card_uuid, slug, true)
+		_animate_deck_card_to_zone(slug, card_uuid, banish_node.global_position, banish_node, "add_card_to_slot", true, "", false)
 	update_deck_view()
 	update_deck_state()
 
 func banish_top_fu():
 	if player_deck.size() == 0:
 		return
-	var slug = player_deck[0]
+	var card_data = player_deck[0]
+	var slug = card_data["slug"]
+	var card_uuid = card_data["uuid"]
 	player_deck.remove_at(0)
 	var banish_node = get_tree().current_scene.find_child("BANISH", true, false)
 	if banish_node:
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
-			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), "", slug, false)
-		_animate_deck_card_to_zone(slug, banish_node.global_position, banish_node, "add_card_to_slot", false, "", true)
+			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), card_uuid, slug, false)
+		_animate_deck_card_to_zone(slug, card_uuid, banish_node.global_position, banish_node, "add_card_to_slot", false, "", true)
 	update_deck_view()
 	update_deck_state()
 
-func _animate_deck_card_to_zone(slug: String, target_pos: Vector2, zone_node: Node, zone_method: String, face_down: bool, _sync_method: String, play_flip: bool = false):
+func _animate_deck_card_to_zone(slug: String, card_uuid: String, target_pos: Vector2, zone_node: Node, zone_method: String, face_down: bool, _sync_method: String, play_flip: bool = false):
 	var card_scene = preload(CARD_SCENE_PATH)
 	var proxy_card = card_scene.instantiate()
+	proxy_card.uuid = card_uuid
 	get_tree().current_scene.add_child(proxy_card)
 	proxy_card.set_meta("slug", slug)
 	proxy_card.global_position = global_position
@@ -232,19 +263,18 @@ func _animate_deck_card_to_zone(slug: String, target_pos: Vector2, zone_node: No
 		if anim_player:
 			anim_player.play("card_flip")
 	tween.set_parallel(false)
-	tween.tween_callback(func():
-		if zone_node.has_method(zone_method):
-			if zone_node.name == "BANISH":
-				zone_node.call(zone_method, proxy_card, face_down)
-			else:
-				zone_node.call(zone_method, proxy_card)
-	)
+	await tween.finished
+	if zone_node.has_method(zone_method):
+		if zone_node.name == "BANISH":
+			zone_node.call(zone_method, proxy_card, face_down)
+		else:
+			zone_node.call(zone_method, proxy_card)
 
 func _on_deck_view_close():
 	deck_view_window.hide()
 	if has_node("Sprite2D"):
 		$Sprite2D.modulate = Color(1, 1, 1, 1)
-	selected_card_slug = ""
+	selected_card_uuid = ""
 
 func shuffle_deck():
 	player_deck.shuffle()
@@ -260,36 +290,60 @@ func update_deck_state():
 		$Sprite2D.visible = false
 		visible = false
 
-func add_to_top(slug: String):
+func add_to_top(slug: String, uuid: String = ""):
 	if slug == "":
 		return
-	player_deck.insert(0, slug)
+	var card_uuid = uuid
+	if card_uuid == "":
+		card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
+	player_deck.insert(0, {"slug": slug, "uuid": card_uuid})
 	update_deck_view()
 	update_deck_state()
 
-func add_to_bottom(slug: String):
+func add_to_bottom(slug: String, uuid: String = ""):
 	if slug == "":
 		return
-	player_deck.append(slug)
+	var card_uuid = uuid
+	if card_uuid == "":
+		card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
+	player_deck.append({"slug": slug, "uuid": card_uuid})
 	update_deck_view()
 	update_deck_state()
 
-func remove_card_by_slug(slug: String):
-	var card_index = player_deck.find(slug)
+func remove_card_by_uuid(target_uuid: String):
+	var card_index = -1
+	for i in range(player_deck.size()):
+		if player_deck[i]["uuid"] == target_uuid:
+			card_index = i
+			break
 	if card_index != -1:
 		player_deck.remove_at(card_index)
 		update_deck_view()
 		update_deck_state()
 
-func draw_card(card_drawn_name):
+func draw_card(card_drawn_name, card_uuid := ""):
 	if player_deck.size() == 0:
 		return
-	player_deck.erase(card_drawn_name)
+	var final_uuid = card_uuid
+	var card_index = -1
+	for i in range(player_deck.size()):
+		if player_deck[i]["slug"] == card_drawn_name:
+			if card_uuid == "" or player_deck[i]["uuid"] == card_uuid:
+				card_index = i
+				if final_uuid == "":
+					final_uuid = player_deck[i]["uuid"]
+				break
+	if card_index != -1:
+		player_deck.remove_at(card_index)
+	else:
+		if final_uuid == "":
+			final_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
 	update_deck_view()
 	if player_deck.size() == 0:
 		update_deck_state()
 	var card_scene = preload(CARD_SCENE_PATH)
 	var new_card = card_scene.instantiate()
+	new_card.uuid = final_uuid
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_drawn_name + ".png"
 	if ResourceLoader.exists(card_image_path):
 		new_card.get_node("CardImage").texture = load(card_image_path)

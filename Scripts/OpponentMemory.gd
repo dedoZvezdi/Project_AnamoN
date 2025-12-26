@@ -2,7 +2,7 @@ extends Node2D
 
 var cards_in_slot: Array = []
 var base_z_index := 0
-var memory_z_index_offset := 10
+var memory_z_index_offset := 0
 var memory_max_z_index := 49
 var is_roulette_running = false
 var roulette_timer: Timer
@@ -16,6 +16,8 @@ var highlighted_card = null
 var roulette_cards = []
 
 func _ready():
+	z_as_relative = false
+	z_index = 0
 	add_to_group("memory_slots")
 	roulette_timer = Timer.new()
 	roulette_timer.wait_time = roulette_speed
@@ -34,6 +36,7 @@ func add_card_to_memory(card):
 		card.set_current_field(self)
 	if card not in cards_in_slot:
 		cards_in_slot.append(card)
+		card.z_index = memory_z_index_offset + cards_in_slot.size()
 	_show_card_back(card)
 	_arrange_cards_symmetrically()
 
@@ -212,3 +215,8 @@ func _clear_current_highlight():
 func reset_card_colors():
 	_clear_current_highlight()
 	highlighted_card = null
+
+func set_all_cards_reveal_status(revealed: bool):
+	for card in cards_in_slot:
+		if card and is_instance_valid(card) and card.has_method("set_opponent_reveal_status"):
+			card.set_opponent_reveal_status(revealed)

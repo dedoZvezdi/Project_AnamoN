@@ -62,6 +62,11 @@ func _process(_delta: float) -> void:
 	if card_being_dragged and is_instance_valid(card_being_dragged):
 		var mouse_pos = get_global_mouse_position()
 		card_being_dragged.global_position = mouse_pos
+		if player_hand_reference:
+			if player_hand_reference.is_mouse_near_hand():
+				player_hand_reference.preview_reorder(mouse_pos.x)
+			else:
+				player_hand_reference.clear_external_preview()
 
 func can_hover_card(card) -> bool:
 	if not card or not is_instance_valid(card):
@@ -161,6 +166,8 @@ func start_drag(card):
 		return
 	_clear_memory_highlights()
 	card_being_dragged = card
+	if player_hand_reference and card in player_hand_reference.player_hand:
+		player_hand_reference.dragging_card_from_hand = card
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.z_index = drag_z_index
 	card.scale = normal_scale
@@ -277,6 +284,11 @@ func finish_drag():
 		if player_hand_reference:
 			player_hand_reference.add_card_to_hand(card_being_dragged)
 			card_being_dragged.z_index = base_z_index
+	if card_being_dragged and player_hand_reference:
+		if player_hand_reference.dragging_card_from_hand == card_being_dragged:
+			player_hand_reference.dragging_card_from_hand = null
+			player_hand_reference.update_hand_position()
+		player_hand_reference.clear_external_preview()
 	card_being_dragged = null
 	call_deferred("force_hover_check")
 
