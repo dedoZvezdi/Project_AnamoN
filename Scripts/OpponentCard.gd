@@ -86,22 +86,46 @@ func get_uuid() -> String:
 
 func set_opponent_reveal_status(revealed: bool):
 	is_revealed_by_opponent = revealed
-	var anim_player = get_node_or_null("AnimationPlayer")
-	if anim_player and anim_player.has_animation("card_flip"):
-		anim_player.play("card_flip")
-		var length = anim_player.get_animation("card_flip").length
-		await get_tree().create_timer(length / 2.0).timeout
-		_update_card_visuals(revealed)
-	else:
-		_update_card_visuals(revealed)
-
-func _update_card_visuals(revealed: bool):
 	var front = get_node_or_null("CardImage")
 	var back = get_node_or_null("CardImageBack")
-	
-	if revealed:
-		if front: front.visible = true
-		if back: back.visible = false
+	if not front or not back:
+		if revealed:
+			if front: front.visible = true
+			if back: back.visible = false
+		else:
+			if front: front.visible = false
+			if back: back.visible = true
+		return
+	var is_already_revealed = front.visible and not back.visible
+	var is_already_hidden = not front.visible and back.visible
+	if revealed and is_already_revealed:
+		return
+	if not revealed and is_already_hidden:
+		return
+	var anim_player = get_node_or_null("AnimationPlayer")
+	if anim_player and anim_player.has_animation("card_flip"):
+		front.visible = true
+		back.visible = true
+		if revealed:
+			back.z_index = 0
+			front.z_index = -1
+		else:
+			front.z_index = 0
+			back.z_index = -1
+		anim_player.play("card_flip")
+		var timer = get_tree().create_timer(0.1)
+		timer.timeout.connect(func():
+			if revealed:
+				front.visible = true
+				back.visible = false
+			else:
+				front.visible = false
+				back.visible = true
+		)
 	else:
-		if front: front.visible = false
-		if back: back.visible = true
+		if revealed:
+			front.visible = true
+			back.visible = false
+		else:
+			front.visible = false
+			back.visible = true

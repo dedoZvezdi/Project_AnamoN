@@ -101,10 +101,10 @@ func create_card_display(card_name: String, card_uuid: String):
 	card_display.set_meta("slug", card_name)
 	card_display.set_meta("uuid", card_uuid)
 	card_display.set_meta("zone", "ga_deck")
-	card_display.request_popup_menu.connect(_on_card_display_popup_menu_v2)
+	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
 	return card_display
 
-func _on_card_display_popup_menu_v2(_slug, card_uuid):
+func _on_card_display_popup_menu(_slug, card_uuid):
 	selected_card_uuid = card_uuid
 	var popup_menu = $DeckViewWindow/PopupMenu
 	popup_menu.clear()
@@ -170,7 +170,9 @@ func draw_to_memory():
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
 			main_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), card_uuid, slug)
-		_animate_deck_card_to_zone(slug, card_uuid, memory_node.global_position, memory_node, "add_card_to_memory", true, "", false)
+		var final_position = memory_node.calculate_final_position_for_new_card()
+		memory_node.arrange_cards_symmetrically(true)
+		_animate_deck_card_to_zone(slug, card_uuid, final_position, memory_node, "add_card_to_memory", true, "", false)
 	update_deck_view()
 	update_deck_state()
 	selected_card_uuid = ""
@@ -267,6 +269,8 @@ func _animate_deck_card_to_zone(slug: String, card_uuid: String, target_pos: Vec
 	if zone_node.has_method(zone_method):
 		if zone_node.name == "BANISH":
 			zone_node.call(zone_method, proxy_card, face_down)
+		elif zone_node.name == "MEMORY":
+			zone_node.call(zone_method, proxy_card, true)
 		else:
 			zone_node.call(zone_method, proxy_card)
 

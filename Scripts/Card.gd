@@ -222,12 +222,12 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						popup_menu.add_item("Show", 10)
 					else:
 						popup_menu.add_item("Hide", 11)
-					var all_revealed = _are_all_memory_cards_revealed()
-					if all_revealed:
-						popup_menu.add_item("Hide All", 13)
-					else:
+					var has_hidden = _has_hidden_memory_cards()
+					var has_revealed = _has_revealed_memory_cards()
+					if has_hidden:
 						popup_menu.add_item("Show All", 12)
-				
+					if has_revealed:
+						popup_menu.add_item("Hide All", 13)
 				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
 					popup_menu.add_item("Banish Face Down", 1)
 					popup_menu.add_item("Go to Top Deck", 2)
@@ -862,12 +862,75 @@ func _are_all_memory_cards_revealed() -> bool:
 			return false
 	return true
 
+func _has_hidden_memory_cards() -> bool:
+	var memory_slot = find_parent_memory_slot()
+	if not memory_slot:
+		return false
+	for card in memory_slot.cards_in_slot:
+		var is_revealed = false
+		if card.has_method("get") and card.get("is_publicly_revealed") != null:
+			is_revealed = card.is_publicly_revealed
+		elif card.has_meta("is_publicly_revealed"):
+			is_revealed = card.get_meta("is_publicly_revealed")
+		if not is_revealed:
+			return true
+	return false
+
+func _has_revealed_memory_cards() -> bool:
+	var memory_slot = find_parent_memory_slot()
+	if not memory_slot:
+		return false
+	for card in memory_slot.cards_in_slot:
+		var is_revealed = false
+		if card.has_method("get") and card.get("is_publicly_revealed") != null:
+			is_revealed = card.is_publicly_revealed
+		elif card.has_meta("is_publicly_revealed"):
+			is_revealed = card.get_meta("is_publicly_revealed")
+		if is_revealed:
+			return true
+	return false
+
 func _update_local_card_visuals(revealed: bool):
 	var front = get_node_or_null("CardImage")
 	var back = get_node_or_null("CardImageBack")
-	if revealed:
-		if front: front.visible = true
-		if back: back.visible = false
+	if not front or not back:
+		if revealed:
+			if front: front.visible = true
+			if back: back.visible = false
+		else:
+			if front: front.visible = false
+			if back: back.visible = true
+		return
+	var is_already_revealed = front.visible and not back.visible
+	var is_already_hidden = not front.visible and back.visible
+	if revealed and is_already_revealed:
+		return
+	if not revealed and is_already_hidden:
+		return
+	var anim_player = get_node_or_null("AnimationPlayer")
+	if anim_player and anim_player.has_animation("card_flip"):
+		front.visible = true
+		back.visible = true
+		if revealed:
+			back.z_index = 0
+			front.z_index = -1
+		else:
+			front.z_index = 0
+			back.z_index = -1
+		anim_player.play("card_flip")
+		var timer = get_tree().create_timer(0.1)
+		timer.timeout.connect(func():
+			if revealed:
+				front.visible = true
+				back.visible = false
+			else:
+				front.visible = false
+				back.visible = true
+		)
 	else:
-		if front: front.visible = false
-		if back: back.visible = true
+		if revealed:
+			front.visible = true
+			back.visible = false
+		else:
+			front.visible = false
+			back.visible = true
