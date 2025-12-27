@@ -309,6 +309,35 @@ func sync_move_to_banish(player_id: int, uuid: String, slug: String, face_down: 
 					opp_banish.add_card_to_slot(c, face_down)
 
 @rpc("any_peer", "reliable")
+func sync_banish_flip(player_id: int, uuid: String, is_face_down: bool):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return
+	var c = _find_opponent_card_by_uuid(opp_field, uuid)
+	if c:
+		c.set_meta("is_face_down", is_face_down)
+		var front = c.get_node_or_null("CardImage")
+		var back = c.get_node_or_null("CardImageBack")
+		if front and back:
+			if is_face_down:
+				front.visible = false
+				back.visible = true
+				back.z_index = 0
+				front.z_index = -1
+			else:
+				front.visible = true
+				back.visible = false
+				back.z_index = -1
+				front.z_index = 0
+		var opp_banish = opp_field.get_node_or_null("OpponentBanish")
+		if opp_banish and opp_banish.has_method("update_deck_view"):
+			if opp_banish.has_node("BanishViewWindow") and opp_banish.get_node("BanishViewWindow").visible:
+				opp_banish.update_deck_view()
+
+@rpc("any_peer", "reliable")
 func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Vector2, rot_deg: float):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:

@@ -84,14 +84,21 @@ func _on_banish_view_popup_menu_pressed(id):
 		2: go_to_bottom_deck()
 
 func flip_card():
-	if selected_card_slug == "":
+	if selected_card_slug == "" and selected_card_uuid == "":
 		return
-	var target_card = null
-	for card in cards_in_banish:
-		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
-		if card_slug == selected_card_slug:
-			target_card = card
-			break
+	var target_card: Node = null
+	if selected_card_uuid != "":
+		for card in cards_in_banish:
+			var c_uuid = card.uuid if "uuid" in card else ""
+			if c_uuid == selected_card_uuid:
+				target_card = card
+				break
+	if not target_card:
+		for card in cards_in_banish:
+			var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+			if card_slug == selected_card_slug:
+				target_card = card
+				break
 	if not target_card:
 		return
 	var card_image = target_card.get_node_or_null("CardImage")
@@ -102,9 +109,13 @@ func flip_card():
 		show_card_back(target_card)
 	else:
 		show_card_front(target_card)
+	var uuid_to_send = target_card.uuid if "uuid" in target_card else selected_card_uuid
+	var is_face_down: bool = target_card.has_meta("is_face_down") and target_card.get_meta("is_face_down") == true
+	_sync_banish_flip(uuid_to_send, is_face_down)
 	if banish_view_window.visible:
 		update_deck_view()
 	selected_card_slug = ""
+	selected_card_uuid = ""
 
 func go_to_top_deck():
 	if selected_card_slug == "":
@@ -168,6 +179,11 @@ func _sync_move_to_deck(uuid: String, is_top: bool):
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_move_to_deck", multiplayer.get_unique_id(), uuid, is_top)
+
+func _sync_banish_flip(uuid: String, is_face_down: bool):
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_banish_flip", multiplayer.get_unique_id(), uuid, is_face_down)
 
 func animate_card_to_deck_from_banish(card, deck_position: Vector2, slug: String, card_uuid: String, is_top: bool):
 	remove_card_from_slot(card)
