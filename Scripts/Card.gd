@@ -217,17 +217,18 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
 			else:
-				if is_in_memory_slot():
+				if is_in_memory_slot() or is_in_hand():
 					if not is_publicly_revealed:
 						popup_menu.add_item("Show", 10)
 					else:
 						popup_menu.add_item("Hide", 11)
-					var has_hidden = _has_hidden_memory_cards()
-					var has_revealed = _has_revealed_memory_cards()
-					if has_hidden:
-						popup_menu.add_item("Show All", 12)
-					if has_revealed:
-						popup_menu.add_item("Hide All", 13)
+					if is_in_memory_slot():
+						var has_hidden = _has_hidden_cards_in_container()
+						var has_revealed = _has_revealed_cards_in_container()
+						if has_hidden:
+							popup_menu.add_item("Show All", 12)
+						if has_revealed:
+							popup_menu.add_item("Hide All", 13)
 				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
 					popup_menu.add_item("Banish Face Down", 1)
 					popup_menu.add_item("Go to Top Deck", 2)
@@ -469,6 +470,8 @@ func on_drag_start():
 
 func on_drag_end():
 	is_dragging = false
+	if is_in_hand() and current_field and current_field.has_method("sync_hand_order"):
+		current_field.sync_hand_order()
 
 func set_current_field(field):
 	if is_token() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
@@ -795,21 +798,25 @@ func sync_stats_to_opponent():
 		multiplayer_node.rpc("sync_card_stats_v2", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters, current_direction)
 
 func reveal_to_opponent():
-	if not is_in_memory_slot() or is_publicly_revealed:
+	if (not is_in_memory_slot() and not is_in_hand()) or is_publicly_revealed:
 		return
 	is_publicly_revealed = true
+	if is_in_hand():
+		var parent = find_parent_container()
+		if parent and parent.has_method("sync_hand_order"):
+			parent.sync_hand_order()
 	_update_local_card_visuals(true)
 	sync_reveal_state(true)
 
 func hide_from_opponent():
-	if not is_in_memory_slot() or not is_publicly_revealed:
+	if (not is_in_memory_slot() and not is_in_hand()) or not is_publicly_revealed:
 		return
 	is_publicly_revealed = false
 	_update_local_card_visuals(false)
 	sync_reveal_state(false)
 
 func reveal_all_in_memory():
-	var memory_slot = find_parent_memory_slot()
+	var memory_slot = find_parent_container()
 	if memory_slot:
 		for card in memory_slot.cards_in_slot:
 			if card.has_method("_update_local_card_visuals"):
@@ -818,7 +825,7 @@ func reveal_all_in_memory():
 		sync_all_reveal_state(true)
 
 func hide_all_in_memory():
-	var memory_slot = find_parent_memory_slot()
+	var memory_slot = find_parent_container()
 	if memory_slot:
 		for card in memory_slot.cards_in_slot:
 			if card.has_method("_update_local_card_visuals"):
@@ -826,14 +833,20 @@ func hide_all_in_memory():
 				card._update_local_card_visuals(false)
 		sync_all_reveal_state(false)
 
-func find_parent_memory_slot():
+func find_parent_container():
 	var p = get_parent()
-	if p and p.is_in_group("memory_slots") and not p.name.contains("Opponent"):
-		return p
+	if p:
+		if (p.is_in_group("memory_slots") or p.is_in_group("player_hand")) and not p.name.contains("Opponent"):
+			return p
+	var hand_nodes = get_tree().get_nodes_in_group("player_hand")
+	for node in hand_nodes:
+		if not node.name.contains("Opponent"):
+			if "player_hand" in node and self in node.player_hand:
+				return node
 	var memory_nodes = get_tree().get_nodes_in_group("memory_slots")
 	for node in memory_nodes:
 		if not node.name.contains("Opponent"):
-			if self in node.cards_in_slot:
+			if "cards_in_slot" in node and self in node.cards_in_slot:
 				return node
 	return null
 
@@ -848,7 +861,7 @@ func sync_all_reveal_state(revealed: bool):
 		main_node.rpc("rpc_set_all_cards_reveal_status", multiplayer.get_unique_id(), revealed)
 
 func _are_all_memory_cards_revealed() -> bool:
-	var memory_slot = find_parent_memory_slot()
+	var memory_slot = find_parent_container()
 	if not memory_slot:
 		return false
 	for card in memory_slot.cards_in_slot:
@@ -862,11 +875,16 @@ func _are_all_memory_cards_revealed() -> bool:
 			return false
 	return true
 
-func _has_hidden_memory_cards() -> bool:
-	var memory_slot = find_parent_memory_slot()
-	if not memory_slot:
+func _has_hidden_cards_in_container() -> bool:
+	var container = find_parent_container()
+	if not container:
 		return false
-	for card in memory_slot.cards_in_slot:
+	var cards = []
+	if "cards_in_slot" in container:
+		cards = container.cards_in_slot
+	elif "player_hand" in container:
+		cards = container.player_hand
+	for card in cards:
 		var is_revealed = false
 		if card.has_method("get") and card.get("is_publicly_revealed") != null:
 			is_revealed = card.is_publicly_revealed
@@ -876,11 +894,16 @@ func _has_hidden_memory_cards() -> bool:
 			return true
 	return false
 
-func _has_revealed_memory_cards() -> bool:
-	var memory_slot = find_parent_memory_slot()
-	if not memory_slot:
+func _has_revealed_cards_in_container() -> bool:
+	var container = find_parent_container()
+	if not container:
 		return false
-	for card in memory_slot.cards_in_slot:
+	var cards = []
+	if "cards_in_slot" in container:
+		cards = container.cards_in_slot
+	elif "player_hand" in container:
+		cards = container.player_hand
+	for card in cards:
 		var is_revealed = false
 		if card.has_method("get") and card.get("is_publicly_revealed") != null:
 			is_revealed = card.is_publicly_revealed
@@ -894,7 +917,12 @@ func _update_local_card_visuals(revealed: bool):
 	var front = get_node_or_null("CardImage")
 	var back = get_node_or_null("CardImageBack")
 	if not front or not back:
-		if revealed:
+		var show_front = revealed
+		if is_in_hand() and revealed:
+			show_front = false
+		elif is_in_hand() and not revealed:
+			show_front = true
+		if show_front:
 			if front: front.visible = true
 			if back: back.visible = false
 		else:
@@ -903,32 +931,45 @@ func _update_local_card_visuals(revealed: bool):
 		return
 	var is_already_revealed = front.visible and not back.visible
 	var is_already_hidden = not front.visible and back.visible
-	if revealed and is_already_revealed:
+	var target_show_front = revealed
+	var target_show_back = not revealed
+	if is_in_hand():
+		if revealed:
+			target_show_front = false
+			target_show_back = true
+		else:
+			target_show_front = true
+			target_show_back = false
+	if target_show_front and is_already_revealed:
 		return
-	if not revealed and is_already_hidden:
+	if target_show_back and is_already_hidden:
 		return
 	var anim_player = get_node_or_null("AnimationPlayer")
 	if anim_player and anim_player.has_animation("card_flip"):
 		front.visible = true
 		back.visible = true
-		if revealed:
-			back.z_index = 0
-			front.z_index = -1
-		else:
+		if target_show_back:
 			front.z_index = 0
 			back.z_index = -1
+		else:
+			back.z_index = 0
+			front.z_index = -1
 		anim_player.play("card_flip")
 		var timer = get_tree().create_timer(0.1)
 		timer.timeout.connect(func():
-			if revealed:
+			if target_show_front:
 				front.visible = true
 				back.visible = false
+				front.z_index = 0
+				back.z_index = -1
 			else:
 				front.visible = false
 				back.visible = true
+				back.z_index = 0
+				front.z_index = -1
 		)
 	else:
-		if revealed:
+		if target_show_front:
 			front.visible = true
 			back.visible = false
 		else:
