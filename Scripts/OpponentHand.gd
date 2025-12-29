@@ -76,6 +76,7 @@ func update_hand_position():
 			card.hand_position = new_position
 			card.z_index = int(HAND_Z_INDEX + i + 1)
 			animate_card_to_position(card, new_position, new_rotation)
+	call_deferred("enforce_z_ordering")
 
 func calculate_card_position(index):
 	var hand_size = opponent_hand.size()
@@ -220,6 +221,7 @@ func organise_cards(cards: Array) -> void:
 	for card in cards:
 		if card and is_instance_valid(card):
 			opponent_hand.append(card)
+			connect_card_signals(card)
 	update_hand_position()
 
 func set_hand_field_width(new_width: float):
@@ -228,6 +230,15 @@ func set_hand_field_width(new_width: float):
 	hand_field_right = center_screen_x + HAND_FIELD_WIDTH / 2
 	if not opponent_hand.is_empty():
 		update_hand_position()
+		
+func enforce_z_ordering():
+	validate_hand()
+	for i in range(opponent_hand.size()):
+		var card = opponent_hand[i]
+		if card and is_instance_valid(card):
+			if card == hovered_card:
+				continue
+			card.z_index = int(HAND_Z_INDEX + i + 1)
 
 func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):
@@ -329,9 +340,86 @@ func validate_hand():
 		opponent_hand.erase(invalid_card)
 
 func disconnect_card_signals(card):
-	if not card or not is_instance_valid(card) or not card.has_node("Area2D"):
+	if not card or not is_instance_valid(card):
 		return
-		
+	if card.visuals_changed.is_connected(_on_card_visuals_changed):
+		card.visuals_changed.disconnect(_on_card_visuals_changed)
+
+func connect_card_signals(card):
+	if not card.visuals_changed.is_connected(_on_card_visuals_changed):
+		card.visuals_changed.connect(_on_card_visuals_changed.bind(card))
+
+func _on_card_visuals_changed(_card):
+	call_deferred("enforce_z_ordering")
+func reorder_by_uuids(uuid_list: Array):
+	uuid_list.reverse()
+	var revealed_map = {}
+	var hidden_pool = []
+	var hidden_map = {}
+	for card in opponent_hand:
+		if not card or not is_instance_valid(card):
+			continue
+		var is_revealed = false
+		if card.get("is_revealed_by_opponent") == true:
+			is_revealed = true
+		if is_revealed:
+			revealed_map[card.uuid] = card
+		else:
+			hidden_pool.append(card)
+			hidden_map[card.uuid] = card
+	var new_hand = []
+	new_hand.resize(uuid_list.size())
+	for i in range(uuid_list.size()):
+		var target_uuid = uuid_list[i]
+		if target_uuid in revealed_map:
+			new_hand[i] = revealed_map[target_uuid]
+	var pool_index = 0
+	for i in range(new_hand.size()):
+		if new_hand[i] == null:
+			if pool_index < hidden_pool.size():
+				new_hand[i] = hidden_pool[pool_index]
+				pool_index += 1
+			else:
+				pass
+	for i in range(new_hand.size()):
+		var visual_card = new_hand[i]
+		var target_uuid = uuid_list[i]
+		if visual_card and visual_card.uuid != target_uuid:
+			if target_uuid in hidden_map:
+				var data_source_card = hidden_map[target_uuid]
+				swap_card_data(visual_card, data_source_card)
+				hidden_map[visual_card.uuid] = visual_card
+				hidden_map[data_source_card.uuid] = data_source_card
+	for i in range(pool_index, hidden_pool.size()):
+		new_hand.append(hidden_pool[i])
+	opponent_hand = new_hand
+	update_hand_position()
+	call_deferred("enforce_z_ordering")
+
+func swap_card_data(card1, card2):
+	var temp_uuid = card1.uuid
+	card1.uuid = card2.uuid
+	card2.uuid = temp_uuid
+	var slug1 = card1.get_meta("slug") if card1.has_meta("slug") else ""
+	var slug2 = card2.get_meta("slug") if card2.has_meta("slug") else ""
+	card1.set_meta("slug", slug2)
+	card2.set_meta("slug", slug1)
+	var temp_mods = card1.runtime_modifiers
+	card1.runtime_modifiers = card2.runtime_modifiers
+	card2.runtime_modifiers = temp_mods
+	var temp_markers = card1.attached_markers
+	card1.attached_markers = card2.attached_markers
+	card2.attached_markers = temp_markers
+	var temp_counters = card1.attached_counters
+	card1.attached_counters = card2.attached_counters
+	card2.attached_counters = temp_counters
+	var front1 = card1.get_node_or_null("CardImage")
+	var front2 = card2.get_node_or_null("CardImage")
+	if front1 and front2:
+		var temp_tex = front1.texture
+		front1.texture = front2.texture
+		front2.texture = temp_tex
+	
 func cleanup():
 	for tween in active_tween_objects:
 		if tween and tween.is_valid():

@@ -448,3 +448,17 @@ func cleanup():
 	player_hand.clear()
 	active_tweens = 0
 	animation_in_progress = false
+
+func sync_hand_order():
+	var has_revealed = false
+	var uuid_list = []
+	for card in player_hand:
+		if card and is_instance_valid(card):
+			if "uuid" in card:
+				uuid_list.append(card.uuid)
+			if card.get("is_publicly_revealed") == true:
+				has_revealed = true
+	if has_revealed:
+		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+		if multiplayer_node and multiplayer_node.has_method("rpc"):
+			multiplayer_node.rpc("rpc_sync_hand_order", multiplayer.get_unique_id(), uuid_list)

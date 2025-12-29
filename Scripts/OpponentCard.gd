@@ -2,6 +2,7 @@ extends Node2D
 
 signal hovered
 signal hovered_off
+signal visuals_changed
 
 var hand_position
 var mouse_inside = false
@@ -49,12 +50,13 @@ func _on_area_2d_mouse_exited() -> void:
 	emit_signal("hovered_off", self)
 
 func _is_card_in_restricted_zones() -> bool:
+	if is_revealed_by_opponent:
+		return false
 	var opponent_hand_nodes = get_tree().get_nodes_in_group("opponent_hand")
 	for hand_node in opponent_hand_nodes:
 		if hand_node.has_method("has_cards"):
 			if self in hand_node.opponent_hand:
 				return true
-	
 	var opponent_memory_nodes = get_tree().get_nodes_in_group("memory_slots")
 	for memory_node in opponent_memory_nodes:
 		if memory_node.name.contains("Opponent"):
@@ -62,6 +64,8 @@ func _is_card_in_restricted_zones() -> bool:
 				if is_revealed_by_opponent:
 					return false
 				return true
+	if is_revealed_by_opponent:
+		return false
 	return false
 
 func is_in_main_field() -> bool:
@@ -86,6 +90,14 @@ func get_uuid() -> String:
 
 func set_opponent_reveal_status(revealed: bool):
 	is_revealed_by_opponent = revealed
+	if mouse_inside:
+		if revealed:
+			if not _is_card_in_restricted_zones():
+				emit_signal("hovered", self)
+				if card_information_reference:
+					card_information_reference.show_card_preview(self)
+		else:
+			emit_signal("hovered_off", self)
 	var front = get_node_or_null("CardImage")
 	var back = get_node_or_null("CardImageBack")
 	if not front or not back:
@@ -121,6 +133,7 @@ func set_opponent_reveal_status(revealed: bool):
 			else:
 				front.visible = false
 				back.visible = true
+			emit_signal("visuals_changed")
 		)
 	else:
 		if revealed:
@@ -129,3 +142,4 @@ func set_opponent_reveal_status(revealed: bool):
 		else:
 			front.visible = false
 			back.visible = true
+		emit_signal("visuals_changed")

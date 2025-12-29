@@ -734,3 +734,14 @@ func _find_opponent_card_by_uuid(root_node, target_uuid):
 		if res:
 			return res
 	return null
+
+@rpc("any_peer", "reliable")
+func rpc_sync_hand_order(player_id: int, uuid_list: Array):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		var opp_hand = opp_field.get_node_or_null("OpponentHand")
+		if opp_hand and opp_hand.has_method("reorder_by_uuids"):
+			opp_hand.reorder_by_uuids(uuid_list)
