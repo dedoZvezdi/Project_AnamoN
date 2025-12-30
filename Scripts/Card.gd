@@ -948,25 +948,15 @@ func _update_local_card_visuals(revealed: bool):
 	if anim_player and anim_player.has_animation("card_flip"):
 		front.visible = true
 		back.visible = true
-		if target_show_back:
-			front.z_index = 0
-			back.z_index = -1
-		else:
-			back.z_index = 0
-			front.z_index = -1
 		anim_player.play("card_flip")
 		var timer = get_tree().create_timer(0.1)
 		timer.timeout.connect(func():
 			if target_show_front:
 				front.visible = true
 				back.visible = false
-				front.z_index = 0
-				back.z_index = -1
 			else:
 				front.visible = false
 				back.visible = true
-				back.z_index = 0
-				front.z_index = -1
 		)
 	else:
 		if target_show_front:

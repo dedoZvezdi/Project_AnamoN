@@ -203,13 +203,14 @@ func start_drag(card):
 		last_hovered_card = null
 
 func finish_drag():
-	if not card_being_dragged or not is_instance_valid(card_being_dragged):
+	var card = card_being_dragged
+	if not card or not is_instance_valid(card):
 		card_being_dragged = null
 		return
 	_clear_memory_highlights()
-	free_card_from_slot(card_being_dragged)
-	if card_being_dragged.has_method("on_drag_end"):
-		card_being_dragged.on_drag_end()
+	free_card_from_slot(card)
+	if card.has_method("on_drag_end"):
+		card.on_drag_end()
 	var card_slot_found = raycast_check_for_card_single_slot()
 	if card_slot_found:
 		if dragged_from_grid:
@@ -218,61 +219,68 @@ func finish_drag():
 			original_slug = ""
 			original_zone = ""
 			original_card_display = null
-		if player_hand_reference and card_being_dragged in player_hand_reference.player_hand:
-			player_hand_reference.remove_card_from_hand(card_being_dragged)
+		if player_hand_reference and card in player_hand_reference.player_hand:
+			player_hand_reference.remove_card_from_hand(card)
+		if (card_slot_found.name == "MEMORY" or card_slot_found.name == "MAINFIELD"or 
+		card_slot_found.name == "GRAVEYARD" or card_slot_found.name == "BANISH") and \
+		   card.has_method("is_in_hand") and card.is_in_hand() and \
+		   card.get("is_publicly_revealed") == true:
+			card_being_dragged = null 
+			card.hide_from_opponent()
+			await get_tree().create_timer(0.2).timeout
 		if card_slot_found.name == "MEMORY":
-			card_slot_found.add_card_to_memory(card_being_dragged)
-			var slug = get_card_slug(card_being_dragged)
+			card_slot_found.add_card_to_memory(card)
+			var slug = get_card_slug(card)
 			if slug != "":
-				var uuid = get_card_uuid(card_being_dragged)
+				var uuid = get_card_uuid(card)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node and not card_being_dragged.is_token():
+				if multiplayer_node and not card.is_token():
 					multiplayer_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), uuid, slug)
-			card_being_dragged.scale = normal_scale
-			card_being_dragged.z_index = base_z_index
+			card.scale = normal_scale
+			card.z_index = base_z_index
 		elif card_slot_found.name == "MAINFIELD":
 			var is_first_card = card_slot_found.cards_in_field.is_empty()
 			var drop_position = null
 			if not is_first_card:
-				drop_position = card_being_dragged.global_position
-			card_slot_found.add_card_to_field(card_being_dragged, drop_position)
-			var slug = get_card_slug(card_being_dragged)
+				drop_position = card.global_position
+			card_slot_found.add_card_to_field(card, drop_position)
+			var slug = get_card_slug(card)
 			if slug != "":
-				var uuid = get_card_uuid(card_being_dragged)
-				var pos = card_being_dragged.global_position
-				var rot = card_being_dragged.rotation_degrees
+				var uuid = get_card_uuid(card)
+				var pos = card.global_position
+				var rot = card.rotation_degrees
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node:
 					multiplayer_node.rpc("sync_move_to_main_field", multiplayer.get_unique_id(), uuid, slug, pos, rot)
-			card_being_dragged.scale = normal_scale
-			card_being_dragged.z_index = base_z_index
-		elif card_slot_found.name == "CardsSlotForSignleCard" or card_slot_found.name == "GRAVEYARD":
-			card_slot_found.add_card_to_slot(card_being_dragged)
-			var slug = get_card_slug(card_being_dragged)
+			card.scale = normal_scale
+			card.z_index = base_z_index
+		elif card_slot_found.name == "GRAVEYARD":
+			card_slot_found.add_card_to_slot(card)
+			var slug = get_card_slug(card)
 			if slug != "":
-				var uuid = get_card_uuid(card_being_dragged)
+				var uuid = get_card_uuid(card)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node and not card_being_dragged.is_token():
+				if multiplayer_node and not card.is_token():
 					multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug)
-			card_being_dragged.scale = normal_scale
-			card_being_dragged.z_index = base_z_index
-		elif card_slot_found.name == "90DegreesCardSlot" or card_slot_found.name == "BANISH":
+			card.scale = normal_scale
+			card.z_index = base_z_index
+		elif card_slot_found.name == "BANISH":
 			var face_down := false
-			if card_being_dragged.has_meta("banish_face_down"):
-				face_down = card_being_dragged.get_meta("banish_face_down") == true
-			card_slot_found.add_card_to_slot(card_being_dragged, face_down)
-			var slug = get_card_slug(card_being_dragged)
+			if card.has_meta("banish_face_down"):
+				face_down = card.get_meta("banish_face_down") == true
+			card_slot_found.add_card_to_slot(card, face_down)
+			var slug = get_card_slug(card)
 			if slug != "":
-				var uuid = get_card_uuid(card_being_dragged)
+				var uuid = get_card_uuid(card)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node and not card_being_dragged.is_token():
+				if multiplayer_node and not card.is_token():
 					multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, face_down)
-			if card_being_dragged.has_meta("banish_face_down"):
-				card_being_dragged.set_meta("banish_face_down", false)
-			card_being_dragged.scale = normal_scale
-			card_being_dragged.z_index = base_z_index
+			if card.has_meta("banish_face_down"):
+				card.set_meta("banish_face_down", false)
+			card.scale = normal_scale
+			card.z_index = base_z_index
 		else:
-			card_being_dragged.z_index = base_z_index + card_counter
+			card.z_index = base_z_index + card_counter
 			card_counter += 1
 	else:
 		if dragged_from_grid:
@@ -282,10 +290,10 @@ func finish_drag():
 			original_zone = ""
 			original_card_display = null
 		if player_hand_reference:
-			player_hand_reference.add_card_to_hand(card_being_dragged)
-			card_being_dragged.z_index = base_z_index
-	if card_being_dragged and player_hand_reference:
-		if player_hand_reference.dragging_card_from_hand == card_being_dragged:
+			player_hand_reference.add_card_to_hand(card)
+			card.z_index = base_z_index
+	if card and player_hand_reference:
+		if player_hand_reference.dragging_card_from_hand == card:
 			player_hand_reference.dragging_card_from_hand = null
 			player_hand_reference.update_hand_position()
 		player_hand_reference.clear_external_preview()

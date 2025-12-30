@@ -142,7 +142,9 @@ func _arrange_cards_symmetrically():
 		var card = cards_in_slot[i]
 		if card and is_instance_valid(card):
 			var tween = create_tween()
+			tween.set_parallel(true)
 			tween.tween_property(card, "global_position", target, 0.3)
+			tween.tween_property(card, "rotation", 0.0, 0.3)
 			card.z_index = memory_z_index_offset + i + 1
 
 func start_synced_roulette(target_index: int, total_time: float):
