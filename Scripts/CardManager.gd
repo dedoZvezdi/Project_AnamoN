@@ -92,6 +92,17 @@ func can_hover_card(card) -> bool:
 func can_drag_card(card) -> bool:
 	if not card or not is_instance_valid(card):
 		return false
+	var space_state = get_world_2d().direct_space_state
+	if space_state:
+		var parameters = PhysicsPointQueryParameters2D.new()
+		parameters.position = get_global_mouse_position()
+		parameters.collide_with_areas = true
+		parameters.collision_mask = COLLISION_MASK_CARD
+		parameters.collide_with_bodies = false
+		var result = space_state.intersect_point(parameters)
+		for collision in result:
+			if collision.collider.get_parent().name == "Crystal":
+				return false
 	if is_card_in_memory_slot(card):
 		var memory_slot = get_memory_slot_for_card(card)
 		if memory_slot and memory_slot.has_method("are_cards_blocked") and memory_slot.are_cards_blocked():
@@ -430,6 +441,9 @@ func raycast_check_at_position(pos):
 	parameters.collide_with_bodies = false
 	var result = space_state.intersect_point(parameters)
 	if result.size() > 0:
+		for collision in result:
+			if collision.collider.get_parent().name == "Crystal":
+				return null
 		var highest_card = null
 		var highest_z_index = -9999
 		for collision in result:

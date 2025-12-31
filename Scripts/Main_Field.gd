@@ -19,7 +19,26 @@ func add_card_to_field(card, position = null):
 	if is_champion_card(card):
 		var card_already_in_field = card in cards_in_field
 		if not card_already_in_field:
+			var inherit_source = current_champion_card
+			if inherit_source == null:
+				for c in cards_in_field:
+					if c != card and not is_mastery_card(c) and "champion_lineage" in c:
+						if c.champion_lineage.size() > 0:
+							inherit_source = c
+							break
+			if inherit_source != null and inherit_source != card:
+				if "champion_lineage" in inherit_source:
+					var old_lineage = inherit_source.champion_lineage
+					for entry in old_lineage:
+						if card.has_method("add_to_lineage"):
+							card.add_to_lineage(entry)
 			if current_champion_card != null and current_champion_card != card:
+				if card.has_method("add_to_lineage"):
+					var lineage_data = {
+						"slug": get_card_slug(current_champion_card),
+						"uuid": current_champion_card.uuid if "uuid" in current_champion_card else ""
+					}
+					card.add_to_lineage(lineage_data)
 				remove_previous_champions()
 			current_champion_card = card
 			cards_in_field.append(card)

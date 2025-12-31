@@ -7,7 +7,12 @@ signal hovered_off
 @onready var area: Area2D = $Area2D
 @onready var card_level_lable = $Level
 @onready var card_PLDS_lable = $PowerLifeDurSpeed
+@onready var crystal_node: Sprite2D = $Crystal
+@onready var crystal_collision: CollisionShape2D = $Crystal/Area2D2/CollisionShape2D
+@onready var banish_view_window = $LineageViewWindow
+@onready var grid_container = $LineageViewWindow/ScrollContainer/GridContainer
 
+var champion_lineage := []
 var was_removed = false
 var current_field = null
 var original_rotation = 0.0
@@ -132,6 +137,14 @@ func _ready() -> void:
 	find_card_information_reference()
 	if card_level_lable:
 		card_level_lable.clear()
+	update_crystal_visibility()
+	if crystal_node and crystal_node.has_node("Area2D2"):
+		var crystal_area_node = crystal_node.get_node("Area2D2")
+		if not crystal_area_node.input_event.is_connected(_on_crystal_input_event):
+			crystal_area_node.input_event.connect(_on_crystal_input_event)
+	if banish_view_window:
+		if not banish_view_window.close_requested.is_connected(_on_lineage_window_close):
+			banish_view_window.close_requested.connect(_on_lineage_window_close)
 
 func find_card_information_reference():
 	var root = get_tree().current_scene
@@ -269,6 +282,43 @@ func _on_area_2d_mouse_exited() -> void:
 	if is_in_main_field():
 		hide_card_info()
 
+func _on_crystal_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if crystal_node and crystal_node.visible:
+			open_lineage_window()
+
+func open_lineage_window():
+	if not banish_view_window or not grid_container:
+		return
+	var children = grid_container.get_children()
+	if children.size() > 0:
+		children[0].visible = false
+	for i in range(1, children.size()):
+		children[i].queue_free()
+	for lineage_data in champion_lineage:
+		var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+		var card_display = card_display_scene.instantiate()
+		card_display.set_meta("slug", lineage_data.get("slug", ""))
+		card_display.set_meta("uuid", lineage_data.get("uuid", ""))
+		card_display.set_meta("zone", "lineage")
+		grid_container.add_child(card_display)
+	banish_view_window.popup_centered()
+
+func _on_lineage_window_close():
+	if banish_view_window:
+		banish_view_window.hide()
+
+func add_to_lineage(lineage_data: Dictionary):
+	champion_lineage.append(lineage_data)
+	update_crystal_visibility()
+
+func remove_from_lineage_by_uuid(target_uuid: String):
+	for i in range(champion_lineage.size() - 1, -1, -1):
+		if champion_lineage[i].get("uuid", "") == target_uuid:
+			champion_lineage.remove_at(i)
+			update_crystal_visibility()
+			break
+
 func transform_card():
 	var slug = get_slug_from_card()
 	if slug == "" or not TRANSFORM_PAIRS.has(slug):
@@ -289,15 +339,25 @@ func transform_card():
 	if is_in_main_field() and current_field:
 		if current_field.has_method("is_champion_card") and current_field.is_champion_card(self):
 			if current_field.current_champion_card and current_field.current_champion_card != self:
+				var prev = current_field.current_champion_card
+				if "champion_lineage" in prev:
+					for entry in prev.champion_lineage:
+						add_to_lineage(entry)
+				var lineage_data = {
+					"slug": current_field.get_card_slug(prev),
+					"uuid": prev.uuid if "uuid" in prev else ""
+				}
+				add_to_lineage(lineage_data)
 				current_field.remove_previous_champions()
 			current_field.current_champion_card = self
-			global_position = current_field.global_position
+			global_position = current_field.global_position + Vector2(0, -20)
 			z_index = 400
 			current_field.champion_life_delta = 0
 			if has_method("apply_champion_life_delta"):
 				apply_champion_life_delta(0)
 	if is_in_main_field():
 		clear_runtime_modifiers()
+	update_crystal_visibility()
 	if card_information_reference and mouse_inside and not is_dragging:
 		hide_card_info()
 		show_card_info()
@@ -493,6 +553,7 @@ func set_current_field(field):
 		is_rotated = false
 		if field != null and not field.is_in_group("rotated_slots"):
 			rotation_degrees = original_rotation
+	update_crystal_visibility()
 
 func is_in_main_field() -> bool:
 	return current_field != null and current_field.is_in_group("main_fields")
@@ -796,6 +857,18 @@ func sync_stats_to_opponent():
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_card_stats_v2", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters, current_direction)
+
+func update_crystal_visibility():
+	if not crystal_node:
+		return
+	var contains_lineage = champion_lineage.size() > 0
+	var should_be_visible = is_champion_card() and is_in_main_field() and contains_lineage
+	crystal_node.visible = should_be_visible
+	if crystal_collision:
+		crystal_collision.set_deferred("disabled", !should_be_visible)
+	if crystal_node.has_node("Area2D2"):
+		var crystal_area = crystal_node.get_node("Area2D2")
+		crystal_area.set_deferred("input_pickable", should_be_visible)
 
 func reveal_to_opponent():
 	if (not is_in_memory_slot() and not is_in_hand()) or is_publicly_revealed:
