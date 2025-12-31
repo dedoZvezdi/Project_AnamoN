@@ -1,7 +1,12 @@
-[gd_scene load_steps=7 format=3 uid="uid://bdq4b32kkn1di"]
+[gd_scene load_steps=10 format=3 uid="uid://bdq4b32kkn1di"]
 
 [ext_resource type="Script" uid="uid://qtrh38o1lpkw" path="res://Scripts/Card.gd" id="1_hael8"]
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="2_3p273"]
+[ext_resource type="Texture2D" uid="uid://c3p6kxcog4c1q" path="res://Assets/Crystal.png" id="3_h8wm0"]
+[ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="4_3m7nw"]
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_h8wm0"]
+points = PackedVector2Array(0, -42.8573, 20, 0, 0, 42.8572, -20, 0)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hael8"]
 size = Vector2(246, 344)
@@ -130,6 +135,20 @@ z_index = -1
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_3p273")
 
+[node name="Crystal" type="Sprite2D" parent="."]
+position = Vector2(135.714, -202.857)
+scale = Vector2(0.159598, 0.159598)
+texture = ExtResource("3_h8wm0")
+
+[node name="Area2D2" type="Area2D" parent="Crystal"]
+position = Vector2(-904.057, 358.042)
+scale = Vector2(6.26573, 6.26573)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Crystal/Area2D2"]
+position = Vector2(144.286, -57.1429)
+scale = Vector2(1, 1)
+shape = SubResource("ConvexPolygonShape2D_h8wm0")
+
 [node name="Level" type="RichTextLabel" parent="."]
 offset_left = -219.231
 offset_top = -171.795
@@ -156,6 +175,26 @@ libraries = {
 
 [node name="PopupMenu" type="PopupMenu" parent="."]
 size = Vector2i(100, 50)
+
+[node name="LineageViewWindow" type="Window" parent="."]
+auto_translate_mode = 1
+size = Vector2i(600, 142)
+visible = false
+unresizable = true
+
+[node name="PopupMenu" type="PopupMenu" parent="LineageViewWindow"]
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LineageViewWindow"]
+offset_right = 600.0
+offset_bottom = 142.0
+
+[node name="GridContainer" type="GridContainer" parent="LineageViewWindow/ScrollContainer"]
+custom_minimum_size = Vector2(600, 142)
+layout_mode = 2
+columns = 1024
+
+[node name="Control" parent="LineageViewWindow/ScrollContainer/GridContainer" instance=ExtResource("4_3m7nw")]
+layout_mode = 2
 
 [connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]

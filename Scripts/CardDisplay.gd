@@ -52,17 +52,22 @@ func _on_mouse_exited():
 
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery"]:
+		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery", "lineage"]:
 			var current_uuid = get_meta("uuid") if has_meta("uuid") else ""
 			emit_signal("request_popup_menu", card_slug, current_uuid)
+			accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed and not is_holding:
 			start_drag_from_grid()
+			accept_event()
 		elif not event.pressed and is_holding:
 			finish_drag_from_grid()
+			accept_event()
 
 func start_drag_from_grid():
 	if is_holding:
+		return
+	if zone == "lineage":
 		return
 	var real_card = create_real_card_for_drag()
 	if real_card:
@@ -73,6 +78,14 @@ func start_drag_from_grid():
 			card_manager.start_drag(real_card)
 			card_manager.set_dragged_from_grid_info(card_slug, zone, self)
 			if zone != "logo_tokens" and zone != "logo_mastery":
+				if zone == "lineage":
+					var owner_node = get_parent()
+					while owner_node != null and not owner_node.has_method("remove_from_lineage_by_uuid"):
+						owner_node = owner_node.get_parent()
+					
+					if owner_node and owner_node.has_method("remove_from_lineage_by_uuid"):
+						var u = get_meta("uuid") if has_meta("uuid") else ""
+						owner_node.remove_from_lineage_by_uuid(u)
 				update_grid_immediately()
 				emit_signal("card_drag_started", self)
 				card_image_path = ""
@@ -94,6 +107,8 @@ func update_grid_immediately():
 		parent_window.update_deck_view()
 
 func get_drag_data(_pos):
+	if zone == "lineage":
+		return null
 	var real_card = create_real_card_for_drag()
 	if real_card:
 		set_drag_preview(real_card)
@@ -105,7 +120,7 @@ func get_drag_data(_pos):
 func create_real_card_for_drag():
 	if card_slug == "":
 		return null
-	var card_scene = preload("res://Scenes/Card.tscn")
+	var card_scene = load("res://Scenes/Card.tscn")
 	var real_card = card_scene.instantiate()
 	if has_meta("uuid"):
 		real_card.uuid = get_meta("uuid")
