@@ -146,7 +146,6 @@ scale = Vector2(6.26573, 6.26573)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Crystal/Area2D2"]
 position = Vector2(144.286, -57.1429)
-scale = Vector2(1, 1)
 shape = SubResource("ConvexPolygonShape2D_h8wm0")
 
 [node name="Level" type="RichTextLabel" parent="."]

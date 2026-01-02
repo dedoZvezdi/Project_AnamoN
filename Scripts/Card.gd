@@ -28,6 +28,8 @@ var attached_markers := {}
 var attached_counters := {}
 var is_publicly_revealed = false
 var current_direction = "North"
+var selected_lineage_card_slug: String = ""
+var selected_lineage_card_uuid: String = ""
 
 const SHIFTING_CURRENTS_SLUGS := ["shifting-currents-p24", "shifting-currents-ambsd"]
 const TRANSFORMABLE_SLUGS := [
@@ -145,6 +147,9 @@ func _ready() -> void:
 	if banish_view_window:
 		if not banish_view_window.close_requested.is_connected(_on_lineage_window_close):
 			banish_view_window.close_requested.connect(_on_lineage_window_close)
+		var lineage_popup_menu = banish_view_window.get_node_or_null("PopupMenu")
+		if lineage_popup_menu and not lineage_popup_menu.id_pressed.is_connected(_on_lineage_popup_menu_pressed):
+			lineage_popup_menu.id_pressed.connect(_on_lineage_popup_menu_pressed)
 
 func find_card_information_reference():
 	var root = get_tree().current_scene
@@ -251,7 +256,8 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						popup_menu.add_item("Awake", 4)
 					else:
 						popup_menu.add_item("Rest", 4)
-				if is_in_main_field():
+					if not is_champion_card() and not is_token() and not is_mastery() and find_champion_on_field() != null:
+						popup_menu.add_item("Move to Lineage", 14)
 					var slug = get_slug_from_card()
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
@@ -301,6 +307,8 @@ func open_lineage_window():
 		card_display.set_meta("slug", lineage_data.get("slug", ""))
 		card_display.set_meta("uuid", lineage_data.get("uuid", ""))
 		card_display.set_meta("zone", "lineage")
+		if not card_display.request_popup_menu.is_connected(_on_lineage_card_display_popup_menu):
+			card_display.request_popup_menu.connect(_on_lineage_card_display_popup_menu)
 		grid_container.add_child(card_display)
 	banish_view_window.popup_centered()
 
@@ -318,6 +326,94 @@ func remove_from_lineage_by_uuid(target_uuid: String):
 			champion_lineage.remove_at(i)
 			update_crystal_visibility()
 			break
+
+func _on_lineage_card_display_popup_menu(slug, card_uuid):
+	selected_lineage_card_slug = slug
+	selected_lineage_card_uuid = card_uuid
+	var lineage_popup_menu = banish_view_window.get_node_or_null("PopupMenu")
+	if lineage_popup_menu:
+		lineage_popup_menu.clear()
+		lineage_popup_menu.add_item("Banish", 0)
+		lineage_popup_menu.popup(Rect2(get_viewport().get_mouse_position(), Vector2(0, 0)))
+
+func _on_lineage_popup_menu_pressed(id):
+	match id:
+		0: banish_lineage_card()
+
+func banish_lineage_card():
+	if selected_lineage_card_slug == "" and selected_lineage_card_uuid == "":
+		return
+	var scene = get_tree().get_current_scene()
+	if scene == null:
+		return
+	var banish_node = scene.find_child("BANISH", true, false)
+	if banish_node == null:
+		return
+	var target_uuid = selected_lineage_card_uuid
+	remove_from_lineage_by_uuid(target_uuid)
+	var card_scene = load("res://Scenes/Card.tscn")
+	var new_card = card_scene.instantiate()
+	new_card.set_meta("slug", selected_lineage_card_slug)
+	if target_uuid != "":
+		new_card.uuid = target_uuid
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + selected_lineage_card_slug + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var card_image = new_card.get_node("CardImage")
+		var card_image_back = new_card.get_node("CardImageBack")
+		card_image.texture = load(card_image_path)
+		card_image.visible = true
+		card_image_back.visible = false
+		card_image.z_index = 0
+	var card_manager = scene.find_child("CardManager", true, false)
+	if card_manager:
+		new_card.global_position = global_position
+		new_card.z_index = 1000
+		card_manager.add_child(new_card)
+		new_card.add_to_group("cards")
+		if card_manager.has_method("connect_card_signals"):
+			card_manager.connect_card_signals(new_card)
+	var target_pos = banish_node.global_position
+	if banish_node.has_node("Area2D/CollisionShape2D"):
+		target_pos = banish_node.get_node("Area2D/CollisionShape2D").global_position
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(new_card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(new_card, "rotation_degrees", 90.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		if banish_node.has_method("add_card_to_slot"):
+			banish_node.add_card_to_slot(new_card, false))
+	if banish_view_window and banish_view_window.visible:
+		open_lineage_window()
+	selected_lineage_card_slug = ""
+	selected_lineage_card_uuid = ""
+
+func move_to_lineage():
+	var champion = find_champion_on_field()
+	if not champion:
+		return
+	var card_slug = get_slug_from_card()
+	var card_uuid = uuid
+	z_index = -1
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "global_position", champion.global_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "rotation_degrees", original_rotation, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		var data = {"slug": card_slug, "uuid": card_uuid}
+		if champion.has_method("add_to_lineage"):
+			champion.add_to_lineage(data)
+		remove_from_current_position())
+
+func find_champion_on_field():
+	var fields = get_tree().get_nodes_in_group("main_fields")
+	for f in fields:
+		if f.has_method("get") and f.get("current_champion_card"):
+			return f.current_champion_card
+		elif "current_champion_card" in f and f.current_champion_card:
+			return f.current_champion_card
+	return null
 
 func transform_card():
 	var slug = get_slug_from_card()
@@ -493,6 +589,7 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		11: hide_from_opponent()
 		12: reveal_all_in_memory()
 		13: hide_all_in_memory()
+		14: move_to_lineage()
 		20: set_direction("North")
 		21: set_direction("East")
 		22: set_direction("South")
