@@ -13,6 +13,9 @@ var attached_counters := {}
 var uuid = ""
 var is_revealed_by_opponent = false
 
+@onready var lineage_view_window = $LineageViewWindow
+@onready var grid_container = $LineageViewWindow/ScrollContainer/GridContainer
+
 func _ready() -> void:
 	if get_parent() and get_parent().has_method("connect_card_signals"):
 		get_parent().connect_card_signals(self)

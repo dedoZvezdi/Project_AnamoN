@@ -1,7 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://jo76eg2ytpyo"]
+[gd_scene load_steps=10 format=3 uid="uid://jo76eg2ytpyo"]
 
 [ext_resource type="Script" uid="uid://b855tn1schyyc" path="res://Scripts/OpponentCard.gd" id="1_mv32a"]
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="2_qrb68"]
+[ext_resource type="Texture2D" uid="uid://c3p6kxcog4c1q" path="res://Assets/Crystal.png" id="3_qrb68"]
+[ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="4_r8ami"]
 
 [sub_resource type="Animation" id="Animation_h8wm0"]
 length = 0.001
@@ -114,6 +116,9 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mv32a"]
 size = Vector2(245.613, 344.672)
 
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_r8ami"]
+points = PackedVector2Array(0, -268.532, 120.84, 0, 0, 260, -120, 0)
+
 [node name="Card" type="Node2D"]
 z_index = -2
 texture_filter = 2
@@ -143,3 +148,33 @@ collision_mask = 64
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("RectangleShape2D_mv32a")
+
+[node name="Crystal" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(-135, 200)
+rotation = 3.14159
+scale = Vector2(0.159598, 0.159598)
+texture = ExtResource("3_qrb68")
+
+[node name="Area2D" type="Area2D" parent="Crystal"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Crystal/Area2D"]
+shape = SubResource("ConvexPolygonShape2D_r8ami")
+
+[node name="LineageViewWindow" type="Window" parent="."]
+auto_translate_mode = 1
+size = Vector2i(600, 142)
+visible = false
+unresizable = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LineageViewWindow"]
+offset_right = 600.0
+offset_bottom = 142.0
+
+[node name="GridContainer" type="GridContainer" parent="LineageViewWindow/ScrollContainer"]
+custom_minimum_size = Vector2(600, 142)
+layout_mode = 2
+columns = 1024
+
+[node name="Control" parent="LineageViewWindow/ScrollContainer/GridContainer" instance=ExtResource("4_r8ami")]
+layout_mode = 2

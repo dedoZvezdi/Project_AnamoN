@@ -9,7 +9,7 @@ signal hovered_off
 @onready var card_PLDS_lable = $PowerLifeDurSpeed
 @onready var crystal_node: Sprite2D = $Crystal
 @onready var crystal_collision: CollisionShape2D = $Crystal/Area2D2/CollisionShape2D
-@onready var banish_view_window = $LineageViewWindow
+@onready var lineage_view_window = $LineageViewWindow
 @onready var grid_container = $LineageViewWindow/ScrollContainer/GridContainer
 
 var champion_lineage := []
@@ -30,6 +30,7 @@ var is_publicly_revealed = false
 var current_direction = "North"
 var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
+var is_tweening: bool = false
 
 const SHIFTING_CURRENTS_SLUGS := ["shifting-currents-p24", "shifting-currents-ambsd"]
 const TRANSFORMABLE_SLUGS := [
@@ -144,10 +145,10 @@ func _ready() -> void:
 		var crystal_area_node = crystal_node.get_node("Area2D2")
 		if not crystal_area_node.input_event.is_connected(_on_crystal_input_event):
 			crystal_area_node.input_event.connect(_on_crystal_input_event)
-	if banish_view_window:
-		if not banish_view_window.close_requested.is_connected(_on_lineage_window_close):
-			banish_view_window.close_requested.connect(_on_lineage_window_close)
-		var lineage_popup_menu = banish_view_window.get_node_or_null("PopupMenu")
+	if lineage_view_window:
+		if not lineage_view_window.close_requested.is_connected(_on_lineage_window_close):
+			lineage_view_window.close_requested.connect(_on_lineage_window_close)
+		var lineage_popup_menu = lineage_view_window.get_node_or_null("PopupMenu")
 		if lineage_popup_menu and not lineage_popup_menu.id_pressed.is_connected(_on_lineage_popup_menu_pressed):
 			lineage_popup_menu.id_pressed.connect(_on_lineage_popup_menu_pressed)
 
@@ -294,7 +295,7 @@ func _on_crystal_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 			open_lineage_window()
 
 func open_lineage_window():
-	if not banish_view_window or not grid_container:
+	if not lineage_view_window or not grid_container:
 		return
 	var children = grid_container.get_children()
 	if children.size() > 0:
@@ -310,11 +311,11 @@ func open_lineage_window():
 		if not card_display.request_popup_menu.is_connected(_on_lineage_card_display_popup_menu):
 			card_display.request_popup_menu.connect(_on_lineage_card_display_popup_menu)
 		grid_container.add_child(card_display)
-	banish_view_window.popup_centered()
+	lineage_view_window.popup_centered()
 
 func _on_lineage_window_close():
-	if banish_view_window:
-		banish_view_window.hide()
+	if lineage_view_window:
+		lineage_view_window.hide()
 
 func add_to_lineage(lineage_data: Dictionary):
 	champion_lineage.append(lineage_data)
@@ -330,7 +331,7 @@ func remove_from_lineage_by_uuid(target_uuid: String):
 func _on_lineage_card_display_popup_menu(slug, card_uuid):
 	selected_lineage_card_slug = slug
 	selected_lineage_card_uuid = card_uuid
-	var lineage_popup_menu = banish_view_window.get_node_or_null("PopupMenu")
+	var lineage_popup_menu = lineage_view_window.get_node_or_null("PopupMenu")
 	if lineage_popup_menu:
 		lineage_popup_menu.clear()
 		lineage_popup_menu.add_item("Banish", 0)
@@ -383,7 +384,7 @@ func banish_lineage_card():
 	tween.tween_callback(func():
 		if banish_node.has_method("add_card_to_slot"):
 			banish_node.add_card_to_slot(new_card, false))
-	if banish_view_window and banish_view_window.visible:
+	if lineage_view_window and lineage_view_window.visible:
 		open_lineage_window()
 	selected_lineage_card_slug = ""
 	selected_lineage_card_uuid = ""
@@ -1135,3 +1136,13 @@ func _update_local_card_visuals(revealed: bool):
 		else:
 			front.visible = false
 			back.visible = true
+
+func set_tweening(active: bool):
+	is_tweening = active
+	if area:
+		area.set_deferred("input_pickable", !active)
+	if active:
+		scale = Vector2(0.35, 0.35) 
+		hide_card_info()
+		mouse_inside = false
+		emit_signal("hovered_off", self)
