@@ -136,7 +136,7 @@ scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_3p273")
 
 [node name="Crystal" type="Sprite2D" parent="."]
-position = Vector2(135.714, -202.857)
+position = Vector2(135, -200)
 scale = Vector2(0.159598, 0.159598)
 texture = ExtResource("3_h8wm0")
 

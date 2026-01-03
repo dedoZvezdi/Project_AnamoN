@@ -87,6 +87,8 @@ func can_hover_card(card) -> bool:
 		var collision_shape = card.get_node("Area2D/CollisionShape2D")
 		if collision_shape.disabled:
 			return false
+	if card.get("is_tweening") == true:
+		return false
 	return true
 
 func can_drag_card(card) -> bool:

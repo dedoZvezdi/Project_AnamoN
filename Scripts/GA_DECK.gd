@@ -184,12 +184,12 @@ func send_top_to_gy():
 	var slug = card_data["slug"]
 	var card_uuid = card_data["uuid"]
 	player_deck.remove_at(0)
-	var gy_node = get_tree().current_scene.find_child("GRAVEYARD", true, false)
-	if gy_node:
+	var graveyard_node = get_parent().get_parent().find_child("GRAVEYARD", true, false)
+	if graveyard_node:
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
 			main_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), card_uuid, slug)
-		_animate_deck_card_to_zone(slug, card_uuid, gy_node.global_position, gy_node, "add_card_to_slot", false, "", true)
+		_animate_deck_card_to_zone(slug, card_uuid, graveyard_node.global_position, graveyard_node, "add_card_to_slot", false, "", true, true)
 	update_deck_view()
 	update_deck_state()
 
@@ -225,7 +225,7 @@ func banish_top_fu():
 	update_deck_view()
 	update_deck_state()
 
-func _animate_deck_card_to_zone(slug: String, card_uuid: String, target_pos: Vector2, zone_node: Node, zone_method: String, face_down: bool, _sync_method: String, play_flip: bool = false):
+func _animate_deck_card_to_zone(slug: String, card_uuid: String, target_pos: Vector2, zone_node: Node, zone_method: String, face_down: bool, _sync_method: String, play_flip: bool = false, block_interaction: bool = false):
 	var card_scene = preload(CARD_SCENE_PATH)
 	var proxy_card = card_scene.instantiate()
 	proxy_card.uuid = card_uuid
@@ -265,7 +265,11 @@ func _animate_deck_card_to_zone(slug: String, card_uuid: String, target_pos: Vec
 		if anim_player:
 			anim_player.play("card_flip")
 	tween.set_parallel(false)
+	if block_interaction and proxy_card.has_method("set_tweening"):
+		proxy_card.set_tweening(true)
 	await tween.finished
+	if is_instance_valid(proxy_card) and proxy_card.has_method("set_tweening"):
+		proxy_card.set_tweening(false)
 	if zone_node.has_method(zone_method):
 		if zone_node.name == "BANISH":
 			zone_node.call(zone_method, proxy_card, face_down)
