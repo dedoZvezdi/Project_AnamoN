@@ -429,6 +429,10 @@ func transform_card():
 	attached_counters.clear()
 	if current_field and current_field.has_method("notify_card_transformed"):
 		current_field.notify_card_transformed(self)
+	
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_card_transform", multiplayer.get_unique_id(), uuid, new_slug)
 	if has_node("AnimationPlayer"):
 		var anim: AnimationPlayer = $AnimationPlayer
 		if anim.has_animation("card_flip"):
@@ -599,21 +603,28 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 func rotate_card():
 	if not is_in_main_field():
 		return
+	var target_rot = original_rotation
 	if is_rotated:
-		rotation_degrees = original_rotation
+		target_rot = original_rotation
 		is_rotated = false
 	else:
-		rotation_degrees = original_rotation + 90
+		target_rot = original_rotation + 90
 		is_rotated = true
+	var tween = create_tween()
+	tween.tween_property(self, "rotation_degrees", target_rot, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	sync_stats_to_opponent(target_rot)
 
 func set_direction(dir: String):
 	current_direction = dir
+	var target_rot = original_rotation
 	match dir:
-		"North": rotation_degrees = original_rotation
-		"East": rotation_degrees = original_rotation + 90
-		"South": rotation_degrees = original_rotation + 180
-		"West": rotation_degrees = original_rotation + 270
-	sync_stats_to_opponent()
+		"North": target_rot = original_rotation
+		"East": target_rot = original_rotation + 90
+		"South": target_rot = original_rotation + 180
+		"West": target_rot = original_rotation + 270
+	var tween = create_tween()
+	tween.tween_property(self, "rotation_degrees", target_rot, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	sync_stats_to_opponent(target_rot)
 
 func on_drag_start():
 	is_dragging = true
@@ -948,13 +959,14 @@ func destroy_mastery():
 		current_field.remove_card_from_slot(self)
 	queue_free()
 
-func sync_stats_to_opponent():
+func sync_stats_to_opponent(forced_rot: float = -999.0):
 	var slug = get_slug_from_card()
 	if slug == "":
 		return
+	var rot_to_send = rotation_degrees if forced_rot == -999.0 else forced_rot
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_card_stats_v2", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters, current_direction)
+		multiplayer_node.rpc("sync_card_state", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters, current_direction, rot_to_send)
 
 func update_crystal_visibility():
 	if not crystal_node:
@@ -1127,8 +1139,7 @@ func _update_local_card_visuals(revealed: bool):
 				back.visible = false
 			else:
 				front.visible = false
-				back.visible = true
-		)
+				back.visible = true)
 	else:
 		if target_show_front:
 			front.visible = true

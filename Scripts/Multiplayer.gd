@@ -379,7 +379,7 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 							is_token = true
 						if "mastery_slugs" in local_logo and slug in local_logo.mastery_slugs:
 							is_mastery = true
-					if is_token or is_mastery:
+					if (is_token or is_mastery) and not (c in opp_main.cards_in_field):
 						var opp_logo = null
 						for child in opp_field.get_children():
 							if "Logo" in child.name:
@@ -477,8 +477,7 @@ func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node):
 	tween.tween_callback(func():
 		if opp_field:
 			_remove_card_from_all_zones(card, opp_field)
-		card.queue_free()
-	)
+		card.queue_free())
 
 func _remove_card_from_all_zones(card: Node, opp_field: Node):
 	if not card or not is_instance_valid(card):
@@ -527,7 +526,7 @@ func sync_move_to_deck(player_id: int, uuid: String, _is_top: bool):
 		opp_deck.increment_deck_size()
 
 @rpc("any_peer", "reliable")
-func sync_card_stats(player_id: int, uuid: String, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary):
+func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary, direction: String, rot_deg: float):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -544,33 +543,11 @@ func sync_card_stats(player_id: int, uuid: String, slug: String, modifiers: Dict
 				c.attached_markers = markers
 			if "attached_counters" in c:
 				c.attached_counters = counters
-
-@rpc("any_peer", "reliable")
-func sync_card_stats_v2(player_id: int, uuid: String, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary, direction: String):
-	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
-	if not is_from_remote:
-		return
-	var opp_field = get_node_or_null("OpponentField")
-	if not opp_field:
-		return
-	var card_manager = opp_field.get_node_or_null("CardManager")
-	if card_manager:
-		var c = get_or_create_opponent_card(card_manager, uuid, slug)
-		if c:
-			if "runtime_modifiers" in c:
-				c.runtime_modifiers = modifiers
-			if "attached_markers" in c:
-				c.attached_markers = markers
-			if "attached_counters" in c:
-				c.attached_counters = counters
-			if direction != "":
-				var rot = 0.0
-				match direction:
-					"North": rot = 0.0
-					"East": rot = 90.0
-					"South": rot = 180.0
-					"West": rot = 270.0
-				c.rotation_degrees = rot
+			if "current_direction" in c:
+				c.current_direction = direction
+			var target_rot = rot_deg
+			var tween = create_tween()
+			tween.tween_property(c, "rotation_degrees", target_rot, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func reset_ui():
 	$HostButton.disabled = false
@@ -725,6 +702,18 @@ func rpc_set_all_cards_reveal_status(player_id: int, revealed: bool):
 	var opp_memory = opp_field.get_node_or_null("OpponentMemory")
 	if opp_memory and opp_memory.has_method("set_all_cards_reveal_status"):
 		opp_memory.set_all_cards_reveal_status(revealed)
+
+@rpc("any_peer", "reliable")
+func sync_card_transform(player_id: int, uuid: String, new_slug: String):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return
+	var c = _find_opponent_card_by_uuid(opp_field, uuid)
+	if c and c.has_method("remote_transform"):
+		c.remote_transform(new_slug)
 
 func _find_opponent_card_by_uuid(root_node, target_uuid):
 	if root_node.has_method("get_uuid") and root_node.get_uuid() == target_uuid:

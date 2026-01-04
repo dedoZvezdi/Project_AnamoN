@@ -3,17 +3,105 @@ extends Node2D
 var cards_in_field: Array = []
 var base_position := Vector2.ZERO
 var current_mastery_card: Node = null
+var current_champion_card: Node = null
+
+func is_champion_card(card) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	var slug = ""
+	if card.has_meta("slug"):
+		slug = card.get_meta("slug")
+	if slug == "":
+		return false
+	var root = get_tree().current_scene
+	var card_info = null
+	if root:
+		card_info = find_node_by_script(root, "res://Scripts/CardInformation.gd")
+	if not card_info or not card_info.card_database_reference:
+		return false
+	var db = card_info.card_database_reference
+	if not db.cards_db.has(slug):
+		return false
+	var data = db.cards_db[slug]
+	if data.has("types") and data["types"] is Array:
+		for t in data["types"]:
+			if str(t).to_upper() == "CHAMPION":
+				return true
+	
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], db)
+		if base_slug and db.cards_db.has(base_slug):
+			var base_data = db.cards_db[base_slug]
+			if base_data.has("types") and base_data["types"] is Array:
+				for card_type in base_data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if db.cards_db.has(parent_slug):
+			var parent_data = db.cards_db[parent_slug]
+			if parent_data.has("types") and parent_data["types"] is Array:
+				for card_type in parent_data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	return false
+
+func find_base_card_for_edition(edition_id, card_database):
+	if not card_database:
+		return null
+	for slug in card_database.cards_db:
+		var data = card_database.cards_db[slug]
+		if data.has("editions"):
+			for edition in data["editions"]:
+				if edition.get("edition_id") == edition_id:
+					return slug
+	return null
+
+func find_node_by_script(node: Node, script_path: String) -> Node:
+	if node.get_script() and node.get_script().resource_path == script_path:
+		return node
+	for child in node.get_children():
+		var result = find_node_by_script(child, script_path)
+		if result:
+			return result
+	return null
+
+func notify_card_transformed(card: Node):
+	if is_champion_card(card):
+		if current_champion_card != null and current_champion_card != card:
+			remove_previous_champions()
+		current_champion_card = card
+		card.global_position = global_position + Vector2(0, 20)
+		card.z_index = 400
+	elif card == current_champion_card:
+		current_champion_card = null
+
+func remove_previous_champions():
+	if current_champion_card and is_instance_valid(current_champion_card):
+		if current_champion_card in cards_in_field:
+			cards_in_field.erase(current_champion_card)
+		if current_champion_card.get_parent():
+			current_champion_card.get_parent().remove_child(current_champion_card)
+		current_champion_card.queue_free()
+		current_champion_card = null
 
 func _ready() -> void:
 	base_position = Vector2.ZERO
+	add_to_group("main_fields")
 
 func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 0.0) -> void:
 	if not card or not is_instance_valid(card):
 		return
-	if is_mastery_card(card):
+	if is_champion_card(card):
+		if current_champion_card != null and current_champion_card != card:
+			remove_previous_champions()
+		current_champion_card = card
+		card.global_position = global_position + Vector2(0, 20)
+	elif is_mastery_card(card):
 		if current_mastery_card != null and current_mastery_card != card:
 			remove_previous_mastery()
 		current_mastery_card = card
+	
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in cards_in_field:
@@ -56,24 +144,28 @@ func remove_card_from_field(card: Node) -> void:
 		cards_in_field.erase(card)
 		if card.has_method("set_current_field"):
 			card.set_current_field(null)
+		if card == current_champion_card:
+			current_champion_card = null
+		if card == current_mastery_card:
+			current_mastery_card = null
 
 func bring_card_to_front(card: Node) -> void:
 	var idx := cards_in_field.find(card)
 	if idx == -1:
 		return
 	for i in range(cards_in_field.size()):
-		var c = cards_in_field[i]
-		if c and is_instance_valid(c):
+		var cards = cards_in_field[i]
+		if cards and is_instance_valid(cards):
 			if i >= idx:
-				c.z_index = 200 + i + 50
+				cards.z_index = 200 + i + 50
 			else:
-				c.z_index = 200 + i + 1
+				cards.z_index = 200 + i + 1
 
 func clear_hovered_card() -> void:
 	for i in range(cards_in_field.size()):
-		var c = cards_in_field[i]
-		if c and is_instance_valid(c):
-			c.z_index = 200 + i + 1
+		var card = cards_in_field[i]
+		if card and is_instance_valid(card):
+			card.z_index = 200 + i + 1
 
 func connect_card_signals(card):
 	var card_manager = get_tree().get_root().find_child("CardManager", true, false)

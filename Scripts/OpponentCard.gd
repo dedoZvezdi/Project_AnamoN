@@ -11,6 +11,7 @@ var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
 var attached_markers := {}
 var attached_counters := {}
 var uuid = ""
+var current_field = null
 var is_revealed_by_opponent = false
 
 @onready var lineage_view_window = $LineageViewWindow
@@ -91,6 +92,9 @@ func get_slug_from_card() -> String:
 func get_uuid() -> String:
 	return uuid
 
+func set_current_field(field):
+	current_field = field
+
 func set_opponent_reveal_status(revealed: bool):
 	is_revealed_by_opponent = revealed
 	if mouse_inside:
@@ -136,8 +140,7 @@ func set_opponent_reveal_status(revealed: bool):
 			else:
 				front.visible = false
 				back.visible = true
-			emit_signal("visuals_changed")
-		)
+			emit_signal("visuals_changed"))
 	else:
 		if revealed:
 			front.visible = true
@@ -146,3 +149,20 @@ func set_opponent_reveal_status(revealed: bool):
 			front.visible = false
 			back.visible = true
 		emit_signal("visuals_changed")
+
+func remote_transform(new_slug: String):
+	set_meta("slug", new_slug)
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + new_slug + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var img = get_node_or_null("CardImage")
+		if img:
+			img.texture = load(card_image_path)
+	var anim_player = get_node_or_null("AnimationPlayer")
+	if anim_player and anim_player.has_animation("card_flip"):
+		anim_player.play("card_flip")
+	runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
+	attached_markers.clear()
+	attached_counters.clear()
+	if current_field and current_field.has_method("notify_card_transformed"):
+		current_field.notify_card_transformed(self)
+	emit_signal("visuals_changed")
