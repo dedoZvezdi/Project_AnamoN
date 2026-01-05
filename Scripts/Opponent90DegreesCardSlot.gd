@@ -150,9 +150,9 @@ func remove_card_from_slot(card):
 
 func reorder_z_indices():
 	var idx := 0
-	for c in cards_in_banish:
-		if c and is_instance_valid(c):
-			c.z_index = base_z_index + idx + 1
+	for card in cards_in_banish:
+		if card and is_instance_valid(card):
+			card.z_index = base_z_index + idx + 1
 			idx += 1
 
 func get_top_card():

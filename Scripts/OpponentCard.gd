@@ -13,7 +13,12 @@ var attached_counters := {}
 var uuid = ""
 var current_field = null
 var is_revealed_by_opponent = false
+var champion_lineage := []
+var selected_lineage_card_slug: String = ""
+var selected_lineage_card_uuid: String = ""
 
+@onready var crystal_node: Sprite2D = get_node_or_null("Crystal")
+@onready var crystal_collision: CollisionShape2D = get_node_or_null("Crystal/Area2D/CollisionShape2D")
 @onready var lineage_view_window = $LineageViewWindow
 @onready var grid_container = $LineageViewWindow/ScrollContainer/GridContainer
 
@@ -27,6 +32,17 @@ func _ready() -> void:
 			area.mouse_entered.connect(_on_area_2d_mouse_entered)
 		if not area.mouse_exited.is_connected(_on_area_2d_mouse_exited):
 			area.mouse_exited.connect(_on_area_2d_mouse_exited)
+	if lineage_view_window:
+		if not lineage_view_window.close_requested.is_connected(_on_lineage_window_close):
+			lineage_view_window.close_requested.connect(_on_lineage_window_close)
+	if crystal_node:
+		var crystal_area_node = crystal_node.get_node_or_null("Area2D")
+		if not crystal_area_node:
+			crystal_area_node = crystal_node.get_node_or_null("Area2D2")
+		if crystal_area_node:
+			if not crystal_area_node.input_event.is_connected(_on_crystal_input_event):
+				crystal_area_node.input_event.connect(_on_crystal_input_event)
+	update_crystal_visibility()
 
 func find_card_information_reference():
 	var root = get_tree().current_scene
@@ -166,3 +182,165 @@ func remote_transform(new_slug: String):
 	if current_field and current_field.has_method("notify_card_transformed"):
 		current_field.notify_card_transformed(self)
 	emit_signal("visuals_changed")
+
+func add_to_lineage(lineage_data: Dictionary):
+	champion_lineage.append(lineage_data)
+	update_crystal_visibility()
+	if lineage_view_window and lineage_view_window.visible:
+		open_lineage_window()
+
+func remove_from_lineage_by_uuid(target_uuid: String):
+	for i in range(champion_lineage.size() - 1, -1, -1):
+		if champion_lineage[i].get("uuid", "") == target_uuid:
+			champion_lineage.remove_at(i)
+			update_crystal_visibility()
+			break
+
+func update_crystal_visibility():
+	if not crystal_node:
+		return
+	var contains_lineage = champion_lineage.size() > 0
+	var should_be_visible = is_in_main_field() and is_champion_card() and contains_lineage
+	crystal_node.visible = should_be_visible
+	if crystal_collision:
+		crystal_collision.set_deferred("disabled", !should_be_visible)
+	if crystal_node:
+		var crystal_area = crystal_node.get_node_or_null("Area2D")
+		if not crystal_area:
+			crystal_area = crystal_node.get_node_or_null("Area2D2")
+		if crystal_area:
+			crystal_area.set_deferred("input_pickable", should_be_visible)
+
+func is_champion_card() -> bool:
+	var slug = get_slug_from_card()
+	if slug == "":
+		return false
+	if not card_information_reference or not card_information_reference.card_database_reference:
+		return false
+	var db = card_information_reference.card_database_reference
+	if not db.cards_db.has(slug):
+		return false
+	var data = db.cards_db[slug]
+	if data.has("types") and data["types"] is Array:
+		for t in data["types"]:
+			if str(t).to_upper() == "CHAMPION":
+				return true
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], db)
+		if base_slug and db.cards_db.has(base_slug):
+			var base_data = db.cards_db[base_slug]
+			if base_data.has("types") and base_data["types"] is Array:
+				for card_type in base_data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if db.cards_db.has(parent_slug):
+			var parent_data = db.cards_db[parent_slug]
+			if parent_data.has("types") and parent_data["types"] is Array:
+				for card_type in parent_data["types"]:
+					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	return false
+
+func find_base_card_for_edition(edition_id, card_database):
+	if not card_database:
+		return null
+	for slug in card_database.cards_db:
+		var data = card_database.cards_db[slug]
+		if data.has("editions"):
+			for edition in data["editions"]:
+				if edition.get("edition_id") == edition_id:
+					return slug
+	return null
+
+func _on_crystal_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if crystal_node and crystal_node.visible:
+			open_lineage_window()
+
+func open_lineage_window():
+	if not lineage_view_window or not grid_container:
+		return
+	var children = grid_container.get_children()
+	for child in children:
+		child.queue_free()
+	for lineage_data in champion_lineage:
+		var card_display_scene = load("res://Scenes/CardDisplay.tscn")
+		if card_display_scene:
+			var card_display = card_display_scene.instantiate()
+			card_display.set_meta("slug", lineage_data.get("slug", ""))
+			card_display.set_meta("uuid", lineage_data.get("uuid", ""))
+			card_display.set_meta("zone", "lineage_opponent")
+			grid_container.add_child(card_display)
+	lineage_view_window.popup_centered()
+
+func _on_lineage_window_close():
+	if lineage_view_window:
+		lineage_view_window.hide()
+
+func animate_lineage_banish(slug: String, lineage_uuid: String):
+	remove_from_lineage_by_uuid(lineage_uuid)
+	if lineage_view_window and lineage_view_window.visible:
+		open_lineage_window()
+	var scene = get_tree().get_current_scene()
+	if not scene:
+		return
+	var opp_banish = scene.find_child("OpponentBanish", true, false)
+	if not opp_banish:
+		return
+	var visual_card = load("res://Scenes/OpponentCard.tscn").instantiate()
+	visual_card.set_meta("slug", slug)
+	if lineage_uuid != "":
+		visual_card.uuid = lineage_uuid
+	var card_info = card_information_reference
+	if card_info and card_info.card_database_reference:
+		var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+		if ResourceLoader.exists(card_image_path):
+			var img = visual_card.get_node_or_null("CardImage")
+			if img:
+				img.texture = load(card_image_path)
+				img.visible = true
+				var back = visual_card.get_node_or_null("CardImageBack")
+				if back:
+					back.visible = false
+					img.z_index = 0
+	scene.add_child(visual_card)
+	visual_card.global_position = global_position
+	visual_card.z_index = 1000
+	var target_pos = opp_banish.global_position
+	if opp_banish.has_node("Area2D/CollisionShape2D"):
+		target_pos = opp_banish.get_node("Area2D/CollisionShape2D").global_position
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(visual_card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(visual_card, "rotation_degrees", 90.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		if opp_banish.has_method("add_card_to_slot"):
+			opp_banish.add_card_to_slot(visual_card, false)
+		else:
+			visual_card.queue_free())
+
+func animate_send_to_lineage(card_node: Node, card_slug: String, card_uuid: String):
+	var final_callback = func():
+		add_to_lineage({"slug": card_slug, "uuid": card_uuid})
+		if card_node and is_instance_valid(card_node):
+			if card_node.get_parent():
+				if card_node.get_parent().has_method("remove_card_from_field"):
+					card_node.get_parent().remove_card_from_field(card_node)
+				elif card_node.get_parent().has_method("remove_card_from_slot"):
+					card_node.get_parent().remove_card_from_slot(card_node)
+				else:
+					card_node.get_parent().remove_child(card_node)
+			card_node.queue_free()
+	if card_node and is_instance_valid(card_node):
+		card_node.z_index = 1000
+		var tween = create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(card_node, "global_position", global_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(card_node, "rotation_degrees", 0.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.set_parallel(false)
+		tween.tween_callback(final_callback)
+	else:
+		final_callback.call()

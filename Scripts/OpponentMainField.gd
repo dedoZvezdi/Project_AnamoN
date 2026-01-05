@@ -27,7 +27,6 @@ func is_champion_card(card) -> bool:
 		for t in data["types"]:
 			if str(t).to_upper() == "CHAMPION":
 				return true
-	
 	if data.has("edition_id") and not data.has("parent_orientation_slug"):
 		var base_slug = find_base_card_for_edition(data["edition_id"], db)
 		if base_slug and db.cards_db.has(base_slug):
@@ -69,6 +68,20 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 func notify_card_transformed(card: Node):
 	if is_champion_card(card):
 		if current_champion_card != null and current_champion_card != card:
+			var old_lineage = []
+			if "champion_lineage" in current_champion_card:
+				old_lineage = current_champion_card.champion_lineage
+			for entry in old_lineage:
+				if card.has_method("add_to_lineage"):
+					card.add_to_lineage(entry)
+			var old_slug = ""
+			if current_champion_card.has_meta("slug"):
+				old_slug = current_champion_card.get_meta("slug")
+			var old_uuid = ""
+			if "uuid" in current_champion_card:
+				old_uuid = current_champion_card.uuid
+			if card.has_method("add_to_lineage"):
+				card.add_to_lineage({"slug": old_slug, "uuid": old_uuid})
 			remove_previous_champions()
 		current_champion_card = card
 		card.global_position = global_position + Vector2(0, 20)
@@ -94,6 +107,20 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 		return
 	if is_champion_card(card):
 		if current_champion_card != null and current_champion_card != card:
+			var old_lineage = []
+			if "champion_lineage" in current_champion_card:
+				old_lineage = current_champion_card.champion_lineage
+			for entry in old_lineage:
+				if card.has_method("add_to_lineage"):
+					card.add_to_lineage(entry)
+			var old_slug = ""
+			if current_champion_card.has_meta("slug"):
+				old_slug = current_champion_card.get_meta("slug")
+			var old_uuid = ""
+			if "uuid" in current_champion_card:
+				old_uuid = current_champion_card.uuid
+			if card.has_method("add_to_lineage"):
+				card.add_to_lineage({"slug": old_slug, "uuid": old_uuid})
 			remove_previous_champions()
 		current_champion_card = card
 		card.global_position = global_position + Vector2(0, 20)
@@ -101,7 +128,6 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 		if current_mastery_card != null and current_mastery_card != card:
 			remove_previous_mastery()
 		current_mastery_card = card
-	
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in cards_in_field:

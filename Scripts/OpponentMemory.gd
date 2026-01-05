@@ -57,20 +57,20 @@ func bring_card_to_front(card):
 	if idx == -1:
 		return
 	for i in range(cards_in_slot.size()):
-		var c = cards_in_slot[i]
-		if c and is_instance_valid(c):
+		var cards = cards_in_slot[i]
+		if cards and is_instance_valid(cards):
 			if i >= idx:
-				c.z_index = min(memory_z_index_offset + i + 20, memory_max_z_index)
+				cards.z_index = min(memory_z_index_offset + i + 20, memory_max_z_index)
 			else:
-				c.z_index = memory_z_index_offset + i + 1
+				cards.z_index = memory_z_index_offset + i + 1
 
 func clear_hovered_card():
 	if is_roulette_running:
 		return
 	for i in range(cards_in_slot.size()):
-		var c = cards_in_slot[i]
-		if c and is_instance_valid(c):
-			c.z_index = memory_z_index_offset + i + 1
+		var card = cards_in_slot[i]
+		if card and is_instance_valid(card):
+			card.z_index = memory_z_index_offset + i + 1
 
 func are_cards_blocked() -> bool:
 	return is_roulette_running

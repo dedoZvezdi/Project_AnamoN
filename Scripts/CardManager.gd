@@ -460,9 +460,9 @@ func raycast_check_at_position(pos):
 
 func handle_hover():
 	if card_being_dragged or animation_in_progress:
-		for c in connected_cards:
-			if is_instance_valid(c) and c.has_node("Area2D"):
-				c.get_node("Area2D").input_pickable = false
+		for card in connected_cards:
+			if is_instance_valid(card) and card.has_node("Area2D"):
+				card.get_node("Area2D").input_pickable = false
 		return
 	validate_references()
 	var current_card = raycast_check_for_card()
@@ -488,9 +488,9 @@ func handle_hover():
 			current_card = null
 	if current_card and is_instance_valid(current_card) and is_opponent_card(current_card) and is_card_in_memory_slot(current_card):
 		current_card = null
-	for c in connected_cards:
-		if is_instance_valid(c) and c.has_node("Area2D"):
-			c.get_node("Area2D").input_pickable = (current_card != null and c == current_card)
+	for card in connected_cards:
+		if is_instance_valid(card) and card.has_node("Area2D"):
+			card.get_node("Area2D").input_pickable = (current_card != null and card == current_card)
 	if current_card != last_hovered_card:
 		if last_hovered_card and is_instance_valid(last_hovered_card):
 			if can_hover_card(last_hovered_card):

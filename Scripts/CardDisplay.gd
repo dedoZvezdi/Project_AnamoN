@@ -67,7 +67,7 @@ func _gui_input(event):
 func start_drag_from_grid():
 	if is_holding:
 		return
-	if zone == "lineage":
+	if zone == "lineage" or zone == "lineage_opponent":
 		return
 	var real_card = create_real_card_for_drag()
 	if real_card:
@@ -82,7 +82,6 @@ func start_drag_from_grid():
 					var owner_node = get_parent()
 					while owner_node != null and not owner_node.has_method("remove_from_lineage_by_uuid"):
 						owner_node = owner_node.get_parent()
-					
 					if owner_node and owner_node.has_method("remove_from_lineage_by_uuid"):
 						var u = get_meta("uuid") if has_meta("uuid") else ""
 						owner_node.remove_from_lineage_by_uuid(u)
@@ -107,7 +106,7 @@ func update_grid_immediately():
 		parent_window.update_deck_view()
 
 func get_drag_data(_pos):
-	if zone == "lineage":
+	if zone == "lineage" or zone == "lineage_opponent":
 		return null
 	var real_card = create_real_card_for_drag()
 	if real_card:

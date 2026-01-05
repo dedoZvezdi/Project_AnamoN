@@ -320,6 +320,8 @@ func _on_lineage_window_close():
 func add_to_lineage(lineage_data: Dictionary):
 	champion_lineage.append(lineage_data)
 	update_crystal_visibility()
+	if lineage_view_window and lineage_view_window.visible:
+		open_lineage_window()
 
 func remove_from_lineage_by_uuid(target_uuid: String):
 	for i in range(champion_lineage.size() - 1, -1, -1):
@@ -384,6 +386,9 @@ func banish_lineage_card():
 	tween.tween_callback(func():
 		if banish_node.has_method("add_card_to_slot"):
 			banish_node.add_card_to_slot(new_card, false))
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_banish_lineage_card", multiplayer.get_unique_id(), uuid, target_uuid, selected_lineage_card_slug)
 	if lineage_view_window and lineage_view_window.visible:
 		open_lineage_window()
 	selected_lineage_card_slug = ""
@@ -395,6 +400,9 @@ func move_to_lineage():
 		return
 	var card_slug = get_slug_from_card()
 	var card_uuid = uuid
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_move_to_lineage", multiplayer.get_unique_id(), champion.uuid, card_uuid, card_slug)
 	z_index = -1
 	var tween = create_tween()
 	tween.set_parallel(true)
