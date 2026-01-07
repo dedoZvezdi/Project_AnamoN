@@ -16,6 +16,7 @@ var is_revealed_by_opponent = false
 var champion_lineage := []
 var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
+var original_owner_id = 0
 
 @onready var crystal_node: Sprite2D = get_node_or_null("Crystal")
 @onready var crystal_collision: CollisionShape2D = get_node_or_null("Crystal/Area2D/CollisionShape2D")
