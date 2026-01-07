@@ -31,6 +31,7 @@ var current_direction = "North"
 var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
 var is_tweening: bool = false
+var original_owner_id = 0
 
 const SHIFTING_CURRENTS_SLUGS := ["shifting-currents-p24", "shifting-currents-ambsd"]
 const TRANSFORMABLE_SLUGS := [
@@ -259,6 +260,10 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						popup_menu.add_item("Rest", 4)
 					if not is_champion_card() and not is_token() and not is_mastery() and find_champion_on_field() != null:
 						popup_menu.add_item("Move to Lineage", 14)
+					if not is_champion_card() and not is_token() and not is_mastery():
+						var opponent_field = get_tree().get_root().find_child("OpponentField", true, false)
+						if opponent_field:
+							popup_menu.add_item("Give Control", 15)
 					var slug = get_slug_from_card()
 					if slug in TRANSFORMABLE_SLUGS:
 						popup_menu.add_item("Transform", 5)
@@ -437,7 +442,6 @@ func transform_card():
 	attached_counters.clear()
 	if current_field and current_field.has_method("notify_card_transformed"):
 		current_field.notify_card_transformed(self)
-	
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_card_transform", multiplayer.get_unique_id(), uuid, new_slug)
@@ -603,6 +607,7 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		12: reveal_all_in_memory()
 		13: hide_all_in_memory()
 		14: move_to_lineage()
+		15: give_control_to_opponent()
 		20: set_direction("North")
 		21: set_direction("East")
 		22: set_direction("South")
@@ -1165,3 +1170,78 @@ func set_tweening(active: bool):
 		hide_card_info()
 		mouse_inside = false
 		emit_signal("hovered_off", self)
+
+func give_control_to_opponent():
+	if not is_in_main_field():
+		return
+	var scene = get_tree().get_current_scene()
+	var main_field_node = scene.find_child("MAINFIELD", true, false)
+	var opp_field_node = scene.find_child("OpponentMainField", true, false)
+	if not main_field_node or not opp_field_node:
+		return
+	var relative_pos = global_position - main_field_node.global_position
+	var target_pos = opp_field_node.global_position - relative_pos
+	var target_rot = rotation_degrees
+	if original_owner_id == 0:
+		original_owner_id = multiplayer.get_unique_id()
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		var stats = {
+			"slug": get_slug_from_card(),
+			"uuid": uuid if uuid else "",
+			"modifiers": runtime_modifiers,
+			"markers": attached_markers,
+			"counters": attached_counters,
+			"direction": current_direction,
+			"rot_deg": target_rot,
+			"original_owner_id": original_owner_id}
+		multiplayer_node.rpc("sync_give_control", multiplayer.get_unique_id(), stats)
+	z_index = 1000
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "rotation_degrees", target_rot + 180, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		_convert_to_opponent_card_visuals(target_pos, target_rot))
+
+func _convert_to_opponent_card_visuals(final_pos, final_rot):
+	var scene = get_tree().get_current_scene()
+	if not scene:
+		return
+	var opp_main_field = scene.find_child("OpponentMainField", true, false)
+	if not opp_main_field:
+		queue_free()
+		return
+	var opp_card_scene = load("res://Scenes/OpponentCard.tscn")
+	var new_opp_card = opp_card_scene.instantiate()
+	new_opp_card.set_meta("slug", get_slug_from_card())
+	new_opp_card.uuid = uuid
+	if "original_owner_id" in new_opp_card:
+		new_opp_card.original_owner_id = original_owner_id
+	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
+	new_opp_card.attached_markers = attached_markers.duplicate()
+	new_opp_card.attached_counters = attached_counters.duplicate()
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + get_slug_from_card() + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var image = new_opp_card.get_node_or_null("CardImage")
+		if image:
+			image.texture = load(card_image_path)
+			image.visible = true
+			var back = new_opp_card.get_node_or_null("CardImageBack")
+			if back: back.visible = false
+	var opp_field = scene.find_child("OpponentField", true, false)
+	var card_manager = null
+	if opp_field:
+		card_manager = opp_field.get_node_or_null("CardManager")
+	if not card_manager:
+		if opp_main_field:
+			opp_main_field.add_child(new_opp_card)
+	else:
+		card_manager.add_child(new_opp_card)
+	new_opp_card.global_position = final_pos
+	new_opp_card.rotation_degrees = final_rot
+	opp_main_field.add_card_to_field(new_opp_card, final_pos, final_rot)
+	var fix_tween = create_tween()
+	fix_tween.tween_property(new_opp_card, "rotation_degrees", final_rot, 0.2)
+	remove_from_current_position()

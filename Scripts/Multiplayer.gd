@@ -763,3 +763,97 @@ func sync_move_to_lineage(player_id: int, champion_uuid: String, card_uuid: Stri
 		pass
 	if champion_card.has_method("animate_send_to_lineage"):
 		champion_card.animate_send_to_lineage(card_to_move, card_slug, card_uuid)
+
+@rpc("any_peer", "reliable")
+func sync_give_control(player_id: int, stats: Dictionary):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return
+	var card_uuid = stats.get("uuid", "")
+	var opponent_card = _find_opponent_card_by_uuid(opp_field, card_uuid)
+	if not opponent_card:
+		return
+	var player_field = get_node_or_null("PlayerField")
+	var main_field = player_field.get_node_or_null("MAINFIELD") if player_field else null
+	var opp_main_field = opp_field.get_node_or_null("OpponentMainField")
+	if not main_field or not opp_main_field:
+		return
+	var relative_pos = opponent_card.global_position - opp_main_field.global_position
+	var target_pos = main_field.global_position - relative_pos
+	var target_rot = opponent_card.rotation_degrees + 180
+	opponent_card.z_index = 1000
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(opponent_card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(opponent_card, "rotation_degrees", target_rot, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		_convert_opponent_to_player_card(opponent_card, stats, target_pos, target_rot + 180))
+
+func _convert_opponent_to_player_card(opp_card: Node, stats: Dictionary, final_pos: Vector2, final_rot: float):
+	var player_field = get_node_or_null("PlayerField")
+	if not player_field:
+		return
+	var main_field = player_field.get_node_or_null("MAINFIELD")
+	if not main_field:
+		return
+	var card_manager = player_field.get_node_or_null("CardManager")
+	if not card_manager:
+		return
+	var card_scene = load("res://Scenes/Card.tscn")
+	var new_card = card_scene.instantiate()
+	new_card.set_meta("slug", stats.get("slug", ""))
+	new_card.uuid = stats.get("uuid", "")
+	if "original_owner_id" in new_card:
+		new_card.original_owner_id = stats.get("original_owner_id", 0)
+	new_card.runtime_modifiers = stats.get("modifiers", {}).duplicate()
+	new_card.attached_markers = stats.get("markers", {}).duplicate()
+	new_card.attached_counters = stats.get("counters", {}).duplicate()
+	new_card.is_rotated = false
+	if abs(fmod(final_rot, 360.0)) > 45 and abs(fmod(final_rot, 360.0)) < 135:
+		new_card.is_rotated = true
+	elif abs(fmod(final_rot, 360.0)) > 225 and abs(fmod(final_rot, 360.0)) < 315:
+		new_card.is_rotated = true
+	new_card.original_rotation = 0.0 
+	new_card.rotation_degrees = final_rot
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + stats.get("slug", "") + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var image = new_card.get_node_or_null("CardImage")
+		if image:
+			image.texture = load(card_image_path)
+			image.visible = true
+			var back = new_card.get_node_or_null("CardImageBack")
+			if back: back.visible = false
+	card_manager.add_child(new_card)
+	if card_manager.has_method("connect_card_signals"):
+		card_manager.connect_card_signals(new_card)
+	if main_field.has_method("add_card_to_field"):
+		main_field.add_card_to_field(new_card, final_pos)
+		var normalized_rot = fmod(final_rot, 360.0)
+		if normalized_rot < 0:
+			normalized_rot += 360.0
+		new_card.rotation_degrees = normalized_rot
+		if abs(new_card.rotation_degrees - 360.0) < 1.0:
+			new_card.rotation_degrees = 0.0
+		new_card.original_rotation = 0.0
+		new_card.is_rotated = (abs(fmod(final_rot, 180.0)) > 45 and abs(fmod(final_rot, 180.0)) < 135)
+		new_card.z_index = 300 
+		if main_field.has_method("bring_card_to_front"):
+			main_field.bring_card_to_front(new_card)
+	else:
+		if new_card.has_method("set_current_field"):
+			new_card.set_current_field(main_field)
+		new_card.global_position = final_pos
+		new_card.rotation_degrees = final_rot
+		if abs(new_card.rotation_degrees - 360.0) < 1.0:
+			new_card.rotation_degrees = 0.0
+		new_card.z_index = 300
+	if opp_card.get_parent():
+		if opp_card.get_parent().has_method("remove_card_from_field"):
+			opp_card.get_parent().remove_card_from_field(opp_card)
+		else:
+			opp_card.get_parent().remove_child(opp_card)
+	opp_card.queue_free()
