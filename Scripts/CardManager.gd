@@ -12,6 +12,7 @@ var base_z_index = 0
 var hover_z_index = 10
 var drag_z_index = 1000
 var card_counter = 0
+var drag_start_position = Vector2.ZERO
 var player_hand_reference
 var animation_in_progress = false
 var connected_cards = []
@@ -179,6 +180,7 @@ func start_drag(card):
 		return
 	_clear_memory_highlights()
 	card_being_dragged = card
+	drag_start_position = card.global_position
 	if player_hand_reference and card in player_hand_reference.player_hand:
 		player_hand_reference.dragging_card_from_hand = card
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
@@ -225,6 +227,31 @@ func finish_drag():
 	if card.has_method("on_drag_end"):
 		card.on_drag_end()
 	var card_slot_found = raycast_check_for_card_single_slot()
+	var is_borrowed = false
+	if "original_owner_id" in card and card.original_owner_id != 0 and card.original_owner_id != multiplayer.get_unique_id():
+		is_borrowed = true
+	if is_borrowed:
+		var restricted = false
+		if card_slot_found:
+			if card_slot_found.name == "GRAVEYARD" or card_slot_found.name == "MEMORY" or card_slot_found.name == "BANISH":
+				restricted = true
+		else:
+			restricted = true
+		if restricted:
+			var main_field = get_tree().get_current_scene().find_child("MAINFIELD", true, false)
+			if main_field:
+				if card.has_method("set_tweening"):
+					card.set_tweening(true)
+				var tween = create_tween()
+				tween.tween_property(card, "global_position", drag_start_position, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				tween.tween_callback(func():
+					main_field.add_card_to_field(card, drag_start_position)
+					card.scale = normal_scale
+					card.z_index = base_z_index
+					if card.has_method("set_tweening"):
+						card.set_tweening(false))
+			card_being_dragged = null
+			return
 	if card_slot_found:
 		if dragged_from_grid:
 			remove_card_from_original_slot()

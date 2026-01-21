@@ -251,15 +251,17 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 							popup_menu.add_item("Hide All", 13)
 				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
 					popup_menu.add_item("Banish Face Down", 1)
-					popup_menu.add_item("Go to Top Deck", 2)
-					popup_menu.add_item("Go to Bottom Deck", 3)
+					if original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id():
+						popup_menu.add_item("Go to Top Deck", 2)
+						popup_menu.add_item("Go to Bottom Deck", 3)
 				if is_in_main_field():
 					if is_rotated:
 						popup_menu.add_item("Awake", 4)
 					else:
 						popup_menu.add_item("Rest", 4)
 					if not is_champion_card() and not is_token() and not is_mastery() and find_champion_on_field() != null:
-						popup_menu.add_item("Move to Lineage", 14)
+						if original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id():
+							popup_menu.add_item("Move to Lineage", 14)
 					if not is_champion_card() and not is_token() and not is_mastery():
 						var opponent_field = get_tree().get_root().find_child("OpponentField", true, false)
 						if opponent_field:
@@ -811,6 +813,9 @@ func go_to_banish_face_down():
 	var banish_node = scene.find_child("BANISH", true, false)
 	if banish_node == null:
 		return
+	if original_owner_id != 0 and original_owner_id != multiplayer.get_unique_id():
+		_return_to_original_owner_banish()
+		return
 	var player_hand_node = scene.find_child("PlayerHand", true, false)
 	if player_hand_node and player_hand_node.has_method("remove_card_from_hand"):
 		player_hand_node.remove_card_from_hand(self)
@@ -828,6 +833,83 @@ func go_to_banish_face_down():
 		var slug = get_slug_from_card()
 		if slug != "":
 			multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, true)
+
+func _return_to_original_owner_banish():
+	var scene = get_tree().get_current_scene()
+	if not scene: return
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_return_to_owner_banish", original_owner_id, uuid, get_slug_from_card(), true)
+	var opp_field = scene.find_child("OpponentField", true, false)
+	var target_pos = global_position
+	if opp_field:
+		var opp_banish = opp_field.find_child("OpponentBanish", true, false)
+		if opp_banish:
+			target_pos = opp_banish.global_position
+			if opp_banish.has_node("Area2D/CollisionShape2D"):
+				target_pos = opp_banish.get_node("Area2D/CollisionShape2D").global_position
+	z_index = 1000
+	var anim_player = get_node_or_null("AnimationPlayer")
+	var front = get_node_or_null("CardImage")
+	var back = get_node_or_null("CardImageBack")
+	
+	if anim_player and anim_player.has_animation("card_flip"):
+		anim_player.play("card_flip")
+		var timer = get_tree().create_timer(0.1)
+		timer.timeout.connect(func():
+			if front: front.visible = false
+			if back: back.visible = true)
+	else:
+		if front: front.visible = false
+		if back: back.visible = true
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "rotation_degrees", -90.0, 0.5)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		_convert_to_opponent_banish_visuals(target_pos, true))
+
+func _convert_to_opponent_banish_visuals(final_pos, face_down):
+	var scene = get_tree().get_current_scene()
+	if not scene:
+		remove_from_current_position()
+		return
+	var opp_field = scene.find_child("OpponentField", true, false)
+	if not opp_field:
+		remove_from_current_position()
+		return
+	var opp_banish = opp_field.find_child("OpponentBanish", true, false)
+	if not opp_banish:
+		remove_from_current_position()
+		return
+	var opp_card_scene = load("res://Scenes/OpponentCard.tscn")
+	var new_opp_card = opp_card_scene.instantiate()
+	new_opp_card.set_meta("slug", get_slug_from_card())
+	new_opp_card.uuid = uuid
+	if "original_owner_id" in new_opp_card:
+		new_opp_card.original_owner_id = original_owner_id
+	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
+	new_opp_card.attached_markers = attached_markers.duplicate()
+	new_opp_card.attached_counters = attached_counters.duplicate()
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + get_slug_from_card() + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var image = new_opp_card.get_node_or_null("CardImage")
+		if image:
+			image.texture = load(card_image_path)
+			image.visible = not face_down
+			var back = new_opp_card.get_node_or_null("CardImageBack")
+			if back: back.visible = face_down
+	var card_manager = opp_field.get_node_or_null("CardManager")
+	if card_manager:
+		card_manager.add_child(new_opp_card)
+	else:
+		opp_field.add_child(new_opp_card)
+	new_opp_card.global_position = final_pos
+	new_opp_card.rotation_degrees = 90.0
+	if opp_banish.has_method("add_card_to_slot"):
+		opp_banish.add_card_to_slot(new_opp_card, face_down)
+	remove_from_current_position()
 
 func remove_from_current_position():
 	var scene = get_tree().get_current_scene()
