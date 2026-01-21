@@ -793,6 +793,86 @@ func sync_give_control(player_id: int, stats: Dictionary):
 	tween.tween_callback(func():
 		_convert_opponent_to_player_card(opponent_card, stats, target_pos, target_rot + 180))
 
+@rpc("any_peer", "reliable")
+func sync_return_to_owner_banish(target_owner_id: int, uuid: String, slug: String, face_down: bool):
+	if multiplayer.get_unique_id() == target_owner_id:
+		var opp_field = get_node_or_null("OpponentField")
+		if not opp_field:
+			return
+		var card = _find_opponent_card_by_uuid(opp_field, uuid)
+		if card:
+			_convert_opponent_to_local_banish(card, slug, uuid, face_down)
+	else:
+		pass
+
+func _convert_opponent_to_local_banish(opp_card: Node, slug: String, uuid: String, face_down: bool):
+	var player_field = get_node_or_null("PlayerField")
+	if not player_field:
+		return
+	var banish_node = player_field.get_node_or_null("BANISH")
+	if not banish_node:
+		return
+	var card_manager = player_field.get_node_or_null("CardManager")
+	var card_scene = load("res://Scenes/Card.tscn")
+	var new_card = card_scene.instantiate()
+	new_card.set_meta("slug", slug)
+	new_card.uuid = uuid
+	new_card.uuid = uuid
+	new_card.original_owner_id = multiplayer.get_unique_id() # Reset to self as owner/controller
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var image = new_card.get_node_or_null("CardImage")
+		if image:
+			image.texture = load(card_image_path)
+			image.visible = not face_down
+			var back = new_card.get_node_or_null("CardImageBack")
+			if back: back.visible = face_down
+	if card_manager:
+		card_manager.add_child(new_card)
+		if card_manager.has_method("connect_card_signals"):
+			card_manager.connect_card_signals(new_card)
+	new_card.global_position = opp_card.global_position
+	new_card.rotation_degrees = opp_card.rotation_degrees
+	new_card.z_index = 1000
+	if face_down:
+		var front = new_card.get_node_or_null("CardImage")
+		var back = new_card.get_node_or_null("CardImageBack")
+		if front: front.visible = true
+		if back: back.visible = false
+		var anim = new_card.get_node_or_null("AnimationPlayer")
+		if anim and anim.has_animation("card_flip"):
+			anim.play("card_flip")
+			var timer = get_tree().create_timer(0.1)
+			timer.timeout.connect(func():
+				if front: front.visible = false
+				if back: back.visible = true)
+		else:
+			if front: front.visible = false
+			if back: back.visible = true
+	if opp_card.get_parent():
+		if opp_card.get_parent().has_method("remove_card_from_field"):
+			opp_card.get_parent().remove_card_from_field(opp_card)
+		elif opp_card.get_parent().has_method("remove_card_from_slot"):
+			opp_card.get_parent().remove_card_from_slot(opp_card)
+		elif opp_card.get_parent().has_method("remove_card_from_memory"):
+			opp_card.get_parent().remove_card_from_memory(opp_card)
+		elif opp_card.get_parent().has_method("remove_card_from_hand"):
+			opp_card.get_parent().remove_card_from_hand(opp_card)
+		else:
+			opp_card.get_parent().remove_child(opp_card)
+	opp_card.queue_free()
+	var target_pos = banish_node.global_position
+	if banish_node.has_node("Area2D/CollisionShape2D"):
+		target_pos = banish_node.get_node("Area2D/CollisionShape2D").global_position
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(new_card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(new_card, "rotation_degrees", 90.0, 0.5) 
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		if banish_node.has_method("add_card_to_slot"):
+			banish_node.add_card_to_slot(new_card, face_down))
+
 func _convert_opponent_to_player_card(opp_card: Node, stats: Dictionary, final_pos: Vector2, final_rot: float):
 	var player_field = get_node_or_null("PlayerField")
 	if not player_field:
