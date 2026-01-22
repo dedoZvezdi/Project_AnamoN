@@ -40,6 +40,8 @@ func _ready():
 func _on_mouse_entered():
 	self.scale = Vector2(1, 1)
 	self.z_index = 100
+	if _is_face_down_opponent_banish():
+		return
 	var card_info_node = get_tree().get_current_scene().get_node_or_null("CardInformation")
 	if not card_info_node:
 		card_info_node = get_tree().get_current_scene().get_node_or_null("PlayerField/CardInformation")
@@ -49,6 +51,24 @@ func _on_mouse_entered():
 func _on_mouse_exited():
 	self.scale = Vector2(1, 1)
 	self.z_index = 0
+
+func _is_face_down_opponent_banish() -> bool:
+	if texture_rect and texture_rect.texture:
+		var texture_path = texture_rect.texture.resource_path
+		if "ga_back.png" in texture_path:
+			var parent = get_parent()
+			while parent:
+				if parent.name == "GridContainer":
+					var grandparent = parent.get_parent()
+					if grandparent and grandparent.name == "ScrollContainer":
+						var great_grandparent = grandparent.get_parent()
+						if great_grandparent and great_grandparent.name == "BanishViewWindow":
+							var banish_owner = great_grandparent.get_parent()
+							if banish_owner and banish_owner.name.contains("Opponent"):
+								return true
+					break
+				parent = parent.get_parent()
+	return false
 
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
