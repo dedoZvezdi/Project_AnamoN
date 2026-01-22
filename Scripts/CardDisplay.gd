@@ -70,6 +70,26 @@ func _is_face_down_opponent_banish() -> bool:
 				parent = parent.get_parent()
 	return false
 
+func _is_in_opponent_zone() -> bool:
+	var parent = get_parent()
+	while parent:
+		if parent.name == "GridContainer":
+			var grandparent = parent.get_parent()
+			if grandparent and grandparent.name == "ScrollContainer":
+				var great_grandparent = grandparent.get_parent()
+				if great_grandparent:
+					if great_grandparent.name == "GraveyardViewWindow":
+						var grave_owner = great_grandparent.get_parent()
+						if grave_owner and grave_owner.name.contains("Opponent"):
+							return true
+					elif great_grandparent.name == "BanishViewWindow":
+						var banish_owner = great_grandparent.get_parent()
+						if banish_owner and banish_owner.name.contains("Opponent"):
+							return true
+			break
+		parent = parent.get_parent()
+	return false
+
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery", "lineage"]:
@@ -88,6 +108,8 @@ func start_drag_from_grid():
 	if is_holding:
 		return
 	if zone == "lineage" or zone == "lineage_opponent":
+		return
+	if _is_in_opponent_zone():
 		return
 	var real_card = create_real_card_for_drag()
 	if real_card:
