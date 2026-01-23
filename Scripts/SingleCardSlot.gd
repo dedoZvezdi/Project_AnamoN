@@ -5,6 +5,7 @@ var card_in_slot = false
 var base_z_index = 0
 var selected_card_slug: String = ""
 var selected_card_uuid: String = ""
+var marked_uuids : Array = []
 
 @onready var context_menu = $PopupMenu
 @onready var graveyard_view_window = $GraveyardViewWindow
@@ -26,6 +27,9 @@ func update_deck_view():
 		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
 		var card_uuid = card.uuid if "uuid" in card else ""
 		var card_display = create_card_display(card_slug, card_uuid)
+		if card_uuid in marked_uuids:
+			card_display.modulate = Color(0.5, 0.5, 1.5, 0.9)
+			card_display.set_meta("is_marked", true)
 		grid_container.add_child(card_display)
 		grid_container.move_child(card_display, 0)
 
@@ -57,6 +61,9 @@ func create_card_display(card_name: String, card_uuid: String = ""):
 	card_display.set_meta("slug", card_name)
 	card_display.set_meta("uuid", card_uuid)
 	card_display.set_meta("zone", "graveyard")
+	if card_uuid != "" and card_uuid in marked_uuids:
+		card_display.modulate = Color(0.5, 0.5, 1.5, 0.9)
+		card_display.set_meta("is_marked", true)
 	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
 	return card_display
 
@@ -231,7 +238,9 @@ func add_card_to_slot(card):
 		if ci and cib:
 			ci.visible = true
 			cib.visible = false
+	final_card.rotation = 0.0
 	cards_in_graveyard.append(final_card)
+	reorder_z_indices()
 	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
 	if card_manager and card_manager.has_method("connect_card_signals"):
 		card_manager.connect_card_signals(final_card)
@@ -244,9 +253,8 @@ func add_card_to_slot(card):
 	if final_card.has_node("Area2D"):
 		final_card.get_node("Area2D").set_deferred("input_pickable", false)
 	final_card.global_position = target_pos
-	final_card.rotation = 0.0
-	final_card.z_index = base_z_index + cards_in_graveyard.size()
 	card_in_slot = true
+	update_top_card_visual()
 	if graveyard_view_window.visible:
 		update_deck_view()
 
@@ -255,10 +263,24 @@ func remove_card_from_slot(card):
 		if card.has_method("set_current_field"):
 			card.set_current_field(null)
 		cards_in_graveyard.erase(card)
-		if cards_in_graveyard.is_empty():
-			card_in_slot = false
+		var uuid = card.uuid if "uuid" in card else ""
+		if uuid != "" and uuid in marked_uuids:
+			marked_uuids.erase(uuid)
+		if is_instance_valid(card):
+			card.modulate = Color(1, 1, 1)
+			if card.has_meta("is_marked"):
+				card.set_meta("is_marked", false)
+		reorder_z_indices()
+		update_top_card_visual()
 		if graveyard_view_window.visible:
 			update_deck_view()
+
+func reorder_z_indices():
+	var idx := 0
+	for card in cards_in_graveyard:
+		if card and is_instance_valid(card):
+			card.z_index = base_z_index + idx + 1
+			idx += 1
 
 func get_top_card():
 	return null
@@ -275,3 +297,24 @@ func remove_card_by_slug(slug: String):
 		target_card.queue_free()
 		if graveyard_view_window.visible:
 			update_deck_view()
+
+func set_card_marked(uuid: String, is_marked: bool):
+	if is_marked:
+		if not uuid in marked_uuids:
+			marked_uuids.append(uuid)
+	else:
+		marked_uuids.erase(uuid)
+	update_top_card_visual()
+	if graveyard_view_window.visible:
+		update_deck_view()
+
+func update_top_card_visual():
+	if cards_in_graveyard.is_empty():
+		return
+	var top_card = cards_in_graveyard[-1]
+	if not is_instance_valid(top_card):
+		return
+	if marked_uuids.size() > 0:
+		top_card.modulate = Color(0.5, 0.5, 1.5, 0.9)
+	else:
+		top_card.modulate = Color(1, 1, 1)

@@ -937,3 +937,28 @@ func _convert_opponent_to_player_card(opp_card: Node, stats: Dictionary, final_p
 		else:
 			opp_card.get_parent().remove_child(opp_card)
 	opp_card.queue_free()
+
+@rpc("any_peer", "reliable")
+func sync_mark_card(player_id: int, zone_name: String, uuid: String, is_marked: bool):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var player_field = get_node_or_null("PlayerField")
+	if not player_field:
+		return
+	var slot_name = ""
+	match zone_name:
+		"graveyard":
+			slot_name = "GRAVEYARD"
+		"banish":
+			slot_name = "BANISH"
+	if slot_name != "":
+		var slot = player_field.get_node_or_null(slot_name)
+		if slot and slot.has_method("set_card_marked"):
+			slot.set_card_marked(uuid, is_marked)
+	if multiplayer.is_server():
+		var sender_id = multiplayer.get_remote_sender_id()
+		if sender_id != 0:
+			for peer_id in multiplayer.get_peers():
+				if peer_id != sender_id:
+					rpc_id(peer_id, "sync_mark_card", player_id, zone_name, uuid, is_marked)
