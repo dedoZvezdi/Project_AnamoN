@@ -93,7 +93,7 @@ func show_deck_view():
 	$DeckViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
 	$DeckViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 	if has_node("Sprite2D"):
-		$Sprite2D.modulate = Color(1, 0, 0, 1)
+		$Sprite2D.modulate = Color(0.5, 0.5, 1.5, 0.9)
 
 func create_card_display(card_name: String, card_uuid: String):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")

@@ -97,9 +97,24 @@ func _gui_input(event):
 			emit_signal("request_popup_menu", card_slug, current_uuid)
 			accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed and not is_holding:
-			start_drag_from_grid()
-			accept_event()
+		if event.pressed:
+			if _is_in_opponent_zone():
+				var is_marked = get_meta("is_marked") if has_meta("is_marked") else false
+				is_marked = !is_marked
+				set_meta("is_marked", is_marked)
+				if is_marked:
+					modulate = Color(1.5, 0.5, 0.5, 0.9)
+				else:
+					modulate = Color(1, 1, 1)
+				var uuid = get_meta("uuid") if has_meta("uuid") else ""
+				var card_manager = get_tree().current_scene.get_node("PlayerField/CardManager")
+				if card_manager and card_manager.has_method("request_mark_opponent_card"):
+					card_manager.request_mark_opponent_card(zone, uuid, is_marked)
+				accept_event()
+				return
+			if not is_holding:
+				start_drag_from_grid()
+				accept_event()
 		elif not event.pressed and is_holding:
 			finish_drag_from_grid()
 			accept_event()
@@ -125,8 +140,8 @@ func start_drag_from_grid():
 					while owner_node != null and not owner_node.has_method("remove_from_lineage_by_uuid"):
 						owner_node = owner_node.get_parent()
 					if owner_node and owner_node.has_method("remove_from_lineage_by_uuid"):
-						var u = get_meta("uuid") if has_meta("uuid") else ""
-						owner_node.remove_from_lineage_by_uuid(u)
+						var uuid = get_meta("uuid") if has_meta("uuid") else ""
+						owner_node.remove_from_lineage_by_uuid(uuid)
 				update_grid_immediately()
 				emit_signal("card_drag_started", self)
 				card_image_path = ""

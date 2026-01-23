@@ -303,7 +303,6 @@ func finish_drag():
 				if multiplayer_node and not card.is_token():
 					multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug)
 			card.scale = normal_scale
-			card.z_index = base_z_index
 		elif card_slot_found.name == "BANISH":
 			var face_down := false
 			if card.has_meta("banish_face_down"):
@@ -318,7 +317,6 @@ func finish_drag():
 			if card.has_meta("banish_face_down"):
 				card.set_meta("banish_face_down", false)
 			card.scale = normal_scale
-			card.z_index = base_z_index
 		else:
 			card.z_index = base_z_index + card_counter
 			card_counter += 1
@@ -801,6 +799,23 @@ func get_memory_slot_for_card(card):
 		if node.name == "MEMORY" and is_instance_valid(node) and card in node.cards_in_slot:
 			return node
 	return null
+
+func request_mark_opponent_card(zone_name: String, uuid: String, is_marked: bool):
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_mark_card", multiplayer.get_unique_id(), zone_name, uuid, is_marked)
+	_update_local_opponent_slot_mark(zone_name, uuid, is_marked)
+
+func _update_local_opponent_slot_mark(zone_name: String, uuid: String, is_marked: bool):
+	match zone_name:
+		"graveyard":
+			var slot = get_tree().get_current_scene().get_node_or_null("OpponentField/OpponentGraveyard")
+			if slot and slot.has_method("set_card_marked"):
+				slot.set_card_marked(uuid, is_marked)
+		"banish":
+			var slot = get_tree().get_current_scene().get_node_or_null("OpponentField/OpponentBanish")
+			if slot and slot.has_method("set_card_marked"):
+				slot.set_card_marked(uuid, is_marked)
 
 func find_card_information_reference():
 	var root = get_tree().current_scene
