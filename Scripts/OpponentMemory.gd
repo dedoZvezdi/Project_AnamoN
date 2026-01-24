@@ -25,7 +25,7 @@ func _ready():
 	roulette_timer.one_shot = false
 	add_child(roulette_timer)
 
-func add_card_to_memory(card):
+func add_card_to_memory(card, _skip_arrangement: bool = false, target_index: int = -1):
 	if not card or not is_instance_valid(card):
 		return
 	if card.has_method("is_token") and card.is_token():
@@ -35,7 +35,10 @@ func add_card_to_memory(card):
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in cards_in_slot:
-		cards_in_slot.append(card)
+		if target_index >= 0 and target_index <= cards_in_slot.size():
+			cards_in_slot.insert(target_index, card)
+		else:
+			cards_in_slot.append(card)
 		card.z_index = memory_z_index_offset + cards_in_slot.size()
 	_show_card_back(card)
 	_arrange_cards_symmetrically()

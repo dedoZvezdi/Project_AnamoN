@@ -36,7 +36,7 @@ func _ready():
 func _on_global_lmb_released():
 	reset_card_colors()
 
-func add_card_to_memory(card, skip_arrangement: bool = false):
+func add_card_to_memory(card, skip_arrangement: bool = false, target_index: int = -1):
 	if not card or not is_instance_valid(card):
 		return
 	if card.has_method("is_token") and card.is_token():
@@ -60,7 +60,10 @@ func add_card_to_memory(card, skip_arrangement: bool = false):
 		final_card.is_publicly_revealed = false
 	if final_card.has_method("set_current_field"):
 		final_card.set_current_field(self)
-	cards_in_slot.append(final_card)
+	if target_index >= 0 and target_index <= cards_in_slot.size():
+		cards_in_slot.insert(target_index, final_card)
+	else:
+		cards_in_slot.append(final_card)
 	final_card.z_index = memory_z_index_offset + cards_in_slot.size()
 	show_card_back(final_card)
 	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
