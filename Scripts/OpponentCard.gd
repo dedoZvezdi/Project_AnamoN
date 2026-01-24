@@ -17,6 +17,7 @@ var champion_lineage := []
 var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
 var original_owner_id = 0
+var is_marked = false
 
 @onready var crystal_node: Sprite2D = get_node_or_null("Crystal")
 @onready var crystal_collision: CollisionShape2D = get_node_or_null("Crystal/Area2D/CollisionShape2D")
@@ -33,6 +34,8 @@ func _ready() -> void:
 			area.mouse_entered.connect(_on_area_2d_mouse_entered)
 		if not area.mouse_exited.is_connected(_on_area_2d_mouse_exited):
 			area.mouse_exited.connect(_on_area_2d_mouse_exited)
+		if not area.input_event.is_connected(_on_area_2d_input_event):
+			area.input_event.connect(_on_area_2d_input_event)
 	if lineage_view_window:
 		if not lineage_view_window.close_requested.is_connected(_on_lineage_window_close):
 			lineage_view_window.close_requested.connect(_on_lineage_window_close)
@@ -110,9 +113,18 @@ func get_uuid() -> String:
 	return uuid
 
 func set_current_field(field):
+	if is_marked and current_field and current_field.is_in_group("memory_slots"):
+		if field != current_field:
+			var is_new_field_memory = false
+			if field and field.is_in_group("memory_slots"):
+				is_new_field_memory = true
+			if not is_new_field_memory:
+				set_marked(false)
 	current_field = field
 
 func set_opponent_reveal_status(revealed: bool):
+	if is_marked:
+		set_marked(false)
 	is_revealed_by_opponent = revealed
 	if mouse_inside:
 		if revealed:
@@ -345,3 +357,43 @@ func animate_send_to_lineage(card_node: Node, card_slug: String, card_uuid: Stri
 		tween.tween_callback(final_callback)
 	else:
 		final_callback.call()
+
+func _on_area_2d_input_event(_viewport, event, _shape_idx):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if is_in_memory_zone():
+			if can_be_marked():
+				toggle_mark()
+
+func is_in_memory_zone() -> bool:
+	if current_field and current_field.is_in_group("memory_slots"):
+		return true
+	var parent = get_parent()
+	if parent and parent.is_in_group("memory_slots"):
+		return true
+	return false
+
+func can_be_marked() -> bool:
+	var parent = current_field if current_field else get_parent()
+	if parent and parent.has_method("are_cards_blocked_for_marking"):
+		if parent.are_cards_blocked_for_marking():
+			return false
+	return true
+
+func toggle_mark():
+	set_marked(!is_marked)
+
+func set_marked(value: bool):
+	if is_marked == value:
+		return
+	is_marked = value
+	update_visuals_based_on_mark()
+	if multiplayer.get_unique_id() != 0:
+		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+		if multiplayer_node and multiplayer_node.has_method("rpc"):
+			multiplayer_node.rpc("sync_set_card_marked", multiplayer.get_unique_id(), uuid, is_marked)
+
+func update_visuals_based_on_mark():
+	if is_marked:
+		modulate = Color(1.5, 0.5, 0.5, 0.9)
+	else:
+		modulate = Color(1, 1, 1, 1)
