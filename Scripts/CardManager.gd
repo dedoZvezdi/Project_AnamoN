@@ -24,6 +24,7 @@ var original_card_display = null
 var card_information_reference = null
 var source_memory_slot = null
 var original_memory_index = -1
+var drag_card_was_marked = false
 
 func _ready() -> void:
 	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
@@ -188,8 +189,15 @@ func start_drag(card):
 	source_memory_slot = get_memory_slot_for_card(card)
 	if source_memory_slot:
 		original_memory_index = source_memory_slot.cards_in_slot.find(card)
+		if "is_marked" in card:
+			drag_card_was_marked = card.is_marked
+		elif card.has_meta("is_marked") and card.get_meta("is_marked") == true:
+			drag_card_was_marked = true
+		else:
+			drag_card_was_marked = false
 	else:
 		original_memory_index = -1
+		drag_card_was_marked = false
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.z_index = drag_z_index
 	card.scale = normal_scale
@@ -280,6 +288,11 @@ func finish_drag():
 			if card_slot_found == source_memory_slot:
 				target_idx = original_memory_index
 			card_slot_found.add_card_to_memory(card, false, target_idx)
+			if drag_card_was_marked:
+				if card.has_method("set_marked"):
+					if card.has_method("can_be_marked") and card.can_be_marked():
+						card.set_marked(true)
+				drag_card_was_marked = false
 			var slug = get_card_slug(card)
 			if slug != "":
 				var uuid = get_card_uuid(card)
@@ -345,9 +358,16 @@ func finish_drag():
 			player_hand_reference.dragging_card_from_hand = null
 			player_hand_reference.update_hand_position()
 		player_hand_reference.clear_external_preview()
+	if card and is_instance_valid(card) and card.has_method("set_marked"):
+		var ended_in_memory = false
+		if card_slot_found and card_slot_found.name == "MEMORY":
+			ended_in_memory = true
+		if not ended_in_memory:
+			card.set_marked(false)
 	card_being_dragged = null
 	source_memory_slot = null
 	original_memory_index = -1
+	drag_card_was_marked = false
 	call_deferred("force_hover_check")
 
 func free_card_from_slot(card):

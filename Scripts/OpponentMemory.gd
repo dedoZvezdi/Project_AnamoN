@@ -40,6 +40,8 @@ func add_card_to_memory(card, _skip_arrangement: bool = false, target_index: int
 		else:
 			cards_in_slot.append(card)
 		card.z_index = memory_z_index_offset + cards_in_slot.size()
+	if are_cards_blocked_for_marking() and card.has_method("set_marked"):
+		card.set_marked(false)
 	_show_card_back(card)
 	_arrange_cards_symmetrically()
 
@@ -165,6 +167,7 @@ func start_synced_roulette(target_index: int, total_time: float):
 	roulette_speed = 0.1
 	roulette_timer.wait_time = roulette_speed
 	roulette_timer.start()
+	unmark_all_cards()
 	_highlight_card_at_index(current_highlight_index)
 
 func _on_roulette_tick():
@@ -220,6 +223,18 @@ func _clear_current_highlight():
 func reset_card_colors():
 	_clear_current_highlight()
 	highlighted_card = null
+
+func unmark_all_cards():
+	for card in cards_in_slot:
+		if card and is_instance_valid(card) and card.has_method("set_marked"):
+			card.set_marked(false)
+
+func are_cards_blocked_for_marking() -> bool:
+	if is_roulette_running:
+		return true
+	if highlighted_card != null:
+		return true
+	return false
 
 func set_all_cards_reveal_status(revealed: bool):
 	for card in cards_in_slot:

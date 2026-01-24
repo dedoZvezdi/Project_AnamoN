@@ -794,6 +794,35 @@ func sync_give_control(player_id: int, stats: Dictionary):
 		_convert_opponent_to_player_card(opponent_card, stats, target_pos, target_rot + 180))
 
 @rpc("any_peer", "reliable")
+func sync_set_card_marked(player_id: int, uuid: String, is_marked: bool):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var card_found = false
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		var card = _find_opponent_card_by_uuid(opp_field, uuid)
+		if card and card.has_method("set_marked"):
+			card.set_marked(is_marked)
+			card_found = true
+	if not card_found:
+		var player_field = get_node_or_null("PlayerField")
+		if player_field:
+			var _card_manager = player_field.get_node_or_null("CardManager")
+			var local_card = _find_local_card_by_uuid(player_field, uuid)
+			if local_card and local_card.has_method("set_marked"):
+				local_card.set_marked(is_marked)
+
+func _find_local_card_by_uuid(root_node, target_uuid):
+	if "uuid" in root_node and root_node.uuid == target_uuid:
+		return root_node
+	for child in root_node.get_children():
+		var res = _find_local_card_by_uuid(child, target_uuid)
+		if res:
+			return res
+	return null
+
+@rpc("any_peer", "reliable")
 func sync_return_to_owner_banish(target_owner_id: int, uuid: String, slug: String, face_down: bool):
 	if multiplayer.get_unique_id() == target_owner_id:
 		var opp_field = get_node_or_null("OpponentField")

@@ -32,6 +32,7 @@ var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
 var is_tweening: bool = false
 var original_owner_id = 0
+var is_marked = false
 
 const SHIFTING_CURRENTS_SLUGS := ["shifting-currents-p24", "shifting-currents-ambsd"]
 const TRANSFORMABLE_SLUGS := [
@@ -202,6 +203,10 @@ func is_champion_card() -> bool:
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if is_dragging:
 		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if is_in_memory_slot():
+			if can_be_marked():
+				toggle_mark()
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if mouse_inside:
 			if is_in_graveyard() or is_in_banish():
@@ -798,9 +803,32 @@ func apply_champion_life_delta(delta):
 			card_level_lable.clear()
 		if card_PLDS_lable:
 			card_PLDS_lable.clear()
-		show_card_info()
-		if card_information_reference and mouse_inside and not is_dragging:
-			card_information_reference.show_card_preview(self)
+
+func can_be_marked() -> bool:
+	var parent = current_field if current_field else get_parent()
+	if parent and parent.has_method("are_cards_blocked_for_marking"):
+		if parent.are_cards_blocked_for_marking():
+			return false
+	return true
+
+func toggle_mark():
+	set_marked(!is_marked)
+
+func set_marked(value: bool):
+	if is_marked == value:
+		return
+	is_marked = value
+	update_visuals_based_on_mark()
+	if multiplayer.get_unique_id() != 0 and (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
+		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+		if multiplayer_node and multiplayer_node.has_method("rpc"):
+			multiplayer_node.rpc("sync_set_card_marked", multiplayer.get_unique_id(), uuid, is_marked)
+
+func update_visuals_based_on_mark():
+	if is_marked:
+		modulate = Color(0.5, 0.5, 1.5, 0.9)
+	else:
+		modulate = Color(1, 1, 1, 1)
 		sync_stats_to_opponent()
 
 func is_in_banish() -> bool:

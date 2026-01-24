@@ -65,6 +65,8 @@ func add_card_to_memory(card, skip_arrangement: bool = false, target_index: int 
 	else:
 		cards_in_slot.append(final_card)
 	final_card.z_index = memory_z_index_offset + cards_in_slot.size()
+	if are_cards_blocked_for_marking() and final_card.has_method("set_marked"):
+		final_card.set_marked(false)
 	show_card_back(final_card)
 	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
 	if card_manager and card_manager.has_method("connect_card_signals"):
@@ -274,6 +276,7 @@ func start_roulette():
 	roulette_speed = 0.1
 	roulette_timer.wait_time = roulette_speed
 	roulette_timer.start()
+	unmark_all_cards()
 	_highlight_card_at_index(current_highlight_index)
 	_set_cards_collision_disabled(true)
 
@@ -332,7 +335,10 @@ func _clear_current_highlight():
 	for i in range(cards_in_slot.size()):
 		var card = cards_in_slot[i]
 		if card and is_instance_valid(card):
-			card.modulate = Color(1, 1, 1, 1)
+			if card.has_method("update_visuals_based_on_mark"):
+				card.update_visuals_based_on_mark()
+			else:
+				card.modulate = Color(1, 1, 1, 1)
 
 func reset_card_colors():
 	_clear_current_highlight()
@@ -341,6 +347,18 @@ func reset_card_colors():
 		var main_node = get_tree().get_root().get_node_or_null("Main")
 		if main_node:
 			main_node.rpc("rpc_reset_memory_roulette", multiplayer.get_unique_id())
+
+func unmark_all_cards():
+	for card in cards_in_slot:
+		if card and is_instance_valid(card) and card.has_method("set_marked"):
+			card.set_marked(false)
+
+func are_cards_blocked_for_marking() -> bool:
+	if is_roulette_running:
+		return true
+	if highlighted_card != null:
+		return true
+	return false
 
 func _unhandled_input(event):
 	if highlighted_card and (
