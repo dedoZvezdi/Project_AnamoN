@@ -239,7 +239,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						if current_direction != "East": popup_menu.add_item("East", 21)
 						if current_direction != "South": popup_menu.add_item("South", 22)
 						if current_direction != "West": popup_menu.add_item("West", 23)
-					if slug in TRANSFORMABLE_SLUGS:
+					if slug in TRANSFORMABLE_SLUGS and not is_champion_card():
 						popup_menu.add_item("Transform", 5)
 			else:
 				if is_in_memory_slot() or is_in_hand():
@@ -272,7 +272,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						if opponent_field:
 							popup_menu.add_item("Give Control", 15)
 					var slug = get_slug_from_card()
-					if slug in TRANSFORMABLE_SLUGS:
+					if slug in TRANSFORMABLE_SLUGS and not is_champion_card():
 						popup_menu.add_item("Transform", 5)
 			var mouse_pos = get_global_mouse_position()
 			popup_menu.reset_size()

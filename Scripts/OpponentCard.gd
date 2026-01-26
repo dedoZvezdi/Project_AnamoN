@@ -360,7 +360,7 @@ func animate_send_to_lineage(card_node: Node, card_slug: String, card_uuid: Stri
 
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if is_in_memory_zone():
+		if is_in_memory_zone() or is_in_main_field():
 			if can_be_marked():
 				toggle_mark()
 
