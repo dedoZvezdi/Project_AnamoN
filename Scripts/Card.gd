@@ -442,6 +442,8 @@ func transform_card():
 		return
 	var new_slug = TRANSFORM_PAIRS[slug]
 	set_meta("slug", new_slug)
+	if is_marked:
+		set_marked(false)
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + new_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		$CardImage.texture = load(card_image_path)
@@ -623,6 +625,8 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 func rotate_card():
 	if not is_in_main_field():
 		return
+	if is_marked:
+		set_marked(false)
 	var target_rot = original_rotation
 	if is_rotated:
 		target_rot = original_rotation
@@ -636,6 +640,8 @@ func rotate_card():
 
 func set_direction(dir: String):
 	current_direction = dir
+	if is_marked:
+		set_marked(false)
 	var target_rot = original_rotation
 	match dir:
 		"North": target_rot = original_rotation
@@ -669,6 +675,13 @@ func set_current_field(field):
 	if is_mastery() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
 		destroy_mastery()
 		return
+	if is_marked and is_in_main_field():
+		var is_new_field_main = false
+		if field and field.is_in_group("main_fields"):
+			is_new_field_main = true
+		if not is_new_field_main:
+			set_marked(false)
+			
 	var was_in_main = is_in_main_field()
 	current_field = field
 	if _is_hand_field(current_field):

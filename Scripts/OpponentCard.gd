@@ -113,12 +113,13 @@ func get_uuid() -> String:
 	return uuid
 
 func set_current_field(field):
-	if is_marked and current_field and current_field.is_in_group("memory_slots"):
-		if field != current_field:
-			var is_new_field_memory = false
-			if field and field.is_in_group("memory_slots"):
-				is_new_field_memory = true
-			if not is_new_field_memory:
+	if is_marked and current_field:
+		var was_in_special_zone = current_field.is_in_group("memory_slots") or current_field.is_in_group("main_fields")
+		if was_in_special_zone:
+			var is_new_field_special = false
+			if field and (field.is_in_group("memory_slots") or field.is_in_group("main_fields")):
+				is_new_field_special = true
+			if not is_new_field_special:
 				set_marked(false)
 	current_field = field
 
@@ -181,6 +182,8 @@ func set_opponent_reveal_status(revealed: bool):
 
 func remote_transform(new_slug: String):
 	set_meta("slug", new_slug)
+	if is_marked:
+		set_marked(false)
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + new_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		var img = get_node_or_null("CardImage")
