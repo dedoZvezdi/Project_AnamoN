@@ -458,8 +458,10 @@ func sync_card_returned_to_deck(player_id: int, uuid: String, _slug: String):
 		return
 	var card = _find_opponent_card_by_uuid(card_manager, uuid)
 	if card:
-		var opp_deck = opp_field.find_child("Opponent_GA_DECK", true, false)
+		var opp_deck = opp_field.find_child("OpponentDeck", true, false)
 		if opp_deck:
+			if opp_deck.has_method("increment_deck_size"):
+				opp_deck.increment_deck_size()
 			_animate_card_to_deck(card, opp_deck.global_position, opp_field)
 		else:
 			_remove_card_from_all_zones(card, opp_field)
@@ -468,11 +470,20 @@ func sync_card_returned_to_deck(player_id: int, uuid: String, _slug: String):
 func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node):
 	if not card or not is_instance_valid(card):
 		return
+	var front = card.get_node_or_null("CardImage")
+	var back = card.get_node_or_null("CardImageBack")
+	if front:
+		front.visible = false
+		front.z_index = -1
+	if back:
+		back.visible = true
+		back.z_index = 0
+		
+	card.z_index = 1000
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(card, "global_position", deck_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(card, "scale", Vector2(0.2, 0.2), 0.5)
-	tween.tween_property(card, "rotation_degrees", 360.0, 0.5)
+	tween.tween_property(card, "rotation_degrees", 0.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.set_parallel(false)
 	tween.tween_callback(func():
 		if opp_field:
@@ -521,7 +532,7 @@ func sync_move_to_deck(player_id: int, uuid: String, _is_top: bool):
 			else:
 				card.get_parent().remove_child(card)
 		card.queue_free()
-	var opp_deck = opp_field.find_child("Opponent_GA_DECK", true, false)
+	var opp_deck = opp_field.find_child("OpponentDeck", true, false)
 	if opp_deck and opp_deck.has_method("increment_deck_size"):
 		opp_deck.increment_deck_size()
 
@@ -991,3 +1002,15 @@ func sync_mark_card(player_id: int, zone_name: String, uuid: String, is_marked: 
 			for peer_id in multiplayer.get_peers():
 				if peer_id != sender_id:
 					rpc_id(peer_id, "sync_mark_card", player_id, zone_name, uuid, is_marked)
+
+@rpc("any_peer", "reliable")
+func sync_deck_grid_to_hand(player_id: int, uuid: String, slug: String):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return 
+	var opp_deck = opp_field.find_child("OpponentDeck", true, false)
+	if opp_deck and opp_deck.has_method("draw_card"):
+		opp_deck.draw_card(slug, uuid)

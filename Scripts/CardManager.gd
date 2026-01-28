@@ -162,8 +162,11 @@ func remove_card_from_original_slot():
 		"ga_deck":
 			var deck_slots = get_tree().get_nodes_in_group("deck_zones")
 			for slot in deck_slots:
-				if slot and is_instance_valid(slot) and slot.has_method("remove_card_by_slug"):
-					slot.remove_card_by_slug(original_slug)
+				if slot and is_instance_valid(slot):
+					if slot.has_method("remove_card_by_uuid") and original_card_display and is_instance_valid(original_card_display) and original_card_display.has_meta("uuid"):
+						slot.remove_card_by_uuid(original_card_display.get_meta("uuid"))
+					elif slot.has_method("remove_card_by_slug"):
+						slot.remove_card_by_slug(original_slug)
 					break
 		"mat_deck":
 			var mat_deck_slots = get_tree().get_nodes_in_group("mat_deck_zones")
@@ -345,6 +348,12 @@ func finish_drag():
 			card_counter += 1
 	else:
 		if dragged_from_grid:
+			if original_zone == "ga_deck":
+				var slug = get_card_slug(card)
+				var uuid = get_card_uuid(card)
+				var multiplayer_node = get_tree().get_root().get_node("Main")
+				if multiplayer_node and multiplayer_node.has_method("rpc"):
+					multiplayer_node.rpc("sync_deck_grid_to_hand", multiplayer.get_unique_id(), uuid, slug)
 			remove_card_from_original_slot()
 			dragged_from_grid = false
 			original_slug = ""

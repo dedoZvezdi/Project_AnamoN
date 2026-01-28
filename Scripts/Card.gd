@@ -1012,15 +1012,13 @@ func _prepare_for_deck_move():
 		elif current_field.has_method("remove_card_from_slot"):
 			current_field.remove_card_from_slot(self)
 
-func _sync_move_to_deck(is_top: bool):
-	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
-	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_move_to_deck", multiplayer.get_unique_id(), uuid, is_top)
-
 func animate_card_to_deck(deck_position: Vector2, slug: String, card_uuid: String, is_top: bool):
 	if $Area2D.input_event.is_connected(_on_area_2d_input_event):
 		$Area2D.input_event.disconnect(_on_area_2d_input_event)
 	$Area2D.set_deferred("monitoring", false)
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_card_returned_to_deck", multiplayer.get_unique_id(), card_uuid, slug)
 	z_index = 1000
 	var tween = create_tween()
 	tween.set_parallel(true)
@@ -1041,9 +1039,6 @@ func _on_deck_animation_completed(slug: String, card_uuid: String, is_top: bool)
 			deck_node.add_to_top(slug, card_uuid)
 		elif not is_top and deck_node.has_method("add_to_bottom"):
 			deck_node.add_to_bottom(slug, card_uuid)
-	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
-	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_card_returned_to_deck", multiplayer.get_unique_id(), card_uuid, slug)
 	queue_free()
 
 func _is_hand_field(field) -> bool:
