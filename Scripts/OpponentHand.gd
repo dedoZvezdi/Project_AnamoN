@@ -173,7 +173,6 @@ func remove_card_from_hand(card):
 	if card in opponent_hand:
 		disconnect_card_signals(card)
 		opponent_hand.erase(card)
-		card.rotation = 0.0
 		if not opponent_hand.is_empty():
 			update_hand_position()
 		else:
