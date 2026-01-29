@@ -38,11 +38,14 @@ func _exit_tree():
 func add_card_to_hand(card):
 	if not card or not is_instance_valid(card):
 		return
+	if card.has_method("set_opponent_reveal_status"):
+		if not card.get("is_revealed_by_opponent"):
+			card.set_opponent_reveal_status(false)
 	if card not in opponent_hand:
 		opponent_hand.insert(0, card)
 		for i in range(opponent_hand.size()):
 			if opponent_hand[i] and is_instance_valid(opponent_hand[i]):
-				opponent_hand[i].z_index = int(HAND_Z_INDEX + i + 1)
+				opponent_hand[i].z_index = int(HAND_Z_INDEX + (i * 5) + 1)
 		update_hand_position()
 		if hand_hidden:
 			show_card(card)
@@ -74,7 +77,7 @@ func update_hand_position():
 			var new_position = calculate_card_position(i)
 			var new_rotation = calculate_card_rotation(i)
 			card.hand_position = new_position
-			card.z_index = int(HAND_Z_INDEX + i + 1)
+			card.z_index = int(HAND_Z_INDEX + (i * 5) + 1)
 			animate_card_to_position(card, new_position, new_rotation)
 	call_deferred("enforce_z_ordering")
 
@@ -212,7 +215,7 @@ func return_card_to_hand(card):
 		return
 	if card not in opponent_hand:
 		opponent_hand.append(card)
-		card.z_index = int(HAND_Z_INDEX + opponent_hand.size())
+		card.z_index = int(HAND_Z_INDEX + (opponent_hand.size() * 5))
 		update_hand_position()
 
 func organise_cards(cards: Array) -> void:
@@ -237,7 +240,7 @@ func enforce_z_ordering():
 		if card and is_instance_valid(card):
 			if card == hovered_card:
 				continue
-			card.z_index = int(HAND_Z_INDEX + i + 1)
+			card.z_index = int(HAND_Z_INDEX + (i * 5) + 1)
 
 func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):
@@ -251,9 +254,9 @@ func bring_card_to_front(card):
 		var current_card = opponent_hand[i]
 		if current_card and is_instance_valid(current_card):
 			if i >= hovered_card_index:
-				current_card.z_index = int(HAND_Z_INDEX + i + 100)
+				current_card.z_index = int(HAND_Z_INDEX + (i * 5) + 100)
 			else:
-				current_card.z_index = int(HAND_Z_INDEX + i + 1)
+				current_card.z_index = int(HAND_Z_INDEX + (i * 5) + 1)
 
 func clear_hovered_card():
 	hovered_card = null
@@ -261,7 +264,7 @@ func clear_hovered_card():
 	for i in range(hand_size):
 		var card = opponent_hand[i]
 		if card and is_instance_valid(card):
-			card.z_index = int(HAND_Z_INDEX + i + 1)
+			card.z_index = int(HAND_Z_INDEX + (i * 5) + 1)
 
 func hide_hand():
 	hand_hidden = true

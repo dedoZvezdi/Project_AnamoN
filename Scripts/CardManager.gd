@@ -362,6 +362,12 @@ func finish_drag():
 		if player_hand_reference:
 			player_hand_reference.add_card_to_hand(card)
 			card.z_index = base_z_index
+			var slug = get_card_slug(card)
+			if slug != "":
+				var uuid = get_card_uuid(card)
+				var multiplayer_node = get_tree().get_root().get_node("Main")
+				if multiplayer_node:
+					multiplayer_node.rpc("sync_return_card_to_hand", multiplayer.get_unique_id(), uuid, slug)
 	if card and player_hand_reference:
 		if player_hand_reference.dragging_card_from_hand == card:
 			player_hand_reference.dragging_card_from_hand = null
