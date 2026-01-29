@@ -53,7 +53,7 @@ func add_card_to_hand(card):
 			external_preview_index = -1
 		else:
 			player_hand.append(card)
-		card.z_index = HAND_Z_INDEX + player_hand.size()
+		card.z_index = HAND_Z_INDEX + (player_hand.size() * 5)
 		update_hand_position()
 		if hand_hidden:
 			show_card(card)
@@ -94,7 +94,7 @@ func update_hand_position():
 			var new_position = calculate_card_position(virtual_index, total_positions)
 			var new_rotation = calculate_card_rotation(virtual_index, total_positions)
 			card.hand_position = new_position
-			card.z_index = HAND_Z_INDEX + i + 1
+			card.z_index = HAND_Z_INDEX + (i * 5) + 1
 			if card == dragging_card_from_hand:
 				continue
 			animate_card_to_position(card, new_position, new_rotation)
@@ -107,7 +107,7 @@ func enforce_z_ordering():
 		if card and is_instance_valid(card):
 			if card == hovered_card:
 				continue
-			card.z_index = HAND_Z_INDEX + i + 1
+			card.z_index = HAND_Z_INDEX + (i * 5) + 1
 
 func calculate_card_position(index, total_size = -1):
 	var hand_size = total_size if total_size != -1 else player_hand.size()
@@ -247,7 +247,7 @@ func return_card_to_hand(card):
 		card.set_current_field(self)
 	if card not in player_hand:
 		player_hand.append(card)
-		card.z_index = int(HAND_Z_INDEX + player_hand.size())
+		card.z_index = int(HAND_Z_INDEX + (player_hand.size() * 5))
 		update_hand_position()
 		if card.has_meta("slug"):
 			var slug = card.get_meta("slug")
@@ -298,7 +298,7 @@ func clear_hovered_card():
 	for i in range(hand_size):
 		var card = player_hand[i]
 		if card and is_instance_valid(card):
-			card.z_index = HAND_Z_INDEX + i + 1
+			card.z_index = HAND_Z_INDEX + (i * 5) + 1
 			if card == card_to_restore:
 				var target_pos = calculate_card_position(i)
 				var target_rot = calculate_card_rotation(i)

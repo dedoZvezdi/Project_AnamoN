@@ -1119,6 +1119,8 @@ func reveal_to_opponent():
 		var parent = find_parent_container()
 		if parent and parent.has_method("sync_hand_order"):
 			parent.sync_hand_order()
+		if parent and parent.has_method("enforce_z_ordering"):
+			parent.enforce_z_ordering()
 	_update_local_card_visuals(true)
 	sync_reveal_state(true)
 
@@ -1126,6 +1128,10 @@ func hide_from_opponent():
 	if (not is_in_memory_slot() and not is_in_hand()) or not is_publicly_revealed:
 		return
 	is_publicly_revealed = false
+	if is_in_hand():
+		var parent = find_parent_container()
+		if parent and parent.has_method("enforce_z_ordering"):
+			parent.enforce_z_ordering()
 	_update_local_card_visuals(false)
 	sync_reveal_state(false)
 

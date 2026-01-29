@@ -135,6 +135,9 @@ func set_opponent_reveal_status(revealed: bool):
 					card_information_reference.show_card_preview(self)
 		else:
 			emit_signal("hovered_off", self)
+	var parent_node = get_parent()
+	if parent_node and parent_node.has_method("enforce_z_ordering"):
+		parent_node.enforce_z_ordering()
 	var front = get_node_or_null("CardImage")
 	var back = get_node_or_null("CardImageBack")
 	if not front or not back:
