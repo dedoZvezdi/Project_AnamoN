@@ -360,14 +360,18 @@ func finish_drag():
 			original_zone = ""
 			original_card_display = null
 		if player_hand_reference:
+			var was_in_hand = (player_hand_reference.dragging_card_from_hand == card)
 			player_hand_reference.add_card_to_hand(card)
 			card.z_index = base_z_index
-			var slug = get_card_slug(card)
-			if slug != "":
-				var uuid = get_card_uuid(card)
-				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node:
-					multiplayer_node.rpc("sync_return_card_to_hand", multiplayer.get_unique_id(), uuid, slug)
+			if not was_in_hand:
+				var slug = get_card_slug(card)
+				if slug != "":
+					var uuid = get_card_uuid(card)
+					var multiplayer_node = get_tree().get_root().get_node("Main")
+					if multiplayer_node:
+						multiplayer_node.rpc("sync_return_card_to_hand", multiplayer.get_unique_id(), uuid, slug)
+				if card.has_method("is_in_hand") and card.is_in_hand() and card.get("is_publicly_revealed") == true:
+					card.hide_from_opponent()
 	if card and player_hand_reference:
 		if player_hand_reference.dragging_card_from_hand == card:
 			player_hand_reference.dragging_card_from_hand = null
