@@ -444,6 +444,8 @@ func sync_return_card_to_hand(player_id: int, uuid: String, slug: String):
 					opp_memory.remove_card_from_memory(card)
 				if opp_hand and opp_hand.has_method("add_card_to_hand"):
 					opp_hand.add_card_to_hand(card)
+				if card.has_method("set_opponent_reveal_status"):
+					card.set_opponent_reveal_status(false)
 
 @rpc("any_peer", "reliable")
 func sync_card_returned_to_deck(player_id: int, uuid: String, _slug: String):
@@ -583,6 +585,11 @@ func reset_ui():
 		connect_timer.stop()
 
 func get_or_create_opponent_card(card_manager, uuid: String, slug: String) -> Node:
+	var opp_field = card_manager.get_parent()
+	if opp_field:
+		var existing_card = _find_opponent_card_by_uuid(opp_field, uuid)
+		if existing_card:
+			return existing_card
 	if uuid != "":
 		for card in card_manager.get_children():
 			if "uuid" in card and card.uuid == uuid:
