@@ -524,19 +524,22 @@ func sync_move_to_deck(player_id: int, uuid: String, _is_top: bool):
 		return
 	var card = _find_opponent_card_by_uuid(card_manager, uuid)
 	if card:
-		if card.get_parent():
-			if card.get_parent().has_method("remove_card_from_hand"):
-				card.get_parent().remove_card_from_hand(card)
-			elif card.get_parent().has_method("remove_card_from_slot"):
-				card.get_parent().remove_card_from_slot(card)
-			elif card.get_parent().has_method("remove_card_from_field"):
-				card.get_parent().remove_card_from_field(card)
-			else:
-				card.get_parent().remove_child(card)
-		card.queue_free()
-	var opp_deck = opp_field.find_child("OpponentDeck", true, false)
-	if opp_deck and opp_deck.has_method("increment_deck_size"):
-		opp_deck.increment_deck_size()
+		var opp_deck = opp_field.find_child("OpponentDeck", true, false)
+		if opp_deck:
+			if opp_deck.has_method("increment_deck_size"):
+				opp_deck.increment_deck_size()
+			_animate_card_to_deck(card, opp_deck.global_position, opp_field)
+		else:
+			if card.get_parent():
+				if card.get_parent().has_method("remove_card_from_hand"):
+					card.get_parent().remove_card_from_hand(card)
+				elif card.get_parent().has_method("remove_card_from_slot"):
+					card.get_parent().remove_card_from_slot(card)
+				elif card.get_parent().has_method("remove_card_from_field"):
+					card.get_parent().remove_card_from_field(card)
+				else:
+					card.get_parent().remove_child(card)
+			card.queue_free()
 
 @rpc("any_peer", "reliable")
 func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary, direction: String, rot_deg: float):
