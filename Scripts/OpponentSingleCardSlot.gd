@@ -66,6 +66,19 @@ func create_card_display(card_name: String, card_uuid: String = ""):
 		card_display.set_meta("is_marked", true)
 	return card_display
 
+func show_card_front(card):
+	if not card or not is_instance_valid(card):
+		return
+	var card_image = card.get_node_or_null("CardImage")
+	var card_image_back = card.get_node_or_null("CardImageBack")
+	if card_image and card_image_back:
+		card_image_back.z_index = -1
+		card_image.z_index = 0
+		card_image_back.visible = false
+		card_image.visible = true
+		if card.has_meta("original_card_texture"):
+			card_image.texture = card.get_meta("original_card_texture")
+
 func show_deck_view():
 	update_deck_view()
 	graveyard_view_window.popup_centered()
@@ -97,10 +110,9 @@ func add_card_to_slot(card):
 	var tween = create_tween()
 	tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
 	tween.parallel().tween_property(card, "rotation", 0.0, 0.3)
-	if card.has_node("AnimationPlayer"):
-		var ap = card.get_node("AnimationPlayer")
-		if ap.has_animation("card_flip"):
-			ap.play("card_flip")
+	show_card_front(card)
+	if card.has_method("set_opponent_reveal_status"):
+		card.set_opponent_reveal_status(true)
 	reorder_z_indices()
 	card_in_slot = true
 	update_top_card_visual()
