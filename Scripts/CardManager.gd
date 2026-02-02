@@ -271,6 +271,7 @@ func finish_drag():
 			card_being_dragged = null
 			return
 	if card_slot_found:
+		var was_from_ga_deck = dragged_from_grid and original_zone == "ga_deck"
 		if dragged_from_grid:
 			remove_card_from_original_slot()
 			dragged_from_grid = false
@@ -327,7 +328,7 @@ func finish_drag():
 				var uuid = get_card_uuid(card)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node and not card.is_token():
-					multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug)
+					multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug, was_from_ga_deck)
 			card.scale = normal_scale
 		elif card_slot_found.name == "BANISH":
 			var face_down := false
@@ -339,7 +340,7 @@ func finish_drag():
 				var uuid = get_card_uuid(card)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node and not card.is_token():
-					multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, face_down)
+					multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, face_down, was_from_ga_deck)
 			if card.has_meta("banish_face_down"):
 				card.set_meta("banish_face_down", false)
 			card.scale = normal_scale

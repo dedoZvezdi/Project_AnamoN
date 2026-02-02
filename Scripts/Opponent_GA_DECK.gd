@@ -9,10 +9,7 @@ func _ready() -> void:
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
 
 func draw_card(card_drawn_name: String, card_uuid: String = ""):
-	if deck_size - 1 == 0:
-		visible = false
-	else:
-		deck_size -= 1
+	decrement_deck_size()
 	var card_scene = preload(CARD_SCENE_PATH)
 	var new_card = card_scene.instantiate()
 	if card_uuid != "":
@@ -30,6 +27,16 @@ func draw_card(card_drawn_name: String, card_uuid: String = ""):
 	new_card.name = unique_name
 	$"../CardManager".add_child(new_card)
 	$"../OpponentHand".add_card_to_hand(new_card)
+
+func decrement_deck_size():
+	if not is_instance_valid(self): return
+	if deck_size - 1 <= 0:
+		visible = false
+		if has_node("Sprite2D"):
+			$Sprite2D.visible = false
+		deck_size = 0
+	else:
+		deck_size -= 1
 
 func increment_deck_size():
 	if not is_instance_valid(self): return

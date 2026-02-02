@@ -255,7 +255,7 @@ func sync_opponent_phase(phase_name: String):
 					rpc_id(peer_id, "sync_opponent_phase", phase_name)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_graveyard(player_id: int, uuid: String, slug: String):
+func sync_move_to_graveyard(player_id: int, uuid: String, slug: String, from_deck: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -278,11 +278,17 @@ func sync_move_to_graveyard(player_id: int, uuid: String, slug: String):
 				var opp_main = opp_field.get_node_or_null("OpponentMainField")
 				if opp_main and opp_main.has_method("remove_card_from_field"):
 					opp_main.remove_card_from_field(card)
-				if opp_grave and opp_grave.has_method("add_card_to_slot"):
+				if from_deck:
+					var target_pos = opp_grave.global_position
+					if opp_grave.has_node("Area2D/CollisionShape2D"):
+						target_pos = opp_grave.get_node("Area2D/CollisionShape2D").global_position
+					_animate_opponent_card_from_deck(card, target_pos, true, false, opp_grave, "add_card_to_slot", false)
+				elif opp_grave and opp_grave.has_method("add_card_to_slot"):
+					card.visible = true
 					opp_grave.add_card_to_slot(card)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_banish(player_id: int, uuid: String, slug: String, face_down: bool):
+func sync_move_to_banish(player_id: int, uuid: String, slug: String, face_down: bool, from_deck: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -305,7 +311,13 @@ func sync_move_to_banish(player_id: int, uuid: String, slug: String, face_down: 
 				var opp_main = opp_field.get_node_or_null("OpponentMainField")
 				if opp_main and opp_main.has_method("remove_card_from_field"):
 					opp_main.remove_card_from_field(card)
-				if opp_banish and opp_banish.has_method("add_card_to_slot"):
+				if from_deck:
+					var target_pos = opp_banish.global_position
+					if opp_banish.has_node("Area2D/CollisionShape2D"):
+						target_pos = opp_banish.get_node("Area2D/CollisionShape2D").global_position
+					_animate_opponent_card_from_deck(card, target_pos, !face_down, true, opp_banish, "add_card_to_slot", face_down)
+				elif opp_banish and opp_banish.has_method("add_card_to_slot"):
+					card.visible = true
 					opp_banish.add_card_to_slot(card, face_down)
 
 @rpc("any_peer", "reliable")
@@ -462,14 +474,12 @@ func sync_card_returned_to_deck(player_id: int, uuid: String, _slug: String):
 	if card:
 		var opp_deck = opp_field.find_child("OpponentDeck", true, false)
 		if opp_deck:
-			if opp_deck.has_method("increment_deck_size"):
-				opp_deck.increment_deck_size()
-			_animate_card_to_deck(card, opp_deck.global_position, opp_field)
+			_animate_card_to_deck(card, opp_deck.global_position, opp_field, opp_deck)
 		else:
 			_remove_card_from_all_zones(card, opp_field)
 			card.queue_free()
 
-func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node):
+func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node, opp_deck: Node = null):
 	if not card or not is_instance_valid(card):
 		return
 	var front = card.get_node_or_null("CardImage")
@@ -488,9 +498,38 @@ func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node):
 	tween.tween_property(card, "rotation_degrees", 0.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.set_parallel(false)
 	tween.tween_callback(func():
+		if opp_deck and opp_deck.has_method("increment_deck_size"):
+			opp_deck.increment_deck_size()
 		if opp_field:
 			_remove_card_from_all_zones(card, opp_field)
 		card.queue_free())
+
+func _animate_opponent_card_from_deck(card: Node, target_pos: Vector2, play_flip: bool, is_banish: bool, zone_node: Node, zone_method: String, face_down: bool):
+	var opp_field = card.get_parent().get_parent() 
+	var deck_node = opp_field.find_child("OpponentDeck", true, false)
+	if deck_node:
+		card.global_position = deck_node.global_position
+		card.visible = true
+		if deck_node.has_method("decrement_deck_size"):
+			deck_node.decrement_deck_size()
+	card.scale = Vector2(0.35, 0.35)
+	card.z_index = 1000
+	if card.has_method("set_opponent_reveal_status"):
+		card.set_opponent_reveal_status(false)
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if is_banish:
+		tween.tween_property(card, "rotation_degrees", 90.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if play_flip:
+		if card.has_method("set_opponent_reveal_status"):
+			card.set_opponent_reveal_status(true)
+	await tween.finished
+	if zone_node.has_method(zone_method):
+		if is_banish:
+			zone_node.call(zone_method, card, face_down)
+		else:
+			zone_node.call(zone_method, card)
 
 func _remove_card_from_all_zones(card: Node, opp_field: Node):
 	if not card or not is_instance_valid(card):
@@ -526,9 +565,7 @@ func sync_move_to_deck(player_id: int, uuid: String, _is_top: bool):
 	if card:
 		var opp_deck = opp_field.find_child("OpponentDeck", true, false)
 		if opp_deck:
-			if opp_deck.has_method("increment_deck_size"):
-				opp_deck.increment_deck_size()
-			_animate_card_to_deck(card, opp_deck.global_position, opp_field)
+			_animate_card_to_deck(card, opp_deck.global_position, opp_field, opp_deck)
 		else:
 			if card.get_parent():
 				if card.get_parent().has_method("remove_card_from_hand"):
@@ -600,6 +637,7 @@ func get_or_create_opponent_card(card_manager, uuid: String, slug: String) -> No
 	var scene = load("res://Scenes/OpponentCard.tscn")
 	if scene:
 		var new_card = scene.instantiate()
+		new_card.visible = false
 		new_card.set_meta("slug", slug)
 		if "uuid" in new_card:
 			new_card.uuid = uuid
