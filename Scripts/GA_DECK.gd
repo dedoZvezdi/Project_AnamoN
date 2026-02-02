@@ -188,7 +188,7 @@ func send_top_to_gy():
 	if graveyard_node:
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
-			main_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), card_uuid, slug)
+			main_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), card_uuid, slug, true)
 		_animate_deck_card_to_zone(slug, card_uuid, graveyard_node.global_position, graveyard_node, "add_card_to_slot", false, "", true, true)
 	update_deck_view()
 	update_deck_state()
@@ -220,7 +220,7 @@ func banish_top_fu():
 	if banish_node:
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
-			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), card_uuid, slug, false)
+			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), card_uuid, slug, false, true)
 		_animate_deck_card_to_zone(slug, card_uuid, banish_node.global_position, banish_node, "add_card_to_slot", false, "", true)
 	update_deck_view()
 	update_deck_state()
