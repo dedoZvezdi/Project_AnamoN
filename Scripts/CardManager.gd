@@ -21,6 +21,11 @@ var dragged_from_grid = false
 var original_slug = ""
 var original_zone = ""
 var original_card_display = null
+var original_grid_index = -1
+var original_source_node = null
+var original_left_uuid = ""
+var original_right_uuid = ""
+var original_is_face_down = false
 var card_information_reference = null
 var source_memory_slot = null
 var original_memory_index = -1
@@ -137,28 +142,45 @@ func _on_animation_started():
 func _on_animation_finished():
 	animation_in_progress = false
 
-func set_dragged_from_grid_info(slug: String, zone: String, card_display):
+func set_dragged_from_grid_info(slug: String, zone: String, card_display, grid_index: int = -1, source_node: Node = null, face_down: bool = false, left_uuid: String = "", right_uuid: String = ""):
 	dragged_from_grid = true
 	original_slug = slug
 	original_zone = zone
 	original_card_display = card_display
+	original_grid_index = grid_index
+	original_source_node = source_node
+	original_is_face_down = face_down
+	original_left_uuid = left_uuid
+	original_right_uuid = right_uuid
 
 func remove_card_from_original_slot():
 	if not original_slug or not original_zone:
 		return
+	var card_uuid = ""
+	if original_card_display and is_instance_valid(original_card_display) and original_card_display.has_meta("uuid"):
+		card_uuid = original_card_display.get_meta("uuid")
+
 	match original_zone:
 		"banish":
 			var banish_slots = get_tree().get_nodes_in_group("rotated_slots")
 			for slot in banish_slots:
-				if slot and is_instance_valid(slot) and slot.has_method("remove_card_by_slug"):
-					slot.remove_card_by_slug(original_slug)
-					break
+				if slot and is_instance_valid(slot):
+					if card_uuid != "" and slot.has_method("remove_card_by_uuid"):
+						slot.remove_card_by_uuid(card_uuid)
+						break
+					elif slot.has_method("remove_card_by_slug"):
+						slot.remove_card_by_slug(original_slug)
+						break
 		"graveyard":
 			var graveyard_slots = get_tree().get_nodes_in_group("single_card_slots")
 			for slot in graveyard_slots:
-				if slot and is_instance_valid(slot) and slot.has_method("remove_card_by_slug"):
-					slot.remove_card_by_slug(original_slug)
-					break
+				if slot and is_instance_valid(slot):
+					if card_uuid != "" and slot.has_method("remove_card_by_uuid"):
+						slot.remove_card_by_uuid(card_uuid)
+						break
+					elif slot.has_method("remove_card_by_slug"):
+						slot.remove_card_by_slug(original_slug)
+						break
 		"ga_deck":
 			var deck_slots = get_tree().get_nodes_in_group("deck_zones")
 			for slot in deck_slots:
@@ -322,25 +344,40 @@ func finish_drag():
 			card.scale = normal_scale
 			card.z_index = base_z_index
 		elif card_slot_found.name == "GRAVEYARD":
-			card_slot_found.add_card_to_slot(card)
-			var slug = get_card_slug(card)
-			if slug != "":
-				var uuid = get_card_uuid(card)
-				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node and not card.is_token():
-					multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug, was_from_ga_deck)
+			if card_slot_found == original_source_node:
+				remove_card_from_original_slot()
+				if card_slot_found.has_method("add_card_to_slot_precise"):
+					card_slot_found.add_card_to_slot_precise(card, original_left_uuid, original_right_uuid, original_grid_index)
+				else:
+					card_slot_found.add_card_to_slot(card, original_grid_index)
+			else:
+				card_slot_found.add_card_to_slot(card)
+				var slug = get_card_slug(card)
+				if slug != "":
+					var uuid = get_card_uuid(card)
+					var multiplayer_node = get_tree().get_root().get_node("Main")
+					if multiplayer_node and not card.is_token():
+						multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug, was_from_ga_deck)
 			card.scale = normal_scale
 		elif card_slot_found.name == "BANISH":
 			var face_down := false
-			if card.has_meta("banish_face_down"):
-				face_down = card.get_meta("banish_face_down") == true
-			card_slot_found.add_card_to_slot(card, face_down)
-			var slug = get_card_slug(card)
-			if slug != "":
-				var uuid = get_card_uuid(card)
-				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node and not card.is_token():
-					multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, face_down, was_from_ga_deck)
+			if card_slot_found == original_source_node:
+				face_down = original_is_face_down
+				remove_card_from_original_slot()
+				if card_slot_found.has_method("add_card_to_slot_precise"):
+					card_slot_found.add_card_to_slot_precise(card, original_left_uuid, original_right_uuid, original_grid_index, face_down, true)
+				else:
+					card_slot_found.add_card_to_slot(card, face_down, original_grid_index, true)
+			else:
+				if card.has_meta("banish_face_down"):
+					face_down = card.get_meta("banish_face_down") == true
+				card_slot_found.add_card_to_slot(card, face_down)
+				var slug = get_card_slug(card)
+				if slug != "":
+					var uuid = get_card_uuid(card)
+					var multiplayer_node = get_tree().get_root().get_node("Main")
+					if multiplayer_node and not card.is_token():
+						multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, face_down, was_from_ga_deck)
 			if card.has_meta("banish_face_down"):
 				card.set_meta("banish_face_down", false)
 			card.scale = normal_scale
@@ -387,6 +424,11 @@ func finish_drag():
 	card_being_dragged = null
 	source_memory_slot = null
 	original_memory_index = -1
+	original_grid_index = -1
+	original_source_node = null
+	original_left_uuid = ""
+	original_right_uuid = ""
+	original_is_face_down = false
 	drag_card_was_marked = false
 	call_deferred("force_hover_check")
 

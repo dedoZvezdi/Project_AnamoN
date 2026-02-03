@@ -142,11 +142,27 @@ func start_drag_from_grid():
 					if owner_node and owner_node.has_method("remove_from_lineage_by_uuid"):
 						var uuid = get_meta("uuid") if has_meta("uuid") else ""
 						owner_node.remove_from_lineage_by_uuid(uuid)
-				update_grid_immediately()
-				emit_signal("card_drag_started", self)
-				card_image_path = ""
-				texture_rect.texture = null
-				custom_minimum_size = Vector2.ZERO
+				var source_node = null
+				var grid_index = -1
+				var face_down = false
+				var parent = get_parent()
+				while parent:
+					if parent.is_in_group("single_card_slots") or parent.is_in_group("rotated_slots"):
+						source_node = parent
+						break
+					parent = parent.get_parent()
+				grid_index = get_index()
+				if texture_rect and texture_rect.texture:
+					face_down = "ga_back.png" in texture_rect.texture.resource_path
+				card_manager.set_dragged_from_grid_info(card_slug, zone, self, grid_index, source_node, face_down)
+				if zone != "logo_tokens" and zone != "logo_mastery":
+					if zone == "lineage":
+						pass
+					update_grid_immediately()
+					emit_signal("card_drag_started", self)
+					card_image_path = ""
+					texture_rect.texture = null
+					custom_minimum_size = Vector2.ZERO
 
 func finish_drag_from_grid():
 	if not is_holding or not dragged_card:
