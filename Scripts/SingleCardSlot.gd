@@ -100,11 +100,15 @@ func go_to_banish_face_down():
 	var banish_node = scene.find_child("BANISH", true, false)
 	if banish_node == null:
 		return
+	var card_uuid = target_card.uuid if "uuid" in target_card else ""
 	remove_card_from_slot(target_card)
 	if banish_node.has_method("add_card_to_slot"):
 		banish_node.add_card_to_slot(target_card, true)
 	if banish_node.has_method("show_card_back"):
 		banish_node.show_card_back(target_card)
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), card_uuid, selected_card_slug, true)
 	if graveyard_view_window.visible:
 		update_deck_view()
 	selected_card_slug = ""
@@ -208,7 +212,7 @@ func _on_deck_view_close():
 	graveyard_view_window.hide()
 	selected_card_slug = ""
 
-func add_card_to_slot(card):
+func add_card_to_slot(card, at_index: int = -1):
 	if not card or not is_instance_valid(card):
 		return
 	if card.has_method("is_token") and card.is_token():
@@ -239,7 +243,12 @@ func add_card_to_slot(card):
 			ci.visible = true
 			cib.visible = false
 	final_card.rotation = 0.0
-	cards_in_graveyard.append(final_card)
+	
+	if at_index != -1 and at_index < cards_in_graveyard.size():
+		cards_in_graveyard.insert(at_index, final_card)
+	else:
+		cards_in_graveyard.append(final_card)
+		
 	reorder_z_indices()
 	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
 	if card_manager and card_manager.has_method("connect_card_signals"):
@@ -298,6 +307,19 @@ func remove_card_by_slug(slug: String):
 		if graveyard_view_window.visible:
 			update_deck_view()
 
+func remove_card_by_uuid(uuid: String):
+	if uuid == "": return
+	var target_card = null
+	for card in cards_in_graveyard:
+		if "uuid" in card and card.uuid == uuid:
+			target_card = card
+			break
+	if target_card:
+		remove_card_from_slot(target_card)
+		target_card.queue_free()
+		if graveyard_view_window.visible:
+			update_deck_view()
+
 func set_card_marked(uuid: String, is_marked: bool):
 	if is_marked:
 		if not uuid in marked_uuids:
@@ -318,3 +340,20 @@ func update_top_card_visual():
 		top_card.modulate = Color(0.5, 0.5, 1.5, 0.9)
 	else:
 		top_card.modulate = Color(1, 1, 1)
+
+func add_card_to_slot_precise(card, left_uuid: String, right_uuid: String, fallback_index: int):
+	var target_array_index = -1
+	if left_uuid != "":
+		for i in range(cards_in_graveyard.size()):
+			if cards_in_graveyard[i].has_meta("uuid") and cards_in_graveyard[i].get_meta("uuid") == left_uuid:
+				target_array_index = i
+				break
+	elif right_uuid != "":
+		for i in range(cards_in_graveyard.size()):
+			if cards_in_graveyard[i].has_meta("uuid") and cards_in_graveyard[i].get_meta("uuid") == right_uuid:
+				target_array_index = i + 1
+				break
+	if target_array_index == -1:
+		target_array_index = cards_in_graveyard.size() - fallback_index
+	target_array_index = clampi(target_array_index, 0, cards_in_graveyard.size())
+	add_card_to_slot(card, target_array_index)

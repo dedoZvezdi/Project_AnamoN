@@ -205,7 +205,7 @@ func banish_top_fd():
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
 			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), card_uuid, slug, true)
-		_animate_deck_card_to_zone(slug, card_uuid, banish_node.global_position, banish_node, "add_card_to_slot", true, "", false)
+		_animate_deck_card_to_zone(slug, card_uuid, banish_node.global_position, banish_node, "add_card_to_slot", true, "", false, true)
 	update_deck_view()
 	update_deck_state()
 
@@ -221,7 +221,7 @@ func banish_top_fu():
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
 			main_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), card_uuid, slug, false, true)
-		_animate_deck_card_to_zone(slug, card_uuid, banish_node.global_position, banish_node, "add_card_to_slot", false, "", true)
+		_animate_deck_card_to_zone(slug, card_uuid, banish_node.global_position, banish_node, "add_card_to_slot", false, "", true, true)
 	update_deck_view()
 	update_deck_state()
 

@@ -260,7 +260,7 @@ func _on_deck_view_close():
 	banish_view_window.hide()
 	selected_card_slug = ""
 
-func add_card_to_slot(card, face_down := false):
+func add_card_to_slot(card, face_down := false, at_index: int = -1, skip_animation: bool = false):
 	if not card or not is_instance_valid(card):
 		return
 	if card.has_method("is_token") and card.is_token():
@@ -269,7 +269,10 @@ func add_card_to_slot(card, face_down := false):
 		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
-	cards_in_banish.append(card)
+	if at_index != -1 and at_index < cards_in_banish.size():
+		cards_in_banish.insert(at_index, card)
+	else:
+		cards_in_banish.append(card)
 	var target_pos := Vector2()
 	if has_node("Area2D/CollisionShape2D"):
 		target_pos = $Area2D/CollisionShape2D.global_position
@@ -285,16 +288,21 @@ func add_card_to_slot(card, face_down := false):
 		if has_method("show_card_front"):
 			show_card_front(card)
 	if face_down:
-		var tween = create_tween()
-		tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
-		tween.parallel().tween_property(card, "rotation_degrees", 90.0, 0.3)
-		tween.tween_callback(_on_card_arrived_in_banish.bind(card, face_down))
+		if skip_animation:
+			card.global_position = target_pos
+			card.rotation_degrees = 90.0
+			_on_card_arrived_in_banish(card, face_down, at_index)
+		else:
+			var tween = create_tween()
+			tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
+			tween.parallel().tween_property(card, "rotation_degrees", 90.0, 0.3)
+			tween.tween_callback(_on_card_arrived_in_banish.bind(card, face_down, at_index))
 	else:
 		card.global_position = target_pos
 		card.rotation_degrees = 90.0
-		_on_card_arrived_in_banish(card, face_down)
+		_on_card_arrived_in_banish(card, face_down, at_index)
 
-func _on_card_arrived_in_banish(original_card, face_down: bool):
+func _on_card_arrived_in_banish(original_card, face_down: bool, at_index: int = -1):
 	if not original_card or not is_instance_valid(original_card):
 		return
 	var saved_uuid = original_card.uuid if "uuid" in original_card else ""
@@ -315,7 +323,9 @@ func _on_card_arrived_in_banish(original_card, face_down: bool):
 		new_card.set_meta("is_face_down", false)
 		if has_method("show_card_front"):
 			show_card_front(new_card)
-	var card_index = cards_in_banish.find(original_card)
+	var card_index = at_index
+	if card_index == -1 or card_index >= cards_in_banish.size():
+		card_index = cards_in_banish.find(original_card)
 	if card_index != -1:
 		cards_in_banish[card_index] = new_card
 	else:
@@ -375,13 +385,25 @@ func remove_card_by_slug(slug: String):
 		if banish_view_window.visible:
 			update_deck_view()
 
+func remove_card_by_uuid(uuid: String):
+	if uuid == "": return
+	var target_card = null
+	for card in cards_in_banish:
+		if "uuid" in card and card.uuid == uuid:
+			target_card = card
+			break
+	if target_card:
+		remove_card_from_slot(target_card)
+		target_card.queue_free()
+		if banish_view_window.visible:
+			update_deck_view()
+
 func set_card_marked(uuid: String, is_marked: bool):
 	if is_marked:
 		if not uuid in marked_uuids:
 			marked_uuids.append(uuid)
 	else:
 		marked_uuids.erase(uuid)
-	
 	update_top_card_visual()
 	if banish_view_window.visible:
 		update_deck_view()
@@ -396,3 +418,20 @@ func update_top_card_visual():
 		top_card.modulate = Color(0.5, 0.5, 1.5, 0.9)
 	else:
 		top_card.modulate = Color(1, 1, 1)
+
+func add_card_to_slot_precise(card, left_uuid: String, right_uuid: String, fallback_index: int, face_down: bool = false, skip_animation: bool = false):
+	var target_array_index = -1
+	if left_uuid != "":
+		for i in range(cards_in_banish.size()):
+			if cards_in_banish[i].has_meta("uuid") and cards_in_banish[i].get_meta("uuid") == left_uuid:
+				target_array_index = i
+				break
+	elif right_uuid != "":
+		for i in range(cards_in_banish.size()):
+			if cards_in_banish[i].has_meta("uuid") and cards_in_banish[i].get_meta("uuid") == right_uuid:
+				target_array_index = i + 1
+				break
+	if target_array_index == -1:
+		target_array_index = cards_in_banish.size() - fallback_index
+	target_array_index = clampi(target_array_index, 0, cards_in_banish.size())
+	add_card_to_slot(card, face_down, target_array_index, skip_animation)
