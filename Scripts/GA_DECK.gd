@@ -2,8 +2,12 @@ extends Node2D
 
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 
-var player_deck = ["fabled-ruby-fatestone-hvn1e","excalibur-reflected-edge-dtr1e","lu-bu-indomitable-titan-hvn1e-cur","lu-bu-wrath-incarnate-hvn1e-cur","alice-golden-queen-dtr1e-cur","aetheric-calibration-dtrsd","alice-golden-queen-dtr","academy-guide-p24", "absolving-flames-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb"
-,"suzaku-vermillion-phoenix-hvn1e-csr","acolyte-of-cultivation-amb","arcane-disposition-doap","arthur-young-heir-evp","suzaku-vermillion-phoenix-hvn1e"]
+var player_deck = ["anthem-of-vitality-ftc","excalibur-reflected-edge-dtr1e",
+"lu-bu-indomitable-titan-hvn1e-cur","aesan-protector-doa1e","accompanying-guard-alc-alter",
+"aetheric-calibration-dtrsd","acolyte-of-cultivation-p25","academy-guide-p24", 
+"absolving-flames-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb",
+"anathemas-end-alc","acolyte-of-cultivation-amb","arcane-disposition-doap",
+"arthur-young-heir-evp","allied-warpriestess-alc"]
 var card_database_reference
 var selected_card_slug: String = ""
 var selected_card_uuid: String = ""

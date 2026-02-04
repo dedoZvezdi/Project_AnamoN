@@ -11,8 +11,10 @@ config_version=5
 [application]
 
 config/name="AnamoN"
-run/main_scene="uid://dqt16mao7lo7t"
+run/main_scene="uid://digx6uetsunkk"
 config/features=PackedStringArray("4.4", "Forward Plus")
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/show_image=false
 config/icon="uid://bh4b1t4rtb1d4"
 
 [display]
