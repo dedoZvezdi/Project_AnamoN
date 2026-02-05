@@ -7,62 +7,62 @@
 script = ExtResource("1_r5y74")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(233, 295)
+position = Vector2(1695, 295)
 scale = Vector2(0.7, 0.7)
 texture = ExtResource("2_qchki")
 
 [node name="Name" type="RichTextLabel" parent="."]
-offset_left = 58.0
+offset_left = 1520.0
 offset_top = 542.0
-offset_right = 408.0
+offset_right = 1870.0
 offset_bottom = 595.0
 
 [node name="Types and Suptypes" type="RichTextLabel" parent="."]
-offset_left = 36.0
+offset_left = 1498.0
 offset_top = 573.0
-offset_right = 436.0
+offset_right = 1898.0
 offset_bottom = 616.0
 
 [node name="Level" type="RichTextLabel" parent="."]
-offset_left = 57.0
+offset_left = 1519.0
 offset_top = 607.0
-offset_right = 141.0
+offset_right = 1603.0
 offset_bottom = 647.0
 
 [node name="Element" type="RichTextLabel" parent="."]
-offset_left = 100.0
+offset_left = 1562.0
 offset_top = 607.0
-offset_right = 184.0
+offset_right = 1646.0
 offset_bottom = 647.0
 
 [node name="Cost" type="RichTextLabel" parent="."]
-offset_left = 193.0
+offset_left = 1655.0
 offset_top = 607.0
-offset_right = 328.0
+offset_right = 1790.0
 offset_bottom = 647.0
 
 [node name="Effect" type="RichTextLabel" parent="."]
-offset_left = 57.0
+offset_left = 1519.0
 offset_top = 642.0
-offset_right = 408.0
+offset_right = 1870.0
 offset_bottom = 1027.0
 
 [node name="PowerLifeDurSpeed" type="RichTextLabel" parent="."]
-offset_left = 299.0
+offset_left = 1761.0
 offset_top = 607.0
-offset_right = 455.0
+offset_right = 1917.0
 offset_bottom = 647.0
 
 [node name="Markers" type="RichTextLabel" parent="."]
-offset_left = 1535.0
-offset_top = 343.0
-offset_right = 1719.0
-offset_bottom = 527.0
+offset_left = 45.0
+offset_top = 195.0
+offset_right = 229.0
+offset_bottom = 379.0
 horizontal_alignment = 1
 
 [node name="Counters" type="RichTextLabel" parent="."]
-offset_left = 1721.0
-offset_top = 343.0
-offset_right = 1905.0
-offset_bottom = 527.0
+offset_left = 259.0
+offset_top = 195.0
+offset_right = 443.0
+offset_bottom = 379.0
 horizontal_alignment = 1

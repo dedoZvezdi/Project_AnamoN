@@ -82,6 +82,8 @@ position = Vector2(590, 960)
 script = ExtResource("19_j2sa3")
 
 [node name="Phases" parent="." instance=ExtResource("20_ovfrf")]
+position = Vector2(-1440, 386)
 script = ExtResource("21_h2qut")
 
 [node name="Chat" parent="." instance=ExtResource("22_bg3cw")]
+position = Vector2(-1454, 0)
