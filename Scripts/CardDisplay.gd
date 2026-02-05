@@ -145,16 +145,28 @@ func start_drag_from_grid():
 				var source_node = null
 				var grid_index = -1
 				var face_down = false
-				var parent = get_parent()
-				while parent:
-					if parent.is_in_group("single_card_slots") or parent.is_in_group("rotated_slots"):
-						source_node = parent
+				var left_uuid = ""
+				var right_uuid = ""
+				var parent_node = get_parent()
+				while parent_node:
+					if parent_node.is_in_group("single_card_slots") or parent_node.is_in_group("rotated_slots") or parent_node.is_in_group("mat_deck_zones"):
+						source_node = parent_node
 						break
-					parent = parent.get_parent()
-				grid_index = get_index()
+					parent_node = parent_node.get_parent()
+				var parent_grid = get_parent()
+				if parent_grid:
+					grid_index = get_index()
+					if grid_index > 0:
+						var left_sibling = parent_grid.get_child(grid_index - 1)
+						if left_sibling and left_sibling.has_meta("uuid"):
+							left_uuid = left_sibling.get_meta("uuid")
+					if grid_index < parent_grid.get_child_count() - 1:
+						var right_sibling = parent_grid.get_child(grid_index + 1)
+						if right_sibling and right_sibling.has_meta("uuid"):
+							right_uuid = right_sibling.get_meta("uuid")
 				if texture_rect and texture_rect.texture:
 					face_down = "ga_back.png" in texture_rect.texture.resource_path
-				card_manager.set_dragged_from_grid_info(card_slug, zone, self, grid_index, source_node, face_down)
+				card_manager.set_dragged_from_grid_info(card_slug, zone, self, grid_index, source_node, face_down, left_uuid, right_uuid)
 				if zone != "logo_tokens" and zone != "logo_mastery":
 					if zone == "lineage":
 						pass
