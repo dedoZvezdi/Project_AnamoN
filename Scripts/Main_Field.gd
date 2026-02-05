@@ -22,11 +22,11 @@ func add_card_to_field(card, position = null):
 			var inherit_source = current_champion_card
 			if inherit_source == null:
 				for cards in cards_in_field:
-					if cards != card and not is_mastery_card(cards) and "champion_lineage" in cards:
+					if is_instance_valid(cards) and cards != card and not is_mastery_card(cards) and "champion_lineage" in cards:
 						if cards.champion_lineage.size() > 0:
 							inherit_source = cards
 							break
-			if inherit_source != null and inherit_source != card:
+			if is_instance_valid(inherit_source) and inherit_source != card:
 				if "champion_lineage" in inherit_source:
 					var old_lineage = inherit_source.champion_lineage
 					for entry in old_lineage:

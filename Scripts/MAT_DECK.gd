@@ -22,6 +22,7 @@ func _ready() -> void:
 	setup_context_menu()
 	setup_deck_view()
 	$Area2D.input_event.connect(_on_area_2d_input_event)
+	update_deck_state()
 
 func setup_context_menu():
 	context_menu.add_item("View Material Deck", 0)
@@ -52,9 +53,14 @@ func update_deck_view():
 	for card_data in player_deck:
 		var card_display = create_card_display(card_data["slug"], card_data["uuid"])
 		grid_container.add_child(card_display)
+
+func update_deck_state():
 	if player_deck.size() == 0:
 		$Area2D/CollisionShape2D.disabled = true
 		$Sprite2D.visible = false
+	else:
+		$Area2D/CollisionShape2D.disabled = false
+		$Sprite2D.visible = true
 
 func show_deck_view():
 	deck_view_window.popup_centered()
@@ -79,6 +85,7 @@ func remove_card_by_uuid(target_uuid: String):
 	if card_index != -1:
 		player_deck.remove_at(card_index)
 		update_deck_view()
+		update_deck_state()
 
 func _on_deck_view_close():
 	deck_view_window.hide()

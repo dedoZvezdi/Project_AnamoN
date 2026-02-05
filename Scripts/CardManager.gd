@@ -193,9 +193,13 @@ func remove_card_from_original_slot():
 		"mat_deck":
 			var mat_deck_slots = get_tree().get_nodes_in_group("mat_deck_zones")
 			for slot in mat_deck_slots:
-				if slot and is_instance_valid(slot) and slot.has_method("remove_card_by_slug"):
-					slot.remove_card_by_slug(original_slug)
-					break
+				if slot and is_instance_valid(slot):
+					if slot.has_method("remove_card_by_uuid") and original_card_display and is_instance_valid(original_card_display) and original_card_display.has_meta("uuid"):
+						slot.remove_card_by_uuid(original_card_display.get_meta("uuid"))
+						break
+					elif slot.has_method("remove_card_by_slug"):
+						slot.remove_card_by_slug(original_slug)
+						break
 		"logo_tokens":
 			pass
 		"logo_mastery":
@@ -294,6 +298,11 @@ func finish_drag():
 			return
 	if card_slot_found:
 		var was_from_ga_deck = dragged_from_grid and original_zone == "ga_deck"
+		var was_from_mat_deck = dragged_from_grid and original_zone == "mat_deck"
+		if was_from_mat_deck and card_slot_found.name != "MAINFIELD":
+			_return_mat_card_to_deck(card)
+			card_being_dragged = null
+			return
 		if dragged_from_grid:
 			remove_card_from_original_slot()
 			dragged_from_grid = false
@@ -386,6 +395,10 @@ func finish_drag():
 			card_counter += 1
 	else:
 		if dragged_from_grid:
+			if original_zone == "mat_deck":
+				_return_mat_card_to_deck(card)
+				card_being_dragged = null
+				return
 			if original_zone == "ga_deck":
 				var slug = get_card_slug(card)
 				var uuid = get_card_uuid(card)
@@ -431,6 +444,20 @@ func finish_drag():
 	original_is_face_down = false
 	drag_card_was_marked = false
 	call_deferred("force_hover_check")
+
+func _return_mat_card_to_deck(card):
+	if not card or not is_instance_valid(card):
+		return
+	if original_source_node and is_instance_valid(original_source_node) and original_source_node.has_method("update_deck_view"):
+		original_source_node.update_deck_view()
+	else:
+		var mat_decks = get_tree().get_nodes_in_group("mat_deck_zones")
+		for deck in mat_decks:
+			if deck.has_method("update_deck_view"):
+				deck.update_deck_view()
+	if is_instance_valid(card):
+		card.queue_free()
+	dragged_from_grid = false
 
 func free_card_from_slot(card):
 	if not card or not is_instance_valid(card):
