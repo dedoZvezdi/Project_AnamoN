@@ -30,6 +30,7 @@ var card_information_reference = null
 var source_memory_slot = null
 var original_memory_index = -1
 var drag_card_was_marked = false
+var drag_source_was_main_field = false
 
 func _ready() -> void:
 	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
@@ -130,8 +131,10 @@ func can_drag_card(card) -> bool:
 		var collision_shape = card.get_node("Area2D/CollisionShape2D")
 		if collision_shape.disabled:
 			return false
-	if card.has_method("is_champion_card") and card.is_champion_card() and card.has_method("is_in_main_field") and card.is_in_main_field():
-		return false
+	if card.has_method("is_in_main_field") and card.is_in_main_field():
+		var field = card.current_field
+		if field and field.get("current_champion_card") == card:
+			return false
 	if is_opponent_card(card):
 		return false
 	return true
@@ -213,6 +216,10 @@ func start_drag(card):
 	_clear_memory_highlights()
 	card_being_dragged = card
 	drag_start_position = card.global_position
+	if card.has_method("is_in_main_field") and card.is_in_main_field():
+		drag_source_was_main_field = true
+	else:
+		drag_source_was_main_field = false
 	if player_hand_reference and card in player_hand_reference.player_hand:
 		player_hand_reference.dragging_card_from_hand = card
 	source_memory_slot = get_memory_slot_for_card(card)
@@ -271,6 +278,17 @@ func finish_drag():
 	if card.has_method("on_drag_end"):
 		card.on_drag_end()
 	var card_slot_found = raycast_check_for_card_single_slot()
+	if drag_source_was_main_field and card.has_method("is_regalia_card") and card.is_regalia_card():
+		var should_banish = false
+		if card_slot_found:
+			if card_slot_found.name == "GRAVEYARD" or card_slot_found.name == "MEMORY":
+				should_banish = true
+		else:
+			should_banish = true
+		if should_banish:
+			var banish_node = get_tree().get_current_scene().find_child("BANISH", true, false)
+			if banish_node:
+				card_slot_found = banish_node
 	var is_borrowed = false
 	if "original_owner_id" in card and card.original_owner_id != 0 and card.original_owner_id != multiplayer.get_unique_id():
 		is_borrowed = true
@@ -443,6 +461,7 @@ func finish_drag():
 	original_right_uuid = ""
 	original_is_face_down = false
 	drag_card_was_marked = false
+	drag_source_was_main_field = false
 	call_deferred("force_hover_check")
 
 func _return_mat_card_to_deck(card):

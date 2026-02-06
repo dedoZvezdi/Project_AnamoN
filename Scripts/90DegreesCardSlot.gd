@@ -74,14 +74,76 @@ func create_card_display(card_name: String, card_uuid: String = ""):
 	card_display.request_popup_menu.connect(_on_card_display_popup_menu)
 	return card_display
 
+func find_card_information_reference():
+	var root = get_tree().current_scene
+	if root:
+		return find_node_by_script(root, "res://Scripts/CardInformation.gd")
+	return null
+
+func find_node_by_script(node: Node, script_path: String) -> Node:
+	if node.get_script() and node.get_script().resource_path == script_path:
+		return node
+	for child in node.get_children():
+		var result = find_node_by_script(child, script_path)
+		if result:
+			return result
+	return null
+
+func is_restricted_card(slug: String) -> bool:
+	if slug == "":
+		return false
+	var card_info_ref = find_card_information_reference()
+	if not card_info_ref or not card_info_ref.card_database_reference:
+		return false
+	var card_database = card_info_ref.card_database_reference
+	if not card_database.cards_db.has(slug):
+		return false
+	var data = card_database.cards_db[slug]
+	if data.has("types") and data["types"] is Array:
+		for card_type in data["types"]:
+			var type_str = str(card_type).to_upper()
+			if type_str == "REGALIA" or type_str == "CHAMPION":
+				return true
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
+		if base_slug and card_database.cards_db.has(base_slug):
+			var base_data = card_database.cards_db[base_slug]
+			if base_data.has("types") and base_data["types"] is Array:
+				for card_type in base_data["types"]:
+					var type_str = str(card_type).to_upper()
+					if type_str == "REGALIA" or type_str == "CHAMPION":
+						return true
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database.cards_db.has(parent_slug):
+			var parent_data = card_database.cards_db[parent_slug]
+			if parent_data.has("types") and parent_data["types"] is Array:
+				for card_type in parent_data["types"]:
+					var type_str = str(card_type).to_upper()
+					if type_str == "REGALIA" or type_str == "CHAMPION":
+						return true
+	return false
+
+func find_base_card_for_edition(edition_id, card_database):
+	if not card_database:
+		return null
+	for slug in card_database.cards_db:
+		var data = card_database.cards_db[slug]
+		if data.has("editions"):
+			for edition in data["editions"]:
+				if edition.get("edition_id") == edition_id:
+					return slug
+	return null
+
 func _on_card_display_popup_menu(slug, uuid):
 	selected_card_slug = slug
 	selected_card_uuid = uuid
 	var popup_menu = $BanishViewWindow/PopupMenu
 	popup_menu.clear()
 	popup_menu.add_item("Flip", 0)
-	popup_menu.add_item("To Top Deck", 1)
-	popup_menu.add_item("To Bottom Deck", 2)
+	if not is_restricted_card(slug):
+		popup_menu.add_item("To Top Deck", 1)
+		popup_menu.add_item("To Bottom Deck", 2)
 	popup_menu.popup(Rect2(get_viewport().get_mouse_position(), Vector2(0, 0)))
 
 func _on_banish_view_popup_menu_pressed(id):

@@ -182,6 +182,7 @@ func is_champion_card() -> bool:
 		for card_type in data["types"]:
 			if str(card_type).to_upper() == "CHAMPION":
 				return true
+		return false
 	if data.has("edition_id") and not data.has("parent_orientation_slug"):
 		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
 		if base_slug and card_database.cards_db.has(base_slug):
@@ -190,6 +191,7 @@ func is_champion_card() -> bool:
 				for card_type in base_data["types"]:
 					if str(card_type).to_upper() == "CHAMPION":
 						return true
+				return false
 	elif data.has("parent_orientation_slug"):
 		var parent_slug = data["parent_orientation_slug"]
 		if card_database.cards_db.has(parent_slug):
@@ -197,6 +199,38 @@ func is_champion_card() -> bool:
 			if parent_data.has("types") and parent_data["types"] is Array:
 				for card_type in parent_data["types"]:
 					if str(card_type).to_upper() == "CHAMPION":
+						return true
+	return false
+
+func is_regalia_card() -> bool:
+	var card_slug = get_slug_from_card()
+	if card_slug == "":
+		return false
+	if not card_information_reference or not card_information_reference.card_database_reference:
+		return false
+	var card_database = card_information_reference.card_database_reference
+	if not card_database.cards_db.has(card_slug):
+		return false
+	var data = card_database.cards_db[card_slug]
+	if data.has("types") and data["types"] is Array:
+		for card_type in data["types"]:
+			if str(card_type).to_upper() == "REGALIA":
+				return true
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
+		if base_slug and card_database.cards_db.has(base_slug):
+			var base_data = card_database.cards_db[base_slug]
+			if base_data.has("types") and base_data["types"] is Array:
+				for card_type in base_data["types"]:
+					if str(card_type).to_upper() == "REGALIA":
+						return true
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database.cards_db.has(parent_slug):
+			var parent_data = card_database.cards_db[parent_slug]
+			if parent_data.has("types") and parent_data["types"] is Array:
+				for card_type in parent_data["types"]:
+					if str(card_type).to_upper() == "REGALIA":
 						return true
 	return false
 
@@ -459,7 +493,7 @@ func transform_card():
 		if anim.has_animation("card_flip"):
 			anim.play("card_flip")
 	if is_in_main_field() and current_field:
-		if current_field.has_method("is_champion_card") and current_field.is_champion_card(self):
+		if current_field.has_method("is_champion_card") and current_field.is_champion_card(self) and not is_regalia_card():
 			if current_field.current_champion_card and current_field.current_champion_card != self:
 				var prev = current_field.current_champion_card
 				if "champion_lineage" in prev:
