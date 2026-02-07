@@ -291,9 +291,6 @@ func reorder_z_indices():
 			card.z_index = base_z_index + idx + 1
 			idx += 1
 
-func get_top_card():
-	return null
-
 func remove_card_by_slug(slug: String):
 	var target_card = null
 	for card in cards_in_graveyard:
