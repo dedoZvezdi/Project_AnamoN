@@ -290,7 +290,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 							popup_menu.add_item("Hide All", 13)
 				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
 					popup_menu.add_item("Banish Face Down", 1)
-					if original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id():
+					if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()) and not is_regalia_card():
 						popup_menu.add_item("Go to Top Deck", 2)
 						popup_menu.add_item("Go to Bottom Deck", 3)
 				if is_in_main_field():

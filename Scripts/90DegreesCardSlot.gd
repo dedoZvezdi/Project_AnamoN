@@ -144,6 +144,8 @@ func _on_card_display_popup_menu(slug, uuid):
 	if not is_restricted_card(slug):
 		popup_menu.add_item("To Top Deck", 1)
 		popup_menu.add_item("To Bottom Deck", 2)
+	else:
+		popup_menu.add_item("Sent to Mat Deck", 3)
 	popup_menu.popup(Rect2(get_viewport().get_mouse_position(), Vector2(0, 0)))
 
 func _on_banish_view_popup_menu_pressed(id):
@@ -151,6 +153,7 @@ func _on_banish_view_popup_menu_pressed(id):
 		0: flip_card()
 		1: go_to_top_deck()
 		2: go_to_bottom_deck()
+		3: sent_to_mat_deck()
 
 func flip_card():
 	if selected_card_slug == "" and selected_card_uuid == "":
@@ -431,9 +434,6 @@ func reorder_z_indices():
 			card.z_index = base_z_index + idx + 1
 			idx += 1
 
-func get_top_card():
-	return null
-
 func remove_card_by_slug(slug: String):
 	var target_card = null
 	for card in cards_in_banish:
@@ -497,3 +497,61 @@ func add_card_to_slot_precise(card, left_uuid: String, right_uuid: String, fallb
 		target_array_index = cards_in_banish.size() - fallback_index
 	target_array_index = clampi(target_array_index, 0, cards_in_banish.size())
 	add_card_to_slot(card, face_down, target_array_index, skip_animation)
+
+func sent_to_mat_deck():
+	if selected_card_slug == "":
+		return
+	var mat_deck_nodes = get_tree().get_nodes_in_group("mat_deck_zones")
+	if mat_deck_nodes.size() == 0:
+		return
+	var mat_deck_node = mat_deck_nodes[0]
+	if not mat_deck_node.has_method("add_to_top"):
+		return
+	var target_card = null
+	for card in cards_in_banish:
+		var c_uuid = card.uuid if "uuid" in card else ""
+		if c_uuid == selected_card_uuid:
+			target_card = card
+			break
+	if not target_card:
+		for card in cards_in_banish:
+			var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
+			if card_slug == selected_card_slug:
+				target_card = card
+				break
+	if not target_card:
+		return
+	var card_uuid_to_send = target_card.uuid if "uuid" in target_card else ""
+	animate_card_to_mat_deck_from_banish(target_card, mat_deck_node.global_position, selected_card_slug, card_uuid_to_send)
+	_sync_move_to_mat_deck(card_uuid_to_send)
+	selected_card_slug = ""
+	selected_card_uuid = ""
+
+func animate_card_to_mat_deck_from_banish(card, deck_position: Vector2, slug: String, card_uuid: String):
+	remove_card_from_slot(card)
+	var card_image = card.get_node("CardImage")
+	var original_texture = card_image.texture
+	card_image.texture = load("res://Assets/Grand Archive/ga_back.png")
+	card.z_index = 2
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(card, "global_position", deck_position, 0.5)
+	tween.tween_property(card, "rotation_degrees", 0.0, 0.5)
+	tween.tween_callback(_on_banish_mat_deck_animation_completed.bind(card, slug, card_uuid, original_texture)).set_delay(0.5)
+
+func _on_banish_mat_deck_animation_completed(card, slug: String, card_uuid: String, original_texture: Texture2D):
+	var card_image = card.get_node("CardImage")
+	card_image.texture = original_texture
+	var mat_deck_nodes = get_tree().get_nodes_in_group("mat_deck_zones")
+	if mat_deck_nodes.size() > 0:
+		var mat_deck_node = mat_deck_nodes[0]
+		if mat_deck_node.has_method("add_to_top"):
+			mat_deck_node.add_to_top(slug, card_uuid)
+	card.queue_free()
+	if banish_view_window.visible:
+		update_deck_view()
+
+func _sync_move_to_mat_deck(uuid: String):
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_move_to_mat_deck", multiplayer.get_unique_id(), uuid, true)

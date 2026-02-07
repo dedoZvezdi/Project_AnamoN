@@ -1062,3 +1062,31 @@ func sync_deck_grid_to_hand(player_id: int, uuid: String, slug: String):
 	var opp_deck = opp_field.find_child("OpponentDeck", true, false)
 	if opp_deck and opp_deck.has_method("draw_card"):
 		opp_deck.draw_card(slug, uuid)
+
+@rpc("any_peer", "reliable")
+func sync_move_to_mat_deck(player_id: int, uuid: String, _is_top: bool):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return
+	var card_manager = opp_field.get_node_or_null("CardManager")
+	if not card_manager:
+		return
+	var card = _find_opponent_card_by_uuid(card_manager, uuid)
+	if card:
+		var opp_mat_deck = opp_field.find_child("Opponent_MAT_DECK", true, false)
+		if opp_mat_deck:
+			_animate_card_to_deck(card, opp_mat_deck.global_position, opp_field, opp_mat_deck)
+		else:
+			if card.get_parent():
+				if card.get_parent().has_method("remove_card_from_hand"):
+					card.get_parent().remove_card_from_hand(card)
+				elif card.get_parent().has_method("remove_card_from_slot"):
+					card.get_parent().remove_card_from_slot(card)
+				elif card.get_parent().has_method("remove_card_from_field"):
+					card.get_parent().remove_card_from_field(card)
+				else:
+					card.get_parent().remove_child(card)
+			card.queue_free()

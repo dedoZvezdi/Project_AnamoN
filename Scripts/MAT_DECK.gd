@@ -76,6 +76,16 @@ func create_card_display(card_name: String, card_uuid: String):
 	card_display.set_meta("zone", "mat_deck")
 	return card_display
 
+func add_to_top(slug: String, uuid: String = ""):
+	if slug == "":
+		return
+	var card_uuid = uuid
+	if card_uuid == "":
+		card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
+	player_deck.insert(0, {"slug": slug, "uuid": card_uuid})
+	update_deck_view()
+	update_deck_state()
+
 func remove_card_by_uuid(target_uuid: String):
 	var card_index = -1
 	for i in range(player_deck.size()):
