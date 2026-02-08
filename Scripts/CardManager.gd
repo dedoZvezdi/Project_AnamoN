@@ -278,6 +278,25 @@ func finish_drag():
 	if card.has_method("on_drag_end"):
 		card.on_drag_end()
 	var card_slot_found = raycast_check_for_card_single_slot()
+	var is_banish_restricted = false
+	if dragged_from_grid and original_zone == "banish":
+		if card.has_method("is_champion_card") and card.is_champion_card():
+			is_banish_restricted = true
+		elif card.has_method("is_regalia_card") and card.is_regalia_card():
+			is_banish_restricted = true
+	if is_banish_restricted:
+		var is_returning_to_banish = false
+		if card_slot_found and card_slot_found.name == "BANISH":
+			is_returning_to_banish = true
+		if not is_returning_to_banish:
+			if original_source_node and is_instance_valid(original_source_node):
+				remove_card_from_original_slot()
+				if original_source_node.has_method("add_card_to_slot_precise"):
+					original_source_node.add_card_to_slot_precise(card, original_left_uuid, original_right_uuid, original_grid_index, original_is_face_down, true)
+				else:
+					original_source_node.add_card_to_slot(card, original_is_face_down, original_grid_index, true)
+				_reset_drag_state_vars()
+				return
 	if drag_source_was_main_field and card.has_method("is_regalia_card") and card.is_regalia_card():
 		var should_banish = false
 		if card_slot_found:
@@ -452,6 +471,10 @@ func finish_drag():
 			ended_in_memory = true
 		if not ended_in_memory:
 			card.set_marked(false)
+	_reset_drag_state_vars()
+	call_deferred("force_hover_check")
+
+func _reset_drag_state_vars():
 	card_being_dragged = null
 	source_memory_slot = null
 	original_memory_index = -1
@@ -462,7 +485,10 @@ func finish_drag():
 	original_is_face_down = false
 	drag_card_was_marked = false
 	drag_source_was_main_field = false
-	call_deferred("force_hover_check")
+	dragged_from_grid = false
+	original_slug = ""
+	original_zone = ""
+	original_card_display = null
 
 func _return_mat_card_to_deck(card):
 	if not card or not is_instance_valid(card):
