@@ -98,6 +98,9 @@ func show_deck_view():
 	$DeckViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 	if has_node("Sprite2D"):
 		$Sprite2D.modulate = Color(0.5, 0.5, 1.5, 0.9)
+	var main_node = get_tree().get_root().get_node_or_null("Main")
+	if main_node:
+		main_node.rpc("sync_deck_highlight", multiplayer.get_unique_id(), true)
 
 func create_card_display(card_name: String, card_uuid: String):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
@@ -134,6 +137,9 @@ func move_card_to_top():
 	var card_data = player_deck[card_index]
 	player_deck.remove_at(card_index)
 	player_deck.insert(0, card_data)
+	var chat_node = get_tree().current_scene.find_child("Chat", true, false)
+	if chat_node and chat_node.has_method("send_system_message"):
+		chat_node.send_system_message(chat_node.player_name + " moved a card to the top of their deck")
 	update_deck_view()
 	selected_card_uuid = ""
 
@@ -150,6 +156,9 @@ func move_card_to_bottom():
 	var card_data = player_deck[card_index]
 	player_deck.remove_at(card_index)
 	player_deck.append(card_data)
+	var chat_node = get_tree().current_scene.find_child("Chat", true, false)
+	if chat_node and chat_node.has_method("send_system_message"):
+		chat_node.send_system_message(chat_node.player_name + " moved a card to the bottom of their deck")
 	update_deck_view()
 	selected_card_uuid = ""
 
@@ -286,10 +295,16 @@ func _on_deck_view_close():
 	deck_view_window.hide()
 	if has_node("Sprite2D"):
 		$Sprite2D.modulate = Color(1, 1, 1, 1)
+	var main_node = get_tree().get_root().get_node_or_null("Main")
+	if main_node:
+		main_node.rpc("sync_deck_highlight", multiplayer.get_unique_id(), false)
 	selected_card_uuid = ""
 
 func shuffle_deck():
 	player_deck.shuffle()
+	var chat_node = get_tree().current_scene.find_child("Chat", true, false)
+	if chat_node and chat_node.has_method("send_system_message"):
+		chat_node.send_system_message(chat_node.player_name + " shuffled their deck")
 	update_deck_view()
 
 func update_deck_state():
