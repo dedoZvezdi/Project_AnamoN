@@ -44,3 +44,10 @@ func increment_deck_size():
 	visible = true
 	if has_node("Sprite2D"):
 		$Sprite2D.visible = true
+
+func set_highlight(is_highlighted: bool):
+	if has_node("Sprite2D"):
+		if is_highlighted:
+			$Sprite2D.modulate = Color(1.5, 0.5, 0.5, 0.9)
+		else:
+			$Sprite2D.modulate = Color(1, 1, 1, 1)

@@ -1090,3 +1090,15 @@ func sync_move_to_mat_deck(player_id: int, uuid: String, _is_top: bool):
 				else:
 					card.get_parent().remove_child(card)
 			card.queue_free()
+
+@rpc("any_peer", "reliable")
+func sync_deck_highlight(player_id: int, is_highlighted: bool):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if not opp_field:
+		return
+	var opp_deck = opp_field.find_child("OpponentDeck", true, false)
+	if opp_deck and opp_deck.has_method("set_highlight"):
+		opp_deck.set_highlight(is_highlighted)
