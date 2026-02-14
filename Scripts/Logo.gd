@@ -59,7 +59,7 @@ var token_slugs : Array = [
 ]
 var mastery_slugs : Array = [
 "servile-possessions-p25","servile-possessions-dtrsd","phantasmagoria-ptm",
-"shifting-currents-p24","shifting-currents-ambsd"
+"shifting-currents-p24","shifting-currents-ambsd","fractured-memories-rec-brv", "fractured-memories-p25"
 ]
 
 func _ready():

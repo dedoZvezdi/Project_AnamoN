@@ -372,7 +372,8 @@ func fix_weird_quotes_and_dashes(text: String) -> String:
 		"вЂњ": "\"",
 		"вЂќ": "\"",
 		"вЂ“": "-",
-		"вЂ¦": "..."
+		"вЂ¦": "...",
+		"вЂў": "•"
 	}
 	for weird_char in replacements:
 		text = text.replace(weird_char, replacements[weird_char])
