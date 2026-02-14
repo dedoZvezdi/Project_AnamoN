@@ -16,9 +16,8 @@
 [node name="CardManager" type="Node2D" parent="."]
 
 [node name="FieldGaOpponent" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 1, 0.647059)
 z_index = -2
-position = Vector2(980, 280)
+position = Vector2(980, 284)
 rotation = -3.14159
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("2_we22y")
@@ -27,24 +26,26 @@ texture = ExtResource("2_we22y")
 script = ExtResource("3_4t60u")
 
 [node name="OpponentDeck" parent="." instance=ExtResource("4_t0cvg")]
-position = Vector2(599.5, 300)
+position = Vector2(599.5, 304)
 scale = Vector2(0.9, 0.9)
 
 [node name="OpponentMatDeck" parent="." instance=ExtResource("5_ypfnt")]
-position = Vector2(1361, 300)
+position = Vector2(1361, 304)
 scale = Vector2(0.9, 0.9)
 
 [node name="OpponentBanish" parent="." instance=ExtResource("6_admix")]
+position = Vector2(0, 4)
 
 [node name="OpponentGraveyard" parent="." instance=ExtResource("7_j2155")]
+position = Vector2(0, 4)
 
 [node name="OpponentElements" parent="." instance=ExtResource("8_xqfjh")]
 
 [node name="OpponentMainField" parent="." instance=ExtResource("8_we22y")]
-position = Vector2(999, 370)
+position = Vector2(999, 374)
 
 [node name="OpponentMemory" parent="." instance=ExtResource("9_4t60u")]
-position = Vector2(985, 107)
+position = Vector2(985, 111)
 
 [node name="ОpponentLogo" parent="." instance=ExtResource("10_4t60u")]
-position = Vector2(1370, 120)
+position = Vector2(1370, 124)

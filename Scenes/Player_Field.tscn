@@ -31,9 +31,8 @@ script = ExtResource("1_uld4x")
 script = ExtResource("1_8whdk")
 
 [node name="FieldGa" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 1, 0.647059)
 z_index = -2
-position = Vector2(980, 800)
+position = Vector2(980, 796)
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("2_uld4x")
 
@@ -43,28 +42,28 @@ position = Vector2(960, 541)
 texture = ExtResource("3_xb57x")
 
 [node name="GA_DECK" parent="." instance=ExtResource("4_kym08")]
-position = Vector2(1360.5, 780.5)
+position = Vector2(1360.5, 776.5)
 scale = Vector2(0.17, 0.17)
 script = ExtResource("5_xuc2h")
 
 [node name="MAT_DECK" parent="." instance=ExtResource("6_g5k7o")]
-position = Vector2(599, 780.5)
+position = Vector2(599, 776.5)
 scale = Vector2(0.17, 0.17)
 script = ExtResource("7_vx5jb")
 
 [node name="GRAVEYARD" parent="." instance=ExtResource("8_ul1di")]
-position = Vector2(1362.7, 938.3)
+position = Vector2(1362.7, 934.3)
 scale = Vector2(0.977783, 0.974084)
 
 [node name="BANISH" parent="." instance=ExtResource("9_64y2i")]
-position = Vector2(1342, 642)
+position = Vector2(1342, 638)
 
 [node name="MEMORY" parent="." instance=ExtResource("10_tb1co")]
-position = Vector2(975, 973)
+position = Vector2(975, 969)
 script = ExtResource("11_c4sal")
 
 [node name="MAINFIELD" parent="." instance=ExtResource("12_36ctc")]
-position = Vector2(961, 710)
+position = Vector2(961, 706)
 script = ExtResource("13_3oad2")
 
 [node name="PlayerHand" type="Node2D" parent="."]
@@ -78,7 +77,7 @@ script = ExtResource("15_5crox")
 [node name="Elements" parent="." instance=ExtResource("17_0shgc")]
 
 [node name="Logo" parent="." instance=ExtResource("18_awdcn")]
-position = Vector2(590, 960)
+position = Vector2(590, 956)
 script = ExtResource("19_j2sa3")
 
 [node name="Phases" parent="." instance=ExtResource("20_ovfrf")]
