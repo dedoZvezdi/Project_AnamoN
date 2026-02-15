@@ -40,7 +40,7 @@ func add_card_to_hand(card):
 		return
 	if card.has_method("set_opponent_reveal_status"):
 		if not card.get("is_revealed_by_opponent"):
-			card.set_opponent_reveal_status(false)
+			card.set_opponent_reveal_status(false, true)
 	if card not in opponent_hand:
 		opponent_hand.insert(0, card)
 		for i in range(opponent_hand.size()):

@@ -123,7 +123,7 @@ func set_current_field(field):
 				set_marked(false)
 	current_field = field
 
-func set_opponent_reveal_status(revealed: bool):
+func set_opponent_reveal_status(revealed: bool, skip_animation: bool = false):
 	if is_marked:
 		set_marked(false)
 	is_revealed_by_opponent = revealed
@@ -153,6 +153,19 @@ func set_opponent_reveal_status(revealed: bool):
 	if revealed and is_already_revealed:
 		return
 	if not revealed and is_already_hidden:
+		return
+	if skip_animation:
+		if revealed:
+			front.visible = true
+			back.visible = false
+			back.z_index = -1
+			front.z_index = 0
+		else:
+			front.visible = false
+			back.visible = true
+			back.z_index = 0
+			front.z_index = -1
+		emit_signal("visuals_changed")
 		return
 	var anim_player = get_node_or_null("AnimationPlayer")
 	if anim_player and anim_player.has_animation("card_flip"):

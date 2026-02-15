@@ -348,13 +348,6 @@ func finish_drag():
 			original_card_display = null
 		if player_hand_reference and card in player_hand_reference.player_hand:
 			player_hand_reference.remove_card_from_hand(card)
-		if (card_slot_found.name == "MEMORY" or card_slot_found.name == "MAINFIELD"or 
-		card_slot_found.name == "GRAVEYARD" or card_slot_found.name == "BANISH") and \
-		   card.has_method("is_in_hand") and card.is_in_hand() and \
-		   card.get("is_publicly_revealed") == true:
-			card_being_dragged = null 
-			card.hide_from_opponent()
-			await get_tree().create_timer(0.2).timeout
 		if card_slot_found.name == "MEMORY":
 			var target_idx = -1
 			if card_slot_found == source_memory_slot:
@@ -386,7 +379,7 @@ func finish_drag():
 				var rot = card.rotation_degrees
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node:
-					multiplayer_node.rpc("sync_move_to_main_field", multiplayer.get_unique_id(), uuid, slug, pos, rot)
+					multiplayer_node.rpc("sync_move_to_main_field", multiplayer.get_unique_id(), uuid, slug, pos, rot, was_from_ga_deck)
 			card.scale = normal_scale
 			card.z_index = base_z_index
 		elif card_slot_found.name == "GRAVEYARD":

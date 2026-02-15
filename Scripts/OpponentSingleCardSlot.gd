@@ -112,7 +112,7 @@ func add_card_to_slot(card):
 	tween.parallel().tween_property(card, "rotation", 0.0, 0.3)
 	show_card_front(card)
 	if card.has_method("set_opponent_reveal_status"):
-		card.set_opponent_reveal_status(true)
+		card.set_opponent_reveal_status(true, true)
 	reorder_z_indices()
 	card_in_slot = true
 	update_top_card_visual()

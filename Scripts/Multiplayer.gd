@@ -350,7 +350,7 @@ func sync_banish_flip(player_id: int, uuid: String, is_face_down: bool):
 				opp_banish.update_deck_view()
 
 @rpc("any_peer", "reliable")
-func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Vector2, rot_deg: float):
+func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Vector2, rot_deg: float, from_deck: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -370,6 +370,7 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 		if card_manager:
 			var card = get_or_create_opponent_card(card_manager, uuid, slug)
 			if card:
+				card.visible = true
 				if opp_hand and opp_hand.has_method("remove_card_from_hand"):
 					opp_hand.remove_card_from_hand(card)
 				var opp_grave = opp_field.get_node_or_null("OpponentGraveyard")
@@ -381,7 +382,9 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 				var opp_memory = opp_field.get_node_or_null("OpponentMemory")
 				if opp_memory and opp_memory.has_method("remove_card_from_memory"):
 					opp_memory.remove_card_from_memory(card)
-				if opp_main and opp_main.has_method("add_card_to_field"):
+				if from_deck:
+					_animate_opponent_card_from_deck(card, target_pos, true, false, opp_main, "add_card_to_field_with_rotation", false, rot_deg)
+				elif opp_main and opp_main.has_method("add_card_to_field"):
 					var is_token = false
 					var is_mastery = false
 					var logos = get_tree().get_nodes_in_group("logo")
@@ -404,7 +407,7 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 					opp_main.add_card_to_field(card, target_pos, rot_deg)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_memory(player_id: int, uuid: String, slug: String):
+func sync_move_to_memory(player_id: int, uuid: String, slug: String, from_deck: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -427,7 +430,17 @@ func sync_move_to_memory(player_id: int, uuid: String, slug: String):
 				var opp_main = opp_field.get_node_or_null("OpponentMainField")
 				if opp_main and opp_main.has_method("remove_card_from_field"):
 					opp_main.remove_card_from_field(card)
-				if opp_memory and opp_memory.has_method("add_card_to_memory"):
+				if from_deck:
+					var target_pos = opp_memory.global_position
+					if opp_memory.has_method("calculate_final_position_for_new_card"):
+						target_pos = opp_memory.calculate_final_position_for_new_card()
+					if opp_memory.has_method("_arrange_cards_symmetrically"):
+						opp_memory._arrange_cards_symmetrically(true)
+					elif opp_memory.has_method("arrange_cards_symmetrically"):
+						opp_memory.arrange_cards_symmetrically(true)
+					_animate_opponent_card_from_deck(card, target_pos, false, false, opp_memory, "add_card_to_memory", false)
+				elif opp_memory and opp_memory.has_method("add_card_to_memory"):
+					card.visible = true
 					opp_memory.add_card_to_memory(card)
 
 @rpc("any_peer", "reliable")
@@ -457,7 +470,7 @@ func sync_return_card_to_hand(player_id: int, uuid: String, slug: String):
 				if opp_hand and opp_hand.has_method("add_card_to_hand"):
 					opp_hand.add_card_to_hand(card)
 				if card.has_method("set_opponent_reveal_status"):
-					card.set_opponent_reveal_status(false)
+					card.set_opponent_reveal_status(false, true)
 
 @rpc("any_peer", "reliable")
 func sync_card_returned_to_deck(player_id: int, uuid: String, _slug: String):
@@ -504,7 +517,7 @@ func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node, 
 			_remove_card_from_all_zones(card, opp_field)
 		card.queue_free())
 
-func _animate_opponent_card_from_deck(card: Node, target_pos: Vector2, play_flip: bool, is_banish: bool, zone_node: Node, zone_method: String, face_down: bool):
+func _animate_opponent_card_from_deck(card: Node, target_pos: Vector2, play_flip: bool, is_banish: bool, zone_node: Node, zone_method: String, face_down: bool, target_rotation: float = 0.0):
 	var opp_field = card.get_parent().get_parent() 
 	var deck_node = opp_field.find_child("OpponentDeck", true, false)
 	if deck_node:
@@ -515,12 +528,14 @@ func _animate_opponent_card_from_deck(card: Node, target_pos: Vector2, play_flip
 	card.scale = Vector2(0.35, 0.35)
 	card.z_index = 1000
 	if card.has_method("set_opponent_reveal_status"):
-		card.set_opponent_reveal_status(false)
+		card.set_opponent_reveal_status(false, true)
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	if is_banish:
 		tween.tween_property(card, "rotation_degrees", 90.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	else:
+		tween.tween_property(card, "rotation_degrees", target_rotation, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	if play_flip:
 		if card.has_method("set_opponent_reveal_status"):
 			card.set_opponent_reveal_status(true)
@@ -530,6 +545,9 @@ func _animate_opponent_card_from_deck(card: Node, target_pos: Vector2, play_flip
 			zone_node.call(zone_method, card, face_down)
 		else:
 			zone_node.call(zone_method, card)
+	elif zone_method == "add_card_to_field_with_rotation":
+		if zone_node.has_method("add_card_to_field"):
+			zone_node.add_card_to_field(card, target_pos, target_rotation)
 
 func _remove_card_from_all_zones(card: Node, opp_field: Node):
 	if not card or not is_instance_valid(card):
@@ -739,7 +757,7 @@ func rpc_reset_memory_roulette(player_id: int):
 			opp_memory.reset_card_colors()
 
 @rpc("any_peer", "reliable")
-func rpc_set_card_reveal_status(player_id: int, card_uuid: String, revealed: bool):
+func rpc_set_card_reveal_status(player_id: int, card_uuid: String, revealed: bool, skip_animation: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -748,7 +766,7 @@ func rpc_set_card_reveal_status(player_id: int, card_uuid: String, revealed: boo
 		return
 	var found_card = _find_opponent_card_by_uuid(opp_field, card_uuid)
 	if found_card and found_card.has_method("set_opponent_reveal_status"):
-		found_card.set_opponent_reveal_status(revealed)
+		found_card.set_opponent_reveal_status(revealed, skip_animation)
 
 @rpc("any_peer", "reliable")
 func rpc_set_all_cards_reveal_status(player_id: int, revealed: bool):
