@@ -42,7 +42,13 @@ func add_card_to_memory(card, _skip_arrangement: bool = false, target_index: int
 		card.z_index = memory_z_index_offset + cards_in_slot.size()
 	if are_cards_blocked_for_marking() and card.has_method("set_marked"):
 		card.set_marked(false)
-	_show_card_back(card)
+	var revealed = false
+	if "is_revealed_by_opponent" in card:
+		revealed = card.is_revealed_by_opponent	
+	if revealed:
+		_show_card_front(card)
+	else:
+		_show_card_back(card)
 	_arrange_cards_symmetrically()
 
 func remove_card_from_memory(card):
@@ -115,33 +121,34 @@ func _get_slot_width() -> float:
 			return collision_shape.shape.size.x
 	return 400.0
 
-func _arrange_cards_symmetrically():
+func _arrange_cards_symmetrically(simulate_new_card: bool = false):
 	var card_count = cards_in_slot.size()
+	var future_card_count = card_count + 1 if simulate_new_card else card_count
 	var slot_width = _get_slot_width()
-	if card_count <= 0:
+	if future_card_count <= 0:
 		return
 	var positions: Array[float] = []
-	if card_count == 1:
+	if future_card_count == 1:
 		positions = [0.5]
-	elif card_count == 2:
+	elif future_card_count == 2:
 		positions = [0.4, 0.6]
-	elif card_count == 3:
+	elif future_card_count == 3:
 		positions = [0.3, 0.5, 0.7]
-	elif card_count == 4:
+	elif future_card_count == 4:
 		positions = [0.2, 0.4, 0.6, 0.8]
-	elif card_count == 5:
+	elif future_card_count == 5:
 		positions = [0.15, 0.325, 0.5, 0.675, 0.85]
-	elif card_count == 6:
+	elif future_card_count == 6:
 		positions = [0.125, 0.275, 0.425, 0.575, 0.725, 0.875]
 	else:
 		var min_pos = 0.07
 		var max_pos = 0.93
-		for i in range(card_count):
-			var normalized_pos = min_pos + (max_pos - min_pos) * i / (card_count - 1)
+		for i in range(future_card_count):
+			var normalized_pos = min_pos + (max_pos - min_pos) * i / (future_card_count - 1)
 			positions.append(normalized_pos)
 	for i in range(card_count):
-		var reversed_index = card_count - 1 - i
-		var normalized_x = positions[reversed_index]
+		var reversed_index = future_card_count - 1 - i
+		var normalized_x = positions[reversed_index] 
 		var actual_x = global_position.x - slot_width / 2.0 + normalized_x * slot_width
 		var target = Vector2(actual_x, global_position.y)
 		var card = cards_in_slot[i]
@@ -151,6 +158,32 @@ func _arrange_cards_symmetrically():
 			tween.tween_property(card, "global_position", target, 0.3)
 			tween.tween_property(card, "rotation", 0.0, 0.3)
 			card.z_index = memory_z_index_offset + i + 1
+
+func calculate_final_position_for_new_card() -> Vector2:
+	var future_card_count = cards_in_slot.size() + 1
+	var slot_width = _get_slot_width()
+	var positions = []
+	if future_card_count == 1:
+		return global_position
+	elif future_card_count == 2:
+		positions = [0.4, 0.6]
+	elif future_card_count == 3:
+		positions = [0.3, 0.5, 0.7]
+	elif future_card_count == 4:
+		positions = [0.2, 0.4, 0.6, 0.8]
+	elif future_card_count == 5:
+		positions = [0.15, 0.325, 0.5, 0.675, 0.85]
+	elif future_card_count == 6:
+		positions = [0.125, 0.275, 0.425, 0.575, 0.725, 0.875]
+	else:
+		var min_pos = 0.07
+		var max_pos = 0.93
+		for i in range(future_card_count):
+			var normalized_pos = min_pos + (max_pos - min_pos) * i / (future_card_count - 1)
+			positions.append(normalized_pos)
+	var normalized_x = positions[0]
+	var actual_x = global_position.x - slot_width / 2.0 + normalized_x * slot_width
+	return Vector2(actual_x, global_position.y)
 
 func start_synced_roulette(target_index: int, total_time: float):
 	if cards_in_slot.is_empty():

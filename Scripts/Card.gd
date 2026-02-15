@@ -1145,7 +1145,7 @@ func update_crystal_visibility():
 		var crystal_area = crystal_node.get_node("Area2D2")
 		crystal_area.set_deferred("input_pickable", should_be_visible)
 
-func reveal_to_opponent():
+func reveal_to_opponent(skip_animation: bool = false):
 	if (not is_in_memory_slot() and not is_in_hand()) or is_publicly_revealed:
 		return
 	is_publicly_revealed = true
@@ -1155,10 +1155,10 @@ func reveal_to_opponent():
 			parent.sync_hand_order()
 		if parent and parent.has_method("enforce_z_ordering"):
 			parent.enforce_z_ordering()
-	_update_local_card_visuals(true)
-	sync_reveal_state(true)
+	_update_local_card_visuals(true, skip_animation)
+	sync_reveal_state(true, skip_animation)
 
-func hide_from_opponent():
+func hide_from_opponent(skip_animation: bool = false):
 	if (not is_in_memory_slot() and not is_in_hand()) or not is_publicly_revealed:
 		return
 	is_publicly_revealed = false
@@ -1166,8 +1166,8 @@ func hide_from_opponent():
 		var parent = find_parent_container()
 		if parent and parent.has_method("enforce_z_ordering"):
 			parent.enforce_z_ordering()
-	_update_local_card_visuals(false)
-	sync_reveal_state(false)
+	_update_local_card_visuals(false, skip_animation)
+	sync_reveal_state(false, skip_animation)
 
 func reveal_all_in_memory():
 	var memory_slot = find_parent_container()
@@ -1204,10 +1204,10 @@ func find_parent_container():
 				return node
 	return null
 
-func sync_reveal_state(revealed: bool):
+func sync_reveal_state(revealed: bool, skip_animation: bool = false):
 	var main_node = get_tree().get_root().get_node_or_null("Main")
 	if main_node:
-		main_node.rpc("rpc_set_card_reveal_status", multiplayer.get_unique_id(), uuid, revealed)
+		main_node.rpc("rpc_set_card_reveal_status", multiplayer.get_unique_id(), uuid, revealed, skip_animation)
 
 func sync_all_reveal_state(revealed: bool):
 	var main_node = get_tree().get_root().get_node_or_null("Main")
@@ -1267,7 +1267,7 @@ func _has_revealed_cards_in_container() -> bool:
 			return true
 	return false
 
-func _update_local_card_visuals(revealed: bool):
+func _update_local_card_visuals(revealed: bool, skip_animation: bool = false):
 	var front = get_node_or_null("CardImage")
 	var back = get_node_or_null("CardImageBack")
 	if not front or not back:
@@ -1297,6 +1297,18 @@ func _update_local_card_visuals(revealed: bool):
 	if target_show_front and is_already_revealed:
 		return
 	if target_show_back and is_already_hidden:
+		return
+	if skip_animation:
+		if target_show_front:
+			front.visible = true
+			back.visible = false
+			back.z_index = -1
+			front.z_index = 0
+		else:
+			front.visible = false
+			back.visible = true
+			back.z_index = 0
+			front.z_index = -1
 		return
 	var anim_player = get_node_or_null("AnimationPlayer")
 	if anim_player and anim_player.has_animation("card_flip"):

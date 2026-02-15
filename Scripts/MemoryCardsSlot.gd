@@ -56,8 +56,9 @@ func add_card_to_memory(card, skip_arrangement: bool = false, target_index: int 
 		final_card.rotation = card.rotation
 		card.queue_free()
 	final_card.visible = true
+	var was_revealed = false
 	if "is_publicly_revealed" in final_card:
-		final_card.is_publicly_revealed = false
+		was_revealed = final_card.is_publicly_revealed
 	if final_card.has_method("set_current_field"):
 		final_card.set_current_field(self)
 	if target_index >= 0 and target_index <= cards_in_slot.size():
@@ -67,7 +68,10 @@ func add_card_to_memory(card, skip_arrangement: bool = false, target_index: int 
 	final_card.z_index = memory_z_index_offset + cards_in_slot.size()
 	if are_cards_blocked_for_marking() and final_card.has_method("set_marked"):
 		final_card.set_marked(false)
-	show_card_back(final_card)
+	if was_revealed:
+		show_card_front(final_card)
+	else:
+		show_card_back(final_card)
 	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
 	if card_manager and card_manager.has_method("connect_card_signals"):
 		card_manager.connect_card_signals(final_card)

@@ -182,7 +182,7 @@ func draw_to_memory():
 	if memory_node:
 		var main_node = get_tree().get_root().get_node("Main")
 		if main_node:
-			main_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), card_uuid, slug)
+			main_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), card_uuid, slug, true)
 		var final_position = memory_node.calculate_final_position_for_new_card()
 		memory_node.arrange_cards_symmetrically(true)
 		_animate_deck_card_to_zone(slug, card_uuid, final_position, memory_node, "add_card_to_memory", true, "", false)
