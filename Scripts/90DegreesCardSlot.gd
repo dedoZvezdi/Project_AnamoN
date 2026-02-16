@@ -181,7 +181,7 @@ func flip_card():
 		show_card_back(target_card)
 	else:
 		show_card_front(target_card)
-	var uuid_to_send = target_card.uuid if "uuid" in target_card else selected_card_uuid
+	var uuid_to_send = target_card.uuid if "uuid" in target_card and target_card.uuid != "" else selected_card_uuid
 	var is_face_down: bool = target_card.has_meta("is_face_down") and target_card.get_meta("is_face_down") == true
 	_sync_banish_flip(uuid_to_send, is_face_down)
 	if banish_view_window.visible:
@@ -521,7 +521,7 @@ func sent_to_mat_deck():
 				break
 	if not target_card:
 		return
-	var card_uuid_to_send = target_card.uuid if "uuid" in target_card else ""
+	var card_uuid_to_send = target_card.uuid if "uuid" in target_card and target_card.uuid != "" else selected_card_uuid
 	animate_card_to_mat_deck_from_banish(target_card, mat_deck_node.global_position, selected_card_slug, card_uuid_to_send)
 	_sync_move_to_mat_deck(card_uuid_to_send)
 	selected_card_slug = ""
