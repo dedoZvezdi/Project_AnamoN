@@ -234,6 +234,24 @@ func notify_host_of_join(client_name: String):
 			host_chat_node.add_message("System", client_name + " joined the game")
 
 @rpc("any_peer", "reliable")
+func sync_deck_data(player_id: int, ga_deck: Array, mat_deck: Array):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		var opp_deck = opp_field.find_child("OpponentDeck", true, false)
+		if not opp_deck:
+			opp_deck = opp_field.get_node_or_null("OpponentDeck")
+		if opp_deck and opp_deck.has_method("set_deck"):
+			opp_deck.set_deck(ga_deck)
+		var opp_mat_deck = opp_field.find_child("OpponentMaterialDeck", true, false)
+		if not opp_mat_deck:
+			opp_mat_deck = opp_field.get_node_or_null("OpponentMatDeck")
+		if opp_mat_deck and opp_mat_deck.has_method("set_deck"):
+			opp_mat_deck.set_deck(mat_deck)
+
+@rpc("any_peer", "reliable")
 func sync_element(element_name: String, alpha: float):
 	var opp_element_path = "OpponentField/OpponentElements/Opponent" + element_name
 	var opp_element = get_node(opp_element_path)
@@ -329,6 +347,8 @@ func sync_banish_flip(player_id: int, uuid: String, is_face_down: bool):
 	if not opp_field:
 		return
 	var card = _find_opponent_card_by_uuid(opp_field, uuid)
+	if not card:
+		card = _find_opponent_card_by_uuid(get_tree().current_scene, uuid)
 	if card:
 		card.set_meta("is_face_down", is_face_down)
 		var front = card.get_node_or_null("CardImage")
@@ -350,7 +370,7 @@ func sync_banish_flip(player_id: int, uuid: String, is_face_down: bool):
 				opp_banish.update_deck_view()
 
 @rpc("any_peer", "reliable")
-func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Vector2, rot_deg: float, from_deck: bool = false):
+func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Vector2, rot_deg: float, from_deck: bool = false, from_mat_deck: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -382,8 +402,8 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 				var opp_memory = opp_field.get_node_or_null("OpponentMemory")
 				if opp_memory and opp_memory.has_method("remove_card_from_memory"):
 					opp_memory.remove_card_from_memory(card)
-				if from_deck:
-					_animate_opponent_card_from_deck(card, target_pos, true, false, opp_main, "add_card_to_field_with_rotation", false, rot_deg)
+				if from_deck or from_mat_deck:
+					_animate_opponent_card_from_deck(card, target_pos, true, false, opp_main, "add_card_to_field_with_rotation", false, rot_deg, from_mat_deck)
 				elif opp_main and opp_main.has_method("add_card_to_field"):
 					var is_token = false
 					var is_mastery = false
@@ -517,9 +537,15 @@ func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node, 
 			_remove_card_from_all_zones(card, opp_field)
 		card.queue_free())
 
-func _animate_opponent_card_from_deck(card: Node, target_pos: Vector2, play_flip: bool, is_banish: bool, zone_node: Node, zone_method: String, face_down: bool, target_rotation: float = 0.0):
+func _animate_opponent_card_from_deck(card: Node, target_pos: Vector2, play_flip: bool, is_banish: bool, zone_node: Node, zone_method: String, face_down: bool, target_rotation: float = 0.0, is_mat_deck: bool = false):
 	var opp_field = card.get_parent().get_parent() 
-	var deck_node = opp_field.find_child("OpponentDeck", true, false)
+	var deck_node = null
+	if is_mat_deck:
+		deck_node = opp_field.find_child("OpponentMaterialDeck", true, false)
+		if not deck_node:
+			deck_node = opp_field.get_node_or_null("OpponentMatDeck")
+	else:
+		deck_node = opp_field.find_child("OpponentDeck", true, false)
 	if deck_node:
 		card.global_position = deck_node.global_position
 		card.visible = true
@@ -1092,9 +1118,15 @@ func sync_move_to_mat_deck(player_id: int, uuid: String, _is_top: bool):
 	var card_manager = opp_field.get_node_or_null("CardManager")
 	if not card_manager:
 		return
-	var card = _find_opponent_card_by_uuid(card_manager, uuid)
+	var card = _find_opponent_card_by_uuid(opp_field, uuid)
+	if not card:
+		card = _find_opponent_card_by_uuid(get_tree().current_scene, uuid)
 	if card:
 		var opp_mat_deck = opp_field.find_child("Opponent_MAT_DECK", true, false)
+		if not opp_mat_deck:
+			opp_mat_deck = opp_field.find_child("OpponentMaterialDeck", true, false)
+		if not opp_mat_deck:
+			opp_mat_deck = opp_field.get_node_or_null("OpponentMatDeck")	
 		if opp_mat_deck:
 			_animate_card_to_deck(card, opp_mat_deck.global_position, opp_field, opp_mat_deck)
 		else:

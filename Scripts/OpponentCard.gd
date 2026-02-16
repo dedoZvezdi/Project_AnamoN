@@ -318,13 +318,14 @@ func animate_lineage_banish(slug: String, lineage_uuid: String):
 	var scene = get_tree().get_current_scene()
 	if not scene:
 		return
-	var opp_banish = scene.find_child("OpponentBanish", true, false)
+	var opp_field = scene.find_child("OpponentField", true, false)
+	var opp_banish = opp_field.find_child("OpponentBanish", true, false) if opp_field else scene.find_child("OpponentBanish", true, false)
 	if not opp_banish:
 		return
 	var visual_card = load("res://Scenes/OpponentCard.tscn").instantiate()
 	visual_card.set_meta("slug", slug)
 	if lineage_uuid != "":
-		visual_card.uuid = lineage_uuid
+		visual_card.uuid = lineage_uuid	
 	var card_info = card_information_reference
 	if card_info and card_info.card_database_reference:
 		var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
@@ -336,8 +337,12 @@ func animate_lineage_banish(slug: String, lineage_uuid: String):
 				var back = visual_card.get_node_or_null("CardImageBack")
 				if back:
 					back.visible = false
-					img.z_index = 0
-	scene.add_child(visual_card)
+					img.z_index = 0		
+	var card_manager = opp_field.get_node_or_null("CardManager") if opp_field else null
+	if card_manager:
+		card_manager.add_child(visual_card)
+	else:
+		scene.add_child(visual_card)
 	visual_card.global_position = global_position
 	visual_card.z_index = 1000
 	var target_pos = opp_banish.global_position

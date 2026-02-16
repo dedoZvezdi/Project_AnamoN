@@ -1,15 +1,31 @@
 extends Node2D
 
-var opponent_deck = ["alice-golden-queen-dtr1e-cur","bellonas-runestone-ambdp",
-"alice-golden-queen-dtr","apotheosis-rite-p24-cpr", "crimson-protective-trinket-ftc",
-"assassins-mantle-rec-brv","polaris-twinkling-cauldron-prxy",
-"lost-providence-ptm1e","fabled-azurite-fatestone-hvn1e-csr",
-"huaji-of-heavens-rise-hvn1e","fabled-ruby-fatestone-hvn1e","kaleidoscope-barrette-rec-idy"]
+var opponent_deck = []
 var card_database_reference
 const CARD_SCENE_PATH = "res://Scenes/OpponentCard.tscn"
 
 func _ready() -> void:
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
 
+func set_deck(list: Array):
+	opponent_deck = list
+	update_deck_state()
+
+func decrement_deck_size():
+	if opponent_deck.size() > 0:
+		opponent_deck.remove_at(0)
+		update_deck_state()
+
+func increment_deck_size():
+	opponent_deck.append("placeholder")
+	update_deck_state()
+
+func update_deck_state():
+	if opponent_deck.size() == 0:
+		visible = false
+	else:
+		visible = true
+
 func add_to_top(slug: String):
 	opponent_deck.insert(0, slug)
+	update_deck_state()

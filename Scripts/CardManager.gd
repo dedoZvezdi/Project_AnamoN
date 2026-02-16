@@ -379,7 +379,7 @@ func finish_drag():
 				var rot = card.rotation_degrees
 				var multiplayer_node = get_tree().get_root().get_node("Main")
 				if multiplayer_node:
-					multiplayer_node.rpc("sync_move_to_main_field", multiplayer.get_unique_id(), uuid, slug, pos, rot, was_from_ga_deck)
+					multiplayer_node.rpc("sync_move_to_main_field", multiplayer.get_unique_id(), uuid, slug, pos, rot, was_from_ga_deck, was_from_mat_deck)
 			card.scale = normal_scale
 			card.z_index = base_z_index
 		elif card_slot_found.name == "GRAVEYARD":

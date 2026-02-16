@@ -3,10 +3,23 @@ extends Node2D
 const CARD_SCENE_PATH = "res://Scenes/OpponentCard.tscn"
 
 var card_database_reference
-var deck_size
+var deck_size = 0
+var opponent_deck = []
 
 func _ready() -> void:
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
+
+func set_deck(list: Array):
+	opponent_deck = list
+	deck_size = list.size()
+	if deck_size > 0:
+		visible = true
+		if has_node("Sprite2D"):
+			$Sprite2D.visible = true
+	else:
+		visible = false
+		if has_node("Sprite2D"):
+			$Sprite2D.visible = false
 
 func draw_card(card_drawn_name: String, card_uuid: String = ""):
 	decrement_deck_size()

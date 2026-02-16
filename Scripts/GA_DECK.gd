@@ -29,6 +29,16 @@ func _ready() -> void:
 	setup_deck_view()
 	$Area2D.input_event.connect(_on_area_2d_input_event)
 	update_deck_state()
+	call_deferred("_sync_initial_decks")
+
+func _sync_initial_decks():
+	var main_node = get_tree().get_root().get_node_or_null("Main")
+	if main_node and main_node.has_method("rpc"):
+		var mat_deck_node = get_parent().get_parent().find_child("MAT_DECK", true, false)
+		var mat_deck_list = []
+		if mat_deck_node and "player_deck" in mat_deck_node:
+			mat_deck_list = mat_deck_node.player_deck
+		main_node.rpc("sync_deck_data", multiplayer.get_unique_id(), player_deck, mat_deck_list)
 	
 @rpc("any_peer")
 func draw_here_and_for_peer(player_id, card_drawn_name, card_uuid := ""):
