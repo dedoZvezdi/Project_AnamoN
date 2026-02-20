@@ -112,7 +112,49 @@ func get_slug_from_card() -> String:
 func get_uuid() -> String:
 	return uuid
 
+func is_token() -> bool:
+	var slug = get_slug_from_card()
+	var logos = get_tree().get_nodes_in_group("logo")
+	if logos.size() > 0:
+		var logo = logos[0]
+		if logo.has_method("get") and "token_slugs" in logo:
+			return slug in logo.token_slugs
+		elif logo.get("token_slugs") != null:
+			return slug in logo.token_slugs
+	return false
+
+func is_mastery() -> bool:
+	var slug = get_slug_from_card()
+	var logos = get_tree().get_nodes_in_group("logo")
+	if logos.size() > 0:
+		var logo = logos[0]
+		if logo.has_method("get") and "mastery_slugs" in logo:
+			return slug in logo.mastery_slugs
+		elif logo.get("mastery_slugs") != null:
+			return slug in logo.mastery_slugs
+	return false
+
+func destroy_token():
+	var slug = get_slug_from_card()
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_destroy_token", multiplayer.get_unique_id(), uuid, slug)
+	queue_free()
+
+func destroy_mastery():
+	var slug = get_slug_from_card()
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_destroy_mastery", multiplayer.get_unique_id(), uuid, slug)
+	queue_free()
+
 func set_current_field(field):
+	if is_token() and field and (field.is_in_group("player_hand") or field.is_in_group("opponent_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
+		destroy_token()
+		return
+	if is_mastery() and field and (field.is_in_group("player_hand") or field.is_in_group("opponent_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
+		destroy_mastery()
+		return
 	if is_marked and current_field:
 		var was_in_special_zone = current_field.is_in_group("memory_slots") or current_field.is_in_group("main_fields")
 		if was_in_special_zone:

@@ -36,14 +36,23 @@ func _ready():
 func _on_global_lmb_released():
 	reset_card_colors()
 
-func add_card_to_memory(card, skip_arrangement: bool = false, target_index: int = -1):
+func add_card_to_memory(card, skip_arrangement: bool = false, target_index: int = -1, keep_reveal: bool = false):
 	if not card or not is_instance_valid(card):
 		return
 	if card.has_method("is_token") and card.is_token():
 		if card.has_method("destroy_token"):
 			card.destroy_token()
 		return
+	if card.has_method("is_mastery") and card.is_mastery():
+		if card.has_method("destroy_mastery"):
+			card.destroy_mastery()
+		return
 	var final_card = card
+	var was_revealed = false
+	if card.has_method("get") and card.get("is_publicly_revealed") != null:
+		was_revealed = card.is_publicly_revealed
+	elif card.has_meta("is_publicly_revealed"):
+		was_revealed = card.get_meta("is_publicly_revealed")
 	if card.get_parent() != self:
 		var saved_uuid = card.uuid if "uuid" in card else ""
 		final_card = card.duplicate()
@@ -56,9 +65,8 @@ func add_card_to_memory(card, skip_arrangement: bool = false, target_index: int 
 		final_card.rotation = card.rotation
 		card.queue_free()
 	final_card.visible = true
-	var was_revealed = false
 	if "is_publicly_revealed" in final_card:
-		was_revealed = final_card.is_publicly_revealed
+		final_card.is_publicly_revealed = was_revealed if keep_reveal else false
 	if final_card.has_method("set_current_field"):
 		final_card.set_current_field(self)
 	if target_index >= 0 and target_index <= cards_in_slot.size():
@@ -68,7 +76,7 @@ func add_card_to_memory(card, skip_arrangement: bool = false, target_index: int 
 	final_card.z_index = memory_z_index_offset + cards_in_slot.size()
 	if are_cards_blocked_for_marking() and final_card.has_method("set_marked"):
 		final_card.set_marked(false)
-	if was_revealed:
+	if keep_reveal and was_revealed:
 		show_card_front(final_card)
 	else:
 		show_card_back(final_card)
@@ -151,6 +159,10 @@ func insert_card_at_position(card, index):
 		if card.has_method("destroy_token"):
 			card.destroy_token()
 		return
+	if card.has_method("is_mastery") and card.is_mastery():
+		if card.has_method("destroy_mastery"):
+			card.destroy_mastery()
+		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if index < 0:
@@ -167,6 +179,10 @@ func add_card_near_position(card, target_x_position):
 	if card.has_method("is_token") and card.is_token():
 		if card.has_method("destroy_token"):
 			card.destroy_token()
+		return
+	if card.has_method("is_mastery") and card.is_mastery():
+		if card.has_method("destroy_mastery"):
+			card.destroy_mastery()
 		return
 	var slot_width = get_slot_width()
 	var slot_start = global_position.x - slot_width/2
