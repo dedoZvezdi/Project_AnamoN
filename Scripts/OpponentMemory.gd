@@ -25,13 +25,24 @@ func _ready():
 	roulette_timer.one_shot = false
 	add_child(roulette_timer)
 
-func add_card_to_memory(card, _skip_arrangement: bool = false, target_index: int = -1):
+func add_card_to_memory(card, _skip_arrangement: bool = false, target_index: int = -1, keep_reveal: bool = false):
 	if not card or not is_instance_valid(card):
 		return
 	if card.has_method("is_token") and card.is_token():
 		if card.has_method("destroy_token"):
 			card.destroy_token()
 		return
+	if card.has_method("is_mastery") and card.is_mastery():
+		if card.has_method("destroy_mastery"):
+			card.destroy_mastery()
+		return
+	var was_revealed = false
+	if card.has_method("get") and card.get("is_revealed_by_opponent") != null:
+		was_revealed = card.is_revealed_by_opponent
+	elif card.has_meta("is_revealed_by_opponent"):
+		was_revealed = card.get_meta("is_revealed_by_opponent")
+	elif card.get_node_or_null("CardImage") and card.get_node("CardImage").visible:
+		was_revealed = true
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in cards_in_slot:
@@ -42,12 +53,13 @@ func add_card_to_memory(card, _skip_arrangement: bool = false, target_index: int
 		card.z_index = memory_z_index_offset + cards_in_slot.size()
 	if are_cards_blocked_for_marking() and card.has_method("set_marked"):
 		card.set_marked(false)
-	var revealed = false
-	if "is_revealed_by_opponent" in card:
-		revealed = card.is_revealed_by_opponent	
-	if revealed:
+	if keep_reveal and was_revealed:
+		if card.has_method("set_opponent_reveal_status"):
+			card.set_opponent_reveal_status(true, true)
 		_show_card_front(card)
 	else:
+		if card.has_method("set_opponent_reveal_status"):
+			card.set_opponent_reveal_status(false, true)
 		_show_card_back(card)
 	_arrange_cards_symmetrically()
 

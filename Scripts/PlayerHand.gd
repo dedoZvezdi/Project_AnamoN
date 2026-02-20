@@ -45,6 +45,10 @@ func add_card_to_hand(card):
 		if card.has_method("destroy_token"):
 			card.destroy_token()
 		return
+	if card.has_method("is_mastery") and card.is_mastery():
+		if card.has_method("destroy_mastery"):
+			card.destroy_mastery()
+		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in player_hand:

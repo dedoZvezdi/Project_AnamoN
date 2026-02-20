@@ -700,6 +700,10 @@ func on_drag_start():
 func on_drag_end():
 	is_dragging = false
 	if is_in_hand() and current_field and current_field.has_method("sync_hand_order"):
+		call_deferred("_deferred_sync_hand_order")
+
+func _deferred_sync_hand_order():
+	if current_field and current_field.has_method("sync_hand_order"):
 		current_field.sync_hand_order()
 
 func set_current_field(field):
@@ -1052,8 +1056,8 @@ func animate_card_to_deck(deck_position: Vector2, slug: String, card_uuid: Strin
 	$Area2D.set_deferred("monitoring", false)
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_card_returned_to_deck", multiplayer.get_unique_id(), card_uuid, slug)
-	z_index = 1000
+		multiplayer_node.rpc("sync_card_returned_to_deck", multiplayer.get_unique_id(), card_uuid, slug, is_top)
+	z_index = 1 if is_top else -1
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(self, "global_position", deck_position, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)

@@ -17,7 +17,7 @@ func decrement_deck_size():
 		update_deck_state()
 
 func increment_deck_size():
-	opponent_deck.append("placeholder")
+	opponent_deck.append({"slug": "placeholder", "uuid": ""})
 	update_deck_state()
 
 func update_deck_state():
@@ -26,6 +26,6 @@ func update_deck_state():
 	else:
 		visible = true
 
-func add_to_top(slug: String):
-	opponent_deck.insert(0, slug)
+func add_to_top(slug: String, uuid: String = ""):
+	opponent_deck.insert(0, {"slug": slug, "uuid": uuid})
 	update_deck_state()

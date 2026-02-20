@@ -98,6 +98,8 @@ func update_deck_view():
 		child.queue_free()
 	for card_data in player_deck:
 		var card_display = create_card_display(card_data["slug"], card_data["uuid"])
+		if card_data.has("z_index"):
+			card_display.set_meta("deck_z_index", card_data["z_index"])
 		grid_container.add_child(card_display)
 	grid_container.call_deferred("queue_sort")
 
@@ -145,6 +147,7 @@ func move_card_to_top():
 	if card_index == -1:
 		return
 	var card_data = player_deck[card_index]
+	card_data["z_index"] = 1
 	player_deck.remove_at(card_index)
 	player_deck.insert(0, card_data)
 	var chat_node = get_tree().current_scene.find_child("Chat", true, false)
@@ -164,6 +167,7 @@ func move_card_to_bottom():
 	if card_index == -1:
 		return
 	var card_data = player_deck[card_index]
+	card_data["z_index"] = -1
 	player_deck.remove_at(card_index)
 	player_deck.append(card_data)
 	var chat_node = get_tree().current_scene.find_child("Chat", true, false)
@@ -333,7 +337,7 @@ func add_to_top(slug: String, uuid: String = ""):
 	var card_uuid = uuid
 	if card_uuid == "":
 		card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
-	player_deck.insert(0, {"slug": slug, "uuid": card_uuid})
+	player_deck.insert(0, {"slug": slug, "uuid": card_uuid, "z_index": 1})
 	update_deck_view()
 	update_deck_state()
 
@@ -343,7 +347,7 @@ func add_to_bottom(slug: String, uuid: String = ""):
 	var card_uuid = uuid
 	if card_uuid == "":
 		card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
-	player_deck.append({"slug": slug, "uuid": card_uuid})
+	player_deck.append({"slug": slug, "uuid": card_uuid, "z_index": -1})
 	update_deck_view()
 	update_deck_state()
 

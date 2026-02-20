@@ -38,6 +38,14 @@ func _exit_tree():
 func add_card_to_hand(card):
 	if not card or not is_instance_valid(card):
 		return
+	if card.has_method("is_token") and card.is_token():
+		if card.has_method("destroy_token"):
+			card.destroy_token()
+		return
+	if card.has_method("is_mastery") and card.is_mastery():
+		if card.has_method("destroy_mastery"):
+			card.destroy_mastery()
+		return
 	if card.has_method("set_opponent_reveal_status"):
 		if not card.get("is_revealed_by_opponent"):
 			card.set_opponent_reveal_status(false, true)

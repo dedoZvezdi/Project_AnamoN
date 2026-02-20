@@ -58,6 +58,14 @@ func increment_deck_size():
 	if has_node("Sprite2D"):
 		$Sprite2D.visible = true
 
+func add_to_top(slug: String, uuid: String = ""):
+	opponent_deck.insert(0, {"slug": slug, "uuid": uuid, "z_index": 1})
+	increment_deck_size()
+
+func add_to_bottom(slug: String, uuid: String = ""):
+	opponent_deck.append({"slug": slug, "uuid": uuid, "z_index": -1})
+	increment_deck_size()
+
 func set_highlight(is_highlighted: bool):
 	if has_node("Sprite2D"):
 		if is_highlighted:

@@ -33,6 +33,8 @@ func _ready():
 	if card_image_path != "" and ResourceLoader.exists(card_image_path):
 		texture_rect.texture = load(card_image_path)
 		texture_rect.size = CARD_DISPLAY_SIZE
+	if has_meta("deck_z_index"):
+		self.z_index = get_meta("deck_z_index")
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	gui_input.connect(_gui_input)
@@ -50,7 +52,10 @@ func _on_mouse_entered():
 
 func _on_mouse_exited():
 	self.scale = Vector2(1, 1)
-	self.z_index = 0
+	if has_meta("deck_z_index"):
+		self.z_index = get_meta("deck_z_index")
+	else:
+		self.z_index = 0
 
 func _is_face_down_opponent_banish() -> bool:
 	if texture_rect and texture_rect.texture:

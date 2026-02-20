@@ -262,8 +262,7 @@ func animate_card_to_deck_from_banish(card, deck_position: Vector2, slug: String
 	var card_image = card.get_node("CardImage")
 	var original_texture = card_image.texture
 	card_image.texture = load("res://Assets/Grand Archive/ga_back.png")
-	if is_top:
-		card.z_index = 2
+	card.z_index = 1 if is_top else -1
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(card, "global_position", deck_position, 0.5)
@@ -331,6 +330,10 @@ func add_card_to_slot(card, face_down := false, at_index: int = -1, skip_animati
 	if card.has_method("is_token") and card.is_token():
 		if card.has_method("destroy_token"):
 			card.destroy_token()
+		return
+	if card.has_method("is_mastery") and card.is_mastery():
+		if card.has_method("destroy_mastery"):
+			card.destroy_mastery()
 		return
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)

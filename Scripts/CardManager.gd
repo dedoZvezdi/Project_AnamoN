@@ -352,7 +352,8 @@ func finish_drag():
 			var target_idx = -1
 			if card_slot_found == source_memory_slot:
 				target_idx = original_memory_index
-			card_slot_found.add_card_to_memory(card, false, target_idx)
+			var keep_reveal = (source_memory_slot != null)
+			card_slot_found.add_card_to_memory(card, false, target_idx, keep_reveal)
 			if drag_card_was_marked:
 				if card.has_method("set_marked"):
 					if card.has_method("can_be_marked") and card.can_be_marked():
@@ -362,8 +363,8 @@ func finish_drag():
 			if slug != "":
 				var uuid = get_card_uuid(card)
 				var multiplayer_node = get_tree().get_root().get_node("Main")
-				if multiplayer_node and not card.is_token():
-					multiplayer_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), uuid, slug)
+				if multiplayer_node and not card.is_token() and not card.is_mastery():
+					multiplayer_node.rpc("sync_move_to_memory", multiplayer.get_unique_id(), uuid, slug, false, keep_reveal)
 			card.scale = normal_scale
 			card.z_index = base_z_index
 		elif card_slot_found.name == "MAINFIELD":
@@ -395,7 +396,7 @@ func finish_drag():
 				if slug != "":
 					var uuid = get_card_uuid(card)
 					var multiplayer_node = get_tree().get_root().get_node("Main")
-					if multiplayer_node and not card.is_token():
+					if multiplayer_node and not card.is_token() and not card.is_mastery():
 						multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug, was_from_ga_deck)
 			card.scale = normal_scale
 		elif card_slot_found.name == "BANISH":
@@ -415,7 +416,7 @@ func finish_drag():
 				if slug != "":
 					var uuid = get_card_uuid(card)
 					var multiplayer_node = get_tree().get_root().get_node("Main")
-					if multiplayer_node and not card.is_token():
+					if multiplayer_node and not card.is_token() and not card.is_mastery():
 						multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, face_down, was_from_ga_deck)
 			if card.has_meta("banish_face_down"):
 				card.set_meta("banish_face_down", false)
@@ -449,7 +450,7 @@ func finish_drag():
 				if slug != "":
 					var uuid = get_card_uuid(card)
 					var multiplayer_node = get_tree().get_root().get_node("Main")
-					if multiplayer_node:
+					if multiplayer_node and not card.is_token() and not card.is_mastery():
 						multiplayer_node.rpc("sync_return_card_to_hand", multiplayer.get_unique_id(), uuid, slug)
 				if card.has_method("is_in_hand") and card.is_in_hand() and card.get("is_publicly_revealed") == true:
 					card.hide_from_opponent()

@@ -427,7 +427,7 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 					opp_main.add_card_to_field(card, target_pos, rot_deg)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_memory(player_id: int, uuid: String, slug: String, from_deck: bool = false):
+func sync_move_to_memory(player_id: int, uuid: String, slug: String, from_deck: bool = false, keep_reveal: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -461,7 +461,7 @@ func sync_move_to_memory(player_id: int, uuid: String, slug: String, from_deck: 
 					_animate_opponent_card_from_deck(card, target_pos, false, false, opp_memory, "add_card_to_memory", false)
 				elif opp_memory and opp_memory.has_method("add_card_to_memory"):
 					card.visible = true
-					opp_memory.add_card_to_memory(card)
+					opp_memory.add_card_to_memory(card, false, -1, keep_reveal)
 
 @rpc("any_peer", "reliable")
 func sync_return_card_to_hand(player_id: int, uuid: String, slug: String):
@@ -493,7 +493,7 @@ func sync_return_card_to_hand(player_id: int, uuid: String, slug: String):
 					card.set_opponent_reveal_status(false, true)
 
 @rpc("any_peer", "reliable")
-func sync_card_returned_to_deck(player_id: int, uuid: String, _slug: String):
+func sync_card_returned_to_deck(player_id: int, uuid: String, _slug: String, is_top: bool = true):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -507,12 +507,12 @@ func sync_card_returned_to_deck(player_id: int, uuid: String, _slug: String):
 	if card:
 		var opp_deck = opp_field.find_child("OpponentDeck", true, false)
 		if opp_deck:
-			_animate_card_to_deck(card, opp_deck.global_position, opp_field, opp_deck)
+			_animate_card_to_deck(card, opp_deck.global_position, opp_field, opp_deck, is_top)
 		else:
 			_remove_card_from_all_zones(card, opp_field)
 			card.queue_free()
 
-func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node, opp_deck: Node = null):
+func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node, opp_deck: Node = null, is_top: bool = true):
 	if not card or not is_instance_valid(card):
 		return
 	var front = card.get_node_or_null("CardImage")
@@ -524,15 +524,21 @@ func _animate_card_to_deck(card: Node, deck_position: Vector2, opp_field: Node, 
 		back.visible = true
 		back.z_index = 0
 		
-	card.z_index = 1000
+	card.z_index = 1 if is_top else -1
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(card, "global_position", deck_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(card, "rotation_degrees", 0.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.set_parallel(false)
 	tween.tween_callback(func():
-		if opp_deck and opp_deck.has_method("increment_deck_size"):
-			opp_deck.increment_deck_size()
+		if opp_deck:
+			var slug = card.get_meta("slug") if card.has_meta("slug") else ""
+			if is_top and opp_deck.has_method("add_to_top"):
+				opp_deck.add_to_top(slug, card.uuid)
+			elif not is_top and opp_deck.has_method("add_to_bottom"):
+				opp_deck.add_to_bottom(slug, card.uuid)
+			elif opp_deck.has_method("increment_deck_size"):
+				opp_deck.increment_deck_size()
 		if opp_field:
 			_remove_card_from_all_zones(card, opp_field)
 		card.queue_free())
@@ -609,7 +615,7 @@ func sync_move_to_deck(player_id: int, uuid: String, _is_top: bool):
 	if card:
 		var opp_deck = opp_field.find_child("OpponentDeck", true, false)
 		if opp_deck:
-			_animate_card_to_deck(card, opp_deck.global_position, opp_field, opp_deck)
+			_animate_card_to_deck(card, opp_deck.global_position, opp_field, opp_deck, _is_top)
 		else:
 			if card.get_parent():
 				if card.get_parent().has_method("remove_card_from_hand"):
