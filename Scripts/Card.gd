@@ -33,104 +33,56 @@ var selected_lineage_card_uuid: String = ""
 var is_tweening: bool = false
 var original_owner_id = 0
 var is_marked = false
+var _dynamic_transform_pairs := {}
+var _transform_pairs_initialized := false
 
-const SHIFTING_CURRENTS_SLUGS := ["shifting-currents-p24", "shifting-currents-ambsd"]
-const TRANSFORMABLE_SLUGS := [
-	"huaji-of-heavens-rise-hvn1e","huaji-of-abyssal-fall-hvn1e","fatestone-of-balance-hvn",
-	"woodland-shoats-hvn","fatestone-of-progress-hvn","airborne-squirrel-hvn",
-	"fluvial-fatestone-hvn","mocking-otter-hvn","cyclonic-fatestone-hvn",
-	"windstalker-wolf-hvn","wildgrowth-fatestone-hvn","elder-mandrill-hvn",
-	"companion-fatestone-rec-hvf","fatebound-caracal-rec-hvf","companion-fatestone-p25",
-	"fatebound-caracal-p25","fatestone-of-revelations-rec-hvf","young-wyrmling-rec-hvf",
-	"fatestone-of-revelations-p25","young-wyrmling-p25","submerged-fatestone-hvn",
-	"commanding-sea-titan-hvn","fatestone-of-unrelenting-rec-hvf","cheetah-of-bound-fury-rec-hvf",
-	"fatestone-of-unrelenting-p25","cheetah-of-bound-fury-p25","lavaplume-fatestone-rec-hvf",
-	"firebird-trailblazer-rec-hvf","lavaplume-fatestone-p25","firebird-trailblazer-p25",
-	"idle-fatestone-hvn","bolstered-boar-hvn","coiled-fatestone-hvn",
-	"serpentine-judicator-hvn","pelagic-fatestone-hvn","slick-torrentrider-hvn",
-	"beseeched-fatestone-hvn","daunting-panda-hvn",
-	"craggy-fatestone-rec-hvf","obstinate-cragback-rec-hvf","craggy-fatestone-p25",
-	"obstinate-cragback-p25","fatestone-of-heaven-rec-hvf","heavenly-drake-rec-hvf",
-	"fatestone-of-heaven-p25","heavenly-drake-p25","fabled-ruby-fatestone-hvn1e",
-	"suzaku-vermillion-phoenix-hvn1e","fabled-ruby-fatestone-hvn1e-csr","suzaku-vermillion-phoenix-hvn1e-csr",
-	"fabled-sapphire-fatestone-hvn1e","genbu-black-tortoise-hvn1e","fabled-sapphire-fatestone-hvn1e-csr",
-	"genbu-black-tortoise-hvn1e-csr","fabled-emerald-fatestone-hvn1e","byakko-white-tiger-hvn1e",
-	"fabled-emerald-fatestone-hvn1e-csr","byakko-white-tiger-hvn1e-csr","lu-bu-indomitable-titan-hvn1e",
-	"lu-bu-wrath-incarnate-hvn1e","lu-bu-indomitable-titan-hvn1e-cur","lu-bu-wrath-incarnate-hvn1e-cur",
-	"fabled-azurite-fatestone-rec-hvf","seiryuu-azure-dragon-rec-hvf","fabled-azurite-fatestone-p25",
-	"seiryuu-azure-dragon-p25","fabled-azurite-fatestone-hvn1e-csr","seiryuu-azure-dragon-hvn1e-csr"
-]
+func get_transform_target(slug: String) -> String:
+	if not _transform_pairs_initialized:
+		_build_transform_pairs_cache()
+	if _dynamic_transform_pairs.has(slug):
+		return _dynamic_transform_pairs[slug]
+	return ""
 
-const TRANSFORM_PAIRS := {
-	"huaji-of-heavens-rise-hvn1e": "huaji-of-abyssal-fall-hvn1e",
-	"huaji-of-abyssal-fall-hvn1e": "huaji-of-heavens-rise-hvn1e",
-	"fatestone-of-balance-hvn": "woodland-shoats-hvn",
-	"woodland-shoats-hvn": "fatestone-of-balance-hvn",
-	"fatestone-of-progress-hvn": "airborne-squirrel-hvn",
-	"airborne-squirrel-hvn": "fatestone-of-progress-hvn",
-	"fluvial-fatestone-hvn": "mocking-otter-hvn",
-	"mocking-otter-hvn": "fluvial-fatestone-hvn",
-	"cyclonic-fatestone-hvn": "windstalker-wolf-hvn",
-	"windstalker-wolf-hvn": "cyclonic-fatestone-hvn",
-	"wildgrowth-fatestone-hvn": "elder-mandrill-hvn",
-	"elder-mandrill-hvn": "wildgrowth-fatestone-hvn",
-	"companion-fatestone-rec-hvf": "fatebound-caracal-rec-hvf",
-	"fatebound-caracal-rec-hvf": "companion-fatestone-rec-hvf",
-	"companion-fatestone-p25": "fatebound-caracal-p25",
-	"fatebound-caracal-p25": "companion-fatestone-p25",
-	"fatestone-of-revelations-rec-hvf": "young-wyrmling-rec-hvf",
-	"young-wyrmling-rec-hvf": "fatestone-of-revelations-rec-hvf",
-	"fatestone-of-revelations-p25": "young-wyrmling-p25",
-	"young-wyrmling-p25": "fatestone-of-revelations-p25",
-	"submerged-fatestone-hvn": "commanding-sea-titan-hvn",
-	"commanding-sea-titan-hvn": "submerged-fatestone-hvn",
-	"fatestone-of-unrelenting-rec-hvf": "cheetah-of-bound-fury-rec-hvf",
-	"cheetah-of-bound-fury-rec-hvf": "fatestone-of-unrelenting-rec-hvf",
-	"fatestone-of-unrelenting-p25": "cheetah-of-bound-fury-p25",
-	"cheetah-of-bound-fury-p25": "fatestone-of-unrelenting-p25",
-	"lavaplume-fatestone-rec-hvf": "firebird-trailblazer-rec-hvf",
-	"firebird-trailblazer-rec-hvf": "lavaplume-fatestone-rec-hvf",
-	"lavaplume-fatestone-p25": "firebird-trailblazer-p25",
-	"firebird-trailblazer-p25": "lavaplume-fatestone-p25",
-	"idle-fatestone-hvn": "bolstered-boar-hvn",
-	"bolstered-boar-hvn": "idle-fatestone-hvn",
-	"coiled-fatestone-hvn": "serpentine-judicator-hvn",
-	"serpentine-judicator-hvn": "coiled-fatestone-hvn",
-	"pelagic-fatestone-hvn": "slick-torrentrider-hvn",
-	"slick-torrentrider-hvn": "pelagic-fatestone-hvn",
-	"beseeched-fatestone-hvn": "daunting-panda-hvn",
-	"daunting-panda-hvn": "beseeched-fatestone-hvn",
-	"craggy-fatestone-rec-hvf": "obstinate-cragback-rec-hvf",
-	"obstinate-cragback-rec-hvf": "craggy-fatestone-rec-hvf",
-	"craggy-fatestone-p25": "obstinate-cragback-p25",
-	"obstinate-cragback-p25": "craggy-fatestone-p25",
-	"fatestone-of-heaven-rec-hvf": "heavenly-drake-rec-hvf",
-	"heavenly-drake-rec-hvf": "fatestone-of-heaven-rec-hvf",
-	"fatestone-of-heaven-p25": "heavenly-drake-p25",
-	"heavenly-drake-p25": "fatestone-of-heaven-p25",
-	"fabled-ruby-fatestone-hvn1e": "suzaku-vermillion-phoenix-hvn1e",
-	"suzaku-vermillion-phoenix-hvn1e": "fabled-ruby-fatestone-hvn1e",
-	"fabled-ruby-fatestone-hvn1e-csr": "suzaku-vermillion-phoenix-hvn1e-csr",
-	"suzaku-vermillion-phoenix-hvn1e-csr": "fabled-ruby-fatestone-hvn1e-csr",
-	"fabled-sapphire-fatestone-hvn1e": "genbu-black-tortoise-hvn1e",
-	"genbu-black-tortoise-hvn1e": "fabled-sapphire-fatestone-hvn1e",
-	"fabled-sapphire-fatestone-hvn1e-csr": "genbu-black-tortoise-hvn1e-csr",
-	"genbu-black-tortoise-hvn1e-csr": "fabled-sapphire-fatestone-hvn1e-csr",
-	"fabled-emerald-fatestone-hvn1e": "byakko-white-tiger-hvn1e",
-	"byakko-white-tiger-hvn1e": "fabled-emerald-fatestone-hvn1e",
-	"fabled-emerald-fatestone-hvn1e-csr": "byakko-white-tiger-hvn1e-csr",
-	"byakko-white-tiger-hvn1e-csr": "fabled-emerald-fatestone-hvn1e-csr",
-	"lu-bu-indomitable-titan-hvn1e": "lu-bu-wrath-incarnate-hvn1e",
-	"lu-bu-wrath-incarnate-hvn1e": "lu-bu-indomitable-titan-hvn1e",
-	"lu-bu-indomitable-titan-hvn1e-cur": "lu-bu-wrath-incarnate-hvn1e-cur",
-	"lu-bu-wrath-incarnate-hvn1e-cur": "lu-bu-indomitable-titan-hvn1e-cur",
-	"fabled-azurite-fatestone-rec-hvf": "seiryuu-azure-dragon-rec-hvf",
-	"seiryuu-azure-dragon-rec-hvf": "fabled-azurite-fatestone-rec-hvf",
-	"fabled-azurite-fatestone-p25": "seiryuu-azure-dragon-p25",
-	"seiryuu-azure-dragon-p25": "fabled-azurite-fatestone-p25",
-	"fabled-azurite-fatestone-hvn1e-csr": "seiryuu-azure-dragon-hvn1e-csr",
-	"seiryuu-azure-dragon-hvn1e-csr": "fabled-azurite-fatestone-hvn1e-csr"
-}
+func is_transformable_card(slug: String) -> bool:
+	if slug == "": return false
+	if not _transform_pairs_initialized:
+		_build_transform_pairs_cache()
+	return _dynamic_transform_pairs.has(slug)
+
+func _build_transform_pairs_cache():
+	if not card_information_reference or not card_information_reference.card_database_reference:
+		return
+	var db = card_information_reference.card_database_reference
+	if not db or not db.get("cards_db"):
+		return
+	var edition_to_base = {}
+	for key in db.cards_db:
+		var d = db.cards_db[key]
+		if d.has("editions"):
+			for ed in d["editions"]:
+				var ed_slug = ed.get("slug", "")
+				if ed_slug != "":
+					edition_to_base[ed_slug] = key
+	for key in db.cards_db:
+		var data = db.cards_db[key]
+		if data.has("other_orientations") and data["other_orientations"].size() > 0:
+			var front_edition_slug = key
+			var front_base_slug = edition_to_base.get(front_edition_slug, "")
+			for back_base_slug in data["other_orientations"]:
+				if front_base_slug != "":
+					_dynamic_transform_pairs[front_base_slug] = back_base_slug
+					_dynamic_transform_pairs[back_base_slug] = front_base_slug
+					var variant_suffix = front_edition_slug.trim_prefix(front_base_slug)
+					var target_edition_slug = back_base_slug + variant_suffix
+					if db.cards_db.has(target_edition_slug):
+						_dynamic_transform_pairs[front_edition_slug] = target_edition_slug
+						_dynamic_transform_pairs[target_edition_slug] = front_edition_slug
+				else:
+					var target_slug = back_base_slug
+					if db.cards_db.has(target_slug):
+						_dynamic_transform_pairs[front_edition_slug] = target_slug
+						_dynamic_transform_pairs[target_slug] = front_edition_slug
+	_transform_pairs_initialized = true
 
 func _ready() -> void:
 	if uuid == "":
@@ -234,6 +186,32 @@ func is_regalia_card() -> bool:
 						return true
 	return false
 
+func is_shifting_currents_card() -> bool:
+	var card_slug = get_slug_from_card()
+	if card_slug == "":
+		return false
+	if not card_information_reference or not card_information_reference.card_database_reference:
+		return false
+	var card_database = card_information_reference.card_database_reference
+	if not card_database.cards_db.has(card_slug):
+		return false
+	var data = card_database.cards_db[card_slug]
+	if data.has("name") and data["name"] == "Shifting Currents":
+		return true
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
+		if base_slug and card_database.cards_db.has(base_slug):
+			var base_data = card_database.cards_db[base_slug]
+			if base_data.has("name") and base_data["name"] == "Shifting Currents":
+				return true
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database.cards_db.has(parent_slug):
+			var parent_data = card_database.cards_db[parent_slug]
+			if parent_data.has("name") and parent_data["name"] == "Shifting Currents":
+				return true
+	return false
+
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if is_dragging:
 		return
@@ -260,20 +238,18 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					else:
 						popup_menu.add_item("Rest", 4)
 					var slug = get_slug_from_card()
-					if slug in TRANSFORMABLE_SLUGS:
-						popup_menu.add_item("Transform", 5)
-					if slug in TRANSFORMABLE_SLUGS:
+					if is_transformable_card(slug):
 						popup_menu.add_item("Transform", 5)
 			elif is_mastery():
 				if is_in_main_field():
 					popup_menu.add_item("Destroy", 7)
 					var slug = get_slug_from_card()
-					if slug in SHIFTING_CURRENTS_SLUGS:
+					if is_shifting_currents_card():
 						if current_direction != "North": popup_menu.add_item("North", 20)
 						if current_direction != "East": popup_menu.add_item("East", 21)
 						if current_direction != "South": popup_menu.add_item("South", 22)
 						if current_direction != "West": popup_menu.add_item("West", 23)
-					if slug in TRANSFORMABLE_SLUGS and not is_champion_card():
+					if is_transformable_card(slug) and not is_champion_card():
 						popup_menu.add_item("Transform", 5)
 			else:
 				if is_in_memory_slot() or is_in_hand():
@@ -306,7 +282,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						if opponent_field:
 							popup_menu.add_item("Give Control", 15)
 					var slug = get_slug_from_card()
-					if slug in TRANSFORMABLE_SLUGS and not is_champion_card():
+					if is_transformable_card(slug) and not is_champion_card():
 						popup_menu.add_item("Transform", 5)
 			var mouse_pos = get_global_mouse_position()
 			popup_menu.reset_size()
@@ -472,15 +448,13 @@ func find_champion_on_field():
 
 func transform_card():
 	var slug = get_slug_from_card()
-	if slug == "" or not TRANSFORM_PAIRS.has(slug):
+	var new_slug = get_transform_target(slug)
+	if new_slug == "":
 		return
-	var new_slug = TRANSFORM_PAIRS[slug]
 	set_meta("slug", new_slug)
 	if is_marked:
 		set_marked(false)
-	var card_image_path = "res://Assets/Grand Archive/Card Images/" + new_slug + ".png"
-	if ResourceLoader.exists(card_image_path):
-		$CardImage.texture = load(card_image_path)
+	_update_card_image(new_slug)
 	attached_markers.clear()
 	attached_counters.clear()
 	if current_field and current_field.has_method("notify_card_transformed"):
@@ -518,6 +492,35 @@ func transform_card():
 		hide_card_info()
 		show_card_info()
 		card_information_reference.show_card_preview(self)
+
+func remote_transform(new_slug: String):
+	set_meta("slug", new_slug)
+	_update_card_image(new_slug)
+	if has_node("AnimationPlayer"):
+		var anim: AnimationPlayer = $AnimationPlayer
+		if anim.has_animation("card_flip"):
+			anim.play("card_flip")
+	update_crystal_visibility()
+	if card_information_reference and mouse_inside and not is_dragging:
+		hide_card_info()
+		show_card_info()
+		card_information_reference.show_card_preview(self)
+
+func _update_card_image(card_slug: String):
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
+	var tex = null
+	if ResourceLoader.exists(card_image_path):
+		tex = load(card_image_path)
+	elif FileAccess.file_exists(card_image_path):
+		tex = load(card_image_path)
+	elif FileAccess.file_exists(card_image_path + ".import"):
+		tex = load(card_image_path)
+	if tex:
+		$CardImage.texture = tex
+		$CardImage.visible = true
+		if has_node("CardImageBack"):
+			$CardImageBack.visible = false
+		$CardImage.z_index = 0
 
 func show_card_info():
 	if not card_information_reference:
@@ -689,8 +692,7 @@ func set_direction(dir: String):
 func on_drag_start():
 	is_dragging = true
 	was_rotated_before_drag = is_rotated
-	var slug = get_slug_from_card()
-	if not (slug in SHIFTING_CURRENTS_SLUGS):
+	if not is_shifting_currents_card():
 		if not is_in_main_field():
 			is_rotated = false
 			rotation_degrees = original_rotation
@@ -728,8 +730,7 @@ func set_current_field(field):
 	var now_in_main = is_in_main_field()
 	if was_in_main and not now_in_main:
 		clear_runtime_modifiers()
-	var slug = get_slug_from_card()
-	if not now_in_main and not (slug in SHIFTING_CURRENTS_SLUGS):
+	if not now_in_main and not is_shifting_currents_card():
 		is_rotated = false
 		if field != null and not field.is_in_group("rotated_slots"):
 			rotation_degrees = original_rotation

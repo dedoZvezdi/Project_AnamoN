@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://bhkcqcx0pu1b5"]
+[gd_scene format=3 uid="uid://bhkcqcx0pu1b5"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_8whdk"]
 [ext_resource type="Script" uid="uid://dn6i6yhtowm6r" path="res://Scripts/Game_SetUp.gd" id="1_uld4x"]
@@ -24,65 +24,65 @@
 [ext_resource type="Script" uid="uid://cjdv252o1hnhq" path="res://Scripts/Phases.gd" id="21_h2qut"]
 [ext_resource type="PackedScene" uid="uid://kv77quhf6roj" path="res://Scenes/Chat.tscn" id="22_bg3cw"]
 
-[node name="PlayerField" type="Node2D"]
+[node name="PlayerField" type="Node2D" unique_id=260745692]
 script = ExtResource("1_uld4x")
 
-[node name="CardManager" type="Node2D" parent="."]
+[node name="CardManager" type="Node2D" parent="." unique_id=745441006]
 script = ExtResource("1_8whdk")
 
-[node name="FieldGa" type="Sprite2D" parent="."]
+[node name="FieldGa" type="Sprite2D" parent="." unique_id=96681673]
 z_index = -2
 position = Vector2(980, 796)
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("2_uld4x")
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=1591138068]
 z_index = -3
 position = Vector2(960, 541)
 texture = ExtResource("3_xb57x")
 
-[node name="GA_DECK" parent="." instance=ExtResource("4_kym08")]
+[node name="GA_DECK" parent="." unique_id=1622669110 instance=ExtResource("4_kym08")]
 position = Vector2(1360.5, 776.5)
 scale = Vector2(0.17, 0.17)
 script = ExtResource("5_xuc2h")
 
-[node name="MAT_DECK" parent="." instance=ExtResource("6_g5k7o")]
+[node name="MAT_DECK" parent="." unique_id=1989068499 instance=ExtResource("6_g5k7o")]
 position = Vector2(599, 776.5)
 scale = Vector2(0.17, 0.17)
 script = ExtResource("7_vx5jb")
 
-[node name="GRAVEYARD" parent="." instance=ExtResource("8_ul1di")]
+[node name="GRAVEYARD" parent="." unique_id=958938864 instance=ExtResource("8_ul1di")]
 position = Vector2(1362.7, 934.3)
 scale = Vector2(0.977783, 0.974084)
 
-[node name="BANISH" parent="." instance=ExtResource("9_64y2i")]
+[node name="BANISH" parent="." unique_id=820012226 instance=ExtResource("9_64y2i")]
 position = Vector2(1342, 638)
 
-[node name="MEMORY" parent="." instance=ExtResource("10_tb1co")]
+[node name="MEMORY" parent="." unique_id=2128720337 instance=ExtResource("10_tb1co")]
 position = Vector2(975, 969)
 script = ExtResource("11_c4sal")
 
-[node name="MAINFIELD" parent="." instance=ExtResource("12_36ctc")]
+[node name="MAINFIELD" parent="." unique_id=1231212295 instance=ExtResource("12_36ctc")]
 position = Vector2(961, 706)
 script = ExtResource("13_3oad2")
 
-[node name="PlayerHand" type="Node2D" parent="."]
+[node name="PlayerHand" type="Node2D" parent="." unique_id=726148433]
 script = ExtResource("14_1a7o5")
 
-[node name="InputManager" type="Node2D" parent="."]
+[node name="InputManager" type="Node2D" parent="." unique_id=2072920752]
 script = ExtResource("15_5crox")
 
-[node name="CardInformation" parent="." instance=ExtResource("16_fcs35")]
+[node name="CardInformation" parent="." unique_id=1669797766 instance=ExtResource("16_fcs35")]
 
-[node name="Elements" parent="." instance=ExtResource("17_0shgc")]
+[node name="Elements" parent="." unique_id=1706581851 instance=ExtResource("17_0shgc")]
 
-[node name="Logo" parent="." instance=ExtResource("18_awdcn")]
+[node name="Logo" parent="." unique_id=689740173 instance=ExtResource("18_awdcn")]
 position = Vector2(590, 956)
 script = ExtResource("19_j2sa3")
 
-[node name="Phases" parent="." instance=ExtResource("20_ovfrf")]
+[node name="Phases" parent="." unique_id=1640438607 instance=ExtResource("20_ovfrf")]
 position = Vector2(-1440, 386)
 script = ExtResource("21_h2qut")
 
-[node name="Chat" parent="." instance=ExtResource("22_bg3cw")]
+[node name="Chat" parent="." unique_id=1613080791 instance=ExtResource("22_bg3cw")]
 position = Vector2(-1454, 0)

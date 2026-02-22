@@ -63,10 +63,14 @@ func load_base_cards():
 			}
 
 func load_legalities():
-	var query = "SELECT Id, CardId FROM CardLegality;"
+	var query = """
+	SELECT cl.Id, c.Slug 
+	FROM CardLegality cl
+	JOIN Cards c ON c.Id = cl.CardId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var card_slug = get_card_slug_by_id(row["CardId"])
+			var card_slug = row["Slug"]
 			if card_slug in cards_db:
 				cards_db[card_slug]["legalities"].append({
 					"legality_id": row["Id"],
@@ -97,45 +101,62 @@ func load_legality_formats():
 					legality["formats"] = formats_by_legality[legality["legality_id"]]
 
 func load_card_classes():
-	var query = "SELECT CardId, Class FROM CardClasses;"
+	var query = """
+	SELECT c.Slug, cl.Class 
+	FROM CardClasses cl
+	JOIN Cards c ON c.Id = cl.CardId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var card_slug = get_card_slug_by_id(row["CardId"])
+			var card_slug = row["Slug"]
 			if card_slug and card_slug in cards_db:
 				cards_db[card_slug]["classes"].append(row["Class"])
 
 func load_card_types():
-	var query = "SELECT CardId, Type FROM CardTypes;"
+	var query = """
+	SELECT c.Slug, ct.Type 
+	FROM CardTypes ct
+	JOIN Cards c ON c.Id = ct.CardId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var card_slug = get_card_slug_by_id(row["CardId"])
+			var card_slug = row["Slug"]
 			if card_slug and card_slug in cards_db:
 				cards_db[card_slug]["types"].append(row["Type"])
 
 func load_card_subtypes():
-	var query = "SELECT CardId, Subtype FROM CardSubtypes;"
+	var query = """
+	SELECT c.Slug, cs.Subtype 
+	FROM CardSubtypes cs
+	JOIN Cards c ON c.Id = cs.CardId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var card_slug = get_card_slug_by_id(row["CardId"])
+			var card_slug = row["Slug"]
 			if card_slug and card_slug in cards_db:
 				cards_db[card_slug]["subtypes"].append(row["Subtype"])
 
 func load_card_elements():
-	var query = "SELECT CardId, Element FROM CardElements;"
+	var query = """
+	SELECT c.Slug, ce.Element 
+	FROM CardElements ce
+	JOIN Cards c ON c.Id = ce.CardId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var card_slug = get_card_slug_by_id(row["CardId"])
+			var card_slug = row["Slug"]
 			if card_slug and card_slug in cards_db:
 				cards_db[card_slug]["elements"].append(row["Element"])
 
 func load_editions():
 	var query = """
-	SELECT Id, CardId, Slug, CardEditionId, Effect, EffectRaw, Flavor, Orientation
-	FROM CardEditions;
+	SELECT ce.Id, ce.CardEditionId, ce.Slug, ce.Effect, ce.EffectRaw, ce.Flavor, ce.Orientation, c.Slug AS CardSlug
+	FROM CardEditions ce
+	JOIN Cards c ON c.Id = ce.CardId;
 	"""
 	if db.query(query):
 		for edition in db.query_result:
-			var card_slug = get_card_slug_by_id(edition["CardId"])
+			var card_slug = edition["CardSlug"]
 			if card_slug and card_slug in cards_db:
 				var edition_data = {
 					"id": edition["Id"],
@@ -144,7 +165,8 @@ func load_editions():
 					"effect": edition["Effect"],
 					"effect_raw": edition["EffectRaw"],
 					"flavor": edition["Flavor"],
-					"orientation": edition["Orientation"]
+					"orientation": edition["Orientation"],
+					"other_orientations": []
 				}
 				cards_db[card_slug]["editions"].append(edition_data)
 				cards_db[edition["Slug"]] = edition_data
@@ -179,47 +201,65 @@ func load_other_orientations():
 				"editions": []
 			}
 
+
 func load_orientation_classes():
-	var query = "SELECT OtherOrientationId, Class FROM CardOtherOrientationClasses;"
+	var query = """
+	SELECT co.Slug, coc.Class 
+	FROM CardOtherOrientationClasses coc
+	JOIN CardOtherOrientations co ON co.Id = coc.OtherOrientationId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var orientation_slug = get_orientation_slug_by_id(row["OtherOrientationId"])
+			var orientation_slug = row["Slug"]
 			if orientation_slug and orientation_slug in cards_db:
 				cards_db[orientation_slug]["classes"].append(row["Class"])
 
 func load_orientation_types():
-	var query = "SELECT OtherOrientationId, Type FROM CardOtherOrientationTypes;"
+	var query = """
+	SELECT co.Slug, cot.Type 
+	FROM CardOtherOrientationTypes cot
+	JOIN CardOtherOrientations co ON co.Id = cot.OtherOrientationId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var orientation_slug = get_orientation_slug_by_id(row["OtherOrientationId"])
+			var orientation_slug = row["Slug"]
 			if orientation_slug and orientation_slug in cards_db:
 				cards_db[orientation_slug]["types"].append(row["Type"])
 
 func load_orientation_subtypes():
-	var query = "SELECT OtherOrientationId, Subtype FROM CardOtherOrientationSubtypes;"
+	var query = """
+	SELECT co.Slug, cos.Subtype 
+	FROM CardOtherOrientationSubtypes cos
+	JOIN CardOtherOrientations co ON co.Id = cos.OtherOrientationId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var orientation_slug = get_orientation_slug_by_id(row["OtherOrientationId"])
+			var orientation_slug = row["Slug"]
 			if orientation_slug and orientation_slug in cards_db:
 				cards_db[orientation_slug]["subtypes"].append(row["Subtype"])
 
 func load_orientation_elements():
-	var query = "SELECT OtherOrientationId, Element FROM CardOtherOrientationElements;"
+	var query = """
+	SELECT co.Slug, coe.Element 
+	FROM CardOtherOrientationElements coe
+	JOIN CardOtherOrientations co ON co.Id = coe.OtherOrientationId;
+	"""
 	if db.query(query):
 		for row in db.query_result:
-			var orientation_slug = get_orientation_slug_by_id(row["OtherOrientationId"])
+			var orientation_slug = row["Slug"]
 			if orientation_slug and orientation_slug in cards_db:
 				cards_db[orientation_slug]["elements"].append(row["Element"])
 
 func load_orientation_editions():
 	var query = """
-	SELECT Id, OtherOrientationId, Slug, CardEditionId, Effect, EffectRaw, Flavor, Orientation
-	FROM CardOtherOrientationEditions;
+	SELECT coe.Id, coe.Slug, coe.CardEditionId, coe.Effect, coe.EffectRaw, coe.Flavor, coe.Orientation, co.Slug AS OrientationSlug
+	FROM CardOtherOrientationEditions coe
+	JOIN CardOtherOrientations co ON co.Id = coe.OtherOrientationId;
 	"""
 	
 	if db.query(query):
 		for edition in db.query_result:
-			var orientation_slug = get_orientation_slug_by_id(edition["OtherOrientationId"])
+			var orientation_slug = edition["OrientationSlug"]
 			if orientation_slug and orientation_slug in cards_db:
 				var edition_data = {
 					"id": edition["Id"],
@@ -235,31 +275,15 @@ func load_orientation_editions():
 				cards_db[edition["Slug"]] = edition_data
 	
 	var query2 = """
-	SELECT EditionId, OtherOrientationId
-	FROM CardEditionOtherOrientations;
+	SELECT ce.Slug AS EditionSlug, co.Slug AS OrientationSlug
+	FROM CardEditionOtherOrientations cee
+	JOIN CardEditions ce ON ce.Id = cee.EditionId
+	JOIN CardOtherOrientations co ON co.Id = cee.OtherOrientationId;
 	"""
 	if db.query(query2):
 		for row in db.query_result:
-			var edition_slug = get_edition_slug_by_id(row["EditionId"])
-			var orientation_slug = get_orientation_slug_by_id(row["OtherOrientationId"])
+			var edition_slug = row["EditionSlug"]
+			var orientation_slug = row["OrientationSlug"]
 			if edition_slug and orientation_slug and edition_slug in cards_db and orientation_slug in cards_db:
-				pass
-
-func get_orientation_slug_by_id(orientation_id):
-	var query = "SELECT Slug FROM CardOtherOrientations WHERE Id = " + str(orientation_id) + ";"
-	if db.query(query):
-		if db.query_result.size() > 0:
-			return db.query_result[0]["Slug"]
-	return null
-
-func get_edition_slug_by_id(edition_id):
-	for slug in cards_db:
-		if cards_db[slug].has("id") and cards_db[slug]["id"] == edition_id:
-			return slug
-	return null
-
-func get_card_slug_by_id(card_id):
-	for slug in cards_db:
-		if cards_db[slug].has("id") and cards_db[slug]["id"] == card_id:
-			return slug
-	return null
+				if cards_db[edition_slug].has("other_orientations"):
+					cards_db[edition_slug]["other_orientations"].append(orientation_slug)

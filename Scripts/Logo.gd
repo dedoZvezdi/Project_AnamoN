@@ -42,29 +42,8 @@ var add_counter_dialog: AcceptDialog
 var counter_name_input: LineEdit
 var original_menu_pos: Vector2 = Vector2.ZERO
 var player_name: String = "Player"
-var token_slugs : Array = [
-	"acerbica-hvn","astral-shard-dtr","astral-shard-dtrsd","atmos-shield-mrc",
-	"atmos-shield-sp2","aurousteel-greatsword-alc","aurousteel-greatsword-alcsd","aurousteel-greatsword-sp2",
-	"automaton-drone-alc","automaton-drone-alcsd","automaton-drone-mrc","automaton-drone-sp2",
-	"baihua-hvn","baihua-rec-idy","blightroot-alc","blightroot-alcsd",
-	"blightroot-mrc","blightroot-sp2","direwolf-hvn","fledgling-hvn",
-	"floodbloom-hvn","floodbloom-rec-idy","flowerbud-hvn","flowerbud-rec-idy",
-	"fraysia-alc","fraysia-alcsd","fraysia-mrc","fraysia-sp2","lycoria-hvn",
-	"lycoria-rec-idy","manaroot-alc","manaroot-alcsd","manaroot-mrc","manaroot-sp2",
-	"nightshade-hvn","nightshade-rec-idy","obelisk-of-armaments-alc","obelisk-of-armaments-alcsd",
-	"obelisk-of-armaments-sp2","obelisk-of-fabrication-alc","obelisk-of-fabrication-alcsd",
-	"obelisk-of-fabrication-sp2","obelisk-of-protection-alc","obelisk-of-protection-alcsd","obelisk-of-protection-sp2",
-	"ominous-shadow-evp","ominous-shadow-mrc","ominous-shadow-rec-shd",
-	"ominous-shadow-sp2","powercell-mrc-a","powercell-mrc-b","powercell-sp2",
-	"razorvine-alc","razorvine-alcsd","razorvine-mrc","razorvine-sp2",
-	"silvershine-alc","silvershine-alcsd","silvershine-mrc","silvershine-sp2",
-	"spirit-shard-mrc","spirit-shard-sp2","springleaf-alc","springleaf-alcsd",
-	"springleaf-mrc","springleaf-sp2","vacuous-servant-dtr","washuru-hvn"
-]
-var mastery_slugs : Array = [
-"servile-possessions-p25","servile-possessions-dtrsd","phantasmagoria-ptm",
-"shifting-currents-p24","shifting-currents-ambsd","fractured-memories-rec-brv", "fractured-memories-p25"
-]
+var token_slugs : Array = []
+var mastery_slugs : Array = []
 
 func _ready():
 	add_to_group("logo")
@@ -80,8 +59,8 @@ func _ready():
 	Logo_view_window.visibility_changed.connect(_on_logo_view_visibility_changed)
 	Logo_mastery_view_window.close_requested.connect(_on_logo_mastery_view_close)
 	Logo_mastery_view_window.visibility_changed.connect(_on_logo_mastery_view_visibility_changed)
-	populate_tokens()
-	populate_mastery()
+	call_deferred("populate_tokens")
+	call_deferred("populate_mastery")
 	Logo_view_window.hide()
 	Logo_mastery_view_window.hide()
 	var config = ConfigFile.new()
@@ -723,9 +702,34 @@ func _handle_menu_action(id, metadata = {}):
 				update_status_display()
 				build_counters_menu()
 
+func fetch_slugs_by_type(target_type: String) -> Array:
+	var slugs = []
+	var card_info = find_card_information_reference()
+	var db = null
+	if card_info and card_info.get("card_database_reference"):
+		db = card_info.card_database_reference
+	else:
+		db = load("res://Scripts/CardDatabase.gd").new()
+		db.initialize_database()
+		db.load_all_cards_data()
+	if db and db.get("cards_db"):
+		for key in db.cards_db:
+			var data = db.cards_db[key]
+			if data.has("types") and target_type in data["types"]:
+				if data.has("editions"):
+					for edition in data["editions"]:
+						var slug = edition["slug"]
+						if not slugs.has(slug):
+							var image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+							if ResourceLoader.exists(image_path) or FileAccess.file_exists(image_path) or FileAccess.file_exists(image_path + ".import"):
+								slugs.append(slug)
+	return slugs
+
 func populate_tokens():
 	for child in grid_container.get_children():
 		child.queue_free()
+	if token_slugs.is_empty():
+		token_slugs = fetch_slugs_by_type("TOKEN")
 	token_slugs.sort()
 	for slug in token_slugs:
 		var card_display = create_card_display(slug)
@@ -805,6 +809,8 @@ func find_node_recursive(node, target_name):
 func populate_mastery():
 	for child in mastery_grid_container.get_children():
 		child.queue_free()
+	if mastery_slugs.is_empty():
+		mastery_slugs = fetch_slugs_by_type("MASTERY")
 	mastery_slugs.sort()
 	for slug in mastery_slugs:
 		var card_display = create_card_display_mastery(slug)
