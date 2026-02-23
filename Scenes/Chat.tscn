@@ -1,25 +1,31 @@
-[gd_scene load_steps=2 format=3 uid="uid://kv77quhf6roj"]
+[gd_scene format=3 uid="uid://kv77quhf6roj"]
 
 [ext_resource type="Script" uid="uid://dddogrjplyi36" path="res://Scripts/Chat.gd" id="1_yc4ao"]
 
-[node name="Chat" type="Node2D"]
+[node name="Chat" type="Node2D" unique_id=1967406674]
 script = ExtResource("1_yc4ao")
 
-[node name="Send" type="Button" parent="."]
+[node name="Panel" type="Panel" parent="." unique_id=1537548537]
+offset_left = 1502.0
+offset_top = 581.0
+offset_right = 1887.0
+offset_bottom = 1057.0
+
+[node name="Send" type="Button" parent="." unique_id=621029934]
 offset_left = 1806.0
 offset_top = 1007.0
 offset_right = 1885.0
 offset_bottom = 1055.0
 text = "SEND"
 
-[node name="Message" type="LineEdit" parent="."]
+[node name="Message" type="LineEdit" parent="." unique_id=851550926]
 offset_left = 1502.0
 offset_top = 1007.0
 offset_right = 1805.0
 offset_bottom = 1057.0
 placeholder_text = "Message"
 
-[node name="TextEdit" type="TextEdit" parent="."]
+[node name="TextEdit" type="TextEdit" parent="." unique_id=941147514]
 offset_left = 1502.0
 offset_top = 581.0
 offset_right = 1885.0
