@@ -81,15 +81,12 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 
 func _on_context_menu_pressed(id):
 	match id:
-		0: view_deck()
+		0: show_deck_view()
 		1: shuffle_deck()
 		2: draw_to_memory()
 		3: send_top_to_gy()
 		4: banish_top_fd()
 		5: banish_top_fu()
-
-func view_deck():
-	show_deck_view()
 
 func update_deck_view():
 	if not deck_view_window.visible:

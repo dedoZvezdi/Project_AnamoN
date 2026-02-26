@@ -7,7 +7,6 @@ var player_deck = ["alice-golden-queen-dtr1e-cur","bellonas-runestone-ambdp",
 "huaji-of-heavens-rise-hvn1e","fabled-ruby-fatestone-hvn1e","kaleidoscope-barrette-rec-idy"]
 var card_database_reference
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
-@onready var context_menu = $PopupMenu
 @onready var deck_view_window = $MAT_DECK_VIEW_WINDOW
 @onready var grid_container = $MAT_DECK_VIEW_WINDOW/ScrollContainer/GridContainer
 
@@ -19,14 +18,9 @@ func _ready() -> void:
 		deck_with_uuids.append({"slug": slug, "uuid": card_uuid})
 	player_deck = deck_with_uuids
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
-	setup_context_menu()
 	setup_deck_view()
 	$Area2D.input_event.connect(_on_area_2d_input_event)
 	update_deck_state()
-
-func setup_context_menu():
-	context_menu.add_item("View Material Deck", 0)
-	context_menu.id_pressed.connect(_on_context_menu_pressed)
 
 func setup_deck_view():
 	deck_view_window.close_requested.connect(_on_deck_view_close)
@@ -34,16 +28,8 @@ func setup_deck_view():
 
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			context_menu.position = get_global_mouse_position()
-			context_menu.popup()
-
-func _on_context_menu_pressed(id):
-	match id:
-		0: view_deck()
-
-func view_deck():
-	show_deck_view()
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			show_deck_view()
 
 func update_deck_view():
 	if not deck_view_window.visible:
