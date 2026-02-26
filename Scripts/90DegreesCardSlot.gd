@@ -7,14 +7,12 @@ var selected_card_slug: String = ""
 var selected_card_uuid: String = ""
 var marked_uuids : Array = []
 
-@onready var context_menu = $PopupMenu
 @onready var banish_view_window = $BanishViewWindow
 @onready var grid_container = $BanishViewWindow/ScrollContainer/GridContainer
 @onready var area2d = $Area2D
 
 func _ready() -> void:
 	add_to_group("rotated_slots")
-	setup_context_menu()
 	setup_deck_view()
 	if area2d and not area2d.input_event.is_connected(_on_area_2d_input_event):
 		area2d.input_event.connect(_on_area_2d_input_event)
@@ -40,27 +38,14 @@ func update_deck_view():
 				tex_rect.texture = load(image_path)
 		grid_container.move_child(card_display, 0)
 
-func setup_context_menu():
-	context_menu.clear()
-	context_menu.add_item("View Banish", 0)
-	context_menu.id_pressed.connect(_on_context_menu_pressed)
-
 func setup_deck_view():
 	banish_view_window.close_requested.connect(_on_deck_view_close)
 	banish_view_window.hide()
 
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			context_menu.position = get_global_mouse_position()
-			context_menu.popup()
-
-func _on_context_menu_pressed(id):
-	match id:
-		0: view_deck()
-
-func view_deck():
-	show_deck_view()
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			show_grid_view()
 
 func create_card_display(card_name: String, card_uuid: String = ""):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
@@ -314,7 +299,7 @@ func show_card_front(card):
 			card_image.texture = card.get_meta("original_card_texture")
 		card.set_meta("is_face_down", false)
 
-func show_deck_view():
+func show_grid_view():
 	update_deck_view()
 	banish_view_window.popup_centered()
 	$BanishViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)

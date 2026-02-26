@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://ml3qhw1idgmk"]
+[gd_scene format=3 uid="uid://ml3qhw1idgmk"]
 
 [ext_resource type="Script" uid="uid://c1i30tld7hk0l" path="res://Scripts/SingleCardSlot.gd" id="1_yk7di"]
 [ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="2_4tah1"]
@@ -6,35 +6,32 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3muqk"]
 size = Vector2(92, 132)
 
-[node name="CardsSlotForSignleCard" type="Node2D"]
+[node name="CardsSlotForSignleCard" type="Node2D" unique_id=802075313]
 script = ExtResource("1_yk7di")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=124200218]
 collision_layer = 2
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=183021862]
 shape = SubResource("RectangleShape2D_3muqk")
 
-[node name="PopupMenu" type="PopupMenu" parent="."]
-size = Vector2i(20, 10)
-
-[node name="GraveyardViewWindow" type="Window" parent="."]
+[node name="GraveyardViewWindow" type="Window" parent="." unique_id=1609381763]
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
 
-[node name="PopupMenu" type="PopupMenu" parent="GraveyardViewWindow"]
+[node name="PopupMenu" type="PopupMenu" parent="GraveyardViewWindow" unique_id=167838588]
 size = Vector2i(100, 50)
 
-[node name="ScrollContainer" type="ScrollContainer" parent="GraveyardViewWindow"]
+[node name="ScrollContainer" type="ScrollContainer" parent="GraveyardViewWindow" unique_id=928919010]
 offset_right = 600.0
 offset_bottom = 142.0
 
-[node name="GridContainer" type="GridContainer" parent="GraveyardViewWindow/ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="GraveyardViewWindow/ScrollContainer" unique_id=358298205]
 custom_minimum_size = Vector2(600, 142)
 layout_mode = 2
 columns = 1024
 
-[node name="Control" parent="GraveyardViewWindow/ScrollContainer/GridContainer" instance=ExtResource("2_4tah1")]
+[node name="Control" parent="GraveyardViewWindow/ScrollContainer/GridContainer" unique_id=1005187852 instance=ExtResource("2_4tah1")]
 layout_mode = 2
