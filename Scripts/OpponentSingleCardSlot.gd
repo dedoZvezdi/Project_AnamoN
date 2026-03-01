@@ -5,16 +5,72 @@ var card_in_slot = false
 var base_z_index = 0
 var selected_card_slug: String = ""
 var marked_uuids : Array = []
+var hold_timer = 0.0
+var is_holding_left = false
+var progress_bar: TextureProgressBar
 
 @onready var graveyard_view_window = $GraveyardViewWindow
 @onready var grid_container = $GraveyardViewWindow/ScrollContainer/GridContainer
 @onready var area2d = $Area2D
+
+const HOLD_DURATION = 0.8
 
 func _ready() -> void:
 	add_to_group("single_card_slots")
 	setup_deck_view()
 	if area2d and not area2d.input_event.is_connected(_on_area_2d_input_event):
 		area2d.input_event.connect(_on_area_2d_input_event)
+	if area2d and not area2d.mouse_exited.is_connected(_on_mouse_exited):
+		area2d.mouse_exited.connect(_on_mouse_exited)
+	_setup_progress_bar()
+
+func _setup_progress_bar():
+	progress_bar = TextureProgressBar.new()
+	progress_bar.fill_mode = TextureProgressBar.FILL_CLOCKWISE
+	progress_bar.step = 0.01
+	progress_bar.min_value = 0
+	progress_bar.max_value = 1.0
+	progress_bar.value = 0
+	var progress_size = Vector2(100, 100)
+	progress_bar.custom_minimum_size = progress_size
+	progress_bar.size = progress_size
+	progress_bar.position = -progress_size / 2
+	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_bar.visible = false
+	progress_bar.top_level = true
+	progress_bar.z_index = 2000
+	progress_bar.z_as_relative = false
+	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	for y in range(128):
+		for x in range(128):
+			var dist = Vector2(x-64, y-64).length()
+			if dist > 25 and dist < 30:
+				img.set_pixel(x, y, Color(1, 1, 1, 0.8))
+	var tex = ImageTexture.create_from_image(img)
+	progress_bar.texture_progress = tex
+	progress_bar.modulate = Color(0.2, 0.8, 1.0)
+	get_tree().root.add_child.call_deferred(progress_bar)
+
+func _process(delta):
+	if is_holding_left:
+		hold_timer += delta
+		if progress_bar:
+			progress_bar.value = hold_timer / HOLD_DURATION
+			progress_bar.visible = true
+			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
+		if hold_timer >= HOLD_DURATION:
+			show_grid_view()
+			_reset_hold()
+	else:
+		if progress_bar and progress_bar.visible:
+			progress_bar.visible = false
+
+func _reset_hold():
+	is_holding_left = false
+	hold_timer = 0.0
+	if progress_bar:
+		progress_bar.value = 0
+		progress_bar.visible = false
 
 func update_deck_view():
 	for child in grid_container.get_children():
@@ -37,8 +93,15 @@ func setup_deck_view():
 
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			show_grid_view()
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_holding_left = true
+				hold_timer = 0.0
+			else:
+				_reset_hold()
+
+func _on_mouse_exited():
+	_reset_hold()
 
 func create_card_display(card_name: String, card_uuid: String = ""):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")

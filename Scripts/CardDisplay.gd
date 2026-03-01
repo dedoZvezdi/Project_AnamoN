@@ -5,13 +5,18 @@ var card_image_path = ""
 var zone = ""
 var is_holding = false
 var dragged_card = null
+var hold_timer = 0.0
+var is_holding_left = false
+var progress_bar: TextureProgressBar
 
 signal request_popup_menu(slug, uuid)
 signal card_drag_started(card_display)
+signal card_held(slug, uuid)
+
+const HOLD_DURATION = 0.8
+const CARD_DISPLAY_SIZE = Vector2(98, 98)
 
 @onready var texture_rect = $TextureRect
-
-const CARD_DISPLAY_SIZE = Vector2(98, 98)
 
 func _ready():
 	add_to_group("card_displays")
@@ -38,6 +43,51 @@ func _ready():
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	gui_input.connect(_gui_input)
+	_setup_progress_bar()
+
+func _setup_progress_bar():
+	progress_bar = TextureProgressBar.new()
+	progress_bar.fill_mode = TextureProgressBar.FILL_CLOCKWISE
+	progress_bar.step = 0.01
+	progress_bar.min_value = 0
+	progress_bar.max_value = 1.0
+	progress_bar.value = 0
+	progress_bar.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_bar.visible = false
+	progress_bar.scale = Vector2(0.8, 0.8)
+	progress_bar.position = (CARD_DISPLAY_SIZE - (Vector2(128, 128) * 0.8)) / 2
+	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	for y in range(128):
+		for x in range(128):
+			var dist = Vector2(x-64, y-64).length()
+			if dist > 25 and dist < 30:
+				img.set_pixel(x, y, Color(1, 1, 1, 0.8))
+	var tex = ImageTexture.create_from_image(img)
+	progress_bar.texture_progress = tex
+	progress_bar.modulate = Color(0.2, 0.8, 1.0)
+	add_child(progress_bar)
+
+func _process(delta):
+	if is_holding_left:
+		hold_timer += delta
+		if progress_bar:
+			progress_bar.value = hold_timer / HOLD_DURATION
+			progress_bar.visible = true
+		if hold_timer >= HOLD_DURATION:
+			var current_uuid = get_meta("uuid") if has_meta("uuid") else ""
+			emit_signal("card_held", card_slug, current_uuid)
+			_reset_hold()
+	else:
+		if progress_bar and progress_bar.visible:
+			progress_bar.visible = false
+
+func _reset_hold():
+	is_holding_left = false
+	hold_timer = 0.0
+	if progress_bar:
+		progress_bar.value = 0
+		progress_bar.visible = false
 
 func _on_mouse_entered():
 	self.scale = Vector2(1, 1)
@@ -52,6 +102,7 @@ func _on_mouse_entered():
 
 func _on_mouse_exited():
 	self.scale = Vector2(1, 1)
+	_reset_hold()
 	if has_meta("deck_z_index"):
 		self.z_index = get_meta("deck_z_index")
 	else:
@@ -97,11 +148,22 @@ func _is_in_opponent_zone() -> bool:
 
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		if zone == "lineage":
+			return
 		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery", "lineage"]:
 			var current_uuid = get_meta("uuid") if has_meta("uuid") else ""
 			emit_signal("request_popup_menu", card_slug, current_uuid)
 			accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if zone == "lineage":
+			if event.pressed:
+				is_holding_left = true
+				hold_timer = 0.0
+				accept_event()
+			else:
+				_reset_hold()
+				accept_event()
+			return	
 		if event.pressed:
 			if _is_in_opponent_zone():
 				var is_marked = get_meta("is_marked") if has_meta("is_marked") else false

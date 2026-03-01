@@ -7,8 +7,6 @@ signal hovered_off
 @onready var area: Area2D = $Area2D
 @onready var card_level_lable = $Level
 @onready var card_PLDS_lable = $PowerLifeDurSpeed
-@onready var crystal_node: Sprite2D = $Crystal
-@onready var crystal_collision: CollisionShape2D = $Crystal/Area2D2/CollisionShape2D
 @onready var lineage_view_window = $LineageViewWindow
 @onready var grid_container = $LineageViewWindow/ScrollContainer/GridContainer
 
@@ -35,6 +33,12 @@ var original_owner_id = 0
 var is_marked = false
 var _dynamic_transform_pairs := {}
 var _transform_pairs_initialized := false
+var hold_timer = 0.0
+var is_holding_left = false
+var progress_bar: TextureProgressBar
+
+const HOLD_DURATION = 0.8
+const CARD_SIZE = Vector2(246, 344)
 
 func get_transform_target(slug: String) -> String:
 	if not _transform_pairs_initialized:
@@ -94,11 +98,7 @@ func _ready() -> void:
 	find_card_information_reference()
 	if card_level_lable:
 		card_level_lable.clear()
-	update_crystal_visibility()
-	if crystal_node and crystal_node.has_node("Area2D2"):
-		var crystal_area_node = crystal_node.get_node("Area2D2")
-		if not crystal_area_node.input_event.is_connected(_on_crystal_input_event):
-			crystal_area_node.input_event.connect(_on_crystal_input_event)
+	_setup_progress_bar()
 	if lineage_view_window:
 		if not lineage_view_window.close_requested.is_connected(_on_lineage_window_close):
 			lineage_view_window.close_requested.connect(_on_lineage_window_close)
@@ -215,10 +215,18 @@ func is_shifting_currents_card() -> bool:
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if is_dragging:
 		return
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if is_in_memory_slot():
-			if can_be_marked():
-				toggle_mark()
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if is_champion_card() and is_in_main_field():
+			if event.pressed:
+				is_holding_left = true
+				hold_timer = 0.0
+			else:
+				_reset_hold()
+			return
+		if event.pressed:
+			if is_in_memory_slot():
+				if can_be_marked():
+					toggle_mark()
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if mouse_inside:
 			if is_in_graveyard() or is_in_banish():
@@ -307,14 +315,57 @@ func _on_area_2d_mouse_entered() -> void:
 
 func _on_area_2d_mouse_exited() -> void:
 	mouse_inside = false
+	_reset_hold()
 	emit_signal("hovered_off", self)
 	if is_in_main_field():
 		hide_card_info()
 
-func _on_crystal_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if crystal_node and crystal_node.visible:
+func _setup_progress_bar():
+	progress_bar = TextureProgressBar.new()
+	progress_bar.fill_mode = TextureProgressBar.FILL_CLOCKWISE
+	progress_bar.step = 0.01
+	progress_bar.min_value = 0
+	progress_bar.max_value = 1.0
+	progress_bar.value = 0
+	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_bar.top_level = true
+	progress_bar.z_index = 2000
+	progress_bar.z_as_relative = false
+	var ring_size = Vector2(128, 128)
+	progress_bar.custom_minimum_size = ring_size
+	progress_bar.size = ring_size
+	progress_bar.position = -ring_size / 2
+	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	for y in range(128):
+		for x in range(128):
+			var dist = Vector2(x-64, y-64).length()
+			if dist > 25 and dist < 30:
+				img.set_pixel(x, y, Color(1, 1, 1, 0.8))
+	var tex = ImageTexture.create_from_image(img)
+	progress_bar.texture_progress = tex
+	progress_bar.modulate = Color(0.2, 0.8, 1.0)
+	get_tree().root.add_child.call_deferred(progress_bar)
+
+func _process(delta):
+	if is_holding_left:
+		hold_timer += delta
+		if progress_bar:
+			progress_bar.value = hold_timer / HOLD_DURATION
+			progress_bar.visible = true
+			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
+		if hold_timer >= HOLD_DURATION:
 			open_lineage_window()
+			_reset_hold()
+	else:
+		if progress_bar and progress_bar.visible:
+			progress_bar.visible = false
+
+func _reset_hold():
+	is_holding_left = false
+	hold_timer = 0.0
+	if progress_bar:
+		progress_bar.value = 0
+		progress_bar.visible = false
 
 func open_lineage_window():
 	if not lineage_view_window or not grid_container:
@@ -330,8 +381,8 @@ func open_lineage_window():
 		card_display.set_meta("slug", lineage_data.get("slug", ""))
 		card_display.set_meta("uuid", lineage_data.get("uuid", ""))
 		card_display.set_meta("zone", "lineage")
-		if not card_display.request_popup_menu.is_connected(_on_lineage_card_display_popup_menu):
-			card_display.request_popup_menu.connect(_on_lineage_card_display_popup_menu)
+		if not card_display.card_held.is_connected(_on_lineage_card_held):
+			card_display.card_held.connect(_on_lineage_card_held)
 		grid_container.add_child(card_display)
 	lineage_view_window.popup_centered()
 
@@ -341,7 +392,6 @@ func _on_lineage_window_close():
 
 func add_to_lineage(lineage_data: Dictionary):
 	champion_lineage.append(lineage_data)
-	update_crystal_visibility()
 	if lineage_view_window and lineage_view_window.visible:
 		open_lineage_window()
 
@@ -349,17 +399,12 @@ func remove_from_lineage_by_uuid(target_uuid: String):
 	for i in range(champion_lineage.size() - 1, -1, -1):
 		if champion_lineage[i].get("uuid", "") == target_uuid:
 			champion_lineage.remove_at(i)
-			update_crystal_visibility()
 			break
 
-func _on_lineage_card_display_popup_menu(slug, card_uuid):
+func _on_lineage_card_held(slug, card_uuid):
 	selected_lineage_card_slug = slug
 	selected_lineage_card_uuid = card_uuid
-	var lineage_popup_menu = lineage_view_window.get_node_or_null("PopupMenu")
-	if lineage_popup_menu:
-		lineage_popup_menu.clear()
-		lineage_popup_menu.add_item("Banish", 0)
-		lineage_popup_menu.popup(Rect2(get_viewport().get_mouse_position(), Vector2(0, 0)))
+	banish_lineage_card()
 
 func _on_lineage_popup_menu_pressed(id):
 	match id:
@@ -487,7 +532,6 @@ func transform_card():
 				apply_champion_life_delta(0)
 	if is_in_main_field():
 		clear_runtime_modifiers()
-	update_crystal_visibility()
 	if card_information_reference and mouse_inside and not is_dragging:
 		hide_card_info()
 		show_card_info()
@@ -500,7 +544,6 @@ func remote_transform(new_slug: String):
 		var anim: AnimationPlayer = $AnimationPlayer
 		if anim.has_animation("card_flip"):
 			anim.play("card_flip")
-	update_crystal_visibility()
 	if card_information_reference and mouse_inside and not is_dragging:
 		hide_card_info()
 		show_card_info()
@@ -734,7 +777,6 @@ func set_current_field(field):
 		is_rotated = false
 		if field != null and not field.is_in_group("rotated_slots"):
 			rotation_degrees = original_rotation
-	update_crystal_visibility()
 
 func is_in_main_field() -> bool:
 	return current_field != null and current_field.is_in_group("main_fields")
@@ -1137,18 +1179,6 @@ func sync_stats_to_opponent(forced_rot: float = -999.0):
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_card_state", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters, current_direction, rot_to_send)
-
-func update_crystal_visibility():
-	if not crystal_node:
-		return
-	var contains_lineage = champion_lineage.size() > 0
-	var should_be_visible = is_champion_card() and is_in_main_field() and contains_lineage
-	crystal_node.visible = should_be_visible
-	if crystal_collision:
-		crystal_collision.set_deferred("disabled", !should_be_visible)
-	if crystal_node.has_node("Area2D2"):
-		var crystal_area = crystal_node.get_node("Area2D2")
-		crystal_area.set_deferred("input_pickable", should_be_visible)
 
 func reveal_to_opponent(skip_animation: bool = false):
 	if (not is_in_memory_slot() and not is_in_hand()) or is_publicly_revealed:
