@@ -70,7 +70,7 @@ func draw_clicked():
 func setup_context_menu():
 	context_menu.add_item("Shuffle Deck", 1)
 	context_menu.add_item("Draw to Memory", 2)
-	context_menu.add_item("Sent top card to GY", 3)
+	context_menu.add_item("Mill 1", 3)
 	context_menu.add_item("Banish top card FD", 4)
 	context_menu.add_item("Banish top card FU", 5)
 	context_menu.id_pressed.connect(_on_context_menu_pressed)
