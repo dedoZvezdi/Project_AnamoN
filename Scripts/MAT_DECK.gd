@@ -6,7 +6,13 @@ var player_deck = ["alice-golden-queen-dtr1e-cur","bellonas-runestone-ambdp",
 "lost-providence-ptm1e","fabled-azurite-fatestone-hvn1e-csr",
 "huaji-of-heavens-rise-hvn1e","fabled-ruby-fatestone-hvn1e","kaleidoscope-barrette-rec-idy"]
 var card_database_reference
+var hold_timer = 0.0
+var is_holding_left = false
+var progress_bar: TextureProgressBar
+
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
+const HOLD_DURATION = 0.8
+
 @onready var deck_view_window = $MAT_DECK_VIEW_WINDOW
 @onready var grid_container = $MAT_DECK_VIEW_WINDOW/ScrollContainer/GridContainer
 
@@ -20,7 +26,58 @@ func _ready() -> void:
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
 	setup_deck_view()
 	$Area2D.input_event.connect(_on_area_2d_input_event)
+	if not $Area2D.mouse_exited.is_connected(_on_mouse_exited):
+		$Area2D.mouse_exited.connect(_on_mouse_exited)
 	update_deck_state()
+	_setup_progress_bar()
+
+func _setup_progress_bar():
+	progress_bar = TextureProgressBar.new()
+	progress_bar.fill_mode = TextureProgressBar.FILL_CLOCKWISE
+	progress_bar.step = 0.01
+	progress_bar.min_value = 0
+	progress_bar.max_value = 1.0
+	progress_bar.value = 0
+	var progress_size = Vector2(100, 100)
+	progress_bar.custom_minimum_size = progress_size
+	progress_bar.size = progress_size
+	progress_bar.position = -progress_size / 2
+	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_bar.visible = false
+	progress_bar.top_level = true
+	progress_bar.z_index = 2000
+	progress_bar.z_as_relative = false
+	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	for y in range(128):
+		for x in range(128):
+			var dist = Vector2(x-64, y-64).length()
+			if dist > 25 and dist < 30:
+				img.set_pixel(x, y, Color(1, 1, 1, 0.8))
+	var tex = ImageTexture.create_from_image(img)
+	progress_bar.texture_progress = tex
+	progress_bar.modulate = Color(0.2, 0.8, 1.0)
+	get_tree().root.add_child.call_deferred(progress_bar)
+
+func _process(delta):
+	if is_holding_left:
+		hold_timer += delta
+		if progress_bar:
+			progress_bar.value = hold_timer / HOLD_DURATION
+			progress_bar.visible = true
+			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
+		if hold_timer >= HOLD_DURATION:
+			show_deck_view()
+			_reset_hold()
+	else:
+		if progress_bar and progress_bar.visible:
+			progress_bar.visible = false
+
+func _reset_hold():
+	is_holding_left = false
+	hold_timer = 0.0
+	if progress_bar:
+		progress_bar.value = 0
+		progress_bar.visible = false
 
 func setup_deck_view():
 	deck_view_window.close_requested.connect(_on_deck_view_close)
@@ -28,8 +85,15 @@ func setup_deck_view():
 
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			show_deck_view()
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_holding_left = true
+				hold_timer = 0.0
+			else:
+				_reset_hold()
+
+func _on_mouse_exited():
+	_reset_hold()
 
 func update_deck_view():
 	if not deck_view_window.visible:

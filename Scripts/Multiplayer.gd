@@ -956,7 +956,7 @@ func _convert_opponent_to_local_banish(opp_card: Node, slug: String, uuid: Strin
 	new_card.set_meta("slug", slug)
 	new_card.uuid = uuid
 	new_card.uuid = uuid
-	new_card.original_owner_id = multiplayer.get_unique_id() # Reset to self as owner/controller
+	new_card.original_owner_id = multiplayer.get_unique_id()
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		var image = new_card.get_node_or_null("CardImage")

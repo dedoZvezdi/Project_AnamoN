@@ -1,6 +1,7 @@
 extends Node2D
 
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
+const HOLD_DURATION = 0.8
 
 var player_deck = ["anthem-of-vitality-ftc","excalibur-reflected-edge-dtr1e",
 "lu-bu-indomitable-titan-hvn1e-cur","aesan-protector-doa1e","accompanying-guard-alc-alter",
@@ -11,6 +12,10 @@ var player_deck = ["anthem-of-vitality-ftc","excalibur-reflected-edge-dtr1e",
 var card_database_reference
 var selected_card_slug: String = ""
 var selected_card_uuid: String = ""
+var hold_timer = 0.0
+var is_holding_left = false
+var long_press_triggered = false
+var progress_bar: TextureProgressBar
 
 @onready var context_menu = $PopupMenu
 @onready var deck_view_window = $DeckViewWindow
@@ -27,7 +32,10 @@ func _ready() -> void:
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
 	setup_context_menu()
 	setup_deck_view()
+	_setup_progress_bar()
 	$Area2D.input_event.connect(_on_area_2d_input_event)
+	if not $Area2D.mouse_exited.is_connected(_on_mouse_exited):
+		$Area2D.mouse_exited.connect(_on_mouse_exited)
 	update_deck_state()
 	call_deferred("_sync_initial_decks")
 
@@ -60,7 +68,6 @@ func draw_clicked():
 	rpc("draw_here_and_for_peer", player_id, slug, card_uuid)
 	
 func setup_context_menu():
-	context_menu.add_item("View Deck", 0)
 	context_menu.add_item("Shuffle Deck", 1)
 	context_menu.add_item("Draw to Memory", 2)
 	context_menu.add_item("Sent top card to GY", 3)
@@ -78,10 +85,70 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			context_menu.position = get_global_mouse_position()
 			context_menu.popup()
+		elif event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_holding_left = true
+				hold_timer = 0.0
+				long_press_triggered = false
+			else:
+				if is_holding_left and not long_press_triggered:
+					draw_clicked()
+				_reset_hold()
+
+func _on_mouse_exited():
+	_reset_hold()
+
+func _setup_progress_bar():
+	progress_bar = TextureProgressBar.new()
+	progress_bar.fill_mode = TextureProgressBar.FILL_CLOCKWISE
+	progress_bar.step = 0.01
+	progress_bar.min_value = 0
+	progress_bar.max_value = 1.0
+	progress_bar.value = 0
+	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_bar.visible = false
+	progress_bar.top_level = true
+	progress_bar.z_index = 2000
+	var ring_size = Vector2(128, 128)
+	progress_bar.custom_minimum_size = ring_size
+	progress_bar.size = ring_size
+	progress_bar.size = ring_size
+	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	for y in range(128):
+		for x in range(128):
+			var dist = Vector2(x-64, y-64).length()
+			if dist > 25 and dist < 30:
+				img.set_pixel(x, y, Color(1, 1, 1, 0.8))
+	var tex = ImageTexture.create_from_image(img)
+	progress_bar.texture_progress = tex
+	progress_bar.modulate = Color(0.2, 0.8, 1.0)
+	get_tree().root.add_child.call_deferred(progress_bar)
+
+func _process(delta):
+	if is_holding_left:
+		hold_timer += delta
+		if progress_bar:
+			progress_bar.value = hold_timer / HOLD_DURATION
+			progress_bar.visible = true
+			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
+		if hold_timer >= HOLD_DURATION:
+			long_press_triggered = true
+			is_holding_left = false
+			show_deck_view()
+			_reset_hold()
+	else:
+		if progress_bar and progress_bar.visible:
+			progress_bar.visible = false
+
+func _reset_hold():
+	is_holding_left = false
+	hold_timer = 0.0
+	if progress_bar:
+		progress_bar.value = 0
+		progress_bar.visible = false
 
 func _on_context_menu_pressed(id):
 	match id:
-		0: show_deck_view()
 		1: shuffle_deck()
 		2: draw_to_memory()
 		3: send_top_to_gy()
