@@ -1,6 +1,6 @@
-[gd_scene load_steps=11 format=3 uid="uid://c02vjgxjinwdx"]
+[gd_scene format=3 uid="uid://c02vjgxjinwdx"]
 
-[ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Grand Archive/Field_ga.png" id="2_we22y"]
+[ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Textures/Field_ga.png" id="2_we22y"]
 [ext_resource type="Script" uid="uid://bfjq0vc84eui2" path="res://Scripts/OpponentHand.gd" id="3_4t60u"]
 [ext_resource type="PackedScene" uid="uid://yxylarobbfvt" path="res://Scenes/Opponent_Deck.tscn" id="4_t0cvg"]
 [ext_resource type="PackedScene" uid="uid://cegsen886ew2h" path="res://Scenes/Opponent_Mat_Deck.tscn" id="5_ypfnt"]

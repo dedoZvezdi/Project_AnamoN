@@ -89,7 +89,7 @@ func update_deck_view():
 		if tex_rect:
 			var image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 			if card.has_meta("is_face_down") and card.get_meta("is_face_down") == true:
-				image_path = "res://Assets/Grand Archive/ga_back.png"
+				image_path = "res://Assets/Textures/ga_back.png"
 			if ResourceLoader.exists(image_path):
 				tex_rect.texture = load(image_path)
 		grid_container.move_child(card_display, 0)
@@ -309,7 +309,7 @@ func animate_card_to_deck_from_banish(card, deck_position: Vector2, slug: String
 	remove_card_from_slot(card)
 	var card_image = card.get_node("CardImage")
 	var original_texture = card_image.texture
-	card_image.texture = load("res://Assets/Grand Archive/ga_back.png")
+	card_image.texture = load("res://Assets/Textures/ga_back.png")
 	card.z_index = 1 if is_top else -1
 	var tween = create_tween()
 	tween.set_parallel(true)
@@ -582,7 +582,7 @@ func animate_card_to_mat_deck_from_banish(card, deck_position: Vector2, slug: St
 	remove_card_from_slot(card)
 	var card_image = card.get_node("CardImage")
 	var original_texture = card_image.texture
-	card_image.texture = load("res://Assets/Grand Archive/ga_back.png")
+	card_image.texture = load("res://Assets/Textures/ga_back.png")
 	card.z_index = 2
 	var tween = create_tween()
 	tween.set_parallel(true)

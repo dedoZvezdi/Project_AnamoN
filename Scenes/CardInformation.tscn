@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://db2eqitvw1e27"]
 
 [ext_resource type="Script" uid="uid://dwi8ju2e2xyot" path="res://Scripts/CardInformation.gd" id="1_r5y74"]
-[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="2_qchki"]
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_qchki"]
 
 [node name="CardInformation" type="Node2D" unique_id=511105204]
 script = ExtResource("1_r5y74")

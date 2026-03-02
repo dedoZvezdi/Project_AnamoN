@@ -1108,7 +1108,7 @@ func animate_card_to_deck(deck_position: Vector2, slug: String, card_uuid: Strin
 	tween.tween_property(self, "scale", Vector2(0.3, 0.3), 0.4)
 	tween.set_parallel(false)
 	var mid_timer = get_tree().create_timer(0.2)
-	mid_timer.timeout.connect(func(): $CardImage.texture = load("res://Assets/Grand Archive/ga_back.png"))
+	mid_timer.timeout.connect(func(): $CardImage.texture = load("res://Assets/Textures/ga_back.png"))
 	await tween.finished
 	_on_deck_animation_completed(slug, card_uuid, is_top)
 

@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://cegsen886ew2h"]
+[gd_scene format=3 uid="uid://cegsen886ew2h"]
 
 [ext_resource type="Script" uid="uid://cf80o7nhfih73" path="res://Scripts/Opponent_MAT_DECK.gd" id="1_m2f7w"]
-[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="2_3wosv"]
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_3wosv"]
 
 [node name="OpponentMatDeck" type="Node2D"]
 script = ExtResource("1_m2f7w")
