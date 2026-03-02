@@ -228,7 +228,7 @@ func animate_card_to_deck_from_graveyard(card, deck_position: Vector2, slug: Str
 	remove_card_from_slot(card)
 	var card_image = card.get_node("CardImage")
 	var original_texture = card_image.texture
-	card_image.texture = load("res://Assets/Grand Archive/ga_back.png")
+	card_image.texture = load("res://Assets/Textures/ga_back.png")
 	card.z_index = 1 if is_top else -1
 	var tween = create_tween()
 	tween.set_parallel(true)

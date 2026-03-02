@@ -1,10 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://digx6uetsunkk"]
+[gd_scene format=3 uid="uid://digx6uetsunkk"]
 
-[ext_resource type="Texture2D" uid="uid://6yqn45vvoiby" path="res://Assets/Splash_Screen.png" id="1_cwdsd"]
+[ext_resource type="Texture2D" uid="uid://6yqn45vvoiby" path="res://Assets/Textures/Splash_Screen.png" id="1_cwdsd"]
 [ext_resource type="Script" uid="uid://hn6dxqoghuv5" path="res://Scripts/SplashScreenManager.gd" id="1_lgypn"]
 [ext_resource type="PackedScene" uid="uid://dqt16mao7lo7t" path="res://Scenes/Main.tscn" id="2_main"]
 
-[node name="Splash_screen_manager" type="Control" node_paths=PackedStringArray("splash_screen")]
+[node name="Splash_screen_manager" type="Control" unique_id=1983317384 node_paths=PackedStringArray("splash_screen")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,7 +15,7 @@ script = ExtResource("1_lgypn")
 load_scene = ExtResource("2_main")
 splash_screen = NodePath("CenterContainer/TextureRect")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=921921364]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,7 +24,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=2085524212]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,6 +32,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="CenterContainer"]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer" unique_id=788728841]
 layout_mode = 2
 texture = ExtResource("1_cwdsd")

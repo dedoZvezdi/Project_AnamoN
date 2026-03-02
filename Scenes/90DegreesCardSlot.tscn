@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bibopkgjli11i"]
+[gd_scene format=3 uid="uid://bibopkgjli11i"]
 
 [ext_resource type="Script" uid="uid://wnj3l1f3q2kj" path="res://Scripts/90DegreesCardSlot.gd" id="1_xluvn"]
 [ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="2_a4jdq"]
@@ -6,33 +6,32 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cm0pq"]
 size = Vector2(128, 90)
 
-[node name="90degreesCardSlot" type="Node2D"]
+[node name="90degreesCardSlot" type="Node2D" unique_id=31231617]
 script = ExtResource("1_xluvn")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=7360531]
 collision_layer = 2
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1322800638]
 shape = SubResource("RectangleShape2D_cm0pq")
 
-
-[node name="BanishViewWindow" type="Window" parent="."]
+[node name="BanishViewWindow" type="Window" parent="." unique_id=401311398]
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
 
-[node name="PopupMenu" type="PopupMenu" parent="BanishViewWindow"]
+[node name="PopupMenu" type="PopupMenu" parent="BanishViewWindow" unique_id=254491056]
 size = Vector2i(100, 50)
 
-[node name="ScrollContainer" type="ScrollContainer" parent="BanishViewWindow"]
+[node name="ScrollContainer" type="ScrollContainer" parent="BanishViewWindow" unique_id=1525588920]
 offset_right = 600.0
 offset_bottom = 142.0
 
-[node name="GridContainer" type="GridContainer" parent="BanishViewWindow/ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="BanishViewWindow/ScrollContainer" unique_id=910656735]
 custom_minimum_size = Vector2(600, 142)
 layout_mode = 2
 columns = 1024
 
-[node name="Control" parent="BanishViewWindow/ScrollContainer/GridContainer" instance=ExtResource("2_a4jdq")]
+[node name="Control" parent="BanishViewWindow/ScrollContainer/GridContainer" unique_id=270657687 instance=ExtResource("2_a4jdq")]
 layout_mode = 2

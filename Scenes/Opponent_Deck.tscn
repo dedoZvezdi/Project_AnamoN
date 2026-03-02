@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://yxylarobbfvt"]
+[gd_scene format=3 uid="uid://yxylarobbfvt"]
 
 [ext_resource type="Script" uid="uid://bwyxwauuywjcq" path="res://Scripts/Opponent_GA_DECK.gd" id="1_q2nea"]
-[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="2_eulnh"]
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_eulnh"]
 
 [node name="OpponentDeck" type="Node2D"]
 script = ExtResource("1_q2nea")

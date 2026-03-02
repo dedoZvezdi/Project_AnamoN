@@ -1,7 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://jo76eg2ytpyo"]
+[gd_scene format=3 uid="uid://jo76eg2ytpyo"]
 
 [ext_resource type="Script" uid="uid://b855tn1schyyc" path="res://Scripts/OpponentCard.gd" id="1_mv32a"]
-[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="2_qrb68"]
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_qrb68"]
 [ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="4_r8ami"]
 
 [sub_resource type="Animation" id="Animation_h8wm0"]

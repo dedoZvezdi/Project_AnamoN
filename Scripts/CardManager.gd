@@ -162,7 +162,6 @@ func remove_card_from_original_slot():
 	var card_uuid = ""
 	if original_card_display and is_instance_valid(original_card_display) and original_card_display.has_meta("uuid"):
 		card_uuid = original_card_display.get_meta("uuid")
-
 	match original_zone:
 		"banish":
 			var banish_slots = get_tree().get_nodes_in_group("rotated_slots")

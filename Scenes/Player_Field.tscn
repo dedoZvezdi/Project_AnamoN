@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_8whdk"]
 [ext_resource type="Script" uid="uid://dn6i6yhtowm6r" path="res://Scripts/Game_SetUp.gd" id="1_uld4x"]
-[ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Grand Archive/Field_ga.png" id="2_uld4x"]
-[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/background.png" id="3_xb57x"]
+[ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Textures/Field_ga.png" id="2_uld4x"]
+[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="3_xb57x"]
 [ext_resource type="PackedScene" uid="uid://bhhjuuiiuqcoi" path="res://Scenes/ga_deck.tscn" id="4_kym08"]
 [ext_resource type="Script" uid="uid://dhexhmgxdwua4" path="res://Scripts/GA_DECK.gd" id="5_xuc2h"]
 [ext_resource type="PackedScene" uid="uid://drxl81ccnmul4" path="res://Scenes/mat_deck.tscn" id="6_g5k7o"]

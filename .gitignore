@@ -1,9 +1,32 @@
-.vscode/
-rcedit-x64.exe
-libgdsqlite.windows.template_debug.x86_64.dll
+# Godot-specific ignores
+.godot/
 export_presets.cfg
-/.godot/editor
+rcedit-x64.exe
 
+# Large Binary Files (Builds)
+*.exe
+*.pck
+*.pck.zip
+*.zip
+*.apk
+*.ipa
+*.app
+builds/
+exports/
+*.db-journal
 Project_AnamoN.console.exe
 .godot/mono/metadata/ide_messaging_meta.txt
-addons/godot-sqlite/bin/~libgdsqlite.windows.template_debug.x86_64.dll
+
+# Editor-specific ignores
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Windows-specific ignores
+Thumbs.db
+desktop.ini
+
+# OS-specific ignores
+.DS_Store

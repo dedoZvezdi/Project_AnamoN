@@ -89,7 +89,7 @@ func update_deck_view():
 		if tex_rect:
 			var image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 			if card.has_meta("is_face_down") and card.get_meta("is_face_down") == true:
-				image_path = "res://Assets/Grand Archive/ga_back.png"
+				image_path = "res://Assets/Textures/ga_back.png"
 			if ResourceLoader.exists(image_path):
 				tex_rect.texture = load(image_path)
 		grid_container.move_child(card_display, 0)

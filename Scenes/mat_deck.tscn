@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://drxl81ccnmul4"]
 
-[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Grand Archive/ga_back.png" id="1_61nlp"]
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="1_61nlp"]
 [ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="2_5xpqa"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4n42c"]

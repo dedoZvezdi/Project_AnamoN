@@ -9,7 +9,7 @@ func _ready():
 
 func initialize_database():
 	db = SQLite.new()
-	db.path = "res://SQLite.db"
+	db.path = "res://Data/SQLite.db"
 	if not db.open_db():
 		push_error("Failed to open database")
 		return false
@@ -84,7 +84,6 @@ func load_legality_formats():
 	JOIN CardLegality cl ON lf.CardLegalityId = cl.Id
 	JOIN Cards c ON cl.CardId = c.Id;
 	"""
-	
 	if db.query(query):
 		var formats_by_legality = {}
 		for row in db.query_result:
@@ -93,8 +92,7 @@ func load_legality_formats():
 				formats_by_legality[legality_id] = []
 			formats_by_legality[legality_id].append({
 				"format": row["Format"],
-				"limit": row["LimitValue"]
-			})
+				"limit": row["LimitValue"]})
 		for card_slug in cards_db:
 			for legality in cards_db[card_slug]["legalities"]:
 				if formats_by_legality.has(legality["legality_id"]):
@@ -166,8 +164,7 @@ func load_editions():
 					"effect_raw": edition["EffectRaw"],
 					"flavor": edition["Flavor"],
 					"orientation": edition["Orientation"],
-					"other_orientations": []
-				}
+					"other_orientations": []}
 				cards_db[card_slug]["editions"].append(edition_data)
 				cards_db[edition["Slug"]] = edition_data
 
@@ -198,9 +195,7 @@ func load_other_orientations():
 				"types": [],
 				"subtypes": [],
 				"elements": [],
-				"editions": []
-			}
-
+				"editions": []}
 
 func load_orientation_classes():
 	var query = """
@@ -256,7 +251,6 @@ func load_orientation_editions():
 	FROM CardOtherOrientationEditions coe
 	JOIN CardOtherOrientations co ON co.Id = coe.OtherOrientationId;
 	"""
-	
 	if db.query(query):
 		for edition in db.query_result:
 			var orientation_slug = edition["OrientationSlug"]
@@ -269,8 +263,7 @@ func load_orientation_editions():
 					"effect_raw": edition["EffectRaw"],
 					"flavor": edition["Flavor"],
 					"orientation": edition["Orientation"],
-					"parent_orientation_slug": orientation_slug
-				}
+					"parent_orientation_slug": orientation_slug}
 				cards_db[orientation_slug]["editions"].append(edition_data)
 				cards_db[edition["Slug"]] = edition_data
 	
