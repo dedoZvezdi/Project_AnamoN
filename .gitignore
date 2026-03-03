@@ -11,7 +11,7 @@ rcedit-x64.exe
 *.apk
 *.ipa
 *.app
-builds/
+Builds/
 exports/
 *.db-journal
 Project_AnamoN.console.exe

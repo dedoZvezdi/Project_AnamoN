@@ -59,8 +59,7 @@ func load_base_cards():
 				"subtypes": [],
 				"elements": [],
 				"editions": [],
-				"legalities": []
-			}
+				"legalities": []}
 
 func load_legalities():
 	var query = """
@@ -74,8 +73,7 @@ func load_legalities():
 			if card_slug in cards_db:
 				cards_db[card_slug]["legalities"].append({
 					"legality_id": row["Id"],
-					"formats": []
-				})
+					"formats": []})
 
 func load_legality_formats():
 	var query = """
@@ -266,7 +264,6 @@ func load_orientation_editions():
 					"parent_orientation_slug": orientation_slug}
 				cards_db[orientation_slug]["editions"].append(edition_data)
 				cards_db[edition["Slug"]] = edition_data
-	
 	var query2 = """
 	SELECT ce.Slug AS EditionSlug, co.Slug AS OrientationSlug
 	FROM CardEditionOtherOrientations cee
