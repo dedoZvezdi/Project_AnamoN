@@ -74,6 +74,7 @@ func setup_context_menu():
 	context_menu.add_item("Banish top card FD", 4)
 	context_menu.add_item("Banish top card FU", 5)
 	context_menu.id_pressed.connect(_on_context_menu_pressed)
+	context_menu.reparent.call_deferred(get_tree().root)
 
 func setup_deck_view():
 	deck_view_window.close_requested.connect(_on_deck_view_close)
@@ -462,3 +463,7 @@ func draw_card(card_drawn_name, card_uuid := ""):
 	$"../CardManager".add_child(new_card)
 	$"../PlayerHand".add_card_to_hand(new_card)
 	new_card.get_node("AnimationPlayer").play("card_flip")
+
+func _exit_tree() -> void:
+	if is_instance_valid(context_menu):
+		context_menu.queue_free()
