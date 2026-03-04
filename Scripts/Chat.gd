@@ -1,7 +1,7 @@
 extends Node2D
 
 @onready var message: LineEdit = $Message
-@onready var text_edit: TextEdit = $TextEdit
+@onready var text_edit: RichTextLabel = $TextEdit
 @onready var Send_edit: Button = $Send
 
 var msg: String
@@ -16,8 +16,9 @@ func _ready():
 	var err = config.load("user://player_config.cfg")
 	if err == OK:
 		player_name = config.get_value("Player", "Name", "Player")
-	text_edit.editable = false
-	text_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+	text_edit.bbcode_enabled = true
+	text_edit.scroll_following = true
+	text_edit.focus_mode = Control.FOCUS_NONE
 	Send_edit.pressed.connect(_on_send_pressed)
 	message.text_submitted.connect(_on_message_submitted)
 
@@ -30,18 +31,17 @@ func _on_message_submitted(_text):
 func send_message():
 	msg = message.text.strip_edges()
 	if msg != "":
-		add_message(player_name, msg)
+		add_message(player_name, msg, false)
 		message.text = ""
-		message.grab_focus()
-		text_edit.scroll_vertical = text_edit.get_line_count()
 		send_message_to_peer()
+	message.grab_focus()
 
 func send_message_to_peer():
 	rpc("receive_message", player_name, msg)
 
 @rpc("any_peer", "reliable")
 func receive_message(sender: String, received_msg: String):
-	add_message(sender, received_msg)
+	add_message(sender, received_msg, true)
 
 func send_system_message(system_msg: String):
 	add_message("System", system_msg)
@@ -51,9 +51,15 @@ func send_system_message(system_msg: String):
 func receive_system_message(system_msg: String):
 	add_message("System", system_msg)
 
-func add_message(sender: String, content: String, _color: Color = Color.WHITE):
-	text_edit.text += sender + ": " + content + "\n"
-	text_edit.scroll_vertical = text_edit.get_line_count()
+func add_message(sender: String, content: String, is_opponent: bool = false):
+	var sender_bb: String = sender
+	if sender == "System":
+		sender_bb = "[color=white]" + sender + "[/color]"
+	elif is_opponent:
+		sender_bb = "[color=red]" + sender + "[/color]"
+	else:
+		sender_bb = "[color=blue]" + sender + "[/color]"
+	text_edit.append_text(sender_bb + ": [color=white]" + content + "[/color]\n")
 
 func set_opponent_name(names: String):
 	opponent_name = names

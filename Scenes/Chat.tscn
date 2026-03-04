@@ -25,8 +25,10 @@ offset_right = 1805.0
 offset_bottom = 1057.0
 placeholder_text = "Message"
 
-[node name="TextEdit" type="TextEdit" parent="." unique_id=941147514]
+[node name="TextEdit" type="RichTextLabel" parent="." unique_id=941147514]
 offset_left = 1502.0
 offset_top = 581.0
 offset_right = 1885.0
 offset_bottom = 1007.0
+bbcode_enabled = true
+scroll_following = true

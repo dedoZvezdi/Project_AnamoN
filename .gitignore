@@ -30,3 +30,4 @@ desktop.ini
 
 # OS-specific ignores
 .DS_Store
+addons/godot-sqlite/bin/~libgdsqlite.windows.template_debug.x86_64.dll

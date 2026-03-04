@@ -94,6 +94,7 @@ func _ready() -> void:
 	if get_parent() and get_parent().has_method("connect_card_signals"):
 		get_parent().connect_card_signals(self)
 	popup_menu.id_pressed.connect(_on_PopupMenu_id_pressed)
+	popup_menu.reparent.call_deferred(get_tree().root)
 	area.input_event.connect(_on_area_2d_input_event)
 	find_card_information_reference()
 	if card_level_lable:
@@ -230,6 +231,9 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if mouse_inside:
 			if is_in_graveyard() or is_in_banish():
+				return
+			if is_champion_card() and is_in_main_field():
+				rotate_card()
 				return
 			var logo_nodes = get_tree().get_nodes_in_group("logo")
 			if logo_nodes.size() > 0:
@@ -1450,3 +1454,7 @@ func _convert_to_opponent_card_visuals(final_pos, final_rot):
 	var fix_tween = create_tween()
 	fix_tween.tween_property(new_opp_card, "rotation_degrees", final_rot, 0.2)
 	remove_from_current_position()
+
+func _exit_tree() -> void:
+	if is_instance_valid(popup_menu):
+		popup_menu.queue_free()
