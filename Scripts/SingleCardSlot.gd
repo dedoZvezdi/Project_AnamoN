@@ -294,12 +294,10 @@ func add_card_to_slot(card, at_index: int = -1):
 			ci.visible = true
 			cib.visible = false
 	final_card.rotation = 0.0
-	
 	if at_index != -1 and at_index < cards_in_graveyard.size():
 		cards_in_graveyard.insert(at_index, final_card)
 	else:
 		cards_in_graveyard.append(final_card)
-		
 	reorder_z_indices()
 	var card_manager = get_tree().current_scene.find_child("CardManager", true, false)
 	if card_manager and card_manager.has_method("connect_card_signals"):

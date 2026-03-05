@@ -454,15 +454,15 @@ func cleanup():
 	animation_in_progress = false
 
 func sync_hand_order():
-	var has_revealed = false
+	var should_sync = false
 	var uuid_list = []
 	for card in player_hand:
 		if card and is_instance_valid(card):
 			if "uuid" in card:
 				uuid_list.append(card.uuid)
-			if card.get("is_publicly_revealed") == true:
-				has_revealed = true
-	if has_revealed:
+			if card.get("is_publicly_revealed") == true or card.get("is_marked") == true:
+				should_sync = true
+	if should_sync:
 		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 		if multiplayer_node and multiplayer_node.has_method("rpc"):
 			multiplayer_node.rpc("rpc_sync_hand_order", multiplayer.get_unique_id(), uuid_list)

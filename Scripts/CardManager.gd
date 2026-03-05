@@ -218,20 +218,36 @@ func start_drag(card):
 	if card.has_method("is_in_main_field") and card.is_in_main_field():
 		drag_source_was_main_field = true
 	else:
-		drag_source_was_main_field = false
+		drag_source_was_main_field = false	
+	var drag_source_was_hand = false
 	if player_hand_reference and card in player_hand_reference.player_hand:
 		player_hand_reference.dragging_card_from_hand = card
+		drag_source_was_hand = true
+	var drag_source_was_graveyard = false
+	var graveyard_slot_initial = get_graveyard_slot_for_card(card)
+	if graveyard_slot_initial:
+		drag_source_was_graveyard = true
+	var drag_source_was_banish = false
+	var banish_slot_initial = get_banish_slot_for_card(card)
+	if banish_slot_initial:
+		drag_source_was_banish = true
 	source_memory_slot = get_memory_slot_for_card(card)
+	var drag_source_was_memory = false
 	if source_memory_slot:
 		original_memory_index = source_memory_slot.cards_in_slot.find(card)
-		if "is_marked" in card:
-			drag_card_was_marked = card.is_marked
-		elif card.has_meta("is_marked") and card.get_meta("is_marked") == true:
-			drag_card_was_marked = true
-		else:
-			drag_card_was_marked = false
+		drag_source_was_memory = true
 	else:
 		original_memory_index = -1
+	card.set_meta("drag_origin_hand", drag_source_was_hand)
+	card.set_meta("drag_origin_mainfield", drag_source_was_main_field)
+	card.set_meta("drag_origin_memory", drag_source_was_memory)
+	card.set_meta("drag_origin_graveyard", drag_source_was_graveyard)
+	card.set_meta("drag_origin_banish", drag_source_was_banish)
+	if "is_marked" in card:
+		drag_card_was_marked = card.is_marked
+	elif card.has_meta("is_marked") and card.get_meta("is_marked") == true:
+		drag_card_was_marked = true
+	else:
 		drag_card_was_marked = false
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
 	card.z_index = drag_z_index
@@ -459,11 +475,28 @@ func finish_drag():
 			player_hand_reference.update_hand_position()
 		player_hand_reference.clear_external_preview()
 	if card and is_instance_valid(card) and card.has_method("set_marked"):
-		var ended_in_memory = false
-		if card_slot_found and card_slot_found.name == "MEMORY":
-			ended_in_memory = true
-		if not ended_in_memory:
+		var ended_in_same_zone = false
+		if card_slot_found:
+			if card_slot_found.name == "MEMORY" and card.get_meta("drag_origin_memory") == true:
+				ended_in_same_zone = true
+			elif card_slot_found.name == "MAINFIELD" and card.get_meta("drag_origin_mainfield") == true:
+				ended_in_same_zone = true
+			elif card_slot_found.name == "GRAVEYARD" and (card.get_meta("drag_origin_graveyard") == true or (card.has_meta("is_dragged_from_grid") and card.get_meta("original_zone") == "graveyard")):
+				ended_in_same_zone = true
+			elif card_slot_found.name == "BANISH" and (card.get_meta("drag_origin_banish") == true or (card.has_meta("is_dragged_from_grid") and card.get_meta("original_zone") == "banish")):
+				ended_in_same_zone = true
+		elif not card_slot_found and player_hand_reference and card in player_hand_reference.player_hand:
+			if card.get_meta("drag_origin_hand") == true:
+				ended_in_same_zone = true
+		if not ended_in_same_zone:
 			card.set_marked(false)
+		elif drag_card_was_marked:
+			if card.has_method("can_be_marked") and card.can_be_marked():
+				card.set_marked(true)
+			if card_slot_found and card_slot_found.has_method("set_card_marked"):
+				var uuid = card.uuid if "uuid" in card else ""
+				if uuid != "":
+					card_slot_found.set_card_marked(uuid, true)
 	_reset_drag_state_vars()
 	call_deferred("force_hover_check")
 
