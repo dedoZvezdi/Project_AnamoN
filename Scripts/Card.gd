@@ -94,7 +94,8 @@ func _ready() -> void:
 	if get_parent() and get_parent().has_method("connect_card_signals"):
 		get_parent().connect_card_signals(self)
 	popup_menu.id_pressed.connect(_on_PopupMenu_id_pressed)
-	popup_menu.reparent.call_deferred(get_tree().root)
+	popup_menu.add_theme_font_size_override("font_size", 40)
+	popup_menu.add_theme_constant_override("v_separation", 12)
 	area.input_event.connect(_on_area_2d_input_event)
 	find_card_information_reference()
 	if card_level_lable:
@@ -214,6 +215,8 @@ func is_shifting_currents_card() -> bool:
 	return false
 
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		get_viewport().set_input_as_handled()
 	if is_dragging:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -1454,7 +1457,3 @@ func _convert_to_opponent_card_visuals(final_pos, final_rot):
 	var fix_tween = create_tween()
 	fix_tween.tween_property(new_opp_card, "rotation_degrees", final_rot, 0.2)
 	remove_from_current_position()
-
-func _exit_tree() -> void:
-	if is_instance_valid(popup_menu):
-		popup_menu.queue_free()

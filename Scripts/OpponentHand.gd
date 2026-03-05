@@ -363,17 +363,17 @@ func _on_card_visuals_changed(_card):
 	call_deferred("enforce_z_ordering")
 func reorder_by_uuids(uuid_list: Array):
 	uuid_list.reverse()
-	var revealed_map = {}
+	var tracked_map = {}
 	var hidden_pool = []
 	var hidden_map = {}
 	for card in opponent_hand:
 		if not card or not is_instance_valid(card):
 			continue
-		var is_revealed = false
-		if card.get("is_revealed_by_opponent") == true:
-			is_revealed = true
-		if is_revealed:
-			revealed_map[card.uuid] = card
+		var should_track = false
+		if card.get("is_revealed_by_opponent") == true or card.get("is_marked") == true:
+			should_track = true
+		if should_track:
+			tracked_map[card.uuid] = card
 		else:
 			hidden_pool.append(card)
 			hidden_map[card.uuid] = card
@@ -381,8 +381,8 @@ func reorder_by_uuids(uuid_list: Array):
 	new_hand.resize(uuid_list.size())
 	for i in range(uuid_list.size()):
 		var target_uuid = uuid_list[i]
-		if target_uuid in revealed_map:
-			new_hand[i] = revealed_map[target_uuid]
+		if target_uuid in tracked_map:
+			new_hand[i] = tracked_map[target_uuid]
 	var pool_index = 0
 	for i in range(new_hand.size()):
 		if new_hand[i] == null:

@@ -163,8 +163,6 @@ func set_current_field(field):
 	current_field = field
 
 func set_opponent_reveal_status(revealed: bool, skip_animation: bool = false):
-	if is_marked:
-		set_marked(false)
 	is_revealed_by_opponent = revealed
 	if mouse_inside:
 		if revealed:
@@ -447,6 +445,8 @@ func animate_send_to_lineage(card_node: Node, card_slug: String, card_uuid: Stri
 		final_callback.call()
 
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
+	if event is InputEventMouseButton and event.pressed:
+		get_viewport().set_input_as_handled()
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if is_champion_card() and is_in_main_field():
 			if event.pressed:
@@ -456,7 +456,7 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 				_reset_hold()
 			return
 		if event.pressed:
-			if is_in_memory_zone() or is_in_main_field():
+			if is_in_memory_zone() or is_in_main_field() or is_in_hand():
 				if can_be_marked():
 					toggle_mark()
 
@@ -466,6 +466,14 @@ func is_in_memory_zone() -> bool:
 	var parent = get_parent()
 	if parent and parent.is_in_group("memory_slots"):
 		return true
+	return false
+
+func is_in_hand() -> bool:
+	var opponent_hand_nodes = get_tree().get_nodes_in_group("opponent_hand")
+	for hand_node in opponent_hand_nodes:
+		if "opponent_hand" in hand_node:
+			if self in hand_node.opponent_hand:
+				return true
 	return false
 
 func can_be_marked() -> bool:

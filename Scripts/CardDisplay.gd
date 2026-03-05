@@ -280,6 +280,10 @@ func create_real_card_for_drag():
 	real_card.set_meta("original_zone", zone)
 	if has_meta("uuid"):
 		real_card.set_meta("uuid", get_meta("uuid"))
+	if has_meta("is_marked"):
+		real_card.set_meta("is_marked", get_meta("is_marked"))
+		if "is_marked" in real_card:
+			real_card.is_marked = get_meta("is_marked")
 	card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		var card_image = real_card.get_node("CardImage")
