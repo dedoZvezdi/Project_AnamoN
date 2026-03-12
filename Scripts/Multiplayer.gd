@@ -629,7 +629,7 @@ func sync_move_to_deck(player_id: int, uuid: String, _is_top: bool):
 			card.queue_free()
 
 @rpc("any_peer", "reliable")
-func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary, direction: String, rot_deg: float):
+func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary, direction: String, rot_deg: float, is_marked: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -640,6 +640,10 @@ func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dict
 	if card_manager:
 		var card = get_or_create_opponent_card(card_manager, uuid, slug)
 		if card:
+			if "is_marked" in card:
+				card.is_marked = is_marked
+				if card.has_method("update_visuals_based_on_mark"):
+					card.update_visuals_based_on_mark()
 			if "runtime_modifiers" in card:
 				card.runtime_modifiers = modifiers
 			if "attached_markers" in card:
@@ -827,6 +831,8 @@ func sync_card_transform(player_id: int, uuid: String, new_slug: String):
 func _find_opponent_card_by_uuid(root_node, target_uuid):
 	if root_node.has_method("get_uuid") and root_node.get_uuid() == target_uuid:
 		return root_node
+	if root_node.has_meta("uuid") and root_node.get_meta("uuid") == target_uuid:
+		return root_node
 	for child in root_node.get_children():
 		var res = _find_opponent_card_by_uuid(child, target_uuid)
 		if res:
@@ -923,7 +929,7 @@ func sync_set_card_marked(player_id: int, uuid: String, is_marked: bool):
 				local_card.set_marked(is_marked)
 
 func _find_local_card_by_uuid(root_node, target_uuid):
-	if "uuid" in root_node and root_node.uuid == target_uuid:
+	if ("uuid" in root_node and root_node.uuid == target_uuid) or (root_node.has_meta("uuid") and root_node.get_meta("uuid") == target_uuid):
 		return root_node
 	for child in root_node.get_children():
 		var res = _find_local_card_by_uuid(child, target_uuid)
@@ -1046,6 +1052,10 @@ func _convert_opponent_to_player_card(opp_card: Node, stats: Dictionary, final_p
 			var back = new_card.get_node_or_null("CardImageBack")
 			if back: back.visible = false
 	card_manager.add_child(new_card)
+	if stats.has("is_marked") and stats.get("is_marked", false):
+		new_card.is_marked = true
+		if new_card.has_method("update_visuals_based_on_mark"):
+			new_card.update_visuals_based_on_mark()
 	if card_manager.has_method("connect_card_signals"):
 		card_manager.connect_card_signals(new_card)
 	if main_field.has_method("add_card_to_field"):

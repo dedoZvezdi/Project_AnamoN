@@ -43,6 +43,7 @@ func _ready() -> void:
 		if not lineage_view_window.close_requested.is_connected(_on_lineage_window_close):
 			lineage_view_window.close_requested.connect(_on_lineage_window_close)
 	_setup_progress_bar()
+	update_visuals_based_on_mark()
 
 func find_card_information_reference():
 	var root = get_tree().current_scene
@@ -107,7 +108,11 @@ func get_slug_from_card() -> String:
 	return ""
 
 func get_uuid() -> String:
-	return uuid
+	if uuid != "":
+		return uuid
+	if has_meta("uuid"):
+		return get_meta("uuid")
+	return ""
 
 func is_token() -> bool:
 	var slug = get_slug_from_card()
@@ -152,14 +157,9 @@ func set_current_field(field):
 	if is_mastery() and field and (field.is_in_group("player_hand") or field.is_in_group("opponent_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
 		destroy_mastery()
 		return
-	if is_marked and current_field:
-		var was_in_special_zone = current_field.is_in_group("memory_slots") or current_field.is_in_group("main_fields")
-		if was_in_special_zone:
-			var is_new_field_special = false
-			if field and (field.is_in_group("memory_slots") or field.is_in_group("main_fields")):
-				is_new_field_special = true
-			if not is_new_field_special:
-				set_marked(false)
+	if is_marked and current_field != null and field != null:
+		if current_field != field:
+			set_marked(false)
 	current_field = field
 
 func set_opponent_reveal_status(revealed: bool, skip_animation: bool = false):
@@ -453,6 +453,9 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 				is_holding_left = true
 				hold_timer = 0.0
 			else:
+				if is_holding_left and hold_timer < HOLD_DURATION:
+					if can_be_marked():
+						toggle_mark()
 				_reset_hold()
 			return
 		if event.pressed:

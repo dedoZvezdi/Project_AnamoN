@@ -108,6 +108,9 @@ func _ready() -> void:
 		if lineage_popup_menu and not lineage_popup_menu.id_pressed.is_connected(_on_lineage_popup_menu_pressed):
 			lineage_popup_menu.id_pressed.connect(_on_lineage_popup_menu_pressed)
 
+func get_uuid() -> String:
+	return uuid
+
 func find_card_information_reference():
 	var root = get_tree().current_scene
 	if root:
@@ -123,7 +126,9 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 	return null
 
 func is_champion_card() -> bool:
-	var card_slug = get_slug_from_card()
+	return is_slug_champion(get_slug_from_card())
+
+func is_slug_champion(card_slug: String) -> bool:
 	if card_slug == "":
 		return false
 	if not card_information_reference or not card_information_reference.card_database_reference:
@@ -225,6 +230,9 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 				is_holding_left = true
 				hold_timer = 0.0
 			else:
+				if is_holding_left and hold_timer < HOLD_DURATION:
+					if can_be_marked():
+						toggle_mark()
 				_reset_hold()
 			return
 		if event.pressed:
@@ -254,7 +262,9 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						popup_menu.add_item("Rest", 4)
 					var slug = get_slug_from_card()
 					if is_transformable_card(slug):
-						popup_menu.add_item("Transform", 5)
+						var target_slug = get_transform_target(slug)
+						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
+							popup_menu.add_item("Transform", 5)
 			elif is_mastery():
 				if is_in_main_field():
 					popup_menu.add_item("Destroy", 7)
@@ -265,7 +275,9 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						if current_direction != "South": popup_menu.add_item("South", 22)
 						if current_direction != "West": popup_menu.add_item("West", 23)
 					if is_transformable_card(slug) and not is_champion_card():
-						popup_menu.add_item("Transform", 5)
+						var target_slug = get_transform_target(slug)
+						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
+							popup_menu.add_item("Transform", 5)
 			else:
 				if is_in_memory_slot() or is_in_hand():
 					if not is_publicly_revealed:
@@ -289,16 +301,20 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						popup_menu.add_item("Awake", 4)
 					else:
 						popup_menu.add_item("Rest", 4)
-					if not is_champion_card() and not is_token() and not is_mastery() and find_champion_on_field() != null:
-						if original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id():
-							popup_menu.add_item("Move to Lineage", 14)
+					if not is_champion_card() and not is_token() and not is_mastery():
+						if current_field and current_field.name == "MAINFIELD":
+							if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
+								if "current_champion_card" in current_field and current_field.current_champion_card != null:
+									popup_menu.add_item("Move to Lineage", 14)
 					if not is_champion_card() and not is_token() and not is_mastery():
 						var opponent_field = get_tree().get_root().find_child("OpponentField", true, false)
 						if opponent_field:
 							popup_menu.add_item("Give Control", 15)
 					var slug = get_slug_from_card()
 					if is_transformable_card(slug) and not is_champion_card():
-						popup_menu.add_item("Transform", 5)
+						var target_slug = get_transform_target(slug)
+						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
+							popup_menu.add_item("Transform", 5)
 			var mouse_pos = get_global_mouse_position()
 			popup_menu.reset_size()
 			var screen_size = get_viewport().get_visible_rect().size
@@ -462,7 +478,7 @@ func banish_lineage_card():
 			banish_node.add_card_to_slot(new_card, false))
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_banish_lineage_card", multiplayer.get_unique_id(), uuid, target_uuid, selected_lineage_card_slug)
+		multiplayer_node.rpc("sync_banish_lineage_card", multiplayer.get_unique_id(), get_uuid(), target_uuid, selected_lineage_card_slug)
 	if lineage_view_window and lineage_view_window.visible:
 		open_lineage_window()
 	selected_lineage_card_slug = ""
@@ -473,10 +489,10 @@ func move_to_lineage():
 	if not champion:
 		return
 	var card_slug = get_slug_from_card()
-	var card_uuid = uuid
+	var card_uuid = get_uuid()
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_move_to_lineage", multiplayer.get_unique_id(), champion.uuid, card_uuid, card_slug)
+		multiplayer_node.rpc("sync_move_to_lineage", multiplayer.get_unique_id(), champion.get_uuid(), card_uuid, card_slug)
 	z_index = -1
 	var tween = create_tween()
 	tween.set_parallel(true)
@@ -513,7 +529,7 @@ func transform_card():
 		current_field.notify_card_transformed(self)
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_card_transform", multiplayer.get_unique_id(), uuid, new_slug)
+		multiplayer_node.rpc("sync_card_transform", multiplayer.get_unique_id(), get_uuid(), new_slug)
 	if has_node("AnimationPlayer"):
 		var anim: AnimationPlayer = $AnimationPlayer
 		if anim.has_animation("card_flip"):
@@ -527,8 +543,7 @@ func transform_card():
 						add_to_lineage(entry)
 				var lineage_data = {
 					"slug": current_field.get_card_slug(prev),
-					"uuid": prev.uuid if "uuid" in prev else ""
-				}
+					"uuid": prev.uuid if "uuid" in prev else ""}
 				add_to_lineage(lineage_data)
 				current_field.remove_previous_champions()
 			current_field.current_champion_card = self
@@ -765,13 +780,9 @@ func set_current_field(field):
 	if is_mastery() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
 		destroy_mastery()
 		return
-	if is_marked and is_in_main_field():
-		var is_new_field_main = false
-		if field and field.is_in_group("main_fields"):
-			is_new_field_main = true
-		if not is_new_field_main:
+	if is_marked and current_field != null and field != null:
+		if current_field != field:
 			set_marked(false)
-			
 	var was_in_main = is_in_main_field()
 	current_field = field
 	if _is_hand_field(current_field):
@@ -923,7 +934,7 @@ func set_marked(value: bool):
 	if multiplayer.get_unique_id() != 0 and (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
 		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 		if multiplayer_node and multiplayer_node.has_method("rpc"):
-			multiplayer_node.rpc("sync_set_card_marked", multiplayer.get_unique_id(), uuid, is_marked)
+			multiplayer_node.rpc("sync_set_card_marked", multiplayer.get_unique_id(), get_uuid(), is_marked)
 
 func update_visuals_based_on_mark():
 	if is_marked:
@@ -961,14 +972,14 @@ func go_to_banish_face_down():
 	if multiplayer_node:
 		var slug = get_slug_from_card()
 		if slug != "":
-			multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), uuid, slug, true)
+			multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), get_uuid(), slug, true)
 
 func _return_to_original_owner_banish():
 	var scene = get_tree().get_current_scene()
 	if not scene: return
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_return_to_owner_banish", original_owner_id, uuid, get_slug_from_card(), true)
+		multiplayer_node.rpc("sync_return_to_owner_banish", original_owner_id, get_uuid(), get_slug_from_card(), true)
 	var opp_field = scene.find_child("OpponentField", true, false)
 	var target_pos = global_position
 	if opp_field:
@@ -1021,6 +1032,9 @@ func _convert_to_opponent_banish_visuals(final_pos, face_down):
 	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
 	new_opp_card.attached_markers = attached_markers.duplicate()
 	new_opp_card.attached_counters = attached_counters.duplicate()
+	new_opp_card.is_marked = is_marked
+	if new_opp_card.has_method("update_visuals_based_on_mark"):
+		new_opp_card.update_visuals_based_on_mark()
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + get_slug_from_card() + ".png"
 	if ResourceLoader.exists(card_image_path):
 		var image = new_opp_card.get_node_or_null("CardImage")
@@ -1160,7 +1174,7 @@ func destroy_token():
 	var slug = get_slug_from_card()
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_destroy_token", multiplayer.get_unique_id(), uuid, slug)
+		multiplayer_node.rpc("sync_destroy_token", multiplayer.get_unique_id(), get_uuid(), slug)
 	if current_field and current_field.has_method("remove_card_from_field"):
 		current_field.remove_card_from_field(self)
 	elif current_field and current_field.has_method("remove_card_from_slot"):
@@ -1171,7 +1185,7 @@ func destroy_mastery():
 	var slug = get_slug_from_card()
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_destroy_mastery", multiplayer.get_unique_id(), uuid, slug)
+		multiplayer_node.rpc("sync_destroy_mastery", multiplayer.get_unique_id(), get_uuid(), slug)
 	if current_field and current_field.has_method("remove_card_from_field"):
 		current_field.remove_card_from_field(self)
 	elif current_field and current_field.has_method("remove_card_from_slot"):
@@ -1185,7 +1199,7 @@ func sync_stats_to_opponent(forced_rot: float = -999.0):
 	var rot_to_send = rotation_degrees if forced_rot == -999.0 else forced_rot
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_card_state", multiplayer.get_unique_id(), uuid, slug, runtime_modifiers, attached_markers, attached_counters, current_direction, rot_to_send)
+		multiplayer_node.rpc("sync_card_state", multiplayer.get_unique_id(), get_uuid(), slug, runtime_modifiers, attached_markers, attached_counters, current_direction, rot_to_send, is_marked)
 
 func reveal_to_opponent(skip_animation: bool = false):
 	if (not is_in_memory_slot() and not is_in_hand()) or is_publicly_revealed:
@@ -1249,7 +1263,7 @@ func find_parent_container():
 func sync_reveal_state(revealed: bool, skip_animation: bool = false):
 	var main_node = get_tree().get_root().get_node_or_null("Main")
 	if main_node:
-		main_node.rpc("rpc_set_card_reveal_status", multiplayer.get_unique_id(), uuid, revealed, skip_animation)
+		main_node.rpc("rpc_set_card_reveal_status", multiplayer.get_unique_id(), get_uuid(), revealed, skip_animation)
 
 func sync_all_reveal_state(revealed: bool):
 	var main_node = get_tree().get_root().get_node_or_null("Main")
@@ -1400,12 +1414,13 @@ func give_control_to_opponent():
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		var stats = {
 			"slug": get_slug_from_card(),
-			"uuid": uuid if uuid else "",
+			"uuid": get_uuid() if get_uuid() else "",
 			"modifiers": runtime_modifiers,
 			"markers": attached_markers,
 			"counters": attached_counters,
 			"direction": current_direction,
 			"rot_deg": target_rot,
+			"is_marked": is_marked,
 			"original_owner_id": original_owner_id}
 		multiplayer_node.rpc("sync_give_control", multiplayer.get_unique_id(), stats)
 	z_index = 1000
@@ -1434,6 +1449,9 @@ func _convert_to_opponent_card_visuals(final_pos, final_rot):
 	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
 	new_opp_card.attached_markers = attached_markers.duplicate()
 	new_opp_card.attached_counters = attached_counters.duplicate()
+	new_opp_card.is_marked = is_marked
+	if new_opp_card.has_method("update_visuals_based_on_mark"):
+		new_opp_card.update_visuals_based_on_mark()
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + get_slug_from_card() + ".png"
 	if ResourceLoader.exists(card_image_path):
 		var image = new_opp_card.get_node_or_null("CardImage")

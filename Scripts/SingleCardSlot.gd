@@ -328,6 +328,8 @@ func remove_card_from_slot(card):
 			card.modulate = Color(1, 1, 1)
 			if card.has_meta("is_marked"):
 				card.set_meta("is_marked", false)
+		if card.has_node("Area2D"):
+			card.get_node("Area2D").set_deferred("input_pickable", true)
 		reorder_z_indices()
 		update_top_card_visual()
 		if graveyard_view_window.visible:
