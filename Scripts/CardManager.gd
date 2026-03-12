@@ -208,6 +208,7 @@ func remove_card_from_original_slot():
 			pass
 
 func start_drag(card):
+	_reset_drag_state_vars()
 	if not card or not is_instance_valid(card):
 		return
 	if not can_drag_card(card):
@@ -346,6 +347,7 @@ func finish_drag():
 					card.z_index = base_z_index
 					if card.has_method("set_tweening"):
 						card.set_tweening(false))
+			_reset_drag_state_vars()
 			card_being_dragged = null
 			return
 	if card_slot_found:
@@ -353,7 +355,7 @@ func finish_drag():
 		var was_from_mat_deck = dragged_from_grid and original_zone == "mat_deck"
 		if was_from_mat_deck and card_slot_found.name != "MAINFIELD":
 			_return_mat_card_to_deck(card)
-			card_being_dragged = null
+			_reset_drag_state_vars()
 			return
 		if dragged_from_grid:
 			remove_card_from_original_slot()
@@ -370,9 +372,13 @@ func finish_drag():
 			var keep_reveal = (source_memory_slot != null)
 			card_slot_found.add_card_to_memory(card, false, target_idx, keep_reveal)
 			if drag_card_was_marked:
-				if card.has_method("set_marked"):
-					if card.has_method("can_be_marked") and card.can_be_marked():
-						card.set_marked(true)
+				var originated_from_memory = false
+				if card.has_meta("drag_origin_memory"):
+					originated_from_memory = card.get_meta("drag_origin_memory")
+				if originated_from_memory:
+					if card.has_method("set_marked"):
+						if card.has_method("can_be_marked") and card.can_be_marked():
+							card.set_marked(true)
 				drag_card_was_marked = false
 			var slug = get_card_slug(card)
 			if slug != "":
@@ -443,7 +449,7 @@ func finish_drag():
 		if dragged_from_grid:
 			if original_zone == "mat_deck":
 				_return_mat_card_to_deck(card)
-				card_being_dragged = null
+				_reset_drag_state_vars()
 				return
 			if original_zone == "ga_deck":
 				var slug = get_card_slug(card)
@@ -497,6 +503,10 @@ func finish_drag():
 				var uuid = card.uuid if "uuid" in card else ""
 				if uuid != "":
 					card_slot_found.set_card_marked(uuid, true)
+		if card.has_meta("is_dragged_from_grid"):
+			card.remove_meta("is_dragged_from_grid")
+		if card.has_meta("original_zone"):
+			card.remove_meta("original_zone")
 	_reset_drag_state_vars()
 	call_deferred("force_hover_check")
 
@@ -1041,8 +1051,10 @@ func get_card_slug(card) -> String:
 	return ""
 
 func get_card_uuid(card) -> String:
-	if "uuid" in card:
+	if "uuid" in card and card.uuid != "":
 		return card.uuid
+	if card.has_meta("uuid"):
+		return card.get_meta("uuid")
 	return ""
 
 func is_opponent_card(card) -> bool:
