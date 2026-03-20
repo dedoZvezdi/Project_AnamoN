@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjgsuklx3wak3"
-path="res://.godot/imported/Recollection phase.png-de7f228dea772b028e9e48f9de69088c.ctex"
+uid="uid://dpfqqgyyq2iqe"
+path="res://.godot/imported/Back_Square_Button.png-a6e73655304886ae8e0ed83871e189c0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/Phases/Recollection phase.png"
-dest_files=["res://.godot/imported/Recollection phase.png-de7f228dea772b028e9e48f9de69088c.ctex"]
+source_file="res://Assets/Textures/Phases/Back_Square_Button.png"
+dest_files=["res://.godot/imported/Back_Square_Button.png-a6e73655304886ae8e0ed83871e189c0.ctex"]
 
 [params]
 

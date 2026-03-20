@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://25ntotrakcl4"
-path="res://.godot/imported/Main phase.png-370a7a3bab1968f4267fceff89306784.ctex"
+uid="uid://poj1n62xse1b"
+path="res://.godot/imported/Next_Square_Button.png-03662f5ead635bcc12ea94de90fc8949.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/Phases/Main phase.png"
-dest_files=["res://.godot/imported/Main phase.png-370a7a3bab1968f4267fceff89306784.ctex"]
+source_file="res://Assets/Textures/Phases/Next_Square_Button.png"
+dest_files=["res://.godot/imported/Next_Square_Button.png-03662f5ead635bcc12ea94de90fc8949.ctex"]
 
 [params]
 

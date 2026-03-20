@@ -1,202 +1,41 @@
 [gd_scene format=3 uid="uid://cpn7rtonc8qd4"]
 
-[ext_resource type="Texture2D" uid="uid://ccr45jmyj0a4j" path="res://Assets/Textures/Phases/Wake up phase.png" id="1_k4q3m"]
-[ext_resource type="Texture2D" uid="uid://poj1n62xse1b" path="res://Assets/Textures/Phases/Next Square Button.png" id="2_b2tv2"]
-[ext_resource type="Texture2D" uid="uid://dpfqqgyyq2iqe" path="res://Assets/Textures/Phases/Back Square Button.png" id="3_2s5uk"]
+[ext_resource type="Texture2D" uid="uid://ccr45jmyj0a4j" path="res://Assets/Textures/Phases/Wake_up_phase.png" id="1_k4q3m"]
+[ext_resource type="Texture2D" uid="uid://poj1n62xse1b" path="res://Assets/Textures/Phases/Next_Square_Button.png" id="2_b2tv2"]
+[ext_resource type="Texture2D" uid="uid://dpfqqgyyq2iqe" path="res://Assets/Textures/Phases/Back_Square_Button.png" id="3_2s5uk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xvtyr"]
-size = Vector2(105, 63)
+size = Vector2(200.30518, 200.30534)
 
 [node name="Phases" type="Node2D" unique_id=1636317912]
 
-[node name="WakeUpArea2D" type="Area2D" parent="." unique_id=2138027891]
-position = Vector2(1532.5, 66.5)
-collision_layer = 64
-collision_mask = 64
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WakeUpArea2D" unique_id=1823111589]
-shape = SubResource("RectangleShape2D_xvtyr")
-
-[node name="MaterializeArea2D" type="Area2D" parent="." unique_id=2039916810]
-position = Vector2(1682.5, 66.5)
-collision_layer = 64
-collision_mask = 64
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MaterializeArea2D" unique_id=974184764]
-shape = SubResource("RectangleShape2D_xvtyr")
-
-[node name="RecollectionArea2D" type="Area2D" parent="." unique_id=890414620]
-position = Vector2(1832.5, 66.5)
-collision_layer = 64
-collision_mask = 64
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RecollectionArea2D" unique_id=435523197]
-shape = SubResource("RectangleShape2D_xvtyr")
-
-[node name="DrawArea2D" type="Area2D" parent="." unique_id=1748537638]
-position = Vector2(1532.5, 141.5)
-collision_layer = 64
-collision_mask = 64
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DrawArea2D" unique_id=1111592116]
-shape = SubResource("RectangleShape2D_xvtyr")
-
-[node name="MainArea2D" type="Area2D" parent="." unique_id=1563055998]
-position = Vector2(1682.5, 141.5)
-collision_layer = 64
-collision_mask = 64
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MainArea2D" unique_id=113617823]
-shape = SubResource("RectangleShape2D_xvtyr")
-
-[node name="EndArea2D" type="Area2D" parent="." unique_id=1883655905]
-position = Vector2(1832.5, 141.5)
-collision_layer = 64
-collision_mask = 64
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EndArea2D" unique_id=1535430699]
-shape = SubResource("RectangleShape2D_xvtyr")
-
-[node name="Wake Up Phase" type="RichTextLabel" parent="." unique_id=1731688104]
-offset_left = 1474.0
-offset_top = 44.0
-offset_right = 1591.0
-offset_bottom = 90.0
-text = "Wake Up Phase"
-fit_content = true
-horizontal_alignment = 1
-
-[node name="Materialize Phase" type="RichTextLabel" parent="." unique_id=73688000]
-offset_left = 1624.0
-offset_top = 44.0
-offset_right = 1745.0
-offset_bottom = 90.0
-text = "Materialize Phase"
-fit_content = true
-horizontal_alignment = 1
-
-[node name="Recollection Phase" type="RichTextLabel" parent="." unique_id=1942642611]
-offset_left = 1774.0
-offset_top = 44.0
-offset_right = 1891.0
-offset_bottom = 90.0
-text = "Recollection Phase"
-fit_content = true
-horizontal_alignment = 1
-
-[node name="Draw Phase" type="RichTextLabel" parent="." unique_id=610720281]
-offset_left = 1492.0
-offset_top = 113.0
-offset_right = 1574.0
-offset_bottom = 159.0
-text = "Draw Phase"
-fit_content = true
-horizontal_alignment = 1
-
-[node name="Main Phase" type="RichTextLabel" parent="." unique_id=1456604995]
-offset_left = 1643.0
-offset_top = 113.0
-offset_right = 1726.0
-offset_bottom = 159.0
-text = "Main Phase"
-fit_content = true
-horizontal_alignment = 1
-
-[node name="End Phase" type="RichTextLabel" parent="." unique_id=1446935796]
-offset_left = 1795.0
-offset_top = 113.0
-offset_right = 1870.0
-offset_bottom = 159.0
-text = "End Phase"
-fit_content = true
-horizontal_alignment = 1
-
-[node name="LineWakeUpR" type="Line2D" parent="." unique_id=1311983501]
-position = Vector2(1587.57, 101.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineWakeUpL" type="Line2D" parent="." unique_id=680827254]
-position = Vector2(1482.57, 101.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineDrawR" type="Line2D" parent="." unique_id=893188451]
-position = Vector2(1587.57, 176.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineDrawL" type="Line2D" parent="." unique_id=787958478]
-position = Vector2(1482.57, 176.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineMaterializeL" type="Line2D" parent="." unique_id=563720313]
-position = Vector2(1632.57, 101.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineMaterializeR" type="Line2D" parent="." unique_id=61631332]
-position = Vector2(1737.57, 101.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineMainL" type="Line2D" parent="." unique_id=2095467137]
-position = Vector2(1632.57, 176.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineMainR" type="Line2D" parent="." unique_id=1448442525]
-position = Vector2(1737.57, 176.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineEndL" type="Line2D" parent="." unique_id=1440063753]
-position = Vector2(1782.57, 176.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineEndR" type="Line2D" parent="." unique_id=1912499818]
-position = Vector2(1887.57, 176.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineRecollectionL" type="Line2D" parent="." unique_id=722388784]
-position = Vector2(1782.57, 101.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="LineRecollectionR" type="Line2D" parent="." unique_id=1162873765]
-position = Vector2(1887.57, 101.204)
-scale = Vector2(0.573752, 4.41176)
-points = PackedVector2Array(-4.48584, -15.0063, -4.48584, -0.726273)
-width = 2.0
-
-[node name="WakeUpPhase" type="Sprite2D" parent="." unique_id=285543134]
-visible = false
+[node name="Phases" type="Sprite2D" parent="." unique_id=285543134]
 position = Vector2(1683.0001, 104)
 scale = Vector2(0.41, 0.41)
 texture = ExtResource("1_k4q3m")
 
 [node name="NextSquareButton" type="Sprite2D" parent="." unique_id=17137411]
-visible = false
 position = Vector2(1844, 104)
 scale = Vector2(0.41124892, 0.41124892)
 texture = ExtResource("2_b2tv2")
 
+[node name="NextArea2D" type="Area2D" parent="NextSquareButton" unique_id=1496434223]
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NextSquareButton/NextArea2D" unique_id=1395646279]
+shape = SubResource("RectangleShape2D_xvtyr")
+
 [node name="BackSquareButton" type="Sprite2D" parent="." unique_id=1412667652]
-visible = false
 position = Vector2(1521.9999, 104.00001)
 scale = Vector2(0.40937495, 0.40937495)
 texture = ExtResource("3_2s5uk")
+
+[node name="BackArea2D" type="Area2D" parent="BackSquareButton" unique_id=650733625]
+collision_layer = 64
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BackSquareButton/BackArea2D" unique_id=497145644]
+position = Vector2(0.00024414063, -3.0517578e-05)
+scale = Vector2(1.0000002, 1.0000002)
+shape = SubResource("RectangleShape2D_xvtyr")

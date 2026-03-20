@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cw2y3sc37x0eq"
-path="res://.godot/imported/Materialize phase.png-740afee0b58d0c6901a315b7d920f676.ctex"
+uid="uid://in3geu55b12i"
+path="res://.godot/imported/Draw_phase.png-51457cb308d152922fd193a22d4ccf46.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/Phases/Materialize phase.png"
-dest_files=["res://.godot/imported/Materialize phase.png-740afee0b58d0c6901a315b7d920f676.ctex"]
+source_file="res://Assets/Textures/Phases/Draw_phase.png"
+dest_files=["res://.godot/imported/Draw_phase.png-51457cb308d152922fd193a22d4ccf46.ctex"]
 
 [params]
 

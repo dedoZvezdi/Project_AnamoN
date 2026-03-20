@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://poj1n62xse1b"
-path="res://.godot/imported/Next Square Button.png-c4bcc1b0a101f86bfd1eda47fc2ccf9a.ctex"
+uid="uid://bjgsuklx3wak3"
+path="res://.godot/imported/Recollection_phase.png-c027b3e8c511ed74723dbfe1d5809f94.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/Phases/Next Square Button.png"
-dest_files=["res://.godot/imported/Next Square Button.png-c4bcc1b0a101f86bfd1eda47fc2ccf9a.ctex"]
+source_file="res://Assets/Textures/Phases/Recollection_phase.png"
+dest_files=["res://.godot/imported/Recollection_phase.png-c027b3e8c511ed74723dbfe1d5809f94.ctex"]
 
 [params]
 
