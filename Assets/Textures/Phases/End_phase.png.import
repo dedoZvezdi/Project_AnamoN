@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccr45jmyj0a4j"
-path="res://.godot/imported/Wake up phase.png-50f4ea8c3527bc9e4c55f330674b6688.ctex"
+uid="uid://pjunlne040s1"
+path="res://.godot/imported/End_phase.png-34f7dce6330cf849384702ef4d8ca166.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/Phases/Wake up phase.png"
-dest_files=["res://.godot/imported/Wake up phase.png-50f4ea8c3527bc9e4c55f330674b6688.ctex"]
+source_file="res://Assets/Textures/Phases/End_phase.png"
+dest_files=["res://.godot/imported/End_phase.png-34f7dce6330cf849384702ef4d8ca166.ctex"]
 
 [params]
 

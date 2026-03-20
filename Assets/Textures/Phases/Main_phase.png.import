@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpfqqgyyq2iqe"
-path="res://.godot/imported/Back Square Button.png-112bc9c66ec35561f057f1a883e0dfa2.ctex"
+uid="uid://25ntotrakcl4"
+path="res://.godot/imported/Main_phase.png-971421f9efe9db01bd10c85cdb4ba97e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/Phases/Back Square Button.png"
-dest_files=["res://.godot/imported/Back Square Button.png-112bc9c66ec35561f057f1a883e0dfa2.ctex"]
+source_file="res://Assets/Textures/Phases/Main_phase.png"
+dest_files=["res://.godot/imported/Main_phase.png-971421f9efe9db01bd10c85cdb4ba97e.ctex"]
 
 [params]
 

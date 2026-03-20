@@ -12,6 +12,7 @@ var peer_names = {}
 var upnp: UPNP
 var connect_timer: Timer
 var use_websocket: bool = false
+var is_my_turn: bool = false
 
 func _ready():
 	var config = ConfigFile.new()
@@ -215,9 +216,49 @@ func on_peer_connected(peer_id):
 		var opponent_scene = opponent_field_scene.instantiate()
 		add_child(opponent_scene)
 		get_node("PlayerField").host_set_up()
+		if multiplayer.is_server():
+			randomize()
+			var host_goes_first = randi() % 2 == 0
+			if host_goes_first:
+				is_my_turn = true
+				show_turn_popup("You are going FIRST!")
+				rpc_id(peer_id, "show_turn_popup", "You are going SECOND!")
+			else:
+				is_my_turn = false
+				show_turn_popup("You are going SECOND!")
+				rpc_id(peer_id, "show_turn_popup", "You are going FIRST!")
+		var phases = get_node_or_null("PlayerField/Phases")
+		if phases and phases.has_method("update_phase_visuals"):
+			phases.update_phase_visuals()
 	var host_chat = get_node("PlayerField/Chat")
 	if host_chat:
 		rpc_id(peer_id, "receive_opponent_name", host_chat.player_name)
+
+@rpc("any_peer", "reliable")
+func show_turn_popup(message: String):
+	if message.contains("FIRST"):
+		is_my_turn = true
+	else:
+		is_my_turn = false
+	var player_field = get_node_or_null("PlayerField")
+	if player_field:
+		var phases = player_field.get_node_or_null("Phases")
+		if phases and phases.has_method("update_phase_visuals"):
+			phases.update_phase_visuals()
+	var dialog = AcceptDialog.new()
+	dialog.dialog_text = message
+	dialog.title = "TURN ORDER"
+	get_tree().current_scene.add_child(dialog)
+	dialog.popup_centered()
+
+@rpc("any_peer", "call_local", "reliable")
+func swap_turns():
+	is_my_turn = !is_my_turn
+	var player_field = get_node_or_null("PlayerField")
+	if player_field:
+		var phases = player_field.get_node_or_null("Phases")
+		if phases:
+			phases.receive_opponent_phase_sync("Wake up")
 
 @rpc("any_peer", "reliable")
 func receive_opponent_name(names: String):

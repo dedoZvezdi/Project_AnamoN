@@ -1,71 +1,102 @@
 extends Node2D
 
-var area_line_mapping = {
-	"WakeUpArea2D": ["LineWakeUpR", "LineWakeUpL"],
-	"MaterializeArea2D": ["LineMaterializeL", "LineMaterializeR"], 
-	"RecollectionArea2D": ["LineRecollectionL", "LineRecollectionR"],
-	"DrawArea2D": ["LineDrawR", "LineDrawL"],
-	"MainArea2D": ["LineMainL", "LineMainR"],
-	"EndArea2D": ["LineEndL", "LineEndR"]
-}
-var areas = {}
-var all_lines = []
-var current_phase = "MaterializeArea2D"
+const PHASE_ORDER = ["Wake up", "Materialize", "Recollection", "Draw", "Main", "End"]
+const PHASE_TEXTURES = {
+	"Wake up": "res://Assets/Textures/Phases/Wake_up_phase.png",
+	"Materialize": "res://Assets/Textures/Phases/Materialize_phase.png",
+	"Recollection": "res://Assets/Textures/Phases/Recollection_phase.png",
+	"Draw": "res://Assets/Textures/Phases/Draw_phase.png",
+	"Main": "res://Assets/Textures/Phases/Main_phase.png",
+	"End": "res://Assets/Textures/Phases/End_phase.png"}
+
+var current_phase_index = 0
+
+@onready var phases_sprite = $Phases
+@onready var next_button_area = $NextSquareButton/NextArea2D
+@onready var back_button_area = $BackSquareButton/BackArea2D
 
 func _ready():
-	collect_areas_and_lines()
-	hide_all_lines()
-	show_lines_for_area("MaterializeArea2D")
-
-func collect_areas_and_lines():
-	for area_name in area_line_mapping:
-		var area_node = get_node_or_null(area_name)
-		if area_node:
-			areas[area_name] = area_node
-	for area_name in area_line_mapping:
-		for line_name in area_line_mapping[area_name]:
-			var line_node = get_node_or_null(line_name)
-			if line_node:
-				all_lines.append(line_node)
+	update_phase_visuals()
 
 func _input(event):
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		check_click_on_areas(event.position)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			if is_mouse_over_area(next_button_area):
+				next_button_area.get_parent().modulate = Color(0.2, 0.2, 0.2)
+				next_phase()
+			elif is_mouse_over_area(back_button_area):
+				back_button_area.get_parent().modulate = Color(0.2, 0.2, 0.2)
+				back_phase()
+		else:
+			next_button_area.get_parent().modulate.r = 1.0
+			next_button_area.get_parent().modulate.g = 1.0
+			next_button_area.get_parent().modulate.b = 1.0
+			back_button_area.get_parent().modulate.r = 1.0
+			back_button_area.get_parent().modulate.g = 1.0
+			back_button_area.get_parent().modulate.b = 1.0
 
-func check_click_on_areas(click_pos: Vector2):
-	for area_name in areas:
-		var area = areas[area_name]
-		if is_point_in_area(area, click_pos):
-			current_phase = area_name
-			show_lines_for_area(area_name)
-			sync_phase_with_opponent(area_name)
-			break
-
-func is_point_in_area(area: Area2D, point: Vector2) -> bool:
+func is_mouse_over_area(area: Area2D) -> bool:
 	var collision_shape = area.get_node("CollisionShape2D")
-	if not collision_shape or not collision_shape.shape:
+	if not collision_shape or not collision_shape.shape or collision_shape.disabled:
 		return false
-	var local_point = area.to_local(point)
-	return collision_shape.shape.get_rect().has_point(local_point)
+	var local_point = area.get_local_mouse_position()
+	var shape = collision_shape.shape
+	if shape is RectangleShape2D:
+		var rect = Rect2(-shape.size / 2, shape.size)
+		return rect.has_point(local_point)
+	return false
 
-func show_lines_for_area(area_name: String):
-	hide_all_lines()
-	if area_name in area_line_mapping:
-		for line_name in area_line_mapping[area_name]:
-			var line_node = get_node_or_null(line_name)
-			if line_node:
-				line_node.visible = true
+func next_phase():
+	var is_end_phase = (current_phase_index == PHASE_ORDER.size() - 1)
+	if is_end_phase:
+		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+		if multiplayer_node and multiplayer_node.has_method("rpc"):
+			multiplayer_node.rpc("swap_turns")
+	else:
+		current_phase_index = (current_phase_index + 1) % PHASE_ORDER.size()
+		update_phase_visuals()
+		sync_phase_with_opponent()
 
-func hide_all_lines():
-	for line in all_lines:
-		if line and is_instance_valid(line):
-			line.visible = false
+func back_phase():
+	current_phase_index = (current_phase_index - 1)
+	if current_phase_index < 0:
+		current_phase_index = PHASE_ORDER.size() - 1
+	update_phase_visuals()
+	sync_phase_with_opponent()
 
-func sync_phase_with_opponent(phase_name: String):
-	var multiplayer_node = get_tree().get_root().get_node("Main")
+func update_phase_visuals():
+	var current_phase_name = PHASE_ORDER[current_phase_index]
+	var texture_path = PHASE_TEXTURES[current_phase_name]
+	if ResourceLoader.exists(texture_path):
+		phases_sprite.texture = load(texture_path)
+	var is_wake_up = (current_phase_index == 0)
+	var back_button = back_button_area.get_parent()
+	back_button.visible = !is_wake_up
+	var back_collision = back_button_area.get_node_or_null("CollisionShape2D")
+	if back_collision:
+		back_collision.disabled = is_wake_up
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node:
+		var enough_players = multiplayer_node.multiplayer.get_peers().size() >= 1
+		var my_turn = multiplayer_node.get("is_my_turn") == true
+		var can_interact = enough_players and my_turn
+		var next_button = $NextSquareButton
+		next_button.visible = can_interact
+		back_button.visible = can_interact and !is_wake_up
+		var next_collision = next_button_area.get_node_or_null("CollisionShape2D")
+		if next_collision:
+			next_collision.disabled = !can_interact
+		if back_collision:
+			back_collision.disabled = is_wake_up or !can_interact
+
+func sync_phase_with_opponent():
+	var phase_name = PHASE_ORDER[current_phase_index]
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_opponent_phase", phase_name)
 
 func receive_opponent_phase_sync(phase_name: String):
-	current_phase = phase_name
-	show_lines_for_area(phase_name)
+	var index = PHASE_ORDER.find(phase_name)
+	if index != -1:
+		current_phase_index = index
+		update_phase_visuals()
