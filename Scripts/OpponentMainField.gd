@@ -80,6 +80,9 @@ func notify_card_transformed(card: Node):
 			var old_uuid = ""
 			if "uuid" in current_champion_card:
 				old_uuid = current_champion_card.uuid
+			if "attached_counters" in current_champion_card:
+				for c_name in current_champion_card.attached_counters:
+					card.attached_counters[c_name] = current_champion_card.attached_counters[c_name]
 			if card.has_method("add_to_lineage"):
 				card.add_to_lineage({"slug": old_slug, "uuid": old_uuid})
 			remove_previous_champions()
@@ -119,6 +122,9 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 			var old_uuid = ""
 			if "uuid" in current_champion_card:
 				old_uuid = current_champion_card.uuid
+			if "attached_counters" in current_champion_card:
+				for c_name in current_champion_card.attached_counters:
+					card.attached_counters[c_name] = current_champion_card.attached_counters[c_name]
 			if card.has_method("add_to_lineage"):
 				card.add_to_lineage({"slug": old_slug, "uuid": old_uuid})
 			remove_previous_champions()

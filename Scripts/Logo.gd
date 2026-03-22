@@ -21,23 +21,16 @@ var showing_level_menu := false
 var showing_durability_menu := false
 var showing_power_menu := false
 var showing_life_menu := false
-var showing_markers_menu := false
-var showing_specific_marker_menu := false
 var showing_counters_menu := false
 var showing_specific_counter_menu := false
-var current_marker_name := ""
 var current_counter_name := ""
 var level_value := 0
 var durability_value := 0
 var power_value := 0
 var life_value := 0
-var custom_markers := {}
-var marker_labels := {}
 var custom_counters := {}
 var counter_labels := {}
 var chat_node = null
-var add_marker_dialog: AcceptDialog
-var marker_name_input: LineEdit
 var add_counter_dialog: AcceptDialog
 var counter_name_input: LineEdit
 var original_menu_pos: Vector2 = Vector2.ZERO
@@ -49,10 +42,15 @@ func _ready():
 	add_to_group("logo")
 	$Area2D.input_pickable = true
 	$Area2D.input_event.connect(_on_Area2D_input_event)
+	custom_counters["Buff"] = 0
+	custom_counters["Debuff"] = 0
+	custom_counters["Enlighten"] = 0
+	custom_counters["Omen"] = 0
 	build_main_menu()
 	setup_status_labels()
-	setup_marker_input_dialog()
 	setup_counter_input_dialog()
+	for c_name in custom_counters.keys():
+		create_counter_label(c_name)
 	update_status_display()
 	find_chat_node()
 	Logo_view_window.close_requested.connect(_on_logo_view_close)
@@ -67,22 +65,6 @@ func _ready():
 	var err = config.load("user://player_config.cfg")
 	if err == OK:
 		player_name = config.get_value("Player", "Name", "Player")
-
-func setup_marker_input_dialog():
-	add_marker_dialog = AcceptDialog.new()
-	add_marker_dialog.title = "Add New Marker"
-	add_marker_dialog.size = Vector2(300, 120)
-	var vbox = VBoxContainer.new()
-	var label = Label.new()
-	label.text = "Enter marker name:"
-	marker_name_input = LineEdit.new()
-	marker_name_input.placeholder_text = "Marker name..."
-	marker_name_input.max_length = 17
-	vbox.add_child(label)
-	vbox.add_child(marker_name_input)
-	add_marker_dialog.add_child(vbox)
-	add_child(add_marker_dialog)
-	add_marker_dialog.confirmed.connect(_on_marker_name_confirmed)
 
 func setup_counter_input_dialog():
 	add_counter_dialog = AcceptDialog.new()
@@ -100,14 +82,6 @@ func setup_counter_input_dialog():
 	add_child(add_counter_dialog)
 	add_counter_dialog.confirmed.connect(_on_counter_name_confirmed)
 
-func _on_marker_name_confirmed():
-	var marker_name = marker_name_input.text.strip_edges()
-	if marker_name != "" and not custom_markers.has(marker_name):
-		custom_markers[marker_name] = 0
-		create_marker_label(marker_name)
-	marker_name_input.text = ""
-	build_markers_menu()
-
 func _on_counter_name_confirmed():
 	var counter_name = counter_name_input.text.strip_edges()
 	if counter_name != "" and not custom_counters.has(counter_name):
@@ -115,17 +89,6 @@ func _on_counter_name_confirmed():
 		create_counter_label(counter_name)
 	counter_name_input.text = ""
 	build_counters_menu()
-
-func create_marker_label(marker_name: String):
-	var label = Label.new()
-	label.name = "MarkerLabel_" + marker_name
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 16)
-	label.z_index = 1000
-	label.visible = false
-	add_child(label)
-	marker_labels[marker_name] = label
 
 func create_counter_label(counter_name: String):
 	var label = Label.new()
@@ -244,18 +207,6 @@ func update_status_display():
 		offset_y += line_height
 	else:
 		life_label.visible = false
-	for marker_name in custom_markers.keys():
-		var value = custom_markers[marker_name]
-		if value != 0 and marker_labels.has(marker_name):
-			var label = marker_labels[marker_name]
-			var marker_text = marker_name + " " + ("+" if value > 0 else "") + str(value)
-			label.text = marker_text
-			label.modulate = Color.GREEN if value > 0 else Color.RED
-			label.position = mouse_pos + Vector2(15, -15 + offset_y)
-			label.visible = true
-			offset_y += line_height
-		elif marker_labels.has(marker_name):
-			marker_labels[marker_name].visible = false
 	for counter_name in custom_counters.keys():
 		var value = custom_counters[counter_name]
 		if value != 0 and counter_labels.has(counter_name):
@@ -287,8 +238,7 @@ func build_main_menu():
 	showing_durability_menu = false
 	showing_power_menu = false
 	showing_life_menu = false
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
+	showing_life_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
 	clear_custom_menu()
@@ -297,7 +247,7 @@ func build_main_menu():
 	add_custom_item("Roll Dice", 102)
 	add_custom_item("RPS", 104)
 	add_custom_item("Status Modification", 105)
-	add_custom_item("Add Markers", 107)
+	add_custom_item("Counters", 107)
 	add_custom_item("Add Counters", 108)
 	add_custom_item("Summon Token", 106)
 	add_custom_item("Summon Mastery", 109)
@@ -379,7 +329,7 @@ func adjust_custom_menu_position():
 		pos.y = 0
 	logo_menu.global_position = pos
 
-func build_markers_menu():
+func build_predefined_counters_menu():
 	showing_dice_menu = false
 	showing_rps_menu = false
 	showing_status_menu = false
@@ -387,15 +337,14 @@ func build_markers_menu():
 	showing_durability_menu = false
 	showing_power_menu = false
 	showing_life_menu = false
-	showing_markers_menu = true
-	showing_specific_marker_menu = false
-	showing_counters_menu = false
+	showing_counters_menu = true
 	showing_specific_counter_menu = false
 	clear_custom_menu()
-	add_custom_item("Add", 500)
-	for marker_name in custom_markers.keys():
-		add_custom_item(marker_name + " +", 600, {"action": "increase", "marker": marker_name})
-		add_custom_item(marker_name + " -", 600, {"action": "decrease", "marker": marker_name})
+	var predefined = ["Buff", "Debuff", "Enlighten", "Omen"]
+	for c_name in predefined:
+		add_custom_item(c_name + " +", 700, {"action": "increase", "counter": c_name})
+		if c_name != "Buff" and c_name != "Debuff":
+			add_custom_item(c_name + " -", 700, {"action": "decrease", "counter": c_name})
 	add_custom_item("Back", 999, {}, true)
 	finalize_custom_menu()
 
@@ -407,15 +356,15 @@ func build_counters_menu():
 	showing_durability_menu = false
 	showing_power_menu = false
 	showing_life_menu = false
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
 	showing_counters_menu = true
 	showing_specific_counter_menu = false
 	clear_custom_menu()
 	add_custom_item("Add", 501)
+	var predefined = ["Buff", "Debuff", "Enlighten", "Omen"]
 	for counter_name in custom_counters.keys():
-		add_custom_item(counter_name + " +", 700, {"action": "increase", "counter": counter_name})
-		add_custom_item(counter_name + " -", 700, {"action": "decrease", "counter": counter_name})
+		if not predefined.has(counter_name):
+			add_custom_item(counter_name + " +", 700, {"action": "increase", "counter": counter_name})
+			add_custom_item(counter_name + " -", 700, {"action": "decrease", "counter": counter_name})
 	add_custom_item("Back", 999, {}, true)
 	finalize_custom_menu()
 
@@ -427,8 +376,6 @@ func build_dice_menu():
 	showing_durability_menu = false
 	showing_power_menu = false
 	showing_life_menu = false
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
 	showing_specific_counter_menu = false
@@ -447,8 +394,6 @@ func build_rps_menu():
 	showing_durability_menu = false
 	showing_power_menu = false
 	showing_life_menu = false
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
 	showing_specific_counter_menu = false
@@ -467,8 +412,6 @@ func build_status_menu():
 	showing_durability_menu = false
 	showing_power_menu = false
 	showing_life_menu = false
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
 	showing_specific_counter_menu = false
@@ -488,8 +431,6 @@ func build_level_menu():
 	showing_durability_menu = false
 	showing_power_menu = false
 	showing_life_menu = false
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
 	showing_specific_counter_menu = false
@@ -507,8 +448,6 @@ func build_durability_menu():
 	showing_durability_menu = true
 	showing_power_menu = false
 	showing_life_menu = false
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
 	showing_specific_counter_menu = false
@@ -526,8 +465,6 @@ func build_power_menu():
 	showing_durability_menu = false
 	showing_power_menu = true
 	showing_life_menu = false
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
 	showing_specific_counter_menu = false
@@ -545,8 +482,6 @@ func build_life_menu():
 	showing_durability_menu = false
 	showing_power_menu = false
 	showing_life_menu = true
-	showing_markers_menu = false
-	showing_specific_marker_menu = false
 	showing_counters_menu = false
 	showing_specific_counter_menu = false
 	showing_specific_counter_menu = false
@@ -568,7 +503,7 @@ func _on_Area2D_input_event(_viewport, event, _shape_idx):
 		build_main_menu()
 
 func _handle_menu_action(id, metadata = {}):
-	if not showing_dice_menu and not showing_rps_menu and not showing_status_menu and not showing_level_menu and not showing_durability_menu and not showing_power_menu and not showing_life_menu and not showing_markers_menu and not showing_counters_menu:
+	if not showing_dice_menu and not showing_rps_menu and not showing_status_menu and not showing_level_menu and not showing_durability_menu and not showing_power_menu and not showing_life_menu and not showing_counters_menu:
 		if id == 100:
 			logo_menu.hide()
 			var memory_slot = find_node_recursive(get_tree().get_root(), "MEMORY")
@@ -585,7 +520,7 @@ func _handle_menu_action(id, metadata = {}):
 		elif id == 105:
 			build_status_menu()
 		elif id == 107:
-			build_markers_menu()
+			build_predefined_counters_menu()
 		elif id == 108:
 			build_counters_menu()
 		elif id == 106:
@@ -669,22 +604,6 @@ func _handle_menu_action(id, metadata = {}):
 		elif id == 408:
 			life_value -= 1
 			update_status_display()
-	elif showing_markers_menu:
-		if id == 999:
-			build_main_menu()
-		elif id == 500:
-			logo_menu.hide()
-			add_marker_dialog.popup_centered()
-		elif id >= 600:
-			var marker_name = metadata.get("marker", "")
-			var action = metadata.get("action", "")
-			if custom_markers.has(marker_name):
-				if action == "increase":
-					custom_markers[marker_name] += 1
-				elif action == "decrease":
-					custom_markers[marker_name] -= 1
-				update_status_display()
-				build_markers_menu()
 	elif showing_counters_menu:
 		if id == 999:
 			build_main_menu()
@@ -696,11 +615,19 @@ func _handle_menu_action(id, metadata = {}):
 			var action = metadata.get("action", "")
 			if custom_counters.has(counter_name):
 				if action == "increase":
-					custom_counters[counter_name] += 1
+					if counter_name == "Buff" and custom_counters["Debuff"] > 0:
+						custom_counters["Debuff"] -= 1
+					elif counter_name == "Debuff" and custom_counters["Buff"] > 0:
+						custom_counters["Buff"] -= 1
+					else:
+						custom_counters[counter_name] += 1
 				elif action == "decrease":
 					custom_counters[counter_name] -= 1
 				update_status_display()
-				build_counters_menu()
+				if ["Buff", "Debuff", "Enlighten", "Omen"].has(counter_name):
+					build_predefined_counters_menu()
+				else:
+					build_counters_menu()
 
 func fetch_slugs_by_type(target_type: String) -> Array:
 	var slugs = []
@@ -768,28 +695,18 @@ func create_card_display(card_name: String):
 
 func has_active_status() -> bool:
 	var has_basic_status = level_value != 0 or durability_value != 0 or power_value != 0 or life_value != 0
-	var has_marker_status = false
-	for value in custom_markers.values():
-		if value != 0:
-			has_marker_status = true
-			break
 	var has_counter_status = false
 	for value in custom_counters.values():
 		if value != 0:
 			has_counter_status = true
 			break
-	return has_basic_status or has_marker_status or has_counter_status
+	return has_basic_status or has_counter_status
 
 func reset_all_status_values():
 	level_value = 0
 	durability_value = 0
 	power_value = 0
 	life_value = 0
-	for key in custom_markers.keys():
-		custom_markers[key] = 0
-	for label in marker_labels.values():
-		if is_instance_valid(label):
-			label.visible = false
 	for key in custom_counters.keys():
 		custom_counters[key] = 0
 	for label in counter_labels.values():

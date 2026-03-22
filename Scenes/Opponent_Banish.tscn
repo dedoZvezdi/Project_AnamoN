@@ -9,6 +9,13 @@ size = Vector2(128, 90)
 [node name="OpponentBanish" type="Node2D" unique_id=1512681821]
 script = ExtResource("1_vxi04")
 
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=1380387391]
+offset_left = 578.0
+offset_top = 483.0
+offset_right = 658.0
+offset_bottom = 503.0
+horizontal_alignment = 1
+
 [node name="Area2D" type="Area2D" parent="." unique_id=2043320380]
 collision_layer = 128
 collision_mask = 128

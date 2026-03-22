@@ -32,7 +32,13 @@ func add_card_to_field(card, position = null):
 					for entry in old_lineage:
 						if card.has_method("add_to_lineage"):
 							card.add_to_lineage(entry)
+				if "attached_counters" in inherit_source:
+					for c_name in inherit_source.attached_counters:
+						card.attached_counters[c_name] = inherit_source.attached_counters[c_name]
 			if current_champion_card != null and current_champion_card != card:
+				if "attached_counters" in current_champion_card and card.has_method("get") and "attached_counters" in card:
+					for c_name in current_champion_card.attached_counters:
+						card.attached_counters[c_name] = current_champion_card.attached_counters[c_name]
 				if card.has_method("add_to_lineage"):
 					var lineage_data = {
 						"slug": get_card_slug(current_champion_card),
