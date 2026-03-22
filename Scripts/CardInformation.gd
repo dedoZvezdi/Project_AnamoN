@@ -8,7 +8,6 @@ extends Node2D
 @onready var card_element_lable = $Element
 @onready var card_cost_lable = $Cost
 @onready var card_PLDS_lable = $PowerLifeDurSpeed
-@onready var card_Markers_lable = $Markers
 @onready var card_Counters_lable = $Counters
 
 var card_database_reference = null
@@ -114,8 +113,6 @@ func _update_card_display(slug: String):
 	card_element_lable.clear()
 	card_cost_lable.clear()
 	card_PLDS_lable.clear()
-	if card_Markers_lable:
-		card_Markers_lable.clear()
 	if card_Counters_lable:
 		card_Counters_lable.clear()
 	if preview_sprite and slug != "":
@@ -224,32 +221,17 @@ func _update_card_display(slug: String):
 	if plds_text_to_display != "":
 		card_PLDS_lable.append_text("[left]%s[/left]" % plds_text_to_display)
 	if last_displayed_card and is_instance_valid(last_displayed_card):
-		var markers_text_lines: Array[String] = []
 		var counters_text_lines: Array[String] = []
 		var show_custom = _should_show_custom(last_displayed_card)
 		if show_custom:
-			var any_markers := false
-			var any_counters := false
-			if last_displayed_card.has_method("get_attached_markers"):
-				var mk = last_displayed_card.get_attached_markers()
-				for marker_name in mk.keys():
-					var v = int(mk[marker_name])
-					var signs = "+" if v > 0 else ""
-					markers_text_lines.append("%s %s%s" % [str(marker_name), signs, str(v)])
-				if mk.size() > 0:
-					any_markers = true
 			if last_displayed_card.has_method("get_attached_counters"):
 				var cn = last_displayed_card.get_attached_counters()
 				for counter_name in cn.keys():
 					var v2 = int(cn[counter_name])
 					var signs2 = "+" if v2 > 0 else ""
 					counters_text_lines.append("%s %s%s" % [str(counter_name), signs2, str(v2)])
-				if cn.size() > 0:
-					any_counters = true
-			if card_Markers_lable and any_markers:
-				card_Markers_lable.append_text("[left][b]Markers:[/b]\n%s[/left]" % "\n".join(markers_text_lines))
-			if card_Counters_lable and any_counters:
-				card_Counters_lable.append_text("[left][b]Counters:[/b]\n%s[/left]" % "\n".join(counters_text_lines))
+				if not counters_text_lines.is_empty() and card_Counters_lable:
+					card_Counters_lable.append_text("[left][b]Counters:[/b]\n%s[/left]" % "\n".join(counters_text_lines))
 
 func _should_show_custom(card) -> bool:
 	if not card or not is_instance_valid(card):
@@ -317,12 +299,18 @@ func _build_plds_text_effective(data: Dictionary, mods: Dictionary) -> String:
 	return " - ".join(parts)
 
 func get_effective_mods_for_card() -> Dictionary:
-	var zero = {"level": 0, "power": 0, "life": 0, "durability": 0}
+	var mods = {"level": 0, "power": 0, "life": 0, "durability": 0}
 	if last_displayed_card and is_instance_valid(last_displayed_card):
 		if last_displayed_card.has_method("is_in_main_field") and last_displayed_card.is_in_main_field():
 			if last_displayed_card.has_method("get_runtime_modifiers"):
-				return last_displayed_card.get_runtime_modifiers()
-	return zero
+				mods = last_displayed_card.get_runtime_modifiers().duplicate()
+			if last_displayed_card.has_method("get_attached_counters"):
+				var counters = last_displayed_card.get_attached_counters()
+				var buff = int(counters.get("Buff", 0))
+				var debuff = int(counters.get("Debuff", 0))
+				mods["power"] += (buff - debuff)
+				mods["life"] += (buff - debuff)
+	return mods
 
 func clear_preview():
 	if card_name_label:

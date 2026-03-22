@@ -9,6 +9,9 @@ var marked_uuids : Array = []
 var hold_timer = 0.0
 var is_holding_left = false
 var progress_bar: TextureProgressBar
+var omen_count = 0
+var omen_label: Label
+var is_hovering = false
 
 @onready var banish_view_window = $BanishViewWindow
 @onready var grid_container = $BanishViewWindow/ScrollContainer/GridContainer
@@ -23,6 +26,9 @@ func _ready() -> void:
 		area2d.input_event.connect(_on_area_2d_input_event)
 	if area2d and not area2d.mouse_exited.is_connected(_on_mouse_exited):
 		area2d.mouse_exited.connect(_on_mouse_exited)
+	if area2d and not area2d.mouse_entered.is_connected(_on_mouse_entered):
+		area2d.mouse_entered.connect(_on_mouse_entered)
+	_setup_omen_label()
 	$BanishViewWindow/PopupMenu.id_pressed.connect(_on_banish_view_popup_menu_pressed)
 	_setup_progress_bar()
 
@@ -106,9 +112,59 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 				hold_timer = 0.0
 			else:
 				_reset_hold()
+		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			if cards_in_banish.is_empty():
+				return
+			var logo_nodes = get_tree().get_nodes_in_group("logo")
+			if logo_nodes.size() > 0:
+				var logo = logo_nodes[0]
+				if logo.has_method("has_active_status") and logo.has_active_status():
+					if logo.custom_counters.get("Omen", 0) != 0:
+						omen_count += logo.custom_counters["Omen"]
+						update_omen_label()
+						sync_omen_count()
+						logo.reset_all_status_values()
+						return
+
+func _on_mouse_entered():
+	is_hovering = true
+	update_omen_label()
 
 func _on_mouse_exited():
+	is_hovering = false
+	update_omen_label()
 	_reset_hold()
+
+func _setup_omen_label():
+	omen_label = get_node_or_null("OmenLabel")
+	if not omen_label:
+		omen_label = Label.new()
+		omen_label.name = "OmenLabel"
+		omen_label.add_theme_font_size_override("font_size", 20)
+		omen_label.z_index = 1500
+		omen_label.visible = false
+		add_child(omen_label)
+		omen_label.position = Vector2(-45, -70)
+	
+func update_omen_label():
+	if omen_label:
+		omen_label.text = "Omens : " + str(omen_count)
+		if omen_count > 0:
+			omen_label.modulate = Color.GREEN
+		elif omen_count < 0:
+			omen_label.modulate = Color.RED
+		else:
+			omen_label.modulate = Color.WHITE
+		omen_label.visible = omen_count != 0 and not cards_in_banish.is_empty() and is_hovering
+
+func sync_omen_count():
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_banish_omen_count", multiplayer.get_unique_id(), omen_count)
+
+func remote_set_omen_count(count: int):
+	omen_count = count
+	update_omen_label()
 
 func create_card_display(card_name: String, card_uuid: String = ""):
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
@@ -475,6 +531,10 @@ func remove_card_from_slot(card):
 				card.set_meta("is_marked", false)
 		if card.has_node("Area2D"):
 			card.get_node("Area2D").set_deferred("input_pickable", true)
+		if cards_in_banish.is_empty():
+			omen_count = 0
+			update_omen_label()
+			sync_omen_count()
 		reorder_z_indices()
 		update_top_card_visual()
 		if banish_view_window.visible:

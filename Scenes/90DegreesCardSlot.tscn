@@ -9,6 +9,13 @@ size = Vector2(128, 90)
 [node name="90degreesCardSlot" type="Node2D" unique_id=31231617]
 script = ExtResource("1_xluvn")
 
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=1793208658]
+offset_left = -40.0
+offset_top = -67.0
+offset_right = 40.0
+offset_bottom = -45.0
+horizontal_alignment = 1
+
 [node name="Area2D" type="Area2D" parent="." unique_id=7360531]
 collision_layer = 2
 collision_mask = 2

@@ -417,9 +417,6 @@ func swap_card_data(card1, card2):
 	var temp_mods = card1.runtime_modifiers
 	card1.runtime_modifiers = card2.runtime_modifiers
 	card2.runtime_modifiers = temp_mods
-	var temp_markers = card1.attached_markers
-	card1.attached_markers = card2.attached_markers
-	card2.attached_markers = temp_markers
 	var temp_counters = card1.attached_counters
 	card1.attached_counters = card2.attached_counters
 	card2.attached_counters = temp_counters

@@ -411,6 +411,17 @@ func sync_banish_flip(player_id: int, uuid: String, is_face_down: bool):
 				opp_banish.update_deck_view()
 
 @rpc("any_peer", "reliable")
+func sync_banish_omen_count(player_id: int, count: int):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		var opp_banish = opp_field.get_node_or_null("OpponentBanish")
+		if opp_banish and opp_banish.has_method("remote_set_omen_count"):
+			opp_banish.remote_set_omen_count(count)
+
+@rpc("any_peer", "reliable")
 func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Vector2, rot_deg: float, from_deck: bool = false, from_mat_deck: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
@@ -670,7 +681,7 @@ func sync_move_to_deck(player_id: int, uuid: String, _is_top: bool):
 			card.queue_free()
 
 @rpc("any_peer", "reliable")
-func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dictionary, markers: Dictionary, counters: Dictionary, direction: String, rot_deg: float, is_marked: bool = false):
+func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dictionary, counters: Dictionary, direction: String, rot_deg: float, is_marked: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -687,8 +698,6 @@ func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dict
 					card.update_visuals_based_on_mark()
 			if "runtime_modifiers" in card:
 				card.runtime_modifiers = modifiers
-			if "attached_markers" in card:
-				card.attached_markers = markers
 			if "attached_counters" in card:
 				card.attached_counters = counters
 			if "current_direction" in card:
@@ -1075,7 +1084,6 @@ func _convert_opponent_to_player_card(opp_card: Node, stats: Dictionary, final_p
 	if "original_owner_id" in new_card:
 		new_card.original_owner_id = stats.get("original_owner_id", 0)
 	new_card.runtime_modifiers = stats.get("modifiers", {}).duplicate()
-	new_card.attached_markers = stats.get("markers", {}).duplicate()
 	new_card.attached_counters = stats.get("counters", {}).duplicate()
 	new_card.is_rotated = false
 	if abs(fmod(final_rot, 360.0)) > 45 and abs(fmod(final_rot, 360.0)) < 135:

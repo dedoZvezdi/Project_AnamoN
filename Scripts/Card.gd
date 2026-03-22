@@ -22,7 +22,6 @@ var was_rotated_before_drag = false
 var is_dragging = false
 var card_information_reference = null
 var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
-var attached_markers := {}
 var attached_counters := {}
 var is_publicly_revealed = false
 var current_direction = "North"
@@ -230,28 +229,24 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 				is_holding_left = true
 				hold_timer = 0.0
 			else:
-				if is_holding_left and hold_timer < HOLD_DURATION:
-					if can_be_marked():
-						toggle_mark()
 				_reset_hold()
 			return
 		if event.pressed:
 			if is_in_memory_slot():
-				if can_be_marked():
-					toggle_mark()
+				pass
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if mouse_inside:
 			if is_in_graveyard() or is_in_banish():
-				return
-			if is_champion_card() and is_in_main_field():
-				rotate_card()
-				return
+				return		
 			var logo_nodes = get_tree().get_nodes_in_group("logo")
 			if logo_nodes.size() > 0:
 				var logo_node = logo_nodes[0]
 				if logo_node.has_method("has_active_status") and logo_node.has_active_status():
 					apply_logo_status_to_self(logo_node)
 					return
+			if is_champion_card() and is_in_main_field():
+				rotate_card()
+				return
 			popup_menu.clear()
 			if is_token():
 				if is_in_main_field():
@@ -523,8 +518,6 @@ func transform_card():
 	if is_marked:
 		set_marked(false)
 	_update_card_image(new_slug)
-	attached_markers.clear()
-	attached_counters.clear()
 	if current_field and current_field.has_method("notify_card_transformed"):
 		current_field.notify_card_transformed(self)
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
@@ -538,6 +531,9 @@ func transform_card():
 		if current_field.has_method("is_champion_card") and current_field.is_champion_card(self) and not is_regalia_card():
 			if current_field.current_champion_card and current_field.current_champion_card != self:
 				var prev = current_field.current_champion_card
+				if "attached_counters" in prev:
+					for c_name in prev.attached_counters:
+						attached_counters[c_name] = prev.attached_counters[c_name]
 				if "champion_lineage" in prev:
 					for entry in prev.champion_lineage:
 						add_to_lineage(entry)
@@ -662,12 +658,15 @@ func _build_plds_text(data: Dictionary) -> String:
 func _build_plds_text_effective(data: Dictionary) -> String:
 	var parts: Array[String] = []
 	var mods = runtime_modifiers if is_in_main_field() else {"level": 0, "power": 0, "life": 0, "durability": 0}
+	var buff_count = attached_counters.get("Buff", 0)
+	var debuff_count = attached_counters.get("Debuff", 0)
+	var counter_mod = buff_count - debuff_count
 	if data.has("power") and data["power"] != null:
-		var val = int(data["power"]) + int(mods.get("power", 0))
+		var val = int(data["power"]) + int(mods.get("power", 0)) + counter_mod
 		val = max(0, val)
 		parts.append("POW. %s" % str(val))
 	if data.has("life") and data["life"] != null:
-		var val2 = int(data["life"]) + int(mods.get("life", 0))
+		var val2 = int(data["life"]) + int(mods.get("life", 0)) + counter_mod
 		val2 = max(0, val2)
 		parts.append("LIFE %s" % str(val2))
 	if data.has("durability") and data["durability"] != null:
@@ -786,7 +785,6 @@ func set_current_field(field):
 	var was_in_main = is_in_main_field()
 	current_field = field
 	if _is_hand_field(current_field):
-		attached_markers.clear()
 		attached_counters.clear()
 	var now_in_main = is_in_main_field()
 	if was_in_main and not now_in_main:
@@ -871,22 +869,32 @@ func apply_logo_status_to_self(logo_node):
 		if applied_delta != 0 and current_field and current_field.has_method("is_champion_card") and current_field.is_champion_card(self):
 			if current_field.has_method("adjust_champion_life_delta"):
 				current_field.adjust_champion_life_delta(applied_delta)
-	if logo_node.custom_markers.size() > 0:
-		for marker_name in logo_node.custom_markers.keys():
-			var delta_val = int(logo_node.custom_markers[marker_name])
-			if delta_val == 0:
-				continue
-			if not attached_markers.has(marker_name):
-				attached_markers[marker_name] = 0
-			attached_markers[marker_name] = int(attached_markers[marker_name]) + delta_val
 	if logo_node.custom_counters.size() > 0:
 		for counter_name in logo_node.custom_counters.keys():
 			var delta_valc = int(logo_node.custom_counters[counter_name])
-			if delta_valc == 0:
+			if delta_valc == 0 or counter_name == "Omen":
 				continue
-			if not attached_counters.has(counter_name):
-				attached_counters[counter_name] = 0
-			attached_counters[counter_name] = int(attached_counters[counter_name]) + delta_valc
+			if delta_valc > 0:
+				if counter_name == "Buff":
+					var debuff = attached_counters.get("Debuff", 0)
+					var cancel = min(debuff, delta_valc)
+					attached_counters["Debuff"] = debuff - cancel
+					delta_valc -= cancel
+				elif counter_name == "Debuff":
+					var buff = attached_counters.get("Buff", 0)
+					var cancel = min(buff, delta_valc)
+					attached_counters["Buff"] = buff - cancel
+					delta_valc -= cancel
+				if delta_valc > 0:
+					attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_valc
+			else:
+				attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_valc
+			var keys_to_remove = []
+			for k in attached_counters.keys():
+				if attached_counters[k] <= 0:
+					keys_to_remove.append(k)
+			for k in keys_to_remove:
+				attached_counters.erase(k)
 	logo_node.reset_all_status_values()
 	if card_level_lable:
 		card_level_lable.clear()
@@ -896,9 +904,6 @@ func apply_logo_status_to_self(logo_node):
 	if card_information_reference and mouse_inside and not is_dragging:
 		card_information_reference.show_card_preview(self)
 	sync_stats_to_opponent()
-
-func get_attached_markers() -> Dictionary:
-	return attached_markers.duplicate()
 
 func get_attached_counters() -> Dictionary:
 	return attached_counters.duplicate()
@@ -1030,7 +1035,6 @@ func _convert_to_opponent_banish_visuals(final_pos, face_down):
 	if "original_owner_id" in new_opp_card:
 		new_opp_card.original_owner_id = original_owner_id
 	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
-	new_opp_card.attached_markers = attached_markers.duplicate()
 	new_opp_card.attached_counters = attached_counters.duplicate()
 	new_opp_card.is_marked = is_marked
 	if new_opp_card.has_method("update_visuals_based_on_mark"):
@@ -1199,7 +1203,7 @@ func sync_stats_to_opponent(forced_rot: float = -999.0):
 	var rot_to_send = rotation_degrees if forced_rot == -999.0 else forced_rot
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_card_state", multiplayer.get_unique_id(), get_uuid(), slug, runtime_modifiers, attached_markers, attached_counters, current_direction, rot_to_send, is_marked)
+		multiplayer_node.rpc("sync_card_state", multiplayer.get_unique_id(), get_uuid(), slug, runtime_modifiers, attached_counters, current_direction, rot_to_send, is_marked)
 
 func reveal_to_opponent(skip_animation: bool = false):
 	if (not is_in_memory_slot() and not is_in_hand()) or is_publicly_revealed:
@@ -1416,7 +1420,6 @@ func give_control_to_opponent():
 			"slug": get_slug_from_card(),
 			"uuid": get_uuid() if get_uuid() else "",
 			"modifiers": runtime_modifiers,
-			"markers": attached_markers,
 			"counters": attached_counters,
 			"direction": current_direction,
 			"rot_deg": target_rot,
@@ -1447,7 +1450,6 @@ func _convert_to_opponent_card_visuals(final_pos, final_rot):
 	if "original_owner_id" in new_opp_card:
 		new_opp_card.original_owner_id = original_owner_id
 	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
-	new_opp_card.attached_markers = attached_markers.duplicate()
 	new_opp_card.attached_counters = attached_counters.duplicate()
 	new_opp_card.is_marked = is_marked
 	if new_opp_card.has_method("update_visuals_based_on_mark"):

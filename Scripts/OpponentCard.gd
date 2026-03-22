@@ -8,7 +8,6 @@ var hand_position
 var mouse_inside = false
 var card_information_reference = null
 var runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
-var attached_markers := {}
 var attached_counters := {}
 var uuid = ""
 var current_field = null
@@ -95,9 +94,6 @@ func is_in_main_field() -> bool:
 
 func get_runtime_modifiers() -> Dictionary:
 	return runtime_modifiers.duplicate()
-
-func get_attached_markers() -> Dictionary:
-	return attached_markers.duplicate()
 
 func get_attached_counters() -> Dictionary:
 	return attached_counters.duplicate()
@@ -246,8 +242,6 @@ func remote_transform(new_slug: String):
 	if anim_player and anim_player.has_animation("card_flip"):
 		anim_player.play("card_flip")
 	runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
-	attached_markers.clear()
-	attached_counters.clear()
 	if current_field and current_field.has_method("notify_card_transformed"):
 		current_field.notify_card_transformed(self)
 	emit_signal("visuals_changed")
