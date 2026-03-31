@@ -6,6 +6,7 @@ var card_in_slot = false
 var current_champion_card = null
 var current_mastery_card = null
 var champion_life_delta := 0
+var first_champion_summoned = false
 
 func adjust_champion_life_delta(delta):
 	champion_life_delta += int(delta)
@@ -13,6 +14,39 @@ func adjust_champion_life_delta(delta):
 func _ready() -> void:
 	base_position = Vector2.ZERO
 	add_to_group("main_fields")
+
+func activate_champion_elements(card):
+	if not card or not is_instance_valid(card):
+		return
+	var root = get_tree().current_scene
+	var card_info_ref = find_card_information_reference()
+	if not card_info_ref or not card_info_ref.card_database_reference:
+		if root and root.has_method("find_child"):
+			card_info_ref = root.find_child("CardInformation", true, false)
+	if not card_info_ref or not card_info_ref.card_database_reference:
+		return
+	var card_slug = get_card_slug(card)
+	if card_slug == "":
+		return
+	var element_name = ""
+	if card_info_ref.has_method("get_card_element"):
+		element_name = card_info_ref.get_card_element(card_slug)
+	if element_name == "":
+		return
+	var elements_node = get_parent().get_node_or_null("Elements")
+	if not elements_node:
+		if root and root.has_method("find_child"):
+			elements_node = root.find_child("Elements", true, false)	
+	if elements_node:
+		if not first_champion_summoned:
+			var norm = elements_node.get_node_or_null("Norm")
+			if norm and norm.has_method("activate"):
+				norm.activate()
+			first_champion_summoned = true
+		var capitalized_name = str(element_name).capitalize()
+		var element_node = elements_node.get_node_or_null(capitalized_name)
+		if element_node and element_node.has_method("activate"):
+			element_node.activate()
 
 @warning_ignore("shadowed_variable_base_class")
 func add_card_to_field(card, position = null):
@@ -49,6 +83,7 @@ func add_card_to_field(card, position = null):
 			current_champion_card = card
 			cards_in_field.append(card)
 			card_in_slot = true
+		activate_champion_elements(card)
 		if card and is_instance_valid(card) and card.has_method("apply_champion_life_delta"):
 			card.apply_champion_life_delta(champion_life_delta)
 		card.global_position = global_position + Vector2(0, -20)
@@ -111,6 +146,8 @@ func add_card_to_field(card, position = null):
 func notify_card_transformed(card):
 	if card == current_champion_card and not is_champion_card(card):
 		current_champion_card = null
+	elif is_champion_card(card):
+		activate_champion_elements(card)
 
 func remove_previous_champions():
 	if current_champion_card and is_instance_valid(current_champion_card):
@@ -129,34 +166,8 @@ func is_champion_card(card) -> bool:
 	if card_slug == "":
 		return false
 	var card_info_ref = find_card_information_reference()
-	if not card_info_ref or not card_info_ref.card_database_reference:
-		return false
-	var card_database = card_info_ref.card_database_reference
-	if not card_database.cards_db.has(card_slug):
-		return false
-	var data = card_database.cards_db[card_slug]
-	if data.has("types") and data["types"] is Array:
-		for card_type in data["types"]:
-			if str(card_type).to_upper() == "CHAMPION":
-				return true
-		return false
-	if data.has("edition_id") and not data.has("parent_orientation_slug"):
-		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
-		if base_slug and card_database.cards_db.has(base_slug):
-			var base_data = card_database.cards_db[base_slug]
-			if base_data.has("types") and base_data["types"] is Array:
-				for card_type in base_data["types"]:
-					if str(card_type).to_upper() == "CHAMPION":
-						return true
-				return false
-	elif data.has("parent_orientation_slug"):
-		var parent_slug = data["parent_orientation_slug"]
-		if card_database.cards_db.has(parent_slug):
-			var parent_data = card_database.cards_db[parent_slug]
-			if parent_data.has("types") and parent_data["types"] is Array:
-				for card_type in parent_data["types"]:
-					if str(card_type).to_upper() == "CHAMPION":
-						return true
+	if card_info_ref and card_info_ref.has_method("is_card_of_type"):
+		return card_info_ref.is_card_of_type(card_slug, "CHAMPION")
 	return false
 
 func is_regalia_card(card) -> bool:
@@ -166,32 +177,8 @@ func is_regalia_card(card) -> bool:
 	if card_slug == "":
 		return false
 	var card_info_ref = find_card_information_reference()
-	if not card_info_ref or not card_info_ref.card_database_reference:
-		return false
-	var card_database = card_info_ref.card_database_reference
-	if not card_database.cards_db.has(card_slug):
-		return false
-	var data = card_database.cards_db[card_slug]
-	if data.has("types") and data["types"] is Array:
-		for card_type in data["types"]:
-			if str(card_type).to_upper() == "REGALIA":
-				return true
-	if data.has("edition_id") and not data.has("parent_orientation_slug"):
-		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
-		if base_slug and card_database.cards_db.has(base_slug):
-			var base_data = card_database.cards_db[base_slug]
-			if base_data.has("types") and base_data["types"] is Array:
-				for card_type in base_data["types"]:
-					if str(card_type).to_upper() == "REGALIA":
-						return true
-	elif data.has("parent_orientation_slug"):
-		var parent_slug = data["parent_orientation_slug"]
-		if card_database.cards_db.has(parent_slug):
-			var parent_data = card_database.cards_db[parent_slug]
-			if parent_data.has("types") and parent_data["types"] is Array:
-				for card_type in parent_data["types"]:
-					if str(card_type).to_upper() == "REGALIA":
-						return true
+	if card_info_ref and card_info_ref.has_method("is_card_of_type"):
+		return card_info_ref.is_card_of_type(card_slug, "REGALIA")
 	return false
 
 func remove_previous_mastery():
@@ -229,17 +216,6 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 		var result = find_node_by_script(child, script_path)
 		if result:
 			return result
-	return null
-
-func find_base_card_for_edition(edition_id, card_database):
-	if not card_database:
-		return null
-	for slug in card_database.cards_db:
-		var data = card_database.cards_db[slug]
-		if data.has("editions"):
-			for edition in data["editions"]:
-				if edition.get("edition_id") == edition_id:
-					return slug
 	return null
 
 func remove_card_from_field(card):

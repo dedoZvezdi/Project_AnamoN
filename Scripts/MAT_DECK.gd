@@ -1,9 +1,9 @@
 extends Node2D
 
-var player_deck = ["alice-golden-queen-dtr1e-cur","bellonas-runestone-ambdp",
-"alice-golden-queen-dtr","apotheosis-rite-p24-cpr", "crimson-protective-trinket-ftc",
+var player_deck = ["spirit-of-wind-ambsd","spirit-of-water-alc",
+"silvie-slime-sovereign-p24","apotheosis-rite-p24-cpr", "crimson-protective-trinket-ftc",
 "assassins-mantle-rec-brv","polaris-twinkling-cauldron-prxy",
-"lost-providence-ptm1e","fabled-azurite-fatestone-hvn1e-csr",
+"lost-providence-ptm1e","diana-moonpiercer-dtrsd-csr",
 "huaji-of-heavens-rise-hvn1e","fabled-ruby-fatestone-hvn1e","kaleidoscope-barrette-rec-idy"]
 var card_database_reference
 var hold_timer = 0.0

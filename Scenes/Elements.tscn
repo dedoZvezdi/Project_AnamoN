@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dbfj2hlc71gc6"]
+[gd_scene format=3 uid="uid://dbfj2hlc71gc6"]
 
 [ext_resource type="PackedScene" uid="uid://cw3lmoyxw8aue" path="res://Scenes/Norm.tscn" id="1_4u5m1"]
 [ext_resource type="Script" uid="uid://c57bimiwmr0yp" path="res://Scripts/Element.gd" id="2_5fnqk"]
@@ -14,51 +14,63 @@
 [ext_resource type="PackedScene" uid="uid://8t1wk8td74mg" path="res://Scenes/Neos.tscn" id="12_8csf3"]
 [ext_resource type="PackedScene" uid="uid://cagxgk4egqvqv" path="res://Scenes/Luxem.tscn" id="13_0ue1h"]
 
-[node name="Elements" type="Node2D"]
+[node name="Elements" type="Node2D" unique_id=751180445]
 
-[node name="Norm" parent="." instance=ExtResource("1_4u5m1")]
+[node name="Norm" parent="." unique_id=1666109979 instance=ExtResource("1_4u5m1")]
 position = Vector2(560, 580)
+scale = Vector2(0.45, 0.45)
 script = ExtResource("2_5fnqk")
 
-[node name="Fire" parent="." instance=ExtResource("3_kck3e")]
+[node name="Fire" parent="." unique_id=374077020 instance=ExtResource("3_kck3e")]
 position = Vector2(560, 615)
+scale = Vector2(0.45, 0.45)
 script = ExtResource("2_5fnqk")
 
-[node name="Water" parent="." instance=ExtResource("4_vlsow")]
+[node name="Water" parent="." unique_id=723149034 instance=ExtResource("4_vlsow")]
 position = Vector2(560, 650)
+scale = Vector2(0.45, 0.45)
 script = ExtResource("2_5fnqk")
 
-[node name="Wind" parent="." instance=ExtResource("5_eiivs")]
+[node name="Wind" parent="." unique_id=1176706118 instance=ExtResource("5_eiivs")]
 position = Vector2(560, 685)
+scale = Vector2(0.45, 0.45)
 script = ExtResource("2_5fnqk")
 
-[node name="Astra" parent="." instance=ExtResource("6_vpct8")]
+[node name="Astra" parent="." unique_id=2015843059 instance=ExtResource("6_vpct8")]
 position = Vector2(595, 580)
+scale = Vector2(0.38, 0.38)
 script = ExtResource("2_5fnqk")
 
-[node name="Umbra" parent="." instance=ExtResource("7_82vsi")]
+[node name="Umbra" parent="." unique_id=434383752 instance=ExtResource("7_82vsi")]
 position = Vector2(630, 580)
+scale = Vector2(0.38, 0.38)
 script = ExtResource("2_5fnqk")
 
-[node name="Arcane" parent="." instance=ExtResource("8_usnql")]
+[node name="Arcane" parent="." unique_id=1952007852 instance=ExtResource("8_usnql")]
 position = Vector2(595, 615)
+scale = Vector2(0.45, 0.45)
 script = ExtResource("2_5fnqk")
 
-[node name="Exia" parent="." instance=ExtResource("9_bchgv")]
+[node name="Exia" parent="." unique_id=2073190595 instance=ExtResource("9_bchgv")]
 position = Vector2(630, 615)
+scale = Vector2(0.38, 0.38)
 script = ExtResource("2_5fnqk")
 
-[node name="Crux" parent="." instance=ExtResource("10_tgia7")]
+[node name="Crux" parent="." unique_id=1668994294 instance=ExtResource("10_tgia7")]
 position = Vector2(595, 650)
+scale = Vector2(0.45, 0.45)
 
-[node name="Tera" parent="." instance=ExtResource("11_xtxi3")]
+[node name="Tera" parent="." unique_id=2060848043 instance=ExtResource("11_xtxi3")]
 position = Vector2(595, 685)
+scale = Vector2(0.38, 0.38)
 script = ExtResource("2_5fnqk")
 
-[node name="Neos" parent="." instance=ExtResource("12_8csf3")]
+[node name="Neos" parent="." unique_id=1425423060 instance=ExtResource("12_8csf3")]
 position = Vector2(630, 685)
+scale = Vector2(0.38, 0.38)
 script = ExtResource("2_5fnqk")
 
-[node name="Luxem" parent="." instance=ExtResource("13_0ue1h")]
+[node name="Luxem" parent="." unique_id=912093786 instance=ExtResource("13_0ue1h")]
 position = Vector2(630, 650)
+scale = Vector2(0.38, 0.38)
 script = ExtResource("2_5fnqk")

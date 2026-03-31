@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bbtnckf2a2use"]
+[gd_scene format=3 uid="uid://bbtnckf2a2use"]
 
 [ext_resource type="PackedScene" uid="uid://cw3lmoyxw8aue" path="res://Scenes/Norm.tscn" id="1_6ql4t"]
 [ext_resource type="PackedScene" uid="uid://d2q27vj536tlk" path="res://Scenes/Fire.tscn" id="2_1n4dq"]
@@ -12,54 +12,65 @@
 [ext_resource type="PackedScene" uid="uid://htnh4dr1pgp7" path="res://Scenes/Tera.tscn" id="10_hldlb"]
 [ext_resource type="PackedScene" uid="uid://8t1wk8td74mg" path="res://Scenes/Neos.tscn" id="11_q7drv"]
 [ext_resource type="PackedScene" uid="uid://cagxgk4egqvqv" path="res://Scenes/Luxem.tscn" id="12_td0eo"]
+[ext_resource type="Script" uid="uid://c57bimiwmr0yp" path="res://Scripts/Element.gd" id="13_6ql4t"]
 
-[node name="OpponentElements" type="Node2D"]
+[node name="OpponentElements" type="Node2D" unique_id=71210036]
 
-[node name="OpponentNorm" parent="." instance=ExtResource("1_6ql4t")]
+[node name="OpponentNorm" parent="." unique_id=978366412 instance=ExtResource("1_6ql4t")]
 position = Vector2(1397, 500)
-rotation = -3.14159
+scale = Vector2(0.45, 0.45)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentFire" parent="." instance=ExtResource("2_1n4dq")]
+[node name="OpponentFire" parent="." unique_id=1114004685 instance=ExtResource("2_1n4dq")]
 position = Vector2(1397, 465)
-rotation = -3.14159
+scale = Vector2(0.45, 0.45)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentWater" parent="." instance=ExtResource("3_j7acn")]
+[node name="OpponentWater" parent="." unique_id=910883526 instance=ExtResource("3_j7acn")]
 position = Vector2(1397, 430)
-rotation = -3.14159
+scale = Vector2(0.45, 0.45)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentWind" parent="." instance=ExtResource("4_sec3a")]
+[node name="OpponentWind" parent="." unique_id=831720720 instance=ExtResource("4_sec3a")]
 position = Vector2(1397, 395)
-rotation = -3.14159
+scale = Vector2(0.45, 0.45)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentAstra" parent="." instance=ExtResource("5_7yc41")]
+[node name="OpponentAstra" parent="." unique_id=319612498 instance=ExtResource("5_7yc41")]
 position = Vector2(1362, 500)
-rotation = -3.14159
+scale = Vector2(0.38, 0.38)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentUmbra" parent="." instance=ExtResource("6_xiib5")]
+[node name="OpponentUmbra" parent="." unique_id=1612739560 instance=ExtResource("6_xiib5")]
 position = Vector2(1327, 500)
-rotation = -3.14159
+scale = Vector2(0.38, 0.38)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentArcane" parent="." instance=ExtResource("7_g3co2")]
+[node name="OpponentArcane" parent="." unique_id=367524322 instance=ExtResource("7_g3co2")]
 position = Vector2(1362, 465)
-rotation = -3.14159
+scale = Vector2(0.45, 0.45)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentExia" parent="." instance=ExtResource("8_y5yek")]
+[node name="OpponentExia" parent="." unique_id=234824515 instance=ExtResource("8_y5yek")]
 position = Vector2(1327, 465)
-rotation = -3.14159
+scale = Vector2(0.38, 0.38)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentCrux" parent="." instance=ExtResource("9_gimyw")]
+[node name="OpponentCrux" parent="." unique_id=326146833 instance=ExtResource("9_gimyw")]
 position = Vector2(1362, 430)
-rotation = -3.14159
-script = null
+scale = Vector2(0.45, 0.45)
 
-[node name="OpponentTera" parent="." instance=ExtResource("10_hldlb")]
+[node name="OpponentTera" parent="." unique_id=765129002 instance=ExtResource("10_hldlb")]
 position = Vector2(1362, 395)
-rotation = -3.14159
+scale = Vector2(0.38, 0.38)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentNeos" parent="." instance=ExtResource("11_q7drv")]
+[node name="OpponentNeos" parent="." unique_id=40823860 instance=ExtResource("11_q7drv")]
 position = Vector2(1327, 395)
-rotation = -3.14159
+scale = Vector2(0.38, 0.38)
+script = ExtResource("13_6ql4t")
 
-[node name="OpponentLuxem" parent="." instance=ExtResource("12_td0eo")]
+[node name="OpponentLuxem" parent="." unique_id=1607869790 instance=ExtResource("12_td0eo")]
 position = Vector2(1327, 430)
-rotation = -3.14159
+scale = Vector2(0.38, 0.38)
+script = ExtResource("13_6ql4t")

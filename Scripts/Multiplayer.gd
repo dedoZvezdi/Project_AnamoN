@@ -295,9 +295,12 @@ func sync_deck_data(player_id: int, ga_deck: Array, mat_deck: Array):
 @rpc("any_peer", "reliable")
 func sync_element(element_name: String, alpha: float):
 	var opp_element_path = "OpponentField/OpponentElements/Opponent" + element_name
-	var opp_element = get_node(opp_element_path)
+	var opp_element = get_node_or_null(opp_element_path)
 	if opp_element:
 		opp_element.get_node("Sprite2D").modulate.a = alpha
+		var elements_container = opp_element.get_parent()
+		if elements_container and elements_container.has_method("refresh_layout"):
+			elements_container.refresh_layout()
 
 @rpc("any_peer", "reliable")
 func sync_opponent_phase(phase_name: String):
