@@ -27,6 +27,10 @@
 [ext_resource type="Texture2D" uid="uid://e5jfv2giu16v" path="res://Assets/Textures/Player Info/Over_Blue.png" id="25_g5k7o"]
 [ext_resource type="Texture2D" uid="uid://dtq5vw2bx7em6" path="res://Assets/Textures/Player Info/Progress_Blue.png" id="26_vx5jb"]
 [ext_resource type="Texture2D" uid="uid://bsfe2cbkcwbrn" path="res://Assets/Textures/Player Info/Player_photos/Player_Image.png" id="27_g5k7o"]
+[ext_resource type="Script" uid="uid://dtl8d6lqww58o" path="res://Scripts/PlayerElements.gd" id="new_script_player_elements"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g5k7o"]
+size = Vector2(213, 14)
 
 [node name="PlayerField" type="Node2D" unique_id=260745692]
 script = ExtResource("1_uld4x")
@@ -79,6 +83,7 @@ script = ExtResource("15_5crox")
 [node name="CardInformation" parent="." unique_id=1669797766 instance=ExtResource("16_fcs35")]
 
 [node name="Elements" parent="." unique_id=1706581851 instance=ExtResource("17_0shgc")]
+script = ExtResource("new_script_player_elements")
 
 [node name="Logo" parent="." unique_id=689740173 instance=ExtResource("18_awdcn")]
 position = Vector2(590, 956)
@@ -92,7 +97,6 @@ script = ExtResource("21_h2qut")
 position = Vector2(-1454, 0)
 
 [node name="Player_Info" type="Control" parent="." unique_id=187934437]
-visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 430.0
@@ -111,3 +115,10 @@ texture_progress = ExtResource("26_vx5jb")
 texture = ExtResource("27_g5k7o")
 texture_scale = Vector2(4, 4)
 polygon = PackedVector2Array(43, 6, 9, 26, 9, 66, 44, 86, 78, 66, 78, 26)
+
+[node name="ElementsArea2D" type="Area2D" parent="Player_Info" unique_id=690539420]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player_Info/ElementsArea2D" unique_id=565620193]
+position = Vector2(315.5, 14)
+shape = SubResource("RectangleShape2D_g5k7o")
+disabled = true

@@ -366,3 +366,55 @@ func fix_weird_quotes_and_dashes(text: String) -> String:
 	for weird_char in replacements:
 		text = text.replace(weird_char, replacements[weird_char])
 	return text
+
+func get_card_element(slug: String) -> String:
+	if not slug or not card_database_reference:
+		return ""
+	if not card_database_reference.cards_db.has(slug):
+		return ""
+	var data = card_database_reference.cards_db[slug]
+	var element_to_display = null
+	if data.has("element") and data["element"] != null:
+		element_to_display = data["element"]
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"])
+		if base_slug and card_database_reference.cards_db.has(base_slug):
+			var base_data = card_database_reference.cards_db[base_slug]
+			if base_data.has("element") and base_data["element"] != null:
+				element_to_display = base_data["element"]
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database_reference.cards_db.has(parent_slug):
+			var parent_data = card_database_reference.cards_db[parent_slug]
+			if parent_data.has("element") and parent_data["element"] != null:
+				element_to_display = parent_data["element"]		
+	return str(element_to_display) if element_to_display else ""
+
+func is_card_of_type(slug: String, target_type: String) -> bool:
+	if not slug or not card_database_reference:
+		return false
+	if not card_database_reference.cards_db.has(slug):
+		return false
+	var data = card_database_reference.cards_db[slug]
+	var target_upper = target_type.to_upper()
+	if data.has("types") and data["types"] is Array:
+		for t in data["types"]:
+			if str(t).to_upper() == target_upper:
+				return true
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"])
+		if base_slug and card_database_reference.cards_db.has(base_slug):
+			var base_data = card_database_reference.cards_db[base_slug]
+			if base_data.has("types") and base_data["types"] is Array:
+				for t in base_data["types"]:
+					if str(t).to_upper() == target_upper:
+						return true
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database_reference.cards_db.has(parent_slug):
+			var parent_data = card_database_reference.cards_db[parent_slug]
+			if parent_data.has("types") and parent_data["types"] is Array:
+				for t in parent_data["types"]:
+					if str(t).to_upper() == target_upper:
+						return true		
+	return false

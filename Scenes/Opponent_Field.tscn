@@ -10,42 +10,79 @@
 [ext_resource type="PackedScene" uid="uid://bbtnckf2a2use" path="res://Scenes/Opponent_Elements.tscn" id="8_xqfjh"]
 [ext_resource type="PackedScene" uid="uid://dulc360ofen1q" path="res://Scenes/Opponent_Memory.tscn" id="9_4t60u"]
 [ext_resource type="PackedScene" uid="uid://c8w8ptylfbntf" path="res://Scenes/Opponent_Logo.tscn" id="10_4t60u"]
+[ext_resource type="Texture2D" uid="uid://4ya7n805x51x" path="res://Assets/Textures/Player Info/Over_Yellow_Mirrored.png" id="12_j2155"]
+[ext_resource type="Texture2D" uid="uid://blxkfgnsip0ov" path="res://Assets/Textures/Player Info/Progress_Yellow_Mirrored.png" id="13_urkt4"]
+[ext_resource type="Texture2D" uid="uid://bsfe2cbkcwbrn" path="res://Assets/Textures/Player Info/Player_photos/Player_Image.png" id="13_xqfjh"]
+[ext_resource type="Script" uid="uid://dk06c13rk3fwj" path="res://Scripts/OpponentFieldElements.gd" id="14_4t60u"]
 
-[node name="OpponentField" type="Node2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_urkt4"]
+size = Vector2(213, 14)
 
-[node name="CardManager" type="Node2D" parent="."]
+[node name="OpponentField" type="Node2D" unique_id=1833191212]
 
-[node name="FieldGaOpponent" type="Sprite2D" parent="."]
+[node name="CardManager" type="Node2D" parent="." unique_id=2047622381]
+
+[node name="FieldGaOpponent" type="Sprite2D" parent="." unique_id=1536050888]
 z_index = -2
 position = Vector2(980, 284)
 rotation = -3.14159
 scale = Vector2(0.474, 0.474)
 texture = ExtResource("2_we22y")
 
-[node name="OpponentHand" type="Node2D" parent="."]
+[node name="OpponentHand" type="Node2D" parent="." unique_id=1837109968]
 script = ExtResource("3_4t60u")
 
-[node name="OpponentDeck" parent="." instance=ExtResource("4_t0cvg")]
+[node name="OpponentDeck" parent="." unique_id=169504300 instance=ExtResource("4_t0cvg")]
 position = Vector2(599.5, 304)
 scale = Vector2(0.9, 0.9)
 
-[node name="OpponentMatDeck" parent="." instance=ExtResource("5_ypfnt")]
+[node name="OpponentMatDeck" parent="." unique_id=1701799103 instance=ExtResource("5_ypfnt")]
 position = Vector2(1361, 304)
 scale = Vector2(0.9, 0.9)
 
-[node name="OpponentBanish" parent="." instance=ExtResource("6_admix")]
+[node name="OpponentBanish" parent="." unique_id=32430320 instance=ExtResource("6_admix")]
 position = Vector2(0, 4)
 
-[node name="OpponentGraveyard" parent="." instance=ExtResource("7_j2155")]
+[node name="OpponentGraveyard" parent="." unique_id=1809076686 instance=ExtResource("7_j2155")]
 position = Vector2(0, 4)
 
-[node name="OpponentElements" parent="." instance=ExtResource("8_xqfjh")]
+[node name="OpponentElements" parent="." unique_id=108621285 instance=ExtResource("8_xqfjh")]
+script = ExtResource("14_4t60u")
 
-[node name="OpponentMainField" parent="." instance=ExtResource("8_we22y")]
+[node name="OpponentMainField" parent="." unique_id=2123578278 instance=ExtResource("8_we22y")]
 position = Vector2(999, 374)
 
-[node name="OpponentMemory" parent="." instance=ExtResource("9_4t60u")]
+[node name="OpponentMemory" parent="." unique_id=1981489984 instance=ExtResource("9_4t60u")]
 position = Vector2(985, 111)
 
-[node name="ОpponentLogo" parent="." instance=ExtResource("10_4t60u")]
+[node name="ОpponentLogo" parent="." unique_id=8991340 instance=ExtResource("10_4t60u")]
 position = Vector2(1370, 124)
+
+[node name="Opponents_Info" type="Control" parent="." unique_id=405381721]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 100.0
+offset_right = 430.0
+offset_bottom = 200.0
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="Opponents_Info" unique_id=1874446367]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+value = 60.0
+fill_mode = 1
+texture_over = ExtResource("12_j2155")
+texture_progress = ExtResource("13_urkt4")
+
+[node name="Polygon2D" type="Polygon2D" parent="Opponents_Info" unique_id=430269409]
+position = Vector2(339, 0)
+texture = ExtResource("13_xqfjh")
+texture_scale = Vector2(4, 4)
+polygon = PackedVector2Array(43, 6, 9, 26, 9, 66, 44, 86, 78, 66, 78, 26)
+
+[node name="ElementsArea2D" type="Area2D" parent="Opponents_Info" unique_id=1544681536]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Opponents_Info/ElementsArea2D" unique_id=162856756]
+position = Vector2(110.5, 14)
+shape = SubResource("RectangleShape2D_urkt4")
+disabled = true

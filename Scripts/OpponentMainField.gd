@@ -4,6 +4,7 @@ var cards_in_field: Array = []
 var base_position := Vector2.ZERO
 var current_mastery_card: Node = null
 var current_champion_card: Node = null
+var first_champion_summoned = false
 
 func is_champion_card(card) -> bool:
 	if not card or not is_instance_valid(card):
@@ -17,44 +18,9 @@ func is_champion_card(card) -> bool:
 	var card_info = null
 	if root:
 		card_info = find_node_by_script(root, "res://Scripts/CardInformation.gd")
-	if not card_info or not card_info.card_database_reference:
-		return false
-	var db = card_info.card_database_reference
-	if not db.cards_db.has(slug):
-		return false
-	var data = db.cards_db[slug]
-	if data.has("types") and data["types"] is Array:
-		for t in data["types"]:
-			if str(t).to_upper() == "CHAMPION":
-				return true
-	if data.has("edition_id") and not data.has("parent_orientation_slug"):
-		var base_slug = find_base_card_for_edition(data["edition_id"], db)
-		if base_slug and db.cards_db.has(base_slug):
-			var base_data = db.cards_db[base_slug]
-			if base_data.has("types") and base_data["types"] is Array:
-				for card_type in base_data["types"]:
-					if str(card_type).to_upper() == "CHAMPION":
-						return true
-	elif data.has("parent_orientation_slug"):
-		var parent_slug = data["parent_orientation_slug"]
-		if db.cards_db.has(parent_slug):
-			var parent_data = db.cards_db[parent_slug]
-			if parent_data.has("types") and parent_data["types"] is Array:
-				for card_type in parent_data["types"]:
-					if str(card_type).to_upper() == "CHAMPION":
-						return true
+	if card_info and card_info.has_method("is_card_of_type"):
+		return card_info.is_card_of_type(slug, "CHAMPION")
 	return false
-
-func find_base_card_for_edition(edition_id, card_database):
-	if not card_database:
-		return null
-	for slug in card_database.cards_db:
-		var data = card_database.cards_db[slug]
-		if data.has("editions"):
-			for edition in data["editions"]:
-				if edition.get("edition_id") == edition_id:
-					return slug
-	return null
 
 func find_node_by_script(node: Node, script_path: String) -> Node:
 	if node.get_script() and node.get_script().resource_path == script_path:
@@ -64,6 +30,46 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 		if result:
 			return result
 	return null
+
+func activate_champion_elements(card):
+	if not card or not is_instance_valid(card):
+		return
+	var card_slug = ""
+	if card.has_meta("slug"):
+		card_slug = card.get_meta("slug")
+	if card_slug == "":
+		return
+	var root = get_tree().current_scene
+	var card_info = null
+	if root:
+		card_info = find_node_by_script(root, "res://Scripts/CardInformation.gd")
+	if not card_info:
+		return
+	var element_name = ""
+	if card_info.has_method("get_card_element"):
+		element_name = card_info.get_card_element(card_slug)
+	if element_name == "":
+		return
+	var elements_node = get_parent().get_node_or_null("OpponentElements")
+	if not elements_node:
+		if root:
+			elements_node = root.find_child("OpponentElements", true, false)	
+	if elements_node:
+		if not first_champion_summoned:
+			var norm = elements_node.get_node_or_null("OpponentNorm")
+			if norm and norm.has_method("activate"):
+				norm.activate()
+			elif norm:
+				var sprite = norm.get_node_or_null("Sprite2D")
+				if sprite: sprite.modulate.a = 1.0
+			first_champion_summoned = true
+		var capitalized_name = str(element_name).capitalize()
+		var element_node = elements_node.get_node_or_null("Opponent" + capitalized_name)
+		if element_node and element_node.has_method("activate"):
+			element_node.activate()
+		elif element_node:
+			var sprite = element_node.get_node_or_null("Sprite2D")
+			if sprite: sprite.modulate.a = 1.0
 
 func notify_card_transformed(card: Node):
 	if is_champion_card(card):
@@ -87,6 +93,7 @@ func notify_card_transformed(card: Node):
 				card.add_to_lineage({"slug": old_slug, "uuid": old_uuid})
 			remove_previous_champions()
 		current_champion_card = card
+		activate_champion_elements(card)
 		card.global_position = global_position + Vector2(0, 20)
 		card.z_index = 400
 	elif card == current_champion_card:
@@ -129,6 +136,7 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 				card.add_to_lineage({"slug": old_slug, "uuid": old_uuid})
 			remove_previous_champions()
 		current_champion_card = card
+		activate_champion_elements(card)
 		card.global_position = global_position + Vector2(0, 20)
 	elif is_mastery_card(card):
 		if current_mastery_card != null and current_mastery_card != card:
