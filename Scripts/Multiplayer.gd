@@ -185,7 +185,13 @@ func validate_ip_and_port() -> bool:
 		return false
 	return true
 
+func _close_existing_dialogs():
+	for child in get_tree().current_scene.get_children():
+		if child is AcceptDialog:
+			child.queue_free()
+
 func show_popup(message: String):
+	_close_existing_dialogs()
 	var dialog = AcceptDialog.new()
 	dialog.dialog_text = message
 	dialog.title = "INFO" if message.contains("started") else "ERROR"
@@ -245,6 +251,7 @@ func show_turn_popup(message: String):
 		var phases = player_field.get_node_or_null("Phases")
 		if phases and phases.has_method("update_phase_visuals"):
 			phases.update_phase_visuals()
+	_close_existing_dialogs()
 	var dialog = AcceptDialog.new()
 	dialog.dialog_text = message
 	dialog.title = "TURN ORDER"
