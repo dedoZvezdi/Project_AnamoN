@@ -248,7 +248,6 @@ func build_main_menu():
 	add_custom_item("RPS", 104)
 	add_custom_item("Status Modification", 105)
 	add_custom_item("Counters", 107)
-	add_custom_item("Add Counters", 108)
 	add_custom_item("Summon Token", 106)
 	add_custom_item("Summon Mastery", 109)
 	add_custom_item("Surrender", 103, {}, true)
@@ -329,25 +328,6 @@ func adjust_custom_menu_position():
 		pos.y = 0
 	logo_menu.global_position = pos
 
-func build_predefined_counters_menu():
-	showing_dice_menu = false
-	showing_rps_menu = false
-	showing_status_menu = false
-	showing_level_menu = false
-	showing_durability_menu = false
-	showing_power_menu = false
-	showing_life_menu = false
-	showing_counters_menu = true
-	showing_specific_counter_menu = false
-	clear_custom_menu()
-	var predefined = ["Buff", "Debuff", "Enlighten", "Omen"]
-	for c_name in predefined:
-		add_custom_item(c_name + " +", 700, {"action": "increase", "counter": c_name})
-		if c_name != "Buff" and c_name != "Debuff":
-			add_custom_item(c_name + " -", 700, {"action": "decrease", "counter": c_name})
-	add_custom_item("Back", 999, {}, true)
-	finalize_custom_menu()
-
 func build_counters_menu():
 	showing_dice_menu = false
 	showing_rps_menu = false
@@ -360,10 +340,9 @@ func build_counters_menu():
 	showing_specific_counter_menu = false
 	clear_custom_menu()
 	add_custom_item("Add", 501)
-	var predefined = ["Buff", "Debuff", "Enlighten", "Omen"]
 	for counter_name in custom_counters.keys():
-		if not predefined.has(counter_name):
-			add_custom_item(counter_name + " +", 700, {"action": "increase", "counter": counter_name})
+		add_custom_item(counter_name + " +", 700, {"action": "increase", "counter": counter_name})
+		if counter_name != "Buff" and counter_name != "Debuff" and counter_name != "Enlighten" and counter_name != "Omen":
 			add_custom_item(counter_name + " -", 700, {"action": "decrease", "counter": counter_name})
 	add_custom_item("Back", 999, {}, true)
 	finalize_custom_menu()
@@ -520,8 +499,6 @@ func _handle_menu_action(id, metadata = {}):
 		elif id == 105:
 			build_status_menu()
 		elif id == 107:
-			build_predefined_counters_menu()
-		elif id == 108:
 			build_counters_menu()
 		elif id == 106:
 			logo_menu.hide()
@@ -624,10 +601,7 @@ func _handle_menu_action(id, metadata = {}):
 				elif action == "decrease":
 					custom_counters[counter_name] -= 1
 				update_status_display()
-				if ["Buff", "Debuff", "Enlighten", "Omen"].has(counter_name):
-					build_predefined_counters_menu()
-				else:
-					build_counters_menu()
+				build_counters_menu()
 
 func fetch_slugs_by_type(target_type: String) -> Array:
 	var slugs = []

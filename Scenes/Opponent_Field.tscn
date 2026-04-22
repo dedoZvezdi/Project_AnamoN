@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://dulc360ofen1q" path="res://Scenes/Opponent_Memory.tscn" id="9_4t60u"]
 [ext_resource type="PackedScene" uid="uid://c8w8ptylfbntf" path="res://Scenes/Opponent_Logo.tscn" id="10_4t60u"]
 [ext_resource type="Texture2D" uid="uid://4ya7n805x51x" path="res://Assets/Textures/Player Info/Over_Yellow_Mirrored.png" id="12_j2155"]
+[ext_resource type="Script" uid="uid://bwf674fkbyuad" path="res://Scripts/OpponentsInfo.gd" id="12_xqfjh"]
 [ext_resource type="Texture2D" uid="uid://blxkfgnsip0ov" path="res://Assets/Textures/Player Info/Progress_Yellow_Mirrored.png" id="13_urkt4"]
 [ext_resource type="Texture2D" uid="uid://bsfe2cbkcwbrn" path="res://Assets/Textures/Player Info/Player_photos/Player_Image.png" id="13_xqfjh"]
 [ext_resource type="Script" uid="uid://dk06c13rk3fwj" path="res://Scripts/OpponentFieldElements.gd" id="14_4t60u"]
@@ -64,6 +65,7 @@ anchors_preset = 0
 offset_top = 100.0
 offset_right = 430.0
 offset_bottom = 200.0
+script = ExtResource("12_xqfjh")
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="Opponents_Info" unique_id=1874446367]
 layout_mode = 0

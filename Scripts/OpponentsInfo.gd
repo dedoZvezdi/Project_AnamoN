@@ -1,10 +1,9 @@
 extends Control
 
 @onready var texture_progress_bar = $TextureProgressBar
-@onready var polygon_node = $Polygon2D
 
 var card_info_node = null
-var main_field_node = null
+var opponent_main_field_node = null
 var last_champion_instance = null
 var cached_base_life = 0
 
@@ -15,7 +14,7 @@ func _find_nodes():
 	var root = get_tree().current_scene
 	if root:
 		card_info_node = find_node_by_script(root, "res://Scripts/CardInformation.gd")
-		main_field_node = root.find_child("MAINFIELD", true, false)
+		opponent_main_field_node = root.find_child("OpponentMainField", true, false)
 
 func find_node_by_script(node: Node, script_path: String) -> Node:
 	if node.get_script() and node.get_script().resource_path == script_path:
@@ -29,12 +28,12 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 func _process(_delta):
 	if not texture_progress_bar:
 		return
-	if not main_field_node or not is_instance_valid(main_field_node):
+	if not opponent_main_field_node or not is_instance_valid(opponent_main_field_node):
 		_find_nodes()
-		if not main_field_node:
+		if not opponent_main_field_node:
 			texture_progress_bar.value = 100
 			return
-	var champion = main_field_node.get("current_champion_card")
+	var champion = opponent_main_field_node.get("current_champion_card")
 	if not champion or not is_instance_valid(champion):
 		texture_progress_bar.value = 100
 		last_champion_instance = null
