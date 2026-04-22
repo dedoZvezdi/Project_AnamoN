@@ -19,34 +19,55 @@ func activate_champion_elements(card):
 	if not card or not is_instance_valid(card):
 		return
 	var root = get_tree().current_scene
-	var card_info_ref = find_card_information_reference()
-	if not card_info_ref or not card_info_ref.card_database_reference:
-		if root and root.has_method("find_child"):
-			card_info_ref = root.find_child("CardInformation", true, false)
-	if not card_info_ref or not card_info_ref.card_database_reference:
-		return
 	var card_slug = get_card_slug(card)
 	if card_slug == "":
-		return
-	var element_name = ""
-	if card_info_ref.has_method("get_card_element"):
-		element_name = card_info_ref.get_card_element(card_slug)
-	if element_name == "":
 		return
 	var elements_node = get_parent().get_node_or_null("Elements")
 	if not elements_node:
 		if root and root.has_method("find_child"):
 			elements_node = root.find_child("Elements", true, false)	
+	if not elements_node:
+		return
+	if card_slug.contains("prismatic-sanctuary"):
+		for e_name in ["Fire", "Water", "Wind"]:
+			var e_node = elements_node.get_node_or_null(e_name)
+			if e_node and e_node.has_method("activate"):
+				e_node.activate()
+	if is_champion_card(card):
+		var card_info_ref = find_card_information_reference()
+		if not card_info_ref or not card_info_ref.card_database_reference:
+			if root and root.has_method("find_child"):
+				card_info_ref = root.find_child("CardInformation", true, false)
+		var element_name = ""
+		if card_info_ref and card_info_ref.has_method("get_card_element"):
+			element_name = card_info_ref.get_card_element(card_slug)
+		if element_name != "":
+			if not first_champion_summoned:
+				var norm = elements_node.get_node_or_null("Norm")
+				if norm and norm.has_method("activate"):
+					norm.activate()
+				first_champion_summoned = true
+			var capitalized_name = str(element_name).capitalize()
+			var element_node = elements_node.get_node_or_null(capitalized_name)
+			if element_node and element_node.has_method("activate"):
+				element_node.activate()
+
+func deactivate_card_elements(card):
+	if not card or not is_instance_valid(card):
+		return
+	var card_slug = get_card_slug(card)
+	if not card_slug.contains("prismatic-sanctuary"):
+		return
+	var root = get_tree().current_scene
+	var elements_node = get_parent().get_node_or_null("Elements")
+	if not elements_node:
+		if root and root.has_method("find_child"):
+			elements_node = root.find_child("Elements", true, false)	
 	if elements_node:
-		if not first_champion_summoned:
-			var norm = elements_node.get_node_or_null("Norm")
-			if norm and norm.has_method("activate"):
-				norm.activate()
-			first_champion_summoned = true
-		var capitalized_name = str(element_name).capitalize()
-		var element_node = elements_node.get_node_or_null(capitalized_name)
-		if element_node and element_node.has_method("activate"):
-			element_node.activate()
+		for e_name in ["Fire", "Water", "Wind"]:
+			var e_node = elements_node.get_node_or_null(e_name)
+			if e_node and e_node.has_method("deactivate"):
+				e_node.deactivate()
 
 @warning_ignore("shadowed_variable_base_class")
 func add_card_to_field(card, position = null):
@@ -76,14 +97,13 @@ func add_card_to_field(card, position = null):
 				if card.has_method("add_to_lineage"):
 					var lineage_data = {
 						"slug": get_card_slug(current_champion_card),
-						"uuid": current_champion_card.uuid if "uuid" in current_champion_card else ""
-					}
+						"uuid": current_champion_card.uuid if "uuid" in current_champion_card else ""}
 					card.add_to_lineage(lineage_data)
 				remove_previous_champions()
 			current_champion_card = card
 			cards_in_field.append(card)
 			card_in_slot = true
-		activate_champion_elements(card)
+			activate_champion_elements(card)
 		if card and is_instance_valid(card) and card.has_method("apply_champion_life_delta"):
 			card.apply_champion_life_delta(champion_life_delta)
 		card.global_position = global_position + Vector2(0, -20)
@@ -113,6 +133,8 @@ func add_card_to_field(card, position = null):
 			current_mastery_card = card
 			cards_in_field.append(card)
 			card_in_slot = true
+			if get_card_slug(card).contains("prismatic-sanctuary"):
+				activate_champion_elements(card)
 		if position != null:
 			card.global_position = position
 		else:
@@ -131,6 +153,8 @@ func add_card_to_field(card, position = null):
 		if not (card in cards_in_field):
 			cards_in_field.append(card)
 			card_in_slot = true
+			if get_card_slug(card).contains("prismatic-sanctuary"):
+				activate_champion_elements(card)
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
 		if position != null:
@@ -157,6 +181,7 @@ func remove_previous_champions():
 		if current_champion_card.get_parent():
 			current_champion_card.get_parent().remove_child(current_champion_card)
 		current_champion_card.queue_free()
+		deactivate_card_elements(current_champion_card)
 		current_champion_card = null
 		
 func is_champion_card(card) -> bool:
@@ -189,6 +214,7 @@ func remove_previous_mastery():
 		if current_mastery_card.get_parent():
 			current_mastery_card.get_parent().remove_child(current_mastery_card)
 		current_mastery_card.queue_free()
+		deactivate_card_elements(current_mastery_card)
 		current_mastery_card = null
 
 func is_mastery_card(card) -> bool:
@@ -229,6 +255,7 @@ func remove_card_from_field(card):
 			current_champion_card = null
 		if card == current_mastery_card:
 			current_mastery_card = null
+		deactivate_card_elements(card)
 
 func bring_card_to_front(card):
 	if not card or not is_instance_valid(card):

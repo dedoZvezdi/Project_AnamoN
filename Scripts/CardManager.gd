@@ -555,7 +555,7 @@ func free_card_from_slot(card):
 						if slot.has_property("card_in_slot"):
 							slot.card_in_slot = false
 						break
-	var all_nodes = get_tree().get_nodes_in_group("")
+	var all_nodes = get_tree().get_nodes_in_group("main_fields")
 	for node in all_nodes:
 		if node.name == "MAINFIELD" and is_instance_valid(node) and node.has_method("remove_card_from_field"):
 			if card in node.cards_in_field:
@@ -921,7 +921,7 @@ func cleanup():
 func remove_card_from_main_field(card):
 	if not card or not is_instance_valid(card):
 		return
-	var all_nodes = get_tree().get_nodes_in_group("")
+	var all_nodes = get_tree().get_nodes_in_group("main_fields")
 	for node in all_nodes:
 		if node.name == "MAINFIELD" and is_instance_valid(node) and node.has_method("remove_card_from_field"):
 			if card in node.cards_in_field:
