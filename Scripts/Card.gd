@@ -891,7 +891,7 @@ func apply_logo_status_to_self(logo_node):
 				attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_valc
 			var keys_to_remove = []
 			for k in attached_counters.keys():
-				if attached_counters[k] <= 0:
+				if attached_counters[k] == 0:
 					keys_to_remove.append(k)
 			for k in keys_to_remove:
 				attached_counters.erase(k)
@@ -920,6 +920,7 @@ func apply_champion_life_delta(delta):
 			card_level_lable.clear()
 		if card_PLDS_lable:
 			card_PLDS_lable.clear()
+		sync_stats_to_opponent()
 
 func can_be_marked() -> bool:
 	var parent = current_field if current_field else get_parent()
