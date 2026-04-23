@@ -257,10 +257,6 @@ func start_drag(card):
 		card.on_drag_start()
 	else:
 		card.rotation = 0.0
-	remove_card_from_rotated_slot(card)
-	remove_card_from_memory_slot(card)
-	remove_card_from_main_field(card)
-	remove_card_from_single_card_slot(card)
 	var graveyard_slot = get_graveyard_slot_for_card(card)
 	var banish_slot = get_banish_slot_for_card(card)
 	if graveyard_slot and graveyard_slot.has_method("get_top_card"):
@@ -290,10 +286,13 @@ func finish_drag():
 		card_being_dragged = null
 		return
 	_clear_memory_highlights()
-	free_card_from_slot(card)
 	if card.has_method("on_drag_end"):
 		card.on_drag_end()
 	var card_slot_found = raycast_check_for_card_single_slot()
+	var is_staying_on_mainfield = (drag_source_was_main_field and card_slot_found and card_slot_found.name == "MAINFIELD")
+	free_card_from_slot(card, is_staying_on_mainfield)
+	if drag_source_was_main_field and not is_staying_on_mainfield:
+		remove_card_from_main_field(card)
 	var is_banish_restricted = false
 	if dragged_from_grid and original_zone == "banish":
 		if card.has_method("is_champion_card") and card.is_champion_card():
@@ -540,7 +539,7 @@ func _return_mat_card_to_deck(card):
 		card.queue_free()
 	dragged_from_grid = false
 
-func free_card_from_slot(card):
+func free_card_from_slot(card, skip_mainfield = false):
 	if not card or not is_instance_valid(card):
 		return
 	if card.has_node("Area2D/CollisionShape2D"):
@@ -555,12 +554,13 @@ func free_card_from_slot(card):
 						if slot.has_property("card_in_slot"):
 							slot.card_in_slot = false
 						break
-	var all_nodes = get_tree().get_nodes_in_group("main_fields")
-	for node in all_nodes:
-		if node.name == "MAINFIELD" and is_instance_valid(node) and node.has_method("remove_card_from_field"):
-			if card in node.cards_in_field:
-				node.remove_card_from_field(card)
-				break
+	if not skip_mainfield:
+		var all_nodes = get_tree().get_nodes_in_group("main_fields")
+		for node in all_nodes:
+			if node.name == "MAINFIELD" and is_instance_valid(node) and node.has_method("remove_card_from_field"):
+				if card in node.cards_in_field:
+					node.remove_card_from_field(card)
+					break			
 	var single_card_slots = get_tree().get_nodes_in_group("single_card_slots")
 	for slot in single_card_slots:
 		if is_instance_valid(slot) and slot.has_method("remove_card_from_slot"):

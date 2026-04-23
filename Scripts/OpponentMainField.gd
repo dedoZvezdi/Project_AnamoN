@@ -56,9 +56,11 @@ func activate_champion_elements(card):
 			var e_node = elements_node.get_node_or_null("Opponent" + e_name)
 			if e_node and e_node.has_method("activate"):
 				e_node.activate()
-			elif e_node:
-				var sprite = e_node.get_node_or_null("Sprite2D")
-				if sprite: sprite.modulate.a = 1.0
+	elif card_slug.contains("prismatic-perseverance"):
+		for e_name in ["Norm", "Fire", "Water", "Wind", "Astra", "Umbra", "Arcane", "Exia", "Crux", "Tera", "Neos", "Luxem"]:
+			var e_node = elements_node.get_node_or_null("Opponent" + e_name)
+			if e_node and e_node.has_method("activate"):
+				e_node.activate()
 	if is_champion_card(card):
 		var element_name = ""
 		if card_info.has_method("get_card_element"):
@@ -68,17 +70,11 @@ func activate_champion_elements(card):
 				var norm = elements_node.get_node_or_null("OpponentNorm")
 				if norm and norm.has_method("activate"):
 					norm.activate()
-				elif norm:
-					var sprite = norm.get_node_or_null("Sprite2D")
-					if sprite: sprite.modulate.a = 1.0
 				first_champion_summoned = true
 			var capitalized_name = str(element_name).capitalize()
 			var element_node = elements_node.get_node_or_null("Opponent" + capitalized_name)
 			if element_node and element_node.has_method("activate"):
 				element_node.activate()
-			elif element_node:
-				var sprite = element_node.get_node_or_null("Sprite2D")
-				if sprite: sprite.modulate.a = 1.0
 
 func deactivate_card_elements(card):
 	if not card or not is_instance_valid(card):
@@ -86,7 +82,7 @@ func deactivate_card_elements(card):
 	var card_slug = ""
 	if card.has_meta("slug"):
 		card_slug = card.get_meta("slug")
-	if not card_slug.contains("prismatic-sanctuary"):
+	if not (card_slug.contains("prismatic-sanctuary") or card_slug.contains("prismatic-perseverance")):
 		return
 	var root = get_tree().current_scene
 	var elements_node = get_parent().get_node_or_null("OpponentElements")
@@ -94,13 +90,15 @@ func deactivate_card_elements(card):
 		if root:
 			elements_node = root.find_child("OpponentElements", true, false)	
 	if elements_node:
-		for e_name in ["Fire", "Water", "Wind"]:
+		var elements_to_deactivate = []
+		if card_slug.contains("prismatic-sanctuary"):
+			elements_to_deactivate = ["Fire", "Water", "Wind"]
+		elif card_slug.contains("prismatic-perseverance"):
+			elements_to_deactivate = ["Norm", "Fire", "Water", "Wind", "Astra", "Umbra", "Arcane", "Exia", "Crux", "Tera", "Neos", "Luxem"]
+		for e_name in elements_to_deactivate:
 			var e_node = elements_node.get_node_or_null("Opponent" + e_name)
 			if e_node and e_node.has_method("deactivate"):
 				e_node.deactivate()
-			elif e_node:
-				var sprite = e_node.get_node_or_null("Sprite2D")
-				if sprite: sprite.modulate.a = 0.0
 
 func notify_card_transformed(card: Node):
 	if is_champion_card(card):
@@ -181,13 +179,13 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 			remove_previous_mastery()
 		current_mastery_card = card
 		if not (card in cards_in_field):
-			if get_card_slug(card).contains("prismatic-sanctuary"):
+			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance"):
 				activate_champion_elements(card)
 	if card.has_method("set_current_field"):
 		card.set_current_field(self)
 	if card not in cards_in_field:
 		cards_in_field.append(card)
-		if get_card_slug(card).contains("prismatic-sanctuary") and not is_champion_card(card) and not is_mastery_card(card):
+		if (get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance")) and not is_champion_card(card) and not is_mastery_card(card):
 			activate_champion_elements(card)
 	var card_image = card.get_node_or_null("CardImage")
 	var card_image_back = card.get_node_or_null("CardImageBack")
