@@ -33,6 +33,11 @@ func activate_champion_elements(card):
 			var e_node = elements_node.get_node_or_null(e_name)
 			if e_node and e_node.has_method("activate"):
 				e_node.activate()
+	elif card_slug.contains("prismatic-perseverance"):
+		for e_name in ["Norm", "Fire", "Water", "Wind", "Astra", "Umbra", "Arcane", "Exia", "Crux", "Tera", "Neos", "Luxem"]:
+			var e_node = elements_node.get_node_or_null(e_name)
+			if e_node and e_node.has_method("activate"):
+				e_node.activate()
 	if is_champion_card(card):
 		var card_info_ref = find_card_information_reference()
 		if not card_info_ref or not card_info_ref.card_database_reference:
@@ -56,7 +61,7 @@ func deactivate_card_elements(card):
 	if not card or not is_instance_valid(card):
 		return
 	var card_slug = get_card_slug(card)
-	if not card_slug.contains("prismatic-sanctuary"):
+	if not (card_slug.contains("prismatic-sanctuary") or card_slug.contains("prismatic-perseverance")):
 		return
 	var root = get_tree().current_scene
 	var elements_node = get_parent().get_node_or_null("Elements")
@@ -64,7 +69,12 @@ func deactivate_card_elements(card):
 		if root and root.has_method("find_child"):
 			elements_node = root.find_child("Elements", true, false)	
 	if elements_node:
-		for e_name in ["Fire", "Water", "Wind"]:
+		var elements_to_deactivate = []
+		if card_slug.contains("prismatic-sanctuary"):
+			elements_to_deactivate = ["Fire", "Water", "Wind"]
+		elif card_slug.contains("prismatic-perseverance"):
+			elements_to_deactivate = ["Norm", "Fire", "Water", "Wind", "Astra", "Umbra", "Arcane", "Exia", "Crux", "Tera", "Neos", "Luxem"]
+		for e_name in elements_to_deactivate:
 			var e_node = elements_node.get_node_or_null(e_name)
 			if e_node and e_node.has_method("deactivate"):
 				e_node.deactivate()
@@ -133,7 +143,7 @@ func add_card_to_field(card, position = null):
 			current_mastery_card = card
 			cards_in_field.append(card)
 			card_in_slot = true
-			if get_card_slug(card).contains("prismatic-sanctuary"):
+			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance"):
 				activate_champion_elements(card)
 		if position != null:
 			card.global_position = position
@@ -153,7 +163,7 @@ func add_card_to_field(card, position = null):
 		if not (card in cards_in_field):
 			cards_in_field.append(card)
 			card_in_slot = true
-			if get_card_slug(card).contains("prismatic-sanctuary"):
+			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance"):
 				activate_champion_elements(card)
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
