@@ -29,6 +29,7 @@ var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
 var is_tweening: bool = false
 var original_owner_id = 0
+var chosen_elements := []
 var is_marked = false
 var _dynamic_transform_pairs := {}
 var _transform_pairs_initialized := false
@@ -438,6 +439,18 @@ func banish_lineage_card():
 	if banish_node == null:
 		return
 	var target_uuid = selected_lineage_card_uuid
+	if selected_lineage_card_slug.contains("prismatic-spirit"):
+		for entry in champion_lineage:
+			if entry.get("uuid", "") == target_uuid:
+				var chosen = entry.get("chosen_elements", [])
+				var scene_root = get_tree().current_scene
+				var elements = scene_root.find_child("Elements", true, false)
+				if elements:
+					for e_name in chosen:
+						var e_node = elements.get_node_or_null(e_name)
+						if e_node and e_node.has_method("deactivate"):
+							e_node.deactivate()
+				break
 	remove_from_lineage_by_uuid(target_uuid)
 	var card_scene = load("res://Scenes/Card.tscn")
 	var new_card = card_scene.instantiate()
@@ -487,7 +500,8 @@ func move_to_lineage():
 	var card_uuid = get_uuid()
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_move_to_lineage", multiplayer.get_unique_id(), champion.get_uuid(), card_uuid, card_slug)
+		var chosen = chosen_elements if chosen_elements.size() > 0 else []
+		multiplayer_node.rpc("sync_move_to_lineage", multiplayer.get_unique_id(), champion.get_uuid(), card_uuid, card_slug, chosen)
 	z_index = -1
 	var tween = create_tween()
 	tween.set_parallel(true)
@@ -495,7 +509,7 @@ func move_to_lineage():
 	tween.tween_property(self, "rotation_degrees", original_rotation, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.set_parallel(false)
 	tween.tween_callback(func():
-		var data = {"slug": card_slug, "uuid": card_uuid}
+		var data = {"slug": card_slug, "uuid": card_uuid, "chosen_elements": chosen_elements if chosen_elements.size() > 0 else []}
 		if champion.has_method("add_to_lineage"):
 			champion.add_to_lineage(data)
 		remove_from_current_position())
@@ -1474,6 +1488,7 @@ func _convert_to_opponent_card_visuals(final_pos, final_rot):
 		card_manager.add_child(new_opp_card)
 	new_opp_card.global_position = final_pos
 	new_opp_card.rotation_degrees = final_rot
+	new_opp_card.set_meta("is_given", true)
 	opp_main_field.add_card_to_field(new_opp_card, final_pos, final_rot)
 	var fix_tween = create_tween()
 	fix_tween.tween_property(new_opp_card, "rotation_degrees", final_rot, 0.2)
