@@ -16,6 +16,7 @@ var champion_lineage := []
 var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
 var original_owner_id = 0
+var chosen_elements := []
 var is_marked = false
 var hold_timer = 0.0
 var is_holding_left = false
@@ -368,6 +369,19 @@ func _on_lineage_window_close():
 		lineage_view_window.hide()
 
 func animate_lineage_banish(slug: String, lineage_uuid: String):
+	if slug.contains("prismatic-spirit"):
+		for entry in champion_lineage:
+			if entry.get("uuid", "") == lineage_uuid:
+				var chosen = entry.get("chosen_elements", [])
+				var scene_root = get_tree().current_scene
+				var elements = scene_root.find_child("OpponentElements", true, false)
+				if elements:
+					for e_name in chosen:
+						var e_node = elements.get_node_or_null("Opponent" + e_name)
+						if e_node and e_node.has_method("deactivate"):
+							e_node.deactivate()
+				break
+
 	remove_from_lineage_by_uuid(lineage_uuid)
 	if lineage_view_window and lineage_view_window.visible:
 		open_lineage_window()
@@ -415,24 +429,24 @@ func animate_lineage_banish(slug: String, lineage_uuid: String):
 		else:
 			visual_card.queue_free())
 
-func animate_send_to_lineage(card_node: Node, card_slug: String, card_uuid: String):
+func animate_send_to_lineage(card_to_move: Node, card_slug: String, card_uuid: String, chosen_el: Array = []):
 	var final_callback = func():
-		add_to_lineage({"slug": card_slug, "uuid": card_uuid})
-		if card_node and is_instance_valid(card_node):
-			if card_node.get_parent():
-				if card_node.get_parent().has_method("remove_card_from_field"):
-					card_node.get_parent().remove_card_from_field(card_node)
-				elif card_node.get_parent().has_method("remove_card_from_slot"):
-					card_node.get_parent().remove_card_from_slot(card_node)
+		add_to_lineage({"slug": card_slug, "uuid": card_uuid, "chosen_elements": chosen_el})
+		if card_to_move and is_instance_valid(card_to_move):
+			if card_to_move.get_parent():
+				if card_to_move.get_parent().has_method("remove_card_from_field"):
+					card_to_move.get_parent().remove_card_from_field(card_to_move)
+				elif card_to_move.get_parent().has_method("remove_card_from_slot"):
+					card_to_move.get_parent().remove_card_from_slot(card_to_move)
 				else:
-					card_node.get_parent().remove_child(card_node)
-			card_node.queue_free()
-	if card_node and is_instance_valid(card_node):
-		card_node.z_index = 1000
+					card_to_move.get_parent().remove_child(card_to_move)
+			card_to_move.queue_free()
+	if card_to_move and is_instance_valid(card_to_move):
+		card_to_move.z_index = 1000
 		var tween = create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(card_node, "global_position", global_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-		tween.tween_property(card_node, "rotation_degrees", 0.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(card_to_move, "global_position", global_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(card_to_move, "rotation_degrees", 0.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 		tween.set_parallel(false)
 		tween.tween_callback(final_callback)
 	else:

@@ -260,8 +260,17 @@ func show_turn_popup(message: String):
 
 @rpc("any_peer", "call_local", "reliable")
 func swap_turns():
-	is_my_turn = !is_my_turn
 	var player_field = get_node_or_null("PlayerField")
+	if player_field:
+		var main_field = player_field.get_node_or_null("MAINFIELD")
+		if main_field and main_field.has_method("clear_imperial_seal_activations"):
+			main_field.clear_imperial_seal_activations()
+	var opponent_field = get_node_or_null("OpponentField")
+	if opponent_field:
+		var opp_main_field = opponent_field.get_node_or_null("OpponentMainField")
+		if opp_main_field and opp_main_field.has_method("clear_imperial_seal_activations"):
+			opp_main_field.clear_imperial_seal_activations()
+	is_my_turn = !is_my_turn
 	if player_field:
 		var phases = player_field.get_node_or_null("Phases")
 		if phases:
@@ -923,7 +932,7 @@ func sync_banish_lineage_card(player_id: int, champion_uuid: String, lineage_uui
 		champion_card.animate_lineage_banish(lineage_slug, lineage_uuid)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_lineage(player_id: int, champion_uuid: String, card_uuid: String, card_slug: String):
+func sync_move_to_lineage(player_id: int, champion_uuid: String, card_uuid: String, card_slug: String, chosen_elements: Array = []):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -937,7 +946,7 @@ func sync_move_to_lineage(player_id: int, champion_uuid: String, card_uuid: Stri
 	if not card_to_move:
 		pass
 	if champion_card.has_method("animate_send_to_lineage"):
-		champion_card.animate_send_to_lineage(card_to_move, card_slug, card_uuid)
+		champion_card.animate_send_to_lineage(card_to_move, card_slug, card_uuid, chosen_elements)
 
 @rpc("any_peer", "reliable")
 func sync_give_control(player_id: int, stats: Dictionary):
@@ -1118,6 +1127,7 @@ func _convert_opponent_to_player_card(opp_card: Node, stats: Dictionary, final_p
 	if card_manager.has_method("connect_card_signals"):
 		card_manager.connect_card_signals(new_card)
 	if main_field.has_method("add_card_to_field"):
+		new_card.set_meta("is_given", true)
 		main_field.add_card_to_field(new_card, final_pos)
 		var normalized_rot = fmod(final_rot, 360.0)
 		if normalized_rot < 0:
