@@ -79,7 +79,6 @@ texture_progress = ExtResource("13_urkt4")
 [node name="Polygon2D" type="Polygon2D" parent="Opponents_Info" unique_id=430269409]
 position = Vector2(339, 0)
 texture = ExtResource("13_xqfjh")
-texture_scale = Vector2(4, 4)
 polygon = PackedVector2Array(43, 6, 9, 26, 9, 66, 44, 86, 78, 66, 78, 26)
 
 [node name="ElementsArea2D" type="Area2D" parent="Opponents_Info" unique_id=1544681536]

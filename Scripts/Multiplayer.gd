@@ -13,6 +13,9 @@ var upnp: UPNP
 var connect_timer: Timer
 var use_websocket: bool = false
 var is_my_turn: bool = false
+var USER_PHOTO_PATH = "user://Player_Image.png"
+var DEFAULT_PHOTO_PATH = "res://Assets/Textures/Player Info/Player_photos/Player_Image.png"
+var OPPONENT_PHOTO_FILENAME = "temp_opponent_photo.png"
 
 func _ready():
 	var config = ConfigFile.new()
@@ -21,6 +24,12 @@ func _ready():
 		$Name.text = config.get_value("Player", "Name", "")
 	check.toggled.connect(_on_check_button_toggled)
 	_on_check_button_toggled(check.button_pressed)
+	if FileAccess.file_exists(USER_PHOTO_PATH):
+		var img = Image.load_from_file(USER_PHOTO_PATH)
+		if img:
+			$PhotoPreview.texture = ImageTexture.create_from_image(img)
+	elif ResourceLoader.exists(DEFAULT_PHOTO_PATH):
+		$PhotoPreview.texture = load(DEFAULT_PHOTO_PATH)
 	if not has_node("ConnectTimer"):
 		connect_timer = Timer.new()
 		connect_timer.name = "ConnectTimer"
@@ -28,6 +37,20 @@ func _ready():
 		connect_timer.one_shot = true
 		connect_timer.timeout.connect(_on_connect_timeout)
 		add_child(connect_timer)
+	$FileDialog.add_filter("*.png", "PNG Images")
+	$FileDialog.add_filter("*.jpg", "JPG Images")
+	$FileDialog.add_filter("*.jpeg", "JPEG Images")
+	$PhotoPreview.visible = false
+	_cleanup_temp_files()
+
+func _notification(what):
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_cleanup_temp_files()
+
+func _cleanup_temp_files():
+	var opp_photo = _get_opponent_photo_path()
+	if FileAccess.file_exists(opp_photo):
+		DirAccess.remove_absolute(opp_photo)
 
 func _on_check_button_toggled(is_pressed: bool):
 	use_websocket = is_pressed
@@ -57,6 +80,7 @@ func _on_host_button_pressed() -> void:
 		multiplayer.multiplayer_peer = peer
 		var player_scene = player_field_scene.instantiate()
 		add_child(player_scene)
+		_apply_player_photo_to_field(player_scene)
 		multiplayer.peer_connected.connect(on_peer_connected)
 		var chat_node = player_scene.get_node("Chat")
 		if chat_node:
@@ -75,6 +99,7 @@ func _on_host_button_pressed() -> void:
 		multiplayer.multiplayer_peer = peer
 		var player_scene = player_field_scene.instantiate()
 		add_child(player_scene)
+		_apply_player_photo_to_field(player_scene)
 		multiplayer.peer_connected.connect(on_peer_connected)
 		var chat_node = player_scene.get_node("Chat")
 		if chat_node:
@@ -104,22 +129,24 @@ func _on_join_button_pressed() -> void:
 				connect_timer.stop()
 			var player_scene = player_field_scene.instantiate()
 			add_child(player_scene)
+			_apply_player_photo_to_field(player_scene)
 			var opponent_scene = opponent_field_scene.instantiate()
+			opponent_scene.name = "OpponentField"
 			add_child(opponent_scene)
+			_apply_opponent_photo_to_field(opponent_scene)
+			_send_my_photo_to_peer(1)
 			player_scene.client_set_up()
 			var chat_node = player_scene.get_node("Chat")
 			if chat_node:
 				chat_node.player_name = name_to_use
 			rpc("receive_opponent_name", name_to_use)
 			rpc_id(1, "notify_host_of_join", name_to_use)
-			peer_names[multiplayer.get_unique_id()] = name_to_use
-		)
+			peer_names[multiplayer.get_unique_id()] = name_to_use)
 		multiplayer.connection_failed.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
 			show_popup("Failed to connect to WebSocket server. Check the URL.")
-			reset_ui()
-		)
+			reset_ui())
 		connect_timer.start()
 	else:
 		if not validate_ip_and_port():
@@ -136,22 +163,24 @@ func _on_join_button_pressed() -> void:
 				connect_timer.stop()
 			var player_scene = player_field_scene.instantiate()
 			add_child(player_scene)
+			_apply_player_photo_to_field(player_scene)
 			var opponent_scene = opponent_field_scene.instantiate()
+			opponent_scene.name = "OpponentField"
 			add_child(opponent_scene)
+			_apply_opponent_photo_to_field(opponent_scene)
+			_send_my_photo_to_peer(1)
 			player_scene.client_set_up()
 			var chat_node = player_scene.get_node("Chat")
 			if chat_node:
 				chat_node.player_name = name_to_use
 			rpc("receive_opponent_name", name_to_use)
 			rpc_id(1, "notify_host_of_join", name_to_use)
-			peer_names[multiplayer.get_unique_id()] = name_to_use
-		)
+			peer_names[multiplayer.get_unique_id()] = name_to_use)
 		multiplayer.connection_failed.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
 			show_popup("There is no host with such IP and port.")
-			reset_ui()
-		)
+			reset_ui())
 		connect_timer.start()
 
 func validate_websocket_host() -> bool:
@@ -217,10 +246,91 @@ func _on_connect_timeout():
 		show_popup("Connection timeout. Could not reach the server.")
 		reset_ui()
 
+func _on_change_photo_button_pressed():
+	$FileDialog.popup_centered()
+
+func _on_file_selected(path: String):
+	var img = Image.load_from_file(path)
+	if img:
+		img.resize(85, 85)
+		var err = img.save_png(USER_PHOTO_PATH)
+		if err == OK:
+			pass
+		else:
+			show_popup("Failed to save image to user folder. Error code: " + str(err))
+	else:
+		show_popup("Failed to load image from " + path)
+
+func _apply_player_photo_to_field(field_node: Node):
+	var tex = null
+	if FileAccess.file_exists(USER_PHOTO_PATH):
+		var img = Image.load_from_file(USER_PHOTO_PATH)
+		if img:
+			tex = ImageTexture.create_from_image(img)
+	if not tex and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
+		tex = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
+	if tex:
+		var player_info = field_node.find_child("Player_Info", true, false)
+		if player_info:
+			var poly = player_info.get_node_or_null("Polygon2D")
+			if poly:
+				poly.texture = tex
+
+func _get_opponent_photo_path() -> String:
+	var base_path = ""
+	if OS.has_feature("editor"):
+		base_path = ProjectSettings.globalize_path("res://Data/")
+	else:
+		base_path = OS.get_executable_path().get_base_dir().path_join("Data")
+	if not DirAccess.dir_exists_absolute(base_path):
+		DirAccess.make_dir_recursive_absolute(base_path)
+	return base_path.path_join(OPPONENT_PHOTO_FILENAME)
+
+func _send_my_photo_to_peer(peer_id: int):
+	var photo_path = ""
+	if FileAccess.file_exists(USER_PHOTO_PATH):
+		photo_path = USER_PHOTO_PATH
+	elif ResourceLoader.exists(DEFAULT_PHOTO_PATH):
+		photo_path = DEFAULT_PHOTO_PATH
+	if photo_path != "":
+		var data = FileAccess.get_file_as_bytes(photo_path)
+		if data.size() > 0:
+			rpc_id(peer_id, "receive_opponent_photo", data)
+
+@rpc("any_peer", "reliable")
+func receive_opponent_photo(photo_data: PackedByteArray):
+	var save_path = _get_opponent_photo_path()
+	var file = FileAccess.open(save_path, FileAccess.WRITE)
+	if file:
+		file.store_buffer(photo_data)
+		file.close()
+		var opp_field = get_node_or_null("OpponentField")
+		if opp_field:
+			_apply_opponent_photo_to_field(opp_field)
+
+func _apply_opponent_photo_to_field(field_node: Node):
+	var tex = null
+	var opp_photo_path = _get_opponent_photo_path()
+	if FileAccess.file_exists(opp_photo_path):
+		var img = Image.load_from_file(opp_photo_path)
+		if img:
+			tex = ImageTexture.create_from_image(img)
+	if not tex and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
+		tex = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
+	if tex:
+		var opp_info = field_node.find_child("Opponents_Info", true, false)
+		if opp_info:
+			var poly = opp_info.get_node_or_null("Polygon2D")
+			if poly:
+				poly.texture = tex
+
 func on_peer_connected(peer_id):
 	if not has_node("OpponentField"):
 		var opponent_scene = opponent_field_scene.instantiate()
+		opponent_scene.name = "OpponentField"
 		add_child(opponent_scene)
+		_apply_opponent_photo_to_field(opponent_scene)
+		_send_my_photo_to_peer(peer_id)
 		get_node("PlayerField").host_set_up()
 		if multiplayer.is_server():
 			randomize()
@@ -734,6 +844,11 @@ func reset_ui():
 	server.visible = true
 	port.visible = not use_websocket
 	check.visible = true
+	$ChangePhotoButton.visible = true
+	$PhotoPreview.visible = false
+	var opp_photo = _get_opponent_photo_path()
+	if FileAccess.file_exists(opp_photo):
+		DirAccess.remove_absolute(opp_photo)
 	if multiplayer.multiplayer_peer != null:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null
@@ -787,6 +902,8 @@ func disable_buttons():
 	server.visible = false
 	port.visible = false
 	check.visible = false
+	$ChangePhotoButton.visible = false
+	$PhotoPreview.visible = false
 
 @rpc("any_peer", "reliable")
 func sync_destroy_token(player_id: int, uuid: String, slug: String):
