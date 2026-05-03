@@ -356,6 +356,13 @@ func finish_drag():
 			_return_mat_card_to_deck(card)
 			_reset_drag_state_vars()
 			return
+		if card.has_method("is_status") and card.is_status() and card_slot_found.name != "MAINFIELD":
+			if card.has_method("destroy_status"):
+				card.destroy_status()
+			else:
+				card.queue_free()
+			_reset_drag_state_vars()
+			return
 		if dragged_from_grid:
 			remove_card_from_original_slot()
 			dragged_from_grid = false
@@ -388,6 +395,21 @@ func finish_drag():
 			card.scale = normal_scale
 			card.z_index = base_z_index
 		elif card_slot_found.name == "MAINFIELD":
+			if card.has_method("is_status") and card.is_status():
+				var c_slug = get_card_slug(card)
+				var c_name = get_card_name_from_slug(c_slug)
+				if c_name != "":
+					var to_destroy = []
+					for c in card_slot_found.cards_in_field:
+						if c != card and c.has_method("is_status") and c.is_status():
+							var existing_name = get_card_name_from_slug(get_card_slug(c))
+							if existing_name != "" and existing_name == c_name:
+								to_destroy.append(c)
+					for c in to_destroy:
+						if c.has_method("destroy_status"):
+							c.destroy_status()
+						else:
+							c.queue_free()
 			var is_first_card = card_slot_found.cards_in_field.is_empty()
 			var drop_position = null
 			if not is_first_card:
@@ -461,6 +483,13 @@ func finish_drag():
 			original_slug = ""
 			original_zone = ""
 			original_card_display = null
+		if card.has_method("is_status") and card.is_status():
+			if card.has_method("destroy_status"):
+				card.destroy_status()
+			else:
+				card.queue_free()
+			_reset_drag_state_vars()
+			return
 		if player_hand_reference:
 			var was_in_hand = (player_hand_reference.dragging_card_from_hand == card)
 			player_hand_reference.add_card_to_hand(card)
@@ -1049,6 +1078,28 @@ func get_card_slug(card) -> String:
 	if card.has_meta("slug"):
 		return card.get_meta("slug")
 	return ""
+
+func get_card_name_from_slug(slug: String) -> String:
+	if slug == "":
+		return ""
+	var card_info = card_information_reference
+	if not card_info:
+		card_info = find_card_information_reference()
+	if card_info and card_info.get("card_database_reference"):
+		var db = card_info.card_database_reference
+		if db and db.get("cards_db"):
+			if db.cards_db.has(slug):
+				var data = db.cards_db[slug]
+				if data.has("name"):
+					return str(data["name"])
+			for key in db.cards_db:
+				var data = db.cards_db[key]
+				if data.has("editions"):
+					for edition in data["editions"]:
+						if edition.get("slug", "") == slug:
+							if data.has("name"):
+								return str(data["name"])
+	return slug
 
 func get_card_uuid(card) -> String:
 	if "uuid" in card and card.uuid != "":

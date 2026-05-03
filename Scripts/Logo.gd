@@ -9,6 +9,8 @@ extends Node2D
 @onready var grid_container = $LogoViewWindow/ScrollContainer/GridContainer
 @onready var Logo_mastery_view_window = $LogoMasteryViewWindow
 @onready var mastery_grid_container = $LogoMasteryViewWindow/ScrollContainer/GridContainer
+@onready var Logo_status_view_window = $LogoStatusViewWindow
+@onready var status_grid_container = $LogoStatusViewWindow/ScrollContainer/GridContainer
 
 var level_label: Label
 var durability_label: Label
@@ -37,6 +39,7 @@ var original_menu_pos: Vector2 = Vector2.ZERO
 var player_name: String = "Player"
 var token_slugs : Array = []
 var mastery_slugs : Array = []
+var status_slugs : Array = []
 
 func _ready():
 	add_to_group("logo")
@@ -57,10 +60,14 @@ func _ready():
 	Logo_view_window.visibility_changed.connect(_on_logo_view_visibility_changed)
 	Logo_mastery_view_window.close_requested.connect(_on_logo_mastery_view_close)
 	Logo_mastery_view_window.visibility_changed.connect(_on_logo_mastery_view_visibility_changed)
+	Logo_status_view_window.close_requested.connect(_on_logo_status_view_close)
+	Logo_status_view_window.visibility_changed.connect(_on_logo_status_view_visibility_changed)
 	call_deferred("populate_tokens")
 	call_deferred("populate_mastery")
+	call_deferred("populate_status")
 	Logo_view_window.hide()
 	Logo_mastery_view_window.hide()
+	Logo_status_view_window.hide()
 	var config = ConfigFile.new()
 	var err = config.load("user://player_config.cfg")
 	if err == OK:
@@ -116,6 +123,14 @@ func _on_logo_mastery_view_visibility_changed():
 	if Logo_mastery_view_window.visible:
 		$LogoMasteryViewWindow/ScrollContainer.scroll_horizontal = 0
 		$LogoMasteryViewWindow/ScrollContainer.scroll_vertical = 0
+
+func _on_logo_status_view_close():
+	Logo_status_view_window.hide()
+
+func _on_logo_status_view_visibility_changed():
+	if Logo_status_view_window.visible:
+		$LogoStatusViewWindow/ScrollContainer.scroll_horizontal = 0
+		$LogoStatusViewWindow/ScrollContainer.scroll_vertical = 0
 
 func find_chat_node():
 	chat_node = find_node_recursive(get_tree().get_root(), "Chat")
@@ -250,6 +265,7 @@ func build_main_menu():
 	add_custom_item("Counters", 107)
 	add_custom_item("Summon Token", 106)
 	add_custom_item("Summon Mastery", 109)
+	add_custom_item("Summon Status", 110)
 	add_custom_item("Surrender", 103, {}, true)
 	finalize_custom_menu()
 
@@ -510,6 +526,11 @@ func _handle_menu_action(id, metadata = {}):
 			Logo_mastery_view_window.popup_centered()
 			$LogoMasteryViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
 			$LogoMasteryViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
+		elif id == 110:
+			logo_menu.hide()
+			Logo_status_view_window.popup_centered()
+			$LogoStatusViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
+			$LogoStatusViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 		elif id == 103:
 			logo_menu.hide()
 			send_to_chat("Surrendered")
@@ -719,4 +740,28 @@ func create_card_display_mastery(card_name: String):
 	card_display.set_meta("slug", card_name)
 	card_display.set_meta("uuid", "")
 	card_display.set_meta("zone", "logo_mastery")
+	return card_display
+
+func populate_status():
+	for child in status_grid_container.get_children():
+		child.queue_free()
+	if status_slugs.is_empty():
+		status_slugs = fetch_slugs_by_type("STATUS")
+	status_slugs.sort()
+	for slug in status_slugs:
+		var card_display = create_card_display_status(slug)
+		status_grid_container.add_child(card_display)
+	status_grid_container.anchor_left = 0
+	status_grid_container.anchor_top = 0
+	status_grid_container.anchor_right = 1
+	status_grid_container.anchor_bottom = 1
+	status_grid_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	status_grid_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+func create_card_display_status(card_name: String):
+	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+	var card_display = card_display_scene.instantiate()
+	card_display.set_meta("slug", card_name)
+	card_display.set_meta("uuid", "")
+	card_display.set_meta("zone", "logo_status")
 	return card_display
