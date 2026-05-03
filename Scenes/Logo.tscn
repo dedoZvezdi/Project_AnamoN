@@ -1,77 +1,95 @@
-[gd_scene load_steps=2 format=3 uid="uid://c3x07o1r7glog"]
+[gd_scene format=3 uid="uid://c3x07o1r7glog"]
 
 [ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="1_gukjj"]
 
-[node name="Logo" type="Node2D"]
+[node name="Logo" type="Node2D" unique_id=516982437]
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=1188845047]
 collision_layer = 32
 collision_mask = 32
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D" unique_id=861766340]
 polygon = PackedVector2Array(-3, -35, -9, -29, -38, -19, -45, -23, -44, -7, -56, 15, -50, 24, -34, 30, -8, 25, -4, 36, 1, 25, 27, 31, 43, 26, 50, 16, 38, -7, 39, -22, 31, -20, 3, -29)
 
-[node name="LogoMenu" type="PanelContainer" parent="."]
+[node name="LogoMenu" type="PanelContainer" parent="." unique_id=1101697654]
 visible = false
 z_index = 2000
 
-[node name="MainVBox" type="VBoxContainer" parent="LogoMenu"]
+[node name="MainVBox" type="VBoxContainer" parent="LogoMenu" unique_id=1094107958]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="ScrollSection" type="ScrollContainer" parent="LogoMenu/MainVBox"]
+[node name="ScrollSection" type="ScrollContainer" parent="LogoMenu/MainVBox" unique_id=1460488530]
 layout_mode = 2
 size_flags_vertical = 0
 horizontal_scroll_mode = 0
 
-[node name="ScrollVBox" type="VBoxContainer" parent="LogoMenu/MainVBox/ScrollSection"]
+[node name="ScrollVBox" type="VBoxContainer" parent="LogoMenu/MainVBox/ScrollSection" unique_id=533039558]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 theme_override_constants/separation = 0
 
-[node name="Separator" type="HSeparator" parent="LogoMenu/MainVBox"]
+[node name="Separator" type="HSeparator" parent="LogoMenu/MainVBox" unique_id=489742845]
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="FixedVBox" type="VBoxContainer" parent="LogoMenu/MainVBox"]
+[node name="FixedVBox" type="VBoxContainer" parent="LogoMenu/MainVBox" unique_id=574980550]
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/separation = 0
 
-[node name="LogoViewWindow" type="Window" parent="."]
+[node name="LogoViewWindow" type="Window" parent="." unique_id=1676907393]
 auto_translate_mode = 1
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
 
-[node name="ScrollContainer" type="ScrollContainer" parent="LogoViewWindow"]
+[node name="ScrollContainer" type="ScrollContainer" parent="LogoViewWindow" unique_id=672891432]
 offset_right = 600.0
 offset_bottom = 142.0
 
-[node name="GridContainer" type="GridContainer" parent="LogoViewWindow/ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="LogoViewWindow/ScrollContainer" unique_id=1427530111]
 custom_minimum_size = Vector2(600, 142)
 layout_mode = 2
 columns = 1024
 
-[node name="Control" parent="LogoViewWindow/ScrollContainer/GridContainer" instance=ExtResource("1_gukjj")]
+[node name="Control" parent="LogoViewWindow/ScrollContainer/GridContainer" unique_id=1192546635 instance=ExtResource("1_gukjj")]
 layout_mode = 2
 
-[node name="LogoMasteryViewWindow" type="Window" parent="."]
+[node name="LogoMasteryViewWindow" type="Window" parent="." unique_id=544854343]
 auto_translate_mode = 1
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
 
-[node name="ScrollContainer" type="ScrollContainer" parent="LogoMasteryViewWindow"]
+[node name="ScrollContainer" type="ScrollContainer" parent="LogoMasteryViewWindow" unique_id=531211145]
 offset_right = 600.0
 offset_bottom = 142.0
 
-[node name="GridContainer" type="GridContainer" parent="LogoMasteryViewWindow/ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="LogoMasteryViewWindow/ScrollContainer" unique_id=588084443]
 custom_minimum_size = Vector2(600, 142)
 layout_mode = 2
 columns = 1024
 
-[node name="Control" parent="LogoMasteryViewWindow/ScrollContainer/GridContainer" instance=ExtResource("1_gukjj")]
+[node name="Control" parent="LogoMasteryViewWindow/ScrollContainer/GridContainer" unique_id=425910120 instance=ExtResource("1_gukjj")]
+layout_mode = 2
+
+[node name="LogoStatusViewWindow" type="Window" parent="." unique_id=1022757827]
+auto_translate_mode = 1
+size = Vector2i(600, 142)
+visible = false
+unresizable = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LogoStatusViewWindow" unique_id=335808166]
+offset_right = 600.0
+offset_bottom = 142.0
+
+[node name="GridContainer" type="GridContainer" parent="LogoStatusViewWindow/ScrollContainer" unique_id=1977355046]
+custom_minimum_size = Vector2(600, 142)
+layout_mode = 2
+columns = 1024
+
+[node name="Control" parent="LogoStatusViewWindow/ScrollContainer/GridContainer" unique_id=797281537 instance=ExtResource("1_gukjj")]
 layout_mode = 2

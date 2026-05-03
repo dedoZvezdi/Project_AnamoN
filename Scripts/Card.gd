@@ -274,6 +274,13 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						var target_slug = get_transform_target(slug)
 						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
 							popup_menu.add_item("Transform", 5)
+			elif is_status():
+				if is_in_main_field():
+					popup_menu.add_item("Destroy", 8)
+					if is_rotated:
+						popup_menu.add_item("Awake", 4)
+					else:
+						popup_menu.add_item("Rest", 4)
 			else:
 				if is_in_memory_slot() or is_in_hand():
 					if not is_publicly_revealed:
@@ -297,12 +304,12 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						popup_menu.add_item("Awake", 4)
 					else:
 						popup_menu.add_item("Rest", 4)
-					if not is_champion_card() and not is_token() and not is_mastery():
+					if not is_champion_card() and not is_token() and not is_mastery() and not is_status():
 						if current_field and current_field.name == "MAINFIELD":
 							if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
 								if "current_champion_card" in current_field and current_field.current_champion_card != null:
 									popup_menu.add_item("Move to Lineage", 14)
-					if not is_champion_card() and not is_token() and not is_mastery():
+					if not is_champion_card() and not is_token() and not is_mastery() and not is_status():
 						var opponent_field = get_tree().get_root().find_child("OpponentField", true, false)
 						if opponent_field:
 							popup_menu.add_item("Give Control", 15)
@@ -726,6 +733,7 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		5: transform_card()
 		6: destroy_token()
 		7: destroy_mastery()
+		8: destroy_status()
 		10: reveal_to_opponent()
 		11: hide_from_opponent()
 		12: reveal_all_in_memory()
@@ -792,6 +800,9 @@ func set_current_field(field):
 		return
 	if is_mastery() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
 		destroy_mastery()
+		return
+	if is_status() and field and (field.is_in_group("player_hand") or field.is_in_group("single_card_slots") or field.is_in_group("rotated_slots") or field.is_in_group("memory_slots")):
+		destroy_status()
 		return
 	if is_marked and current_field != null and field != null:
 		if current_field != field:
@@ -1205,6 +1216,28 @@ func destroy_mastery():
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_destroy_mastery", multiplayer.get_unique_id(), get_uuid(), slug)
+	if current_field and current_field.has_method("remove_card_from_field"):
+		current_field.remove_card_from_field(self)
+	elif current_field and current_field.has_method("remove_card_from_slot"):
+		current_field.remove_card_from_slot(self)
+	queue_free()
+
+func is_status() -> bool:
+	var slug = get_slug_from_card()
+	var logos = get_tree().get_nodes_in_group("logo")
+	if logos.size() > 0:
+		var logo = logos[0]
+		if logo.has_method("get") and "status_slugs" in logo:
+			return slug in logo.status_slugs
+		elif logo.get("status_slugs") != null:
+			return slug in logo.status_slugs
+	return false
+
+func destroy_status():
+	var slug = get_slug_from_card()
+	var multiplayer_node = get_tree().get_root().get_node("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_destroy_token", multiplayer.get_unique_id(), get_uuid(), slug)
 	if current_field and current_field.has_method("remove_card_from_field"):
 		current_field.remove_card_from_field(self)
 	elif current_field and current_field.has_method("remove_card_from_slot"):

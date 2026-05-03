@@ -588,6 +588,7 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 				elif opp_main and opp_main.has_method("add_card_to_field"):
 					var is_token = false
 					var is_mastery = false
+					var is_status = false
 					var logos = get_tree().get_nodes_in_group("logo")
 					if logos.size() > 0:
 						var local_logo = logos[0]
@@ -595,7 +596,9 @@ func sync_move_to_main_field(player_id: int, uuid: String, slug: String, pos: Ve
 							is_token = true
 						if "mastery_slugs" in local_logo and slug in local_logo.mastery_slugs:
 							is_mastery = true
-					if (is_token or is_mastery) and not (card in opp_main.cards_in_field):
+						if "status_slugs" in local_logo and slug in local_logo.status_slugs:
+							is_status = true
+					if (is_token or is_mastery or is_status) and not (card in opp_main.cards_in_field):
 						var opp_logo = null
 						for child in opp_field.get_children():
 							if "Logo" in child.name:

@@ -150,7 +150,7 @@ func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if zone == "lineage":
 			return
-		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery", "lineage"]:
+		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery", "logo_status", "lineage"]:
 			var current_uuid = get_meta("uuid") if has_meta("uuid") else ""
 			emit_signal("request_popup_menu", card_slug, current_uuid)
 			accept_event()
@@ -201,7 +201,7 @@ func start_drag_from_grid():
 		if card_manager and card_manager.has_method("start_drag"):
 			card_manager.start_drag(real_card)
 			card_manager.set_dragged_from_grid_info(card_slug, zone, self)
-			if zone != "logo_tokens" and zone != "logo_mastery":
+			if zone != "logo_tokens" and zone != "logo_mastery" and zone != "logo_status":
 				if zone == "lineage":
 					var owner_node = get_parent()
 					while owner_node != null and not owner_node.has_method("remove_from_lineage_by_uuid"):
@@ -234,7 +234,7 @@ func start_drag_from_grid():
 				if texture_rect and texture_rect.texture:
 					face_down = "ga_back.png" in texture_rect.texture.resource_path
 				card_manager.set_dragged_from_grid_info(card_slug, zone, self, grid_index, source_node, face_down, left_uuid, right_uuid)
-				if zone != "logo_tokens" and zone != "logo_mastery":
+				if zone != "logo_tokens" and zone != "logo_mastery" and zone != "logo_status":
 					if zone == "lineage":
 						pass
 					update_grid_immediately()
