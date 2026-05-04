@@ -23,14 +23,9 @@
 [ext_resource type="PackedScene" uid="uid://cpn7rtonc8qd4" path="res://Scenes/Phases.tscn" id="20_ovfrf"]
 [ext_resource type="Script" uid="uid://cjdv252o1hnhq" path="res://Scripts/Phases.gd" id="21_h2qut"]
 [ext_resource type="PackedScene" uid="uid://kv77quhf6roj" path="res://Scenes/Chat.tscn" id="22_bg3cw"]
-[ext_resource type="Script" uid="uid://bsrg4y8nojlly" path="res://Scripts/PlayerInfo.gd" id="24_xuc2h"]
-[ext_resource type="Texture2D" uid="uid://e5jfv2giu16v" path="res://Assets/Textures/Player Info/Over_Blue.png" id="25_g5k7o"]
-[ext_resource type="Texture2D" uid="uid://dtq5vw2bx7em6" path="res://Assets/Textures/Player Info/Progress_Blue.png" id="26_vx5jb"]
-[ext_resource type="Texture2D" uid="uid://bsfe2cbkcwbrn" path="res://Assets/Textures/Player Info/Player_photos/Player_Image.png" id="27_g5k7o"]
+[ext_resource type="PackedScene" uid="uid://dpfq6k4bgsvnc" path="res://Scenes/player_info.tscn" id="25_kym08"]
+[ext_resource type="PackedScene" uid="uid://d4lnbcibqak3y" path="res://Scenes/Pantheon.tscn" id="26_xuc2h"]
 [ext_resource type="Script" uid="uid://dtl8d6lqww58o" path="res://Scripts/PlayerElements.gd" id="new_script_player_elements"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_g5k7o"]
-size = Vector2(213, 14)
 
 [node name="PlayerField" type="Node2D" unique_id=260745692]
 script = ExtResource("1_uld4x")
@@ -96,28 +91,6 @@ script = ExtResource("21_h2qut")
 [node name="Chat" parent="." unique_id=1613080791 instance=ExtResource("22_bg3cw")]
 position = Vector2(-1454, 0)
 
-[node name="Player_Info" type="Control" parent="." unique_id=187934437]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 430.0
-offset_bottom = 100.0
-script = ExtResource("24_xuc2h")
+[node name="Player_Info" parent="." unique_id=980618565 instance=ExtResource("25_kym08")]
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="Player_Info" unique_id=43988247]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-value = 60.0
-texture_over = ExtResource("25_g5k7o")
-texture_progress = ExtResource("26_vx5jb")
-
-[node name="Polygon2D" type="Polygon2D" parent="Player_Info" unique_id=890135997]
-texture = ExtResource("27_g5k7o")
-polygon = PackedVector2Array(43, 6, 9, 26, 9, 66, 44, 86, 78, 66, 78, 26)
-
-[node name="ElementsArea2D" type="Area2D" parent="Player_Info" unique_id=690539420]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player_Info/ElementsArea2D" unique_id=565620193]
-position = Vector2(315.5, 14)
-shape = SubResource("RectangleShape2D_g5k7o")
-disabled = true
+[node name="PANTHEON" parent="." unique_id=653400742 instance=ExtResource("26_xuc2h")]

@@ -10,14 +10,9 @@
 [ext_resource type="PackedScene" uid="uid://bbtnckf2a2use" path="res://Scenes/Opponent_Elements.tscn" id="8_xqfjh"]
 [ext_resource type="PackedScene" uid="uid://dulc360ofen1q" path="res://Scenes/Opponent_Memory.tscn" id="9_4t60u"]
 [ext_resource type="PackedScene" uid="uid://c8w8ptylfbntf" path="res://Scenes/Opponent_Logo.tscn" id="10_4t60u"]
-[ext_resource type="Texture2D" uid="uid://4ya7n805x51x" path="res://Assets/Textures/Player Info/Over_Yellow_Mirrored.png" id="12_j2155"]
-[ext_resource type="Script" uid="uid://bwf674fkbyuad" path="res://Scripts/OpponentsInfo.gd" id="12_xqfjh"]
-[ext_resource type="Texture2D" uid="uid://blxkfgnsip0ov" path="res://Assets/Textures/Player Info/Progress_Yellow_Mirrored.png" id="13_urkt4"]
-[ext_resource type="Texture2D" uid="uid://bsfe2cbkcwbrn" path="res://Assets/Textures/Player Info/Player_photos/Player_Image.png" id="13_xqfjh"]
+[ext_resource type="PackedScene" uid="uid://rv16vxqlf50e" path="res://Scenes/opponents_info.tscn" id="12_ypfnt"]
+[ext_resource type="PackedScene" uid="uid://c11oeig6hpbc1" path="res://Scenes/Opponent_Pantheon.tscn" id="13_admix"]
 [ext_resource type="Script" uid="uid://dk06c13rk3fwj" path="res://Scripts/OpponentFieldElements.gd" id="14_4t60u"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_urkt4"]
-size = Vector2(213, 14)
 
 [node name="OpponentField" type="Node2D" unique_id=1833191212]
 
@@ -59,31 +54,6 @@ position = Vector2(985, 111)
 [node name="ОpponentLogo" parent="." unique_id=8991340 instance=ExtResource("10_4t60u")]
 position = Vector2(1370, 124)
 
-[node name="Opponents_Info" type="Control" parent="." unique_id=405381721]
-layout_mode = 3
-anchors_preset = 0
-offset_top = 100.0
-offset_right = 430.0
-offset_bottom = 200.0
-script = ExtResource("12_xqfjh")
+[node name="Opponents_Info" parent="." unique_id=1122826662 instance=ExtResource("12_ypfnt")]
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="Opponents_Info" unique_id=1874446367]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-value = 60.0
-fill_mode = 1
-texture_over = ExtResource("12_j2155")
-texture_progress = ExtResource("13_urkt4")
-
-[node name="Polygon2D" type="Polygon2D" parent="Opponents_Info" unique_id=430269409]
-position = Vector2(339, 0)
-texture = ExtResource("13_xqfjh")
-polygon = PackedVector2Array(43, 6, 9, 26, 9, 66, 44, 86, 78, 66, 78, 26)
-
-[node name="ElementsArea2D" type="Area2D" parent="Opponents_Info" unique_id=1544681536]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Opponents_Info/ElementsArea2D" unique_id=162856756]
-position = Vector2(110.5, 14)
-shape = SubResource("RectangleShape2D_urkt4")
-disabled = true
+[node name="OpponentPANTHEON" parent="." unique_id=1996522049 instance=ExtResource("13_admix")]

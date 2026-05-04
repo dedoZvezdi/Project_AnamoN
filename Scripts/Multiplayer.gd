@@ -141,7 +141,10 @@ func _on_join_button_pressed() -> void:
 				chat_node.player_name = name_to_use
 			rpc("receive_opponent_name", name_to_use)
 			rpc_id(1, "notify_host_of_join", name_to_use)
-			peer_names[multiplayer.get_unique_id()] = name_to_use)
+			peer_names[multiplayer.get_unique_id()] = name_to_use
+			var pantheon = player_scene.get_node_or_null("PANTHEON")
+			if pantheon and pantheon.has_method("get_pantheon_cards"):
+				rpc_id(1, "sync_initial_pantheon", multiplayer.get_unique_id(), pantheon.get_pantheon_cards()))
 		multiplayer.connection_failed.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
@@ -175,7 +178,10 @@ func _on_join_button_pressed() -> void:
 				chat_node.player_name = name_to_use
 			rpc("receive_opponent_name", name_to_use)
 			rpc_id(1, "notify_host_of_join", name_to_use)
-			peer_names[multiplayer.get_unique_id()] = name_to_use)
+			peer_names[multiplayer.get_unique_id()] = name_to_use
+			var pantheon = player_scene.get_node_or_null("PANTHEON")
+			if pantheon and pantheon.has_method("get_pantheon_cards"):
+				rpc_id(1, "sync_initial_pantheon", multiplayer.get_unique_id(), pantheon.get_pantheon_cards()))
 		multiplayer.connection_failed.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
@@ -346,6 +352,11 @@ func on_peer_connected(peer_id):
 		var phases = get_node_or_null("PlayerField/Phases")
 		if phases and phases.has_method("update_phase_visuals"):
 			phases.update_phase_visuals()
+		var player_field = get_node_or_null("PlayerField")
+		if player_field:
+			var pantheon = player_field.get_node_or_null("PANTHEON")
+			if pantheon and pantheon.has_method("get_pantheon_cards"):
+				rpc_id(peer_id, "sync_initial_pantheon", multiplayer.get_unique_id(), pantheon.get_pantheon_cards())
 	var host_chat = get_node("PlayerField/Chat")
 	if host_chat:
 		rpc_id(peer_id, "receive_opponent_name", host_chat.player_name)
@@ -1357,3 +1368,25 @@ func sync_deck_highlight(player_id: int, is_highlighted: bool):
 	var opp_deck = opp_field.find_child("OpponentDeck", true, false)
 	if opp_deck and opp_deck.has_method("set_highlight"):
 		opp_deck.set_highlight(is_highlighted)
+
+@rpc("any_peer", "reliable")
+func sync_pantheon_flip(player_id: int, side: int, is_flipped: bool, slug: String):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		var pantheon = opp_field.get_node_or_null("OpponentPANTHEON")
+		if pantheon and pantheon.has_method("remote_flip"):
+			pantheon.remote_flip(side, is_flipped, slug)
+
+@rpc("any_peer", "reliable")
+func sync_initial_pantheon(player_id: int, slugs: Array):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		var pantheon = opp_field.get_node_or_null("OpponentPANTHEON")
+		if pantheon and pantheon.has_method("set_initial_cards"):
+			pantheon.set_initial_cards(slugs)

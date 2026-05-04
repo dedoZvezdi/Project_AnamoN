@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://dpfq6k4bgsvnc"]
+
+[ext_resource type="Script" uid="uid://bsrg4y8nojlly" path="res://Scripts/PlayerInfo.gd" id="1_jgqti"]
+[ext_resource type="Texture2D" uid="uid://e5jfv2giu16v" path="res://Assets/Textures/Player Info/Over_Blue.png" id="2_un3a0"]
+[ext_resource type="Texture2D" uid="uid://dtq5vw2bx7em6" path="res://Assets/Textures/Player Info/Progress_Blue.png" id="3_uliol"]
+[ext_resource type="Texture2D" uid="uid://bsfe2cbkcwbrn" path="res://Assets/Textures/Player Info/Player_photos/Player_Image.png" id="4_m477e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g5k7o"]
+size = Vector2(213, 14)
+
+[node name="Player_Info" type="Control" unique_id=980618565]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 430.0
+offset_bottom = 100.0
+script = ExtResource("1_jgqti")
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="." unique_id=547984301]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+value = 60.0
+texture_over = ExtResource("2_un3a0")
+texture_progress = ExtResource("3_uliol")
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=931093571]
+texture = ExtResource("4_m477e")
+polygon = PackedVector2Array(43, 6, 9, 26, 9, 66, 44, 86, 78, 66, 78, 26)
+
+[node name="ElementsArea2D" type="Area2D" parent="." unique_id=1365677033]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ElementsArea2D" unique_id=1134057314]
+position = Vector2(315.5, 14)
+shape = SubResource("RectangleShape2D_g5k7o")
+disabled = true
