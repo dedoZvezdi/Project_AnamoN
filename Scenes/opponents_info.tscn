@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://rv16vxqlf50e"]
+
+[ext_resource type="Script" uid="uid://bwf674fkbyuad" path="res://Scripts/OpponentsInfo.gd" id="1_dfw6x"]
+[ext_resource type="Texture2D" uid="uid://4ya7n805x51x" path="res://Assets/Textures/Player Info/Over_Yellow_Mirrored.png" id="2_7ltdt"]
+[ext_resource type="Texture2D" uid="uid://blxkfgnsip0ov" path="res://Assets/Textures/Player Info/Progress_Yellow_Mirrored.png" id="3_4de2x"]
+[ext_resource type="Texture2D" uid="uid://bsfe2cbkcwbrn" path="res://Assets/Textures/Player Info/Player_photos/Player_Image.png" id="4_s3euu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_urkt4"]
+size = Vector2(213, 14)
+
+[node name="Opponents_Info" type="Control" unique_id=1122826662]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 100.0
+offset_right = 430.0
+offset_bottom = 200.0
+script = ExtResource("1_dfw6x")
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="." unique_id=2010434964]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+value = 60.0
+fill_mode = 1
+texture_over = ExtResource("2_7ltdt")
+texture_progress = ExtResource("3_4de2x")
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=1135554833]
+position = Vector2(339, 0)
+texture = ExtResource("4_s3euu")
+polygon = PackedVector2Array(43, 6, 9, 26, 9, 66, 44, 86, 78, 66, 78, 26)
+
+[node name="ElementsArea2D" type="Area2D" parent="." unique_id=2030725760]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ElementsArea2D" unique_id=2006418554]
+position = Vector2(110.5, 14)
+shape = SubResource("RectangleShape2D_urkt4")
+disabled = true

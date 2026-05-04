@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://c11oeig6hpbc1"]
+
+[ext_resource type="Script" uid="uid://do46fxstymojn" path="res://Scripts/Opponent_Pantheon.gd" id="1_yotk6"]
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_8ga7c"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j2155"]
+size = Vector2(86, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4t60u"]
+size = Vector2(86, 120)
+
+[node name="OpponentPANTHEON" type="Node2D" unique_id=1996522049]
+script = ExtResource("1_yotk6")
+
+[node name="OpponentLeftCardImage" type="Sprite2D" parent="." unique_id=679960164]
+position = Vector2(1358.9999, 461.99994)
+rotation = 3.1415927
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("2_8ga7c")
+
+[node name="OpponentRightCardImage" type="Sprite2D" parent="." unique_id=552239706]
+position = Vector2(1267.9999, 461.99994)
+rotation = 3.1415927
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("2_8ga7c")
+
+[node name="OpponentLeftArea2D" type="Area2D" parent="." unique_id=237613542]
+collision_layer = 256
+collision_mask = 256
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OpponentLeftArea2D" unique_id=807616651]
+position = Vector2(1358.9999, 461.99994)
+shape = SubResource("RectangleShape2D_j2155")
+
+[node name="OpponentRightArea2D" type="Area2D" parent="." unique_id=1962292627]
+collision_layer = 256
+collision_mask = 256
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OpponentRightArea2D" unique_id=316379507]
+position = Vector2(1267.9999, 461.99994)
+shape = SubResource("RectangleShape2D_4t60u")

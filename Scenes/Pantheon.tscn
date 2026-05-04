@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://d4lnbcibqak3y"]
+
+[ext_resource type="Script" uid="uid://o3h8f5o75l0c" path="res://Scripts/Pantheon.gd" id="1_hjl82"]
+[ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_htpno"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g5k7o"]
+size = Vector2(86, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vx5jb"]
+size = Vector2(86, 120)
+
+[node name="PANTHEON" type="Node2D" unique_id=653400742]
+script = ExtResource("1_hjl82")
+
+[node name="LeftCardImage" type="Sprite2D" parent="." unique_id=1216384117]
+position = Vector2(601, 618)
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("2_htpno")
+
+[node name="RightCardImage" type="Sprite2D" parent="." unique_id=1829115158]
+position = Vector2(692, 618)
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("2_htpno")
+
+[node name="LeftArea2D" type="Area2D" parent="." unique_id=2066675575]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftArea2D" unique_id=1204574003]
+position = Vector2(601, 618)
+shape = SubResource("RectangleShape2D_g5k7o")
+
+[node name="RightArea2D" type="Area2D" parent="." unique_id=566420937]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightArea2D" unique_id=2072226969]
+position = Vector2(692, 618)
+shape = SubResource("RectangleShape2D_vx5jb")
