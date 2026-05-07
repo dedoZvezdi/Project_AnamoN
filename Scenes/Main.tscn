@@ -3,56 +3,20 @@
 [ext_resource type="Script" uid="uid://lobbvgacwmar" path="res://Scripts/Multiplayer.gd" id="1_r150o"]
 [ext_resource type="PackedScene" uid="uid://bhkcqcx0pu1b5" path="res://Scenes/Player_Field.tscn" id="2_idj7w"]
 [ext_resource type="PackedScene" uid="uid://c02vjgxjinwdx" path="res://Scenes/Opponent_Field.tscn" id="3_kln2b"]
+[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="4_rgh2o"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pbw6q"]
+texture = ExtResource("4_rgh2o")
 
 [node name="Main" type="Node2D" unique_id=514279848]
 script = ExtResource("1_r150o")
 player_field_scene = ExtResource("2_idj7w")
 opponent_field_scene = ExtResource("3_kln2b")
 
-[node name="HostButton" type="Button" parent="." unique_id=1134001902]
-offset_left = 1288.0
-offset_top = 826.0
-offset_right = 1417.0
-offset_bottom = 889.0
-text = "Host"
-
-[node name="JoinButton" type="Button" parent="." unique_id=1368440957]
-offset_left = 1153.0
-offset_top = 826.0
-offset_right = 1282.0
-offset_bottom = 889.0
-text = "Join"
-
-[node name="Name" type="LineEdit" parent="." unique_id=1305576283]
-offset_left = 639.0
-offset_top = 794.0
-offset_right = 1146.0
-offset_bottom = 825.0
-placeholder_text = "Name"
-alignment = 1
-
-[node name="IP_Address" type="LineEdit" parent="." unique_id=1950617224]
-offset_left = 639.0
-offset_top = 826.0
-offset_right = 1146.0
-offset_bottom = 857.0
-placeholder_text = "PUBLIC IP"
-alignment = 1
-
-[node name="PORT" type="LineEdit" parent="." unique_id=518561486]
-offset_left = 639.0
-offset_top = 858.0
-offset_right = 1146.0
-offset_bottom = 889.0
-placeholder_text = "PORT"
-alignment = 1
-
-[node name="CheckButton" type="CheckButton" parent="." unique_id=731010286]
-offset_left = 1149.0
-offset_top = 793.0
-offset_right = 1422.0
-offset_bottom = 824.0
-text = "Local Mode / Tunnel Mode"
+[node name="Panel" type="Panel" parent="." unique_id=1796635472]
+offset_right = 1920.0
+offset_bottom = 1080.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_pbw6q")
 
 [node name="FileDialog" type="FileDialog" parent="." unique_id=1015547518]
 oversampling_override = 1.0
@@ -64,22 +28,134 @@ file_mode = 0
 access = 2
 filters = PackedStringArray("*.png")
 
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1507937209]
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer" unique_id=165837956]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -487.0
+offset_top = -400.0
+offset_right = 487.0
+offset_bottom = 359.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PanelContainer" unique_id=1844412255]
+layout_mode = 2
+color = Color(0, 0, 0, 0.80784315)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PanelContainer" unique_id=1260342187]
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=849482765]
+custom_minimum_size = Vector2(960, 30)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/ColorRect" unique_id=2038344739]
+modulate = Color(0, 0, 0, 1)
+self_modulate = Color(0, 0, 0, 1)
+layout_mode = 0
+offset_right = 960.0
+offset_bottom = 30.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0)
+theme_override_font_sizes/font_size = 20
+text = "LAN or CF"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=1316848687]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer" unique_id=480110969]
+layout_mode = 2
+
+[node name="HBoxNameContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=1041474622]
+layout_mode = 2
+theme_override_constants/separation = 60
+
+[node name="Label" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer" unique_id=1492579183]
+layout_mode = 2
+text = "Nickname:"
+
+[node name="Name" type="LineEdit" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer" unique_id=1305576283]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="CheckButton" type="CheckButton" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer" unique_id=731010286]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "LAN / CF"
+
+[node name="ItemList" type="ItemList" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=646024003]
+custom_minimum_size = Vector2(0, 600)
+layout_mode = 2
+
+[node name="HBoxButtonsContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=1210522404]
+layout_mode = 2
+theme_override_constants/separation = 320
+alignment = 1
+
+[node name="CancelButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer" unique_id=1753074363]
+custom_minimum_size = Vector2(135, 0)
+layout_mode = 2
+text = "Cancel"
+
+[node name="RefreshButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer" unique_id=1155147563]
+custom_minimum_size = Vector2(135, 0)
+layout_mode = 2
+text = "Refresh"
+
+[node name="JoinButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer" unique_id=1368440957]
+custom_minimum_size = Vector2(135, 0)
+layout_mode = 2
+text = "Join"
+
+[node name="HBoxHostContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=857378389]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="IP_Address" type="LineEdit" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer" unique_id=1950617224]
+custom_minimum_size = Vector2(700, 0)
+layout_mode = 2
+placeholder_text = "PUBLIC IP"
+alignment = 1
+
+[node name="PORT" type="LineEdit" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer" unique_id=518561486]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+placeholder_text = "PORT"
+alignment = 1
+
+[node name="HostButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer" unique_id=1134001902]
+custom_minimum_size = Vector2(135, 0)
+layout_mode = 2
+text = "Host"
+
 [node name="ChangePhotoButton" type="Button" parent="." unique_id=1158501524]
-offset_left = 639.0
-offset_top = 754.0
-offset_right = 789.0
-offset_bottom = 789.0
+offset_left = 134.0
+offset_top = 1099.0
+offset_right = 284.0
+offset_bottom = 1134.0
 text = "Change Photo"
 
 [node name="PhotoPreview" type="TextureRect" parent="." unique_id=128062011]
-offset_left = 544.0
-offset_top = 754.0
-offset_right = 629.0
-offset_bottom = 839.0
+offset_left = 39.0
+offset_top = 1099.0
+offset_right = 124.0
+offset_bottom = 1184.0
 expand_mode = 1
 stretch_mode = 5
 
-[connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
-[connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
 [connection signal="file_selected" from="FileDialog" to="." method="_on_file_selected"]
+[connection signal="pressed" from="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer/JoinButton" to="." method="_on_join_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="ChangePhotoButton" to="." method="_on_change_photo_button_pressed"]

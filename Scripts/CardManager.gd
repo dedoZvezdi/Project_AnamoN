@@ -257,6 +257,8 @@ func start_drag(card):
 		card.on_drag_start()
 	else:
 		card.rotation = 0.0
+	if drag_source_was_memory and source_memory_slot and source_memory_slot.has_method("show_card_front"):
+		source_memory_slot.show_card_front(card)
 	var graveyard_slot = get_graveyard_slot_for_card(card)
 	var banish_slot = get_banish_slot_for_card(card)
 	if graveyard_slot and graveyard_slot.has_method("get_top_card"):
@@ -614,6 +616,7 @@ func free_card_from_slot(card, skip_mainfield = false):
 			if card in node.cards_in_banish:
 				node.remove_card_from_slot(card)
 				break
+	remove_card_from_memory_slot(card)
 
 func is_card_in_graveyard(card):
 	if not card or not is_instance_valid(card):

@@ -13,7 +13,7 @@ func _ready() -> void:
 
 func fade() -> void:
 	if splash_screen == null:
-		get_tree().change_scene_to_packed(load_scene)
+		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 		return
 	splash_screen.modulate.a = 0.0
 	var tween = self.create_tween()
@@ -23,4 +23,4 @@ func fade() -> void:
 	tween.tween_property(splash_screen, "modulate:a", 0.0, fade_out_time)
 	tween.tween_interval(out_time)
 	await tween.finished
-	get_tree().change_scene_to_packed(load_scene)
+	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")

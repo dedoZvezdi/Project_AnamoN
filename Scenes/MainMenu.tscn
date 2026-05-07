@@ -1,0 +1,135 @@
+[gd_scene format=3 uid="uid://b5utnw1u5325q"]
+
+[ext_resource type="Texture2D" uid="uid://basdsfyp7hvlf" path="res://Assets/Textures/background_main_menu.png" id="1_8um5k"]
+[ext_resource type="Script" uid="uid://drmxu0xwa8rfh" path="res://Scripts/Main_Menu.gd" id="1_loo7a"]
+[ext_resource type="Texture2D" uid="uid://dbxxgos4tnkeg" path="res://Assets/Textures/Main Menu Buttons/online_button.png" id="2_xim88"]
+[ext_resource type="Texture2D" uid="uid://b22mm0dq0i27l" path="res://Assets/Textures/Main Menu Buttons/local_button.png" id="3_koqhg"]
+[ext_resource type="Texture2D" uid="uid://xbryek5m170s" path="res://Assets/Textures/Main Menu Buttons/deck_button.png" id="4_cmrfp"]
+[ext_resource type="Texture2D" uid="uid://bnhpwu17xd8qq" path="res://Assets/Textures/Main Menu Buttons/quit_button.png" id="5_loo7a"]
+[ext_resource type="Texture2D" uid="uid://o0wgqi5kpo7x" path="res://Assets/Textures/Main Menu Buttons/settings_button.png" id="6_if7li"]
+[ext_resource type="Texture2D" uid="uid://mimyuupflrmg" path="res://Assets/Textures/Main Menu Buttons/volume_button.png" id="7_koqhg"]
+[ext_resource type="Texture2D" uid="uid://dkbl5a7jw1lw7" path="res://Assets/Textures/Main Menu Buttons/music_button.png" id="8_cmrfp"]
+[ext_resource type="Texture2D" uid="uid://bknjyv0mjyw5m" path="res://Assets/Textures/Main Menu Buttons/info_button.png" id="9_cmrfp"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rrcx7"]
+texture = ExtResource("1_8um5k")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cmrfp"]
+size = Vector2(600, 199.99997)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_loo7a"]
+size = Vector2(200, 200)
+
+[node name="MainMenu" type="Control" unique_id=1146250515]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_loo7a")
+
+[node name="Menu_background" type="Panel" parent="." unique_id=757358683]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_rrcx7")
+
+[node name="Online_button" type="Sprite2D" parent="." unique_id=2065441516]
+position = Vector2(960, 497)
+scale = Vector2(1, 0.7)
+texture = ExtResource("2_xim88")
+
+[node name="Area2D" type="Area2D" parent="Online_button" unique_id=905080831]
+collision_layer = 512
+collision_mask = 512
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Online_button/Area2D" unique_id=1626906382]
+shape = SubResource("RectangleShape2D_cmrfp")
+
+[node name="Local_button" type="Sprite2D" parent="." unique_id=2074762454]
+position = Vector2(960, 641)
+scale = Vector2(1, 0.7)
+texture = ExtResource("3_koqhg")
+
+[node name="Area2D" type="Area2D" parent="Local_button" unique_id=1984903703]
+collision_layer = 512
+collision_mask = 512
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Local_button/Area2D" unique_id=51449359]
+shape = SubResource("RectangleShape2D_cmrfp")
+
+[node name="Decks_button" type="Sprite2D" parent="." unique_id=543496876]
+position = Vector2(960, 785)
+scale = Vector2(1, 0.7)
+texture = ExtResource("4_cmrfp")
+
+[node name="Area2D" type="Area2D" parent="Decks_button" unique_id=1358765287]
+collision_layer = 512
+collision_mask = 512
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decks_button/Area2D" unique_id=347719285]
+shape = SubResource("RectangleShape2D_cmrfp")
+
+[node name="Quit_button" type="Sprite2D" parent="." unique_id=1822932431]
+position = Vector2(960, 929)
+scale = Vector2(1, 0.7)
+texture = ExtResource("5_loo7a")
+
+[node name="Area2D" type="Area2D" parent="Quit_button" unique_id=2089046905]
+collision_layer = 512
+collision_mask = 512
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Quit_button/Area2D" unique_id=1609786930]
+shape = SubResource("RectangleShape2D_cmrfp")
+
+[node name="Settings" type="Sprite2D" parent="." unique_id=120533485]
+position = Vector2(1840, 80)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("6_if7li")
+
+[node name="Area2D" type="Area2D" parent="Settings" unique_id=2053306355]
+collision_layer = 1024
+collision_mask = 1024
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Settings/Area2D" unique_id=1629944999]
+shape = SubResource("RectangleShape2D_loo7a")
+
+[node name="Volume" type="Sprite2D" parent="." unique_id=1393069887]
+position = Vector2(80, 80)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("7_koqhg")
+
+[node name="Area2D" type="Area2D" parent="Volume" unique_id=582098600]
+collision_layer = 1024
+collision_mask = 1024
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Volume/Area2D" unique_id=170498430]
+shape = SubResource("RectangleShape2D_loo7a")
+
+[node name="Music" type="Sprite2D" parent="." unique_id=1074914532]
+position = Vector2(220, 80)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("8_cmrfp")
+
+[node name="Area2D" type="Area2D" parent="Music" unique_id=218552007]
+collision_layer = 1024
+collision_mask = 1024
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Music/Area2D" unique_id=638680621]
+shape = SubResource("RectangleShape2D_loo7a")
+
+[node name="Info" type="Sprite2D" parent="." unique_id=1295787797]
+position = Vector2(1840, 1000)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("9_cmrfp")
+
+[node name="Area2D" type="Area2D" parent="Info" unique_id=395594241]
+collision_layer = 1024
+collision_mask = 1024
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Info/Area2D" unique_id=256141471]
+shape = SubResource("RectangleShape2D_loo7a")
