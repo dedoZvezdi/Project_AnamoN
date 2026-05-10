@@ -100,6 +100,8 @@ func _input(event):
 				get_tree().quit()
 			elif is_mouse_over_area(local_area):
 				get_tree().change_scene_to_file("res://Scenes/Main.tscn")
+			elif is_mouse_over_area(decks_area):
+				get_tree().change_scene_to_file("res://Scenes/Deck_Building.tscn")
 			var btns = [$Info, $Quit_button, $Local_button, $Online_button, $Decks_button, $Settings, $Volume, $Music]
 			for b in btns:
 				var c = COLOR_NORMAL

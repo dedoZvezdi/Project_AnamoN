@@ -1,0 +1,558 @@
+[gd_scene format=3 uid="uid://b7dxkkxbdkn41"]
+
+[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="1_2xl88"]
+[ext_resource type="Script" uid="uid://i6x8mhmwp681" path="res://Scripts/Deck_Building.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://db2eqitvw1e27" path="res://Scenes/CardInformation.tscn" id="2_cardinfo"]
+[ext_resource type="Script" uid="uid://coi14bj72unlx" path="res://Scripts/VirtualizedCardGrid.gd" id="virtual_grid_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2xl88"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9019608)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.05, 0.05, 0.05, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+
+[node name="Deck_Building" type="Control" unique_id=1091405845]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=400156380]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_2xl88")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="CardInformation" parent="." unique_id=817726258 instance=ExtResource("2_cardinfo")]
+position = Vector2(-1480, -20)
+
+[node name="DeckPanel" type="Panel" parent="." unique_id=1757576901]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 10.0
+offset_right = 950.0
+offset_bottom = 195.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2xl88")
+
+[node name="LegalityLabel" type="Label" parent="DeckPanel" unique_id=1031021557]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 10.0
+offset_right = 82.0
+offset_bottom = 60.0
+text = "Legality:"
+vertical_alignment = 1
+
+[node name="legalityOptionButton" type="OptionButton" parent="DeckPanel" unique_id=2081564087]
+layout_mode = 0
+offset_left = 87.0
+offset_top = 10.0
+offset_right = 267.0
+offset_bottom = 60.0
+
+[node name="DeckLabel" type="Label" parent="DeckPanel" unique_id=536057221]
+layout_mode = 0
+offset_left = 39.0
+offset_top = 68.0
+offset_right = 82.0
+offset_bottom = 118.0
+text = "Deck:"
+vertical_alignment = 1
+
+[node name="DeckOptionButton" type="OptionButton" parent="DeckPanel" unique_id=623080949]
+layout_mode = 0
+offset_left = 87.0
+offset_top = 67.5
+offset_right = 267.0
+offset_bottom = 117.5
+
+[node name="NameLabel" type="Label" parent="DeckPanel" unique_id=2138426746]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 125.0
+offset_right = 82.0
+offset_bottom = 173.0
+text = "Name:"
+vertical_alignment = 1
+
+[node name="NameEditLine" type="LineEdit" parent="DeckPanel" unique_id=1893080063]
+layout_mode = 0
+offset_left = 87.0
+offset_top = 125.0
+offset_right = 267.0
+offset_bottom = 175.0
+
+[node name="ClearButton" type="Button" parent="DeckPanel" unique_id=1737433705]
+layout_mode = 0
+offset_left = 272.0
+offset_top = 10.0
+offset_right = 372.0
+offset_bottom = 60.0
+text = "Clear"
+
+[node name="SaveButton" type="Button" parent="DeckPanel" unique_id=672939367]
+layout_mode = 0
+offset_left = 272.0
+offset_top = 67.5
+offset_right = 372.0
+offset_bottom = 117.5
+text = "Save"
+
+[node name="SortButton" type="Button" parent="DeckPanel" unique_id=1248833801]
+layout_mode = 0
+offset_left = 272.0
+offset_top = 125.0
+offset_right = 372.0
+offset_bottom = 175.0
+text = "Sort"
+
+[node name="DeleteButton" type="Button" parent="DeckPanel" unique_id=280301033]
+layout_mode = 0
+offset_left = 377.0
+offset_top = 11.0
+offset_right = 477.0
+offset_bottom = 61.0
+text = "Delete"
+
+[node name="SaveAsButton" type="Button" parent="DeckPanel" unique_id=1291300058]
+layout_mode = 0
+offset_left = 377.0
+offset_top = 67.5
+offset_right = 477.0
+offset_bottom = 117.5
+text = "Save as"
+
+[node name="ShuffleButton" type="Button" parent="DeckPanel" unique_id=405663573]
+layout_mode = 0
+offset_left = 377.0
+offset_top = 125.0
+offset_right = 477.0
+offset_bottom = 175.0
+text = "Shuffle"
+
+[node name="SearchPanel" type="Panel" parent="." unique_id=1697691435]
+layout_mode = 0
+offset_left = 960.0
+offset_top = 10.0
+offset_right = 1910.0
+offset_bottom = 195.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="TypeLabel" type="Label" parent="SearchPanel" unique_id=1013429810]
+layout_mode = 0
+offset_left = 43.0
+offset_top = 10.0
+offset_right = 85.0
+offset_bottom = 60.0
+text = "Type:"
+vertical_alignment = 1
+
+[node name="TypeOptionButton" type="OptionButton" parent="SearchPanel" unique_id=680097776]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 10.0
+offset_right = 270.0
+offset_bottom = 60.0
+
+[node name="SupTypeLabel" type="Label" parent="SearchPanel" unique_id=1820167569]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 68.0
+offset_right = 85.0
+offset_bottom = 118.0
+text = "Subtype:"
+vertical_alignment = 1
+
+[node name="SupTypeOptionButton" type="OptionButton" parent="SearchPanel" unique_id=639990789]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 67.5
+offset_right = 270.0
+offset_bottom = 117.5
+
+[node name="ElementLabel" type="Label" parent="SearchPanel" unique_id=1484043416]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 125.0
+offset_right = 86.0
+offset_bottom = 175.0
+text = "Element:"
+vertical_alignment = 1
+
+[node name="ElementOptionButton" type="OptionButton" parent="SearchPanel" unique_id=772685280]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 125.0
+offset_right = 270.0
+offset_bottom = 175.0
+
+[node name="LevelLabel" type="Label" parent="SearchPanel" unique_id=1267092998]
+layout_mode = 0
+offset_left = 390.0
+offset_top = 10.0
+offset_right = 435.0
+offset_bottom = 58.0
+text = "Level:"
+vertical_alignment = 1
+
+[node name="levelOptionButton" type="LineEdit" parent="SearchPanel" unique_id=474699251]
+layout_mode = 0
+offset_left = 440.0
+offset_top = 10.0
+offset_right = 508.5
+offset_bottom = 60.0
+
+[node name="DurabilityLabel" type="Label" parent="SearchPanel" unique_id=1970637247]
+layout_mode = 0
+offset_left = 354.0
+offset_top = 68.0
+offset_right = 435.0
+offset_bottom = 116.0
+text = "Durability:"
+vertical_alignment = 1
+
+[node name="DirabilityLineEdit" type="LineEdit" parent="SearchPanel" unique_id=999134092]
+layout_mode = 0
+offset_left = 440.0
+offset_top = 67.5
+offset_right = 508.5
+offset_bottom = 117.5
+
+[node name="ClassesLabel" type="Label" parent="SearchPanel" unique_id=1505688182]
+layout_mode = 0
+offset_left = 279.0
+offset_top = 125.0
+offset_right = 323.0
+offset_bottom = 175.0
+text = "Class:"
+vertical_alignment = 1
+
+[node name="ClassesOptionButton" type="OptionButton" parent="SearchPanel" unique_id=78699572]
+layout_mode = 0
+offset_left = 328.0
+offset_top = 125.0
+offset_right = 508.0
+offset_bottom = 175.0
+
+[node name="CostResLabel" type="Label" parent="SearchPanel" unique_id=322047443]
+layout_mode = 0
+offset_left = 525.0
+offset_top = 10.0
+offset_right = 595.0
+offset_bottom = 58.0
+text = "Cost Res:"
+vertical_alignment = 1
+
+[node name="CostResLineEdit" type="LineEdit" parent="SearchPanel" unique_id=480550689]
+layout_mode = 0
+offset_left = 600.0
+offset_top = 10.0
+offset_right = 668.5
+offset_bottom = 60.0
+
+[node name="CostMemLabel" type="Label" parent="SearchPanel" unique_id=1339690999]
+layout_mode = 0
+offset_left = 513.0
+offset_top = 81.0
+offset_right = 595.0
+offset_bottom = 106.0
+text = "Cost Mem:"
+
+[node name="CostMemLineEdit" type="LineEdit" parent="SearchPanel" unique_id=2027067896]
+layout_mode = 0
+offset_left = 600.0
+offset_top = 67.5
+offset_right = 668.5
+offset_bottom = 117.5
+
+[node name="SearchLabel" type="Label" parent="SearchPanel" unique_id=1298333272]
+layout_mode = 0
+offset_left = 538.0
+offset_top = 125.0
+offset_right = 595.0
+offset_bottom = 173.0
+text = "Search:"
+vertical_alignment = 1
+
+[node name="SearchLineEdit" type="LineEdit" parent="SearchPanel" unique_id=1394151110]
+layout_mode = 0
+offset_left = 600.0
+offset_top = 125.0
+offset_right = 810.0
+offset_bottom = 175.0
+
+[node name="LifeLabel" type="Label" parent="SearchPanel" unique_id=1396628120]
+layout_mode = 0
+offset_left = 699.0
+offset_top = 10.0
+offset_right = 735.0
+offset_bottom = 58.0
+text = "LIFE:"
+vertical_alignment = 1
+
+[node name="LifeLineEdit" type="LineEdit" parent="SearchPanel" unique_id=834224751]
+layout_mode = 0
+offset_left = 740.0
+offset_top = 10.0
+offset_right = 808.5
+offset_bottom = 60.0
+
+[node name="PowerLabel" type="Label" parent="SearchPanel" unique_id=880988896]
+layout_mode = 0
+offset_left = 673.0
+offset_top = 68.0
+offset_right = 735.0
+offset_bottom = 116.0
+text = "POWER:"
+vertical_alignment = 1
+
+[node name="PowerLineEdit" type="LineEdit" parent="SearchPanel" unique_id=1639696173]
+layout_mode = 0
+offset_left = 740.0
+offset_top = 67.5
+offset_right = 808.5
+offset_bottom = 117.5
+
+[node name="ExitButton" type="Button" parent="SearchPanel" unique_id=1195655149]
+layout_mode = 0
+offset_left = 820.0
+offset_top = 10.0
+offset_right = 940.0
+offset_bottom = 60.0
+text = "Exit"
+
+[node name="ClearSearchButton" type="Button" parent="SearchPanel" unique_id=382709297]
+layout_mode = 0
+offset_left = 820.0
+offset_top = 67.5
+offset_right = 940.0
+offset_bottom = 117.5
+text = "Clear"
+
+[node name="SearchButton" type="Button" parent="SearchPanel" unique_id=1770162708]
+layout_mode = 0
+offset_left = 820.0
+offset_top = 125.0
+offset_right = 940.0
+offset_bottom = 175.0
+text = "Search"
+
+[node name="DecksArea" type="Control" parent="." unique_id=426776200]
+anchors_preset = 0
+offset_left = 460.0
+offset_top = 210.0
+offset_right = 1490.0
+offset_bottom = 1080.0
+
+[node name="MainDeckHeader" type="Panel" parent="DecksArea" unique_id=1369843753]
+layout_mode = 0
+offset_right = 1025.0
+offset_bottom = 30.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="DecksArea/MainDeckHeader" unique_id=416442426]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "Deck: 0"
+
+[node name="MainDeckContent" type="Panel" parent="DecksArea" unique_id=1129431537]
+layout_mode = 0
+offset_top = 35.0
+offset_right = 1025.0
+offset_bottom = 480.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="DecksArea/MainDeckContent" unique_id=516933260]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="DecksArea/MainDeckContent/ScrollContainer" unique_id=1191127557]
+layout_mode = 2
+columns = 12
+
+[node name="MatDeckHeader" type="Panel" parent="DecksArea" unique_id=448252118]
+layout_mode = 0
+offset_top = 495.0
+offset_right = 850.0
+offset_bottom = 525.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="DecksArea/MatDeckHeader" unique_id=1743375282]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "Mat Deck: 0"
+
+[node name="MatDeckContent" type="Panel" parent="DecksArea" unique_id=834892314]
+layout_mode = 0
+offset_top = 530.0
+offset_right = 850.0
+offset_bottom = 680.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="DecksArea/MatDeckContent" unique_id=1865553604]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="DecksArea/MatDeckContent/ScrollContainer" unique_id=2074639401]
+layout_mode = 2
+columns = 12
+
+[node name="SideDeckHeader" type="Panel" parent="DecksArea" unique_id=615920439]
+layout_mode = 0
+offset_top = 695.0
+offset_right = 1025.0
+offset_bottom = 725.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="DecksArea/SideDeckHeader" unique_id=415163666]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "Side Deck: 0"
+
+[node name="SideDeckContent" type="Panel" parent="DecksArea" unique_id=316351467]
+layout_mode = 0
+offset_top = 730.0
+offset_right = 1025.0
+offset_bottom = 861.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="DecksArea/SideDeckContent" unique_id=1117878361]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="DecksArea/SideDeckContent/ScrollContainer" unique_id=577500694]
+layout_mode = 2
+columns = 12
+
+[node name="PhantomDeckHeader" type="Panel" parent="DecksArea" unique_id=1467651676]
+layout_mode = 0
+offset_left = 865.0
+offset_top = 495.0
+offset_right = 1026.0
+offset_bottom = 525.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="DecksArea/PhantomDeckHeader" unique_id=862450650]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "L/G Boon (0/0)"
+
+[node name="PhantomDeckContent" type="Panel" parent="DecksArea" unique_id=646451840]
+layout_mode = 0
+offset_left = 865.0
+offset_top = 530.0
+offset_right = 1025.0
+offset_bottom = 680.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="DecksArea/PhantomDeckContent" unique_id=316994857]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="DecksArea/PhantomDeckContent/ScrollContainer" unique_id=1540691419]
+layout_mode = 2
+columns = 2
+
+[node name="ResultsArea" type="Control" parent="." unique_id=1600215586]
+anchors_preset = 0
+offset_left = 1500.0
+offset_top = 210.0
+offset_right = 1910.0
+offset_bottom = 1080.0
+
+[node name="ResultsHeader" type="Panel" parent="ResultsArea" unique_id=568771535]
+layout_mode = 0
+offset_right = 410.0
+offset_bottom = 30.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="ResultsArea/ResultsHeader" unique_id=559803244]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "Results: 0"
+
+[node name="ResultsContent" type="Panel" parent="ResultsArea" unique_id=150616082]
+layout_mode = 0
+offset_top = 35.0
+offset_right = 410.0
+offset_bottom = 870.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ResultsArea/ResultsContent" unique_id=1341821725]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="Control" parent="ResultsArea/ResultsContent/ScrollContainer" unique_id=533563523]
+layout_mode = 2
+script = ExtResource("virtual_grid_script")
