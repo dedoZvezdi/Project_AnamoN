@@ -8,6 +8,13 @@
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pbw6q"]
 texture = ExtResource("4_rgh2o")
 
+[sub_resource type="Gradient" id="Gradient_w2b"]
+colors = PackedColorArray(1, 1, 1, 1, 0.2159017, 0.21590173, 0.2159017, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_header"]
+gradient = SubResource("Gradient_w2b")
+fill_from = Vector2(0, 1)
+
 [node name="Main" type="Node2D" unique_id=514279848]
 script = ExtResource("1_r150o")
 player_field_scene = ExtResource("2_idj7w")
@@ -46,14 +53,16 @@ size_flags_horizontal = 4
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/PanelContainer" unique_id=1844412255]
 layout_mode = 2
-color = Color(0, 0, 0, 0.80784315)
+color = Color(0.050980393, 0.050980393, 0.050980393, 0.9019608)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PanelContainer" unique_id=1260342187]
 layout_mode = 2
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=849482765]
+[node name="ColorRect" type="TextureRect" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=849482765]
 custom_minimum_size = Vector2(960, 30)
 layout_mode = 2
+texture = SubResource("GradientTexture2D_header")
+expand_mode = 1
 
 [node name="Label" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/ColorRect" unique_id=2038344739]
 modulate = Color(0, 0, 0, 1)

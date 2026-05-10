@@ -19,7 +19,7 @@ var current_displayed_slug = ""
 func _ready() -> void:
 	if preview_sprite:
 		default_texture = preview_sprite.texture
-	card_manager_reference = get_parent().get_node("CardManager")
+	card_manager_reference = get_parent().get_node_or_null("CardManager")
 	card_database_reference = load("res://Scripts/CardDatabase.gd").new()
 	card_database_reference.initialize_database()
 	card_database_reference.load_all_cards_data()
