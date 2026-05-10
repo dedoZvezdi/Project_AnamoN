@@ -58,17 +58,17 @@ func _process(_delta):
 
 func _update_hover_states():
 	var buttons = [$Online_button, $Local_button, $Decks_button, $Quit_button, $Settings, $Volume, $Music, $Info]
-	for btn in buttons:
-		var area = btn.get_node_or_null("Area2D")
+	for button in buttons:
+		var area = button.get_node_or_null("Area2D")
 		if area and is_mouse_over_area(area):
 			if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 				var target_color = COLOR_HOVER
-				target_color.a = btn.modulate.a
-				btn.modulate = target_color
+				target_color.a = button.modulate.a
+				button.modulate = target_color
 		else:
 			var target_color = COLOR_NORMAL
-			target_color.a = btn.modulate.a
-			btn.modulate = target_color
+			target_color.a = button.modulate.a
+			button.modulate = target_color
 
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -78,14 +78,16 @@ func _input(event):
 				_toggle_info()
 			elif is_mouse_over_area(quit_area):
 				$Quit_button.modulate = COLOR_PRESSED
+				get_tree().quit()
 			elif is_mouse_over_area(local_area):
 				$Local_button.modulate = COLOR_PRESSED
+				get_tree().change_scene_to_file("res://Scenes/Main.tscn")
 			elif is_mouse_over_area(online_area):
 				$Online_button.modulate = COLOR_PRESSED
 				print("Online button pressed")
 			elif is_mouse_over_area(decks_area):
 				$Decks_button.modulate = COLOR_PRESSED
-				print("Decks button pressed")
+				get_tree().change_scene_to_file("res://Scenes/Deck_Building.tscn")
 			elif is_mouse_over_area(settings_area):
 				$Settings.modulate = COLOR_PRESSED
 				print("Settings button pressed")
@@ -96,17 +98,11 @@ func _input(event):
 				$Music.modulate = COLOR_PRESSED
 				_apply_special_effect($Music)
 		else:
-			if is_mouse_over_area(quit_area):
-				get_tree().quit()
-			elif is_mouse_over_area(local_area):
-				get_tree().change_scene_to_file("res://Scenes/Main.tscn")
-			elif is_mouse_over_area(decks_area):
-				get_tree().change_scene_to_file("res://Scenes/Deck_Building.tscn")
-			var btns = [$Info, $Quit_button, $Local_button, $Online_button, $Decks_button, $Settings, $Volume, $Music]
-			for b in btns:
-				var c = COLOR_NORMAL
-				c.a = b.modulate.a
-				b.modulate = c
+			var buttons = [$Info, $Quit_button, $Local_button, $Online_button, $Decks_button, $Settings, $Volume, $Music]
+			for button in buttons:
+				var color = COLOR_NORMAL
+				color.a = button.modulate.a
+				button.modulate = color
 
 func _apply_special_effect(node: Sprite2D):
 	if node.rotation_degrees != 0:

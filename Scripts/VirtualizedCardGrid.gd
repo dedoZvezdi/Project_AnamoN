@@ -30,13 +30,13 @@ func _update_pool_size():
 		add_child(card)
 		card.custom_minimum_size = Vector2(card_width, card_height)
 		card.size = Vector2(card_width, card_height)
-		var t_rect = card.get_node_or_null("TextureRect")
-		if t_rect:
-			t_rect.scale = Vector2(1, 1)
-			t_rect.custom_minimum_size = Vector2(card_width, card_height)
-			t_rect.size = Vector2(card_width, card_height)
-			t_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			t_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		var texture_rect = card.get_node_or_null("TextureRect")
+		if texture_rect:
+			texture_rect.scale = Vector2(1, 1)
+			texture_rect.custom_minimum_size = Vector2(card_width, card_height)
+			texture_rect.size = Vector2(card_width, card_height)
+			texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		pool.append(card)
 
 func _process(_delta):
@@ -55,22 +55,22 @@ func _update_visible_items():
 		if data_index < data.size() and data_index >= 0:
 			var slug = data[data_index]
 			var row = int(data_index / float(columns))
-			var col = data_index % columns
+			var colum = data_index % columns
 			card.position = Vector2(
-				margin_left + col * (item_size.x + h_spacing),
+				margin_left + colum * (item_size.x + h_spacing),
 				row * (item_size.y + v_spacing))
 			if not card.has_meta("slug") or card.get_meta("slug") != slug:
 				card.set_meta("slug", slug)
 				card.set_meta("uuid", "")
 				if "card_slug" in card:
 					card.card_slug = slug
-				var tex_rect = card.get_node_or_null("TextureRect")
-				if tex_rect:
+				var texture_rect = card.get_node_or_null("TextureRect")
+				if texture_rect:
 					var image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
 					if ResourceLoader.exists(image_path) or FileAccess.file_exists(image_path) or FileAccess.file_exists(image_path + ".import"):
-						tex_rect.texture = load(image_path)
+						texture_rect.texture = load(image_path)
 					else:
-						tex_rect.texture = load("res://Assets/Textures/ga_back.png")
+						texture_rect.texture = load("res://Assets/Textures/ga_back.png")
 			card.show()
 		else:
 			card.hide()
