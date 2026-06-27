@@ -3,7 +3,6 @@ extends Node2D
 var cards_in_slot: Array = []
 var base_z_index := 0
 var memory_z_index_offset := 0
-var memory_max_z_index := 49
 var is_roulette_running = false
 var roulette_timer: Timer
 var current_highlight_index = 0
@@ -79,11 +78,12 @@ func bring_card_to_front(card):
 	var idx := cards_in_slot.find(card)
 	if idx == -1:
 		return
-	for i in range(cards_in_slot.size()):
+	var total_cards = cards_in_slot.size()
+	for i in range(total_cards):
 		var cards = cards_in_slot[i]
 		if cards and is_instance_valid(cards):
 			if i >= idx:
-				cards.z_index = min(memory_z_index_offset + i + 20, memory_max_z_index)
+				cards.z_index = memory_z_index_offset + total_cards + i + 1
 			else:
 				cards.z_index = memory_z_index_offset + i + 1
 

@@ -30,8 +30,8 @@ func _ready() -> void:
 	hand_field_right = center_screen_x + HAND_FIELD_WIDTH / 2.0
 	add_to_group("player_hand")
 
-func _notification(what):
-	if what == NOTIFICATION_PREDELETE:
+func _notification(noti):
+	if noti == NOTIFICATION_PREDELETE:
 		cleanup()
 
 func _exit_tree():

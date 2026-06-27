@@ -109,7 +109,7 @@ func _setup_progress_bar():
 	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	progress_bar.visible = false
 	progress_bar.top_level = true
-	progress_bar.z_index = 2000
+	progress_bar.z_index = max(1, player_deck.size() + 1)
 	var ring_size = Vector2(128, 128)
 	progress_bar.custom_minimum_size = ring_size
 	progress_bar.size = ring_size
@@ -129,6 +129,7 @@ func _process(delta):
 	if is_holding_left:
 		hold_timer += delta
 		if progress_bar:
+			progress_bar.z_index = max(1, player_deck.size() + 1)
 			progress_bar.value = hold_timer / HOLD_DURATION
 			progress_bar.visible = true
 			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
@@ -329,24 +330,24 @@ func _animate_deck_card_to_zone(slug: String, card_uuid: String, target_pos: Vec
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
 	if ResourceLoader.exists(card_image_path):
 		proxy_card.get_node("CardImage").texture = load(card_image_path)
-	var ci = proxy_card.get_node_or_null("CardImage")
-	var cib = proxy_card.get_node_or_null("CardImageBack")
-	if ci and cib:
+	var card_image = proxy_card.get_node_or_null("CardImage")
+	var card_image_back = proxy_card.get_node_or_null("CardImageBack")
+	if card_image and card_image_back:
 		if play_flip:
-			ci.visible = true
-			cib.visible = true
-			ci.z_index = -1
-			cib.z_index = 0
+			card_image.visible = true
+			card_image_back.visible = true
+			card_image.z_index = -1
+			card_image_back.z_index = 0
 		elif face_down:
-			ci.visible = false
-			cib.visible = true
-			ci.z_index = -1
-			cib.z_index = 0
+			card_image.visible = false
+			card_image_back.visible = true
+			card_image.z_index = -1
+			card_image_back.z_index = 0
 		else:
-			ci.visible = true
-			cib.visible = false
-			ci.z_index = 0
-			cib.z_index = -1
+			card_image.visible = true
+			card_image_back.visible = false
+			card_image.z_index = 0
+			card_image_back.z_index = -1
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(proxy_card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)

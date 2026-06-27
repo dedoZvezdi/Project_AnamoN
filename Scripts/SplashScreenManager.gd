@@ -9,7 +9,29 @@ extends Control
 @export var splash_screen : TextureRect
 
 func _ready() -> void:
+	_cleanup_temp_opponent_photo()
+	_ensure_decks_folder_exists()
 	fade()
+
+func _ensure_decks_folder_exists():
+	var decks_dir_path = ""
+	if OS.has_feature("standalone"):
+		decks_dir_path = OS.get_executable_path().get_base_dir().path_join("Decks")
+	else:
+		decks_dir_path = "res://Decks"
+	var dir = DirAccess.open(decks_dir_path)
+	if not dir:
+		DirAccess.make_dir_absolute(decks_dir_path)
+
+func _cleanup_temp_opponent_photo():
+	var base_path = ""
+	if OS.has_feature("editor"):
+		base_path = ProjectSettings.globalize_path("res://Data/")
+	else:
+		base_path = OS.get_executable_path().get_base_dir().path_join("Data")
+	var file_path = base_path.path_join("temp_opponent_photo.png")
+	if FileAccess.file_exists(file_path):
+		DirAccess.remove_absolute(file_path)
 
 func fade() -> void:
 	if splash_screen == null:

@@ -6,7 +6,6 @@ var base_position
 var base_z_index = 0
 var hover_z_index = 10
 var memory_z_index_offset = 0
-var memory_max_z_index = 49
 var highlighted_card: Node = null
 var steps_left = 0
 var is_roulette_running = false
@@ -108,8 +107,8 @@ func bring_card_to_front(card):
 	for i in range(slot_size):
 		var current_card = cards_in_slot[i]
 		if current_card and is_instance_valid(current_card):
-			if i >= card_index:
-				current_card.z_index = min(memory_z_index_offset + i + 20, memory_max_z_index)
+			if i == card_index:
+				current_card.z_index = memory_z_index_offset + slot_size + 1
 			else:
 				current_card.z_index = memory_z_index_offset + i + 1
 

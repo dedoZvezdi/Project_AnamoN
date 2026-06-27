@@ -41,13 +41,13 @@ func _ready():
 	hbox.add_theme_constant_override("separation", 20)
 	vbox.add_child(hbox)
 	for e_name in ["Fire", "Water", "Wind"]:
-		var btn = Button.new()
-		btn.text = e_name
-		btn.toggle_mode = true
-		btn.custom_minimum_size = Vector2(100, 50)
-		btn.pressed.connect(func(): _on_element_toggled(e_name))
-		hbox.add_child(btn)
-		element_buttons[e_name] = btn
+		var button = Button.new()
+		button.text = e_name
+		button.toggle_mode = true
+		button.custom_minimum_size = Vector2(100, 50)
+		button.pressed.connect(func(): _on_element_toggled(e_name))
+		hbox.add_child(button)
+		element_buttons[e_name] = button
 	confirm_button = Button.new()
 	confirm_button.text = "Confirm"
 	confirm_button.disabled = true
@@ -60,8 +60,8 @@ func _input(event):
 	if event is InputEventMouse:
 		var mouse_pos = event.global_position
 		var over_button = false
-		for btn in element_buttons.values():
-			if btn.get_global_rect().has_point(mouse_pos):
+		for button in element_buttons.values():
+			if button.get_global_rect().has_point(mouse_pos):
 				over_button = true
 				break
 		if confirm_button and confirm_button.get_global_rect().has_point(mouse_pos):
@@ -70,8 +70,8 @@ func _input(event):
 			get_viewport().set_input_as_handled()
 
 func _on_element_toggled(element_name: String):
-	var btn = element_buttons[element_name]
-	if btn.button_pressed:
+	var button = element_buttons[element_name]
+	if button.button_pressed:
 		if selected_elements.size() >= 2:
 			var oldest = selected_elements.pop_front()
 			if element_buttons.has(oldest):

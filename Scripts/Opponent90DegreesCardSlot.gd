@@ -39,14 +39,14 @@ func _setup_progress_bar():
 	progress_bar.min_value = 0
 	progress_bar.max_value = 1.0
 	progress_bar.value = 0
-	var progress_size = Vector2(100, 100)
+	var progress_size = Vector2(128, 128)
 	progress_bar.custom_minimum_size = progress_size
 	progress_bar.size = progress_size
 	progress_bar.position = -progress_size / 2
 	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	progress_bar.visible = false
 	progress_bar.top_level = true
-	progress_bar.z_index = 2000
+	progress_bar.z_index = max(1, cards_in_banish.size() + 1)
 	progress_bar.z_as_relative = false
 	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
 	for y in range(128):
@@ -63,6 +63,7 @@ func _process(delta):
 	if is_holding_left:
 		hold_timer += delta
 		if progress_bar:
+			progress_bar.z_index = max(1, cards_in_banish.size() + 1)
 			progress_bar.value = hold_timer / HOLD_DURATION
 			progress_bar.visible = true
 			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
@@ -143,7 +144,7 @@ func _setup_omen_label():
 		omen_label = Label.new()
 		omen_label.name = "OmenLabel"
 		omen_label.add_theme_font_size_override("font_size", 20)
-		omen_label.z_index = 1500
+		omen_label.z_index = 2
 		omen_label.visible = false
 		add_child(omen_label)
 		omen_label.position = Vector2(575, 480)
