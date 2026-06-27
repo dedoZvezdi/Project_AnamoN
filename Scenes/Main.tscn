@@ -8,11 +8,11 @@
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pbw6q"]
 texture = ExtResource("4_rgh2o")
 
-[sub_resource type="Gradient" id="Gradient_w2b"]
+[sub_resource type="Gradient" id="Gradient_rgh2o"]
 colors = PackedColorArray(1, 1, 1, 1, 0.2159017, 0.21590173, 0.2159017, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_header"]
-gradient = SubResource("Gradient_w2b")
+gradient = SubResource("Gradient_rgh2o")
 fill_from = Vector2(0, 1)
 
 [node name="Main" type="Node2D" unique_id=514279848]
@@ -68,7 +68,7 @@ expand_mode = 1
 modulate = Color(0, 0, 0, 1)
 self_modulate = Color(0, 0, 0, 1)
 layout_mode = 0
-offset_right = 960.0
+offset_right = 1065.5
 offset_bottom = 30.0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0)
 theme_override_font_sizes/font_size = 20

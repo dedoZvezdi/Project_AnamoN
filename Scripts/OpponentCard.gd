@@ -50,6 +50,10 @@ func find_card_information_reference():
 	if root:
 		card_information_reference = find_node_by_script(root, "res://Scripts/CardInformation.gd")
 
+func _exit_tree() -> void:
+	if is_instance_valid(progress_bar):
+		progress_bar.queue_free()
+
 func find_node_by_script(node: Node, script_path: String) -> Node:
 	if node.get_script() and node.get_script().resource_path == script_path:
 		return node
@@ -269,11 +273,14 @@ func _setup_progress_bar():
 	progress_bar.value = 0
 	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	progress_bar.visible = false
+	progress_bar.top_level = true
+	progress_bar.z_index = 2000
+	progress_bar.z_as_relative = false
 	var ring_size = Vector2(128, 128)
 	progress_bar.custom_minimum_size = ring_size
 	progress_bar.size = ring_size
-	progress_bar.scale = Vector2(1.5, 1.5)
-	progress_bar.position = - (ring_size * 1.5) / 2
+	progress_bar.scale = Vector2(1.0, 1.0)
+	progress_bar.position = - ring_size / 2
 	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
 	for y in range(128):
 		for x in range(128):
@@ -283,7 +290,7 @@ func _setup_progress_bar():
 	var tex = ImageTexture.create_from_image(img)
 	progress_bar.texture_progress = tex
 	progress_bar.modulate = Color(0.2, 0.8, 1.0)
-	add_child(progress_bar)
+	get_tree().root.add_child.call_deferred(progress_bar)
 
 func _process(delta):
 	if is_holding_left:
@@ -291,6 +298,7 @@ func _process(delta):
 		if progress_bar:
 			progress_bar.value = hold_timer / HOLD_DURATION
 			progress_bar.visible = true
+			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
 		if hold_timer >= HOLD_DURATION:
 			open_lineage_window()
 			_reset_hold()

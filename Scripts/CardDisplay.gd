@@ -8,6 +8,8 @@ var dragged_card = null
 var hold_timer = 0.0
 var is_holding_left = false
 var progress_bar: TextureProgressBar
+var _is_deck_builder_pressing = false
+var _deck_builder_drag_start_pos = Vector2.ZERO
 
 signal request_popup_menu(slug, uuid)
 signal card_drag_started(card_display)
@@ -55,16 +57,16 @@ func _setup_progress_bar():
 	progress_bar.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	progress_bar.visible = false
-	progress_bar.scale = Vector2(0.8, 0.8)
-	progress_bar.position = (CARD_DISPLAY_SIZE - (Vector2(128, 128) * 0.8)) / 2
+	progress_bar.scale = Vector2(1.0, 1.0)
+	progress_bar.position = (CARD_DISPLAY_SIZE - Vector2(128, 128)) / 2
 	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
 	for y in range(128):
 		for x in range(128):
-			var dist = Vector2(x-64, y-64).length()
-			if dist > 25 and dist < 30:
+			var distance = Vector2(x-64, y-64).length()
+			if distance > 25 and distance < 30:
 				img.set_pixel(x, y, Color(1, 1, 1, 0.8))
-	var tex = ImageTexture.create_from_image(img)
-	progress_bar.texture_progress = tex
+	var texture = ImageTexture.create_from_image(img)
+	progress_bar.texture_progress = texture
 	progress_bar.modulate = Color(0.2, 0.8, 1.0)
 	add_child(progress_bar)
 
@@ -103,6 +105,7 @@ func _on_mouse_entered():
 func _on_mouse_exited():
 	self.scale = Vector2(1, 1)
 	_reset_hold()
+	_is_deck_builder_pressing = false
 	if has_meta("deck_z_index"):
 		self.z_index = get_meta("deck_z_index")
 	else:
@@ -147,7 +150,22 @@ func _is_in_opponent_zone() -> bool:
 	return false
 
 func _gui_input(event):
+	if event is InputEventMouseMotion:
+		if get_tree().current_scene.name == "Deck_Building":
+			if _is_deck_builder_pressing and event.position.distance_to(_deck_builder_drag_start_pos) > 5:
+				_is_deck_builder_pressing = false
+				var drag_data = _create_deck_builder_drag_data()
+				if drag_data:
+					var preview = drag_data.get("preview")
+					force_drag(drag_data, preview)
+					accept_event()
+			return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		if get_tree().current_scene.name == "Deck_Building":
+			if get_tree().current_scene.has_method("handle_right_click"):
+				get_tree().current_scene.handle_right_click(self)
+			accept_event()
+			return
 		if zone == "lineage":
 			return
 		if zone in ["graveyard", "banish", "ga_deck", "mat_deck", "logo_tokens", "logo_mastery", "logo_status", "lineage"]:
@@ -155,6 +173,15 @@ func _gui_input(event):
 			emit_signal("request_popup_menu", card_slug, current_uuid)
 			accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if get_tree().current_scene.name == "Deck_Building":
+			if event.pressed:
+				_is_deck_builder_pressing = true
+				_deck_builder_drag_start_pos = event.position
+				accept_event()
+			else:
+				_is_deck_builder_pressing = false
+				accept_event()
+			return
 		if zone == "lineage":
 			if event.pressed:
 				is_holding_left = true
@@ -257,16 +284,57 @@ func update_grid_immediately():
 	if parent_window and parent_window.has_method("update_deck_view"):
 		parent_window.update_deck_view()
 
-func get_drag_data(_pos):
+func _get_texture_for_slug(slug: String) -> Texture2D:
+	var image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+	if ResourceLoader.exists(image_path) or FileAccess.file_exists(image_path + ".import"):
+		return load(image_path)
+	var back_path = "res://Assets/Textures/ga_back.png"
+	if ResourceLoader.exists(back_path):
+		return load(back_path)
+	return null
+
+func _create_deck_builder_drag_data():
+	var slug = card_slug
+	if slug == "" and has_meta("slug"):
+		slug = get_meta("slug")
+	if slug == "":
+		return null
+	var source_zone = zone
+	if source_zone == "" and has_meta("zone"):
+		source_zone = get_meta("zone")
+	var deck_building = get_tree().current_scene
+	var original_index = -1
+	if source_zone != "deck_building_results" and deck_building:
+		if has_meta("deck_grid_index"):
+			original_index = int(get_meta("deck_grid_index"))
+		else:
+			original_index = get_index()
+		deck_building._remove_card_from_zone(slug, source_zone, original_index)
+		deck_building.register_drag_start(slug, source_zone, original_index)
+	var preview_container = Control.new()
+	preview_container.z_index = 4096
+	preview_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var preview = TextureRect.new()
+	preview.custom_minimum_size = Vector2(74, 104)
+	preview.size = Vector2(74, 104)
+	preview.position = Vector2(-37, -52)
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview.texture = _get_texture_for_slug(slug)
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	preview_container.add_child(preview)
+	return {"type": "deck_builder", "slug": slug, "zone": source_zone, "card_display": self, "preview": preview_container}
+
+func _get_drag_data(_pos):
 	if zone == "lineage" or zone == "lineage_opponent":
 		return null
-	var real_card = create_real_card_for_drag()
-	if real_card:
-		set_drag_preview(real_card)
-		return {"type": "real_card", "card": real_card, "original_slug": card_slug, "zone": zone}
-	else:
-		set_drag_preview(texture_rect.duplicate())
-		return card_slug
+	var is_deck_builder = get_tree().current_scene.name == "Deck_Building"
+	if is_deck_builder:
+		var drag_data = _create_deck_builder_drag_data()
+		if drag_data:
+			set_drag_preview(drag_data.preview)
+		return drag_data
+	return null
 
 func create_real_card_for_drag():
 	if card_slug == "":
@@ -301,10 +369,24 @@ func create_real_card_for_drag():
 		card_manager.connect_card_signals(real_card)
 	return real_card
 
-func can_drop_data(_pos, data):
+func _can_drop_data(pos, data):
+	if get_tree().current_scene.name == "Deck_Building":
+		if data is Dictionary and data.get("type") == "deck_builder":
+			var parent = get_parent()
+			if parent and parent.has_method("_can_drop_data"):
+				var parent_pos = parent.get_global_transform().affine_inverse() * (get_global_transform() * pos)
+				return parent._can_drop_data(parent_pos, data)
+		return false
 	return typeof(data) == TYPE_STRING and data != card_slug
 
-func drop_data(_pos, data):
+func _drop_data(pos, data):
+	if get_tree().current_scene.name == "Deck_Building":
+		if data is Dictionary and data.get("type") == "deck_builder":
+			var parent = get_parent()
+			if parent and parent.has_method("_drop_data"):
+				var parent_pos = parent.get_global_transform().affine_inverse() * (get_global_transform() * pos)
+				parent._drop_data(parent_pos, data)
+		return
 	card_slug = data
 	card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 	if ResourceLoader.exists(card_image_path):

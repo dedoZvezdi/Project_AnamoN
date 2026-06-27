@@ -61,12 +61,12 @@ func _build_transform_pairs_cache():
 		return
 	var edition_to_base = {}
 	for key in db.cards_db:
-		var d = db.cards_db[key]
-		if d.has("editions"):
-			for ed in d["editions"]:
-				var ed_slug = ed.get("slug", "")
-				if ed_slug != "":
-					edition_to_base[ed_slug] = key
+		var data = db.cards_db[key]
+		if data.has("editions"):
+			for edition in data["editions"]:
+				var edition_slug = edition.get("slug", "")
+				if edition_slug != "":
+					edition_to_base[edition_slug] = key
 	for key in db.cards_db:
 		var data = db.cards_db[key]
 		if data.has("other_orientations") and data["other_orientations"].size() > 0:
@@ -110,6 +110,10 @@ func _ready() -> void:
 
 func get_uuid() -> String:
 	return uuid
+
+func _exit_tree() -> void:
+	if is_instance_valid(progress_bar):
+		progress_bar.queue_free()
 
 func find_card_information_reference():
 	var root = get_tree().current_scene
@@ -355,7 +359,7 @@ func _setup_progress_bar():
 	progress_bar.value = 0
 	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	progress_bar.top_level = true
-	progress_bar.z_index = 2000
+	progress_bar.z_index = 10
 	progress_bar.z_as_relative = false
 	var ring_size = Vector2(128, 128)
 	progress_bar.custom_minimum_size = ring_size
@@ -523,11 +527,11 @@ func move_to_lineage():
 
 func find_champion_on_field():
 	var fields = get_tree().get_nodes_in_group("main_fields")
-	for f in fields:
-		if f.has_method("get") and f.get("current_champion_card"):
-			return f.current_champion_card
-		elif "current_champion_card" in f and f.current_champion_card:
-			return f.current_champion_card
+	for field in fields:
+		if field.has_method("get") and field.get("current_champion_card"):
+			return field.current_champion_card
+		elif "current_champion_card" in field and field.current_champion_card:
+			return field.current_champion_card
 	return null
 
 func transform_card():
@@ -545,27 +549,27 @@ func transform_card():
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_card_transform", multiplayer.get_unique_id(), get_uuid(), new_slug)
 	if has_node("AnimationPlayer"):
-		var anim: AnimationPlayer = $AnimationPlayer
-		if anim.has_animation("card_flip"):
-			anim.play("card_flip")
+		var animation: AnimationPlayer = $AnimationPlayer
+		if animation.has_animation("card_flip"):
+			animation.play("card_flip")
 	if is_in_main_field() and current_field:
 		if current_field.has_method("is_champion_card") and current_field.is_champion_card(self) and not is_regalia_card():
 			if current_field.current_champion_card and current_field.current_champion_card != self:
-				var prev = current_field.current_champion_card
-				if "attached_counters" in prev:
-					for c_name in prev.attached_counters:
-						attached_counters[c_name] = prev.attached_counters[c_name]
-				if "champion_lineage" in prev:
-					for entry in prev.champion_lineage:
+				var previous = current_field.current_champion_card
+				if "attached_counters" in previous:
+					for c_name in previous.attached_counters:
+						attached_counters[c_name] = previous.attached_counters[c_name]
+				if "champion_lineage" in previous:
+					for entry in previous.champion_lineage:
 						add_to_lineage(entry)
 				var lineage_data = {
-					"slug": current_field.get_card_slug(prev),
-					"uuid": prev.uuid if "uuid" in prev else ""}
+					"slug": current_field.get_card_slug(previous),
+					"uuid": previous.uuid if "uuid" in previous else ""}
 				add_to_lineage(lineage_data)
 				current_field.remove_previous_champions()
 			current_field.current_champion_card = self
 			global_position = current_field.global_position + Vector2(0, -20)
-			z_index = 400
+			z_index = 1
 			current_field.champion_life_delta = 0
 			if has_method("apply_champion_life_delta"):
 				apply_champion_life_delta(0)
@@ -580,9 +584,9 @@ func remote_transform(new_slug: String):
 	set_meta("slug", new_slug)
 	_update_card_image(new_slug)
 	if has_node("AnimationPlayer"):
-		var anim: AnimationPlayer = $AnimationPlayer
-		if anim.has_animation("card_flip"):
-			anim.play("card_flip")
+		var animation: AnimationPlayer = $AnimationPlayer
+		if animation.has_animation("card_flip"):
+			animation.play("card_flip")
 	if card_information_reference and mouse_inside and not is_dragging:
 		hide_card_info()
 		show_card_info()
@@ -590,15 +594,15 @@ func remote_transform(new_slug: String):
 
 func _update_card_image(card_slug: String):
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
-	var tex = null
+	var texture = null
 	if ResourceLoader.exists(card_image_path):
-		tex = load(card_image_path)
+		texture = load(card_image_path)
 	elif FileAccess.file_exists(card_image_path):
-		tex = load(card_image_path)
+		texture = load(card_image_path)
 	elif FileAccess.file_exists(card_image_path + ".import"):
-		tex = load(card_image_path)
-	if tex:
-		$CardImage.texture = tex
+		texture = load(card_image_path)
+	if texture:
+		$CardImage.texture = texture
 		$CardImage.visible = true
 		if has_node("CardImageBack"):
 			$CardImageBack.visible = false
@@ -683,17 +687,17 @@ func _build_plds_text_effective(data: Dictionary) -> String:
 	var debuff_count = attached_counters.get("Debuff", 0)
 	var counter_mod = buff_count - debuff_count
 	if data.has("power") and data["power"] != null:
-		var val = int(data["power"]) + int(mods.get("power", 0)) + counter_mod
-		val = max(0, val)
-		parts.append("POW. %s" % str(val))
+		var value = int(data["power"]) + int(mods.get("power", 0)) + counter_mod
+		value = max(0, value)
+		parts.append("POW. %s" % str(value))
 	if data.has("life") and data["life"] != null:
-		var val2 = int(data["life"]) + int(mods.get("life", 0)) + counter_mod
-		val2 = max(0, val2)
-		parts.append("LIFE %s" % str(val2))
+		var sec_val = int(data["life"]) + int(mods.get("life", 0)) + counter_mod
+		sec_val = max(0, sec_val)
+		parts.append("LIFE %s" % str(sec_val))
 	if data.has("durability") and data["durability"] != null:
-		var val3 = int(data["durability"]) + int(mods.get("durability", 0))
-		val3 = max(0, val3)
-		parts.append("DUR. %s" % str(val3))
+		var thirth_val = int(data["durability"]) + int(mods.get("durability", 0))
+		thirth_val = max(0, thirth_val)
+		parts.append("DUR. %s" % str(thirth_val))
 	if data.has("speed") and data["speed"] != null:
 		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
 			if data["speed"] == 1:
@@ -761,12 +765,12 @@ func rotate_card():
 	tween.tween_property(self, "rotation_degrees", target_rot, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	sync_stats_to_opponent(target_rot)
 
-func set_direction(dir: String):
-	current_direction = dir
+func set_direction(direction: String):
+	current_direction = direction
 	if is_marked:
 		set_marked(false)
 	var target_rot = original_rotation
-	match dir:
+	match direction:
 		"North": target_rot = original_rotation
 		"East": target_rot = original_rotation + 90
 		"South": target_rot = original_rotation + 180
@@ -868,58 +872,58 @@ func apply_logo_status_to_self(logo_node):
 		return
 	if data.has("level") and data["level"] != null and logo_node.level_value != 0:
 		var base_lvl = int(data["level"]) 
-		var old = int(runtime_modifiers.get("level", 0))
-		var proposed = old + int(logo_node.level_value)
-		var new_mod = max(-base_lvl, proposed)
-		runtime_modifiers["level"] = new_mod
+		var old_lvl = int(runtime_modifiers.get("level", 0))
+		var proposed_lvl = old_lvl + int(logo_node.level_value)
+		var new_mod_lvl = max(-base_lvl, proposed_lvl)
+		runtime_modifiers["level"] = new_mod_lvl
 	if data.has("durability") and data["durability"] != null and logo_node.durability_value != 0:
 		var base_dur = int(data["durability"]) 
-		var oldd = int(runtime_modifiers.get("durability", 0))
-		var proposedd = oldd + int(logo_node.durability_value)
-		var new_modd = max(-base_dur, proposedd)
-		runtime_modifiers["durability"] = new_modd
+		var oldd_ur = int(runtime_modifiers.get("durability", 0))
+		var proposed_dur = oldd_ur + int(logo_node.durability_value)
+		var new_mod_dur = max(-base_dur, proposed_dur)
+		runtime_modifiers["durability"] = new_mod_dur
 	if data.has("power") and data["power"] != null and logo_node.power_value != 0:
 		var base_pow = int(data["power"]) 
-		var oldp = int(runtime_modifiers.get("power", 0))
-		var proposedp = oldp + int(logo_node.power_value)
-		var new_modp = max(-base_pow, proposedp)
-		runtime_modifiers["power"] = new_modp
+		var old_pow = int(runtime_modifiers.get("power", 0))
+		var proposed_pow = old_pow + int(logo_node.power_value)
+		var new_mod_pow = max(-base_pow, proposed_pow)
+		runtime_modifiers["power"] = new_mod_pow
 	if data.has("life") and data["life"] != null and logo_node.life_value != 0:
 		var base_life = int(data["life"]) 
-		var oldl = int(runtime_modifiers.get("life", 0))
-		var proposedl = oldl + int(logo_node.life_value)
-		var new_modl = max(-base_life, proposedl)
-		runtime_modifiers["life"] = new_modl
-		var applied_delta = new_modl - oldl
+		var old_life = int(runtime_modifiers.get("life", 0))
+		var proposed_life = old_life + int(logo_node.life_value)
+		var new_mod_life = max(-base_life, proposed_life)
+		runtime_modifiers["life"] = new_mod_life
+		var applied_delta = new_mod_life - old_life
 		if applied_delta != 0 and current_field and current_field.has_method("is_champion_card") and current_field.is_champion_card(self):
 			if current_field.has_method("adjust_champion_life_delta"):
 				current_field.adjust_champion_life_delta(applied_delta)
 	if logo_node.custom_counters.size() > 0:
 		for counter_name in logo_node.custom_counters.keys():
-			var delta_valc = int(logo_node.custom_counters[counter_name])
-			if delta_valc == 0 or counter_name == "Omen":
+			var delta_val_count = int(logo_node.custom_counters[counter_name])
+			if delta_val_count == 0 or counter_name == "Omen":
 				continue
-			if delta_valc > 0:
+			if delta_val_count > 0:
 				if counter_name == "Buff":
 					var debuff = attached_counters.get("Debuff", 0)
-					var cancel = min(debuff, delta_valc)
+					var cancel = min(debuff, delta_val_count)
 					attached_counters["Debuff"] = debuff - cancel
-					delta_valc -= cancel
+					delta_val_count -= cancel
 				elif counter_name == "Debuff":
 					var buff = attached_counters.get("Buff", 0)
-					var cancel = min(buff, delta_valc)
+					var cancel = min(buff, delta_val_count)
 					attached_counters["Buff"] = buff - cancel
-					delta_valc -= cancel
-				if delta_valc > 0:
-					attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_valc
+					delta_val_count -= cancel
+				if delta_val_count > 0:
+					attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_val_count
 			else:
-				attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_valc
+				attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_val_count
 			var keys_to_remove = []
-			for k in attached_counters.keys():
-				if attached_counters[k] == 0:
-					keys_to_remove.append(k)
-			for k in keys_to_remove:
-				attached_counters.erase(k)
+			for key in attached_counters.keys():
+				if attached_counters[key] == 0:
+					keys_to_remove.append(key)
+			for key in keys_to_remove:
+				attached_counters.erase(key)
 	logo_node.reset_all_status_values()
 	if card_level_lable:
 		card_level_lable.clear()
@@ -939,8 +943,8 @@ func apply_champion_life_delta(delta):
 		return
 	if data.has("life") and data["life"] != null:
 		var base_life = int(data["life"]) 
-		var new_modl = max(-base_life, int(delta))
-		runtime_modifiers["life"] = new_modl
+		var new_mod_life = max(-base_life, int(delta))
+		runtime_modifiers["life"] = new_mod_life
 		if card_level_lable:
 			card_level_lable.clear()
 		if card_PLDS_lable:
@@ -1023,7 +1027,6 @@ func _return_to_original_owner_banish():
 	var anim_player = get_node_or_null("AnimationPlayer")
 	var front = get_node_or_null("CardImage")
 	var back = get_node_or_null("CardImageBack")
-	
 	if anim_player and anim_player.has_animation("card_flip"):
 		anim_player.play("card_flip")
 		var timer = get_tree().create_timer(0.1)
@@ -1296,10 +1299,10 @@ func hide_all_in_memory():
 		sync_all_reveal_state(false)
 
 func find_parent_container():
-	var p = get_parent()
-	if p:
-		if (p.is_in_group("memory_slots") or p.is_in_group("player_hand")) and not p.name.contains("Opponent"):
-			return p
+	var parent = get_parent()
+	if parent:
+		if (parent.is_in_group("memory_slots") or parent.is_in_group("player_hand")) and not parent.name.contains("Opponent"):
+			return parent
 	var hand_nodes = get_tree().get_nodes_in_group("player_hand")
 	for node in hand_nodes:
 		if not node.name.contains("Opponent"):
@@ -1474,7 +1477,7 @@ func give_control_to_opponent():
 			"is_marked": is_marked,
 			"original_owner_id": original_owner_id}
 		multiplayer_node.rpc("sync_give_control", multiplayer.get_unique_id(), stats)
-	z_index = 1000
+	z_index = 1
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(self, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)

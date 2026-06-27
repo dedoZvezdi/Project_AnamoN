@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="1_2xl88"]
 [ext_resource type="Script" uid="uid://i6x8mhmwp681" path="res://Scripts/Deck_Building.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://db2eqitvw1e27" path="res://Scenes/CardInformation.tscn" id="2_cardinfo"]
+[ext_resource type="Script" uid="uid://b0vtq8nt708y5" path="res://Scripts/DeckGridManager.gd" id="deck_grid_script"]
 [ext_resource type="Script" uid="uid://coi14bj72unlx" path="res://Scripts/VirtualizedCardGrid.gd" id="virtual_grid_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2xl88"]
@@ -45,9 +46,9 @@ position = Vector2(-1480, -20)
 [node name="DeckPanel" type="Panel" parent="." unique_id=1757576901]
 layout_mode = 0
 offset_left = 460.0
-offset_top = 10.0
+offset_top = 9.0
 offset_right = 950.0
-offset_bottom = 195.0
+offset_bottom = 194.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_2xl88")
 
 [node name="LegalityLabel" type="Label" parent="DeckPanel" unique_id=1031021557]
@@ -149,9 +150,9 @@ text = "Shuffle"
 [node name="SearchPanel" type="Panel" parent="." unique_id=1697691435]
 layout_mode = 0
 offset_left = 960.0
-offset_top = 10.0
+offset_top = 9.0
 offset_right = 1910.0
-offset_bottom = 195.0
+offset_bottom = 194.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="TypeLabel" type="Label" parent="SearchPanel" unique_id=1013429810]
@@ -353,166 +354,6 @@ offset_right = 940.0
 offset_bottom = 175.0
 text = "Search"
 
-[node name="DecksArea" type="Control" parent="." unique_id=426776200]
-anchors_preset = 0
-offset_left = 460.0
-offset_top = 210.0
-offset_right = 1490.0
-offset_bottom = 1080.0
-
-[node name="MainDeckHeader" type="Panel" parent="DecksArea" unique_id=1369843753]
-layout_mode = 0
-offset_right = 1025.0
-offset_bottom = 30.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="LabelLeft" type="Label" parent="DecksArea/MainDeckHeader" unique_id=416442426]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 2.0
-offset_right = 100.0
-offset_bottom = 27.0
-text = "Deck: 0"
-
-[node name="MainDeckContent" type="Panel" parent="DecksArea" unique_id=1129431537]
-layout_mode = 0
-offset_top = 35.0
-offset_right = 1025.0
-offset_bottom = 480.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="ScrollContainer" type="ScrollContainer" parent="DecksArea/MainDeckContent" unique_id=516933260]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = -5.0
-offset_bottom = -5.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="GridContainer" type="GridContainer" parent="DecksArea/MainDeckContent/ScrollContainer" unique_id=1191127557]
-layout_mode = 2
-columns = 12
-
-[node name="MatDeckHeader" type="Panel" parent="DecksArea" unique_id=448252118]
-layout_mode = 0
-offset_top = 495.0
-offset_right = 850.0
-offset_bottom = 525.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="LabelLeft" type="Label" parent="DecksArea/MatDeckHeader" unique_id=1743375282]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 2.0
-offset_right = 100.0
-offset_bottom = 27.0
-text = "Mat Deck: 0"
-
-[node name="MatDeckContent" type="Panel" parent="DecksArea" unique_id=834892314]
-layout_mode = 0
-offset_top = 530.0
-offset_right = 850.0
-offset_bottom = 680.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="ScrollContainer" type="ScrollContainer" parent="DecksArea/MatDeckContent" unique_id=1865553604]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = -5.0
-offset_bottom = -5.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="GridContainer" type="GridContainer" parent="DecksArea/MatDeckContent/ScrollContainer" unique_id=2074639401]
-layout_mode = 2
-columns = 12
-
-[node name="SideDeckHeader" type="Panel" parent="DecksArea" unique_id=615920439]
-layout_mode = 0
-offset_top = 695.0
-offset_right = 1025.0
-offset_bottom = 725.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="LabelLeft" type="Label" parent="DecksArea/SideDeckHeader" unique_id=415163666]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 2.0
-offset_right = 100.0
-offset_bottom = 27.0
-text = "Side Deck: 0"
-
-[node name="SideDeckContent" type="Panel" parent="DecksArea" unique_id=316351467]
-layout_mode = 0
-offset_top = 730.0
-offset_right = 1025.0
-offset_bottom = 861.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="ScrollContainer" type="ScrollContainer" parent="DecksArea/SideDeckContent" unique_id=1117878361]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = -5.0
-offset_bottom = -5.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="GridContainer" type="GridContainer" parent="DecksArea/SideDeckContent/ScrollContainer" unique_id=577500694]
-layout_mode = 2
-columns = 12
-
-[node name="PhantomDeckHeader" type="Panel" parent="DecksArea" unique_id=1467651676]
-layout_mode = 0
-offset_left = 865.0
-offset_top = 495.0
-offset_right = 1026.0
-offset_bottom = 525.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="LabelLeft" type="Label" parent="DecksArea/PhantomDeckHeader" unique_id=862450650]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 2.0
-offset_right = 100.0
-offset_bottom = 27.0
-text = "L/G Boon (0/0)"
-
-[node name="PhantomDeckContent" type="Panel" parent="DecksArea" unique_id=646451840]
-layout_mode = 0
-offset_left = 865.0
-offset_top = 530.0
-offset_right = 1025.0
-offset_bottom = 680.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="ScrollContainer" type="ScrollContainer" parent="DecksArea/PhantomDeckContent" unique_id=316994857]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = -5.0
-offset_bottom = -5.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="GridContainer" type="GridContainer" parent="DecksArea/PhantomDeckContent/ScrollContainer" unique_id=1540691419]
-layout_mode = 2
-columns = 2
-
 [node name="ResultsArea" type="Control" parent="." unique_id=1600215586]
 anchors_preset = 0
 offset_left = 1500.0
@@ -522,8 +363,9 @@ offset_bottom = 1080.0
 
 [node name="ResultsHeader" type="Panel" parent="ResultsArea" unique_id=568771535]
 layout_mode = 0
+offset_top = -11.0
 offset_right = 410.0
-offset_bottom = 30.0
+offset_bottom = 19.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="LabelLeft" type="Label" parent="ResultsArea/ResultsHeader" unique_id=559803244]
@@ -536,7 +378,7 @@ text = "Results: 0"
 
 [node name="ResultsContent" type="Panel" parent="ResultsArea" unique_id=150616082]
 layout_mode = 0
-offset_top = 35.0
+offset_top = 24.0
 offset_right = 410.0
 offset_bottom = 870.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
@@ -547,12 +389,178 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 5.0
-offset_top = 5.0
+offset_top = 1.0
 offset_right = -5.0
-offset_bottom = -5.0
+offset_bottom = -1.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="GridContainer" type="Control" parent="ResultsArea/ResultsContent/ScrollContainer" unique_id=533563523]
 layout_mode = 2
 script = ExtResource("virtual_grid_script")
+
+[node name="MainDeckHeader" type="Panel" parent="." unique_id=993809689]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 199.0
+offset_right = 1485.0
+offset_bottom = 229.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="MainDeckHeader" unique_id=454977835]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "Deck: 0"
+
+[node name="MainDeckContent" type="Panel" parent="." unique_id=1658733641]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 234.0
+offset_right = 1485.0
+offset_bottom = 784.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainDeckContent" unique_id=1983798044]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = -1.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="Control" parent="MainDeckContent/ScrollContainer" unique_id=70242141]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("deck_grid_script")
+
+[node name="MatDeckHeader" type="Panel" parent="." unique_id=1558462935]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 789.0
+offset_right = 1310.0
+offset_bottom = 819.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="MatDeckHeader" unique_id=529512962]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "Mat Deck: 0"
+
+[node name="MatDeckContent" type="Panel" parent="." unique_id=1205307182]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 824.0
+offset_right = 1310.0
+offset_bottom = 932.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MatDeckContent" unique_id=1381677422]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = -1.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="Control" parent="MatDeckContent/ScrollContainer" unique_id=377207357]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("deck_grid_script")
+
+[node name="SideDeckHeader" type="Panel" parent="." unique_id=307917725]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 937.0
+offset_right = 1485.0
+offset_bottom = 967.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="SideDeckHeader" unique_id=1569189902]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "Side Deck: 0"
+
+[node name="SideDeckContent" type="Panel" parent="." unique_id=1060693195]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 972.0
+offset_right = 1485.0
+offset_bottom = 1080.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="SideDeckContent" unique_id=1767231136]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = -1.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="Control" parent="SideDeckContent/ScrollContainer" unique_id=1714085734]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("deck_grid_script")
+
+[node name="PantheonDeckHeader" type="Panel" parent="." unique_id=276261377]
+layout_mode = 0
+offset_left = 1325.0
+offset_top = 789.0
+offset_right = 1485.0
+offset_bottom = 819.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="LabelLeft" type="Label" parent="PantheonDeckHeader" unique_id=1444553970]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 27.0
+text = "L/G Boon (0/0)"
+
+[node name="PantheonDeckContent" type="Panel" parent="." unique_id=1175626522]
+layout_mode = 0
+offset_left = 1325.0
+offset_top = 824.0
+offset_right = 1485.0
+offset_bottom = 932.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PantheonDeckContent" unique_id=1172196166]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = -1.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 0
+
+[node name="GridContainer" type="Control" parent="PantheonDeckContent/ScrollContainer" unique_id=240577827]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("deck_grid_script")

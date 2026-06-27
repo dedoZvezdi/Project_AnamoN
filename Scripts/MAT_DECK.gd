@@ -38,14 +38,14 @@ func _setup_progress_bar():
 	progress_bar.min_value = 0
 	progress_bar.max_value = 1.0
 	progress_bar.value = 0
-	var progress_size = Vector2(100, 100)
+	var progress_size = Vector2(128, 128)
 	progress_bar.custom_minimum_size = progress_size
 	progress_bar.size = progress_size
 	progress_bar.position = -progress_size / 2
 	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	progress_bar.visible = false
 	progress_bar.top_level = true
-	progress_bar.z_index = 2000
+	progress_bar.z_index = max(1, player_deck.size() + 1)
 	progress_bar.z_as_relative = false
 	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
 	for y in range(128):
@@ -62,6 +62,7 @@ func _process(delta):
 	if is_holding_left:
 		hold_timer += delta
 		if progress_bar:
+			progress_bar.z_index = max(1, player_deck.size() + 1)
 			progress_bar.value = hold_timer / HOLD_DURATION
 			progress_bar.visible = true
 			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
@@ -88,7 +89,6 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				is_holding_left = true
-				hold_timer = 0.0
 			else:
 				_reset_hold()
 

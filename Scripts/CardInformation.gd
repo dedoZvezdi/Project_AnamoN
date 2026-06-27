@@ -15,6 +15,7 @@ var default_texture = null
 var card_manager_reference = null
 var last_displayed_card = null
 var current_displayed_slug = ""
+var _base_card_for_edition_cache: Dictionary = {}
 
 func _ready() -> void:
 	if preview_sprite:
@@ -60,8 +61,8 @@ func _format_types(data: Dictionary) -> String:
 		for t in data["types"]:
 			types_list.append(str(t).to_upper())
 	if data.has("subtypes") and data["subtypes"] is Array:
-		for s in data["subtypes"]:
-			subtypes_list.append(str(s).to_upper())
+		for subtypes in data["subtypes"]:
+			subtypes_list.append(str(subtypes).to_upper())
 		subtypes_list.sort()
 	if types_list.size() > 0:
 		types_text += " ".join(types_list)
@@ -225,11 +226,11 @@ func _update_card_display(slug: String):
 		var show_custom = _should_show_custom(last_displayed_card)
 		if show_custom:
 			if last_displayed_card.has_method("get_attached_counters"):
-				var cn = last_displayed_card.get_attached_counters()
-				for counter_name in cn.keys():
-					var v2 = int(cn[counter_name])
-					var signs2 = "+" if v2 > 0 else ""
-					counters_text_lines.append("%s %s%s" % [str(counter_name), signs2, str(v2)])
+				var countername = last_displayed_card.get_attached_counters()
+				for counter_name in countername.keys():
+					var counternames = int(countername[counter_name])
+					var signs = "+" if counternames > 0 else ""
+					counters_text_lines.append("%s %s%s" % [str(counter_name), signs, str(counternames)])
 				if not counters_text_lines.is_empty() and card_Counters_lable:
 					card_Counters_lable.append_text("[left][b]Counters:[/b]\n%s[/left]" % "\n".join(counters_text_lines))
 
@@ -273,17 +274,17 @@ func _build_plds_text(data: Dictionary) -> String:
 func _build_plds_text_effective(data: Dictionary, mods: Dictionary) -> String:
 	var parts: Array[String] = []
 	if data.has("power") and data["power"] != null:
-		var p = int(data["power"]) + int(mods.get("power", 0))
-		p = max(0, p)
-		parts.append("POW. %s" % str(p))
+		var power = int(data["power"]) + int(mods.get("power", 0))
+		power = max(0, power)
+		parts.append("POW. %s" % str(power))
 	if data.has("life") and data["life"] != null:
-		var l = int(data["life"]) + int(mods.get("life", 0))
-		l = max(0, l)
-		parts.append("LIFE %s" % str(l))
+		var life = int(data["life"]) + int(mods.get("life", 0))
+		life = max(0, life)
+		parts.append("LIFE %s" % str(life))
 	if data.has("durability") and data["durability"] != null:
-		var d = int(data["durability"]) + int(mods.get("durability", 0))
-		d = max(0, d)
-		parts.append("DUR. %s" % str(d))
+		var durability = int(data["durability"]) + int(mods.get("durability", 0))
+		durability = max(0, durability)
+		parts.append("DUR. %s" % str(durability))
 	if data.has("speed") and data["speed"] != null:
 		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
 			if data["speed"] == 1:
@@ -340,13 +341,20 @@ func format_slug(slug):
 	return " ".join(formatted_words)
 
 func find_base_card_for_edition(edition_id):
+	if _base_card_for_edition_cache.has(edition_id):
+		return _base_card_for_edition_cache[edition_id]
+	var result = null
 	for slug in card_database_reference.cards_db:
 		var data = card_database_reference.cards_db[slug]
 		if data.has("editions"):
 			for edition in data["editions"]:
 				if edition.get("edition_id") == edition_id:
-					return slug
-	return null
+					result = slug
+					break
+			if result != null:
+				break
+	_base_card_for_edition_cache[edition_id] = result
+	return result
 
 func get_slug_from_card(card) -> String:
 	if card.has_meta("slug"):
@@ -398,23 +406,23 @@ func is_card_of_type(slug: String, target_type: String) -> bool:
 	var data = card_database_reference.cards_db[slug]
 	var target_upper = target_type.to_upper()
 	if data.has("types") and data["types"] is Array:
-		for t in data["types"]:
-			if str(t).to_upper() == target_upper:
+		for types in data["types"]:
+			if str(types).to_upper() == target_upper:
 				return true
 	if data.has("edition_id") and not data.has("parent_orientation_slug"):
 		var base_slug = find_base_card_for_edition(data["edition_id"])
 		if base_slug and card_database_reference.cards_db.has(base_slug):
 			var base_data = card_database_reference.cards_db[base_slug]
 			if base_data.has("types") and base_data["types"] is Array:
-				for t in base_data["types"]:
-					if str(t).to_upper() == target_upper:
+				for types in base_data["types"]:
+					if str(types).to_upper() == target_upper:
 						return true
 	elif data.has("parent_orientation_slug"):
 		var parent_slug = data["parent_orientation_slug"]
 		if card_database_reference.cards_db.has(parent_slug):
 			var parent_data = card_database_reference.cards_db[parent_slug]
 			if parent_data.has("types") and parent_data["types"] is Array:
-				for t in parent_data["types"]:
-					if str(t).to_upper() == target_upper:
+				for types in parent_data["types"]:
+					if str(types).to_upper() == target_upper:
 						return true		
 	return false

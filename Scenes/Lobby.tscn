@@ -1,0 +1,737 @@
+[gd_scene format=3 uid="uid://7g36h22timd3"]
+
+[ext_resource type="Script" uid="uid://da3g2yfmrve2s" path="res://Scripts/Lobby.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="2_lolwk"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bg"]
+texture = ExtResource("2_lolwk")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xy1bw"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+skew = Vector2(2, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_transparent"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 1024
+corner_radius_top_right = 1024
+corner_radius_bottom_right = 1024
+corner_radius_bottom_left = 1024
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(1, 1, 1, 0.06)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_p1"]
+bg_color = Color(0.627451, 0.43137255, 1, 0.8)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ready_normal"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ready_pressed"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ready_hover"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.15)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.65)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider_v"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+skew = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vs"]
+bg_color = Color(0.05, 0.05, 0.05, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+corner_detail = 20
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_deck_normal"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yg8gm"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_deck_hover"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.06)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.35)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gqa7q"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s3paf"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sup6t"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_idhfa"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.34901962)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_03jl0"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vmftg"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r753w"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b6u2u"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.34901962)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yesx4"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 0.05882353)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_normal"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_pressed"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.22)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_hover"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.12)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.13333334, 0.7411765, 0.20392157, 0.55)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lolwk"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nsj2m"]
+bg_color = Color(0.7411765, 0.13725491, 0.20392157, 0.21960784)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wgubu"]
+bg_color = Color(0.8745098, 0.15294118, 0.023529412, 0.12156863)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7411765, 0.13333334, 0.20392157, 0.54901963)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_p2"]
+bg_color = Color(1, 0.627451, 0.23529412, 0.8)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="Lobby" type="Control" unique_id=325265899]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BgPanel" type="Panel" parent="." unique_id=456551563]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_bg")
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=607725569]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopLabel" type="Label" parent="RootVBox" unique_id=1691754142]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 32
+text = "DUEL LOBBY"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DivTop" type="Panel" parent="RootVBox" unique_id=1956588243]
+custom_minimum_size = Vector2(1920, 1)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_xy1bw")
+
+[node name="Arena" type="HBoxContainer" parent="RootVBox" unique_id=1543715942]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="Player1Half" type="PanelContainer" parent="RootVBox/Arena" unique_id=1116284594]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_transparent")
+
+[node name="Margin" type="MarginContainer" parent="RootVBox/Arena/Player1Half" unique_id=111222001]
+layout_mode = 2
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 0
+
+[node name="VBox" type="VBoxContainer" parent="RootVBox/Arena/Player1Half/Margin" unique_id=1486201539]
+layout_mode = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="AvatarFrame" type="Panel" parent="RootVBox/Arena/Player1Half/Margin/VBox" unique_id=682818320]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_avatar")
+
+[node name="PlayerIdentity" type="VBoxContainer" parent="RootVBox/Arena/Player1Half/Margin/VBox" unique_id=1499003899]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PlayerSide" type="Label" parent="RootVBox/Arena/Player1Half/Margin/VBox/PlayerIdentity" unique_id=459304266]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 12
+text = "PLAYER I"
+horizontal_alignment = 1
+
+[node name="NameInput" type="LineEdit" parent="RootVBox/Arena/Player1Half/Margin/VBox/PlayerIdentity" unique_id=2122578001]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_placeholder_color = Color(1, 1, 1, 0.9)
+theme_override_font_sizes/font_size = 38
+placeholder_text = "Player 1"
+alignment = 1
+editable = false
+flat = true
+
+[node name="ProgressBar" type="Panel" parent="RootVBox/Arena/Player1Half/Margin/VBox" unique_id=355625259]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bar_bg")
+
+[node name="Fill" type="Panel" parent="RootVBox/Arena/Player1Half/Margin/VBox/ProgressBar" unique_id=355625260]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bar_p1")
+
+[node name="StatusRow" type="HBoxContainer" parent="RootVBox/Arena/Player1Half/Margin/VBox" unique_id=1637880634]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Dot" type="ColorRect" parent="RootVBox/Arena/Player1Half/Margin/VBox/StatusRow" unique_id=1000567798]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(1, 1, 1, 0.15)
+
+[node name="StatusLabel" type="Label" parent="RootVBox/Arena/Player1Half/Margin/VBox/StatusRow" unique_id=802349441]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9411765, 0, 0.105882354, 1)
+theme_override_font_sizes/font_size = 13
+text = "NOT READY"
+
+[node name="ReadyButton" type="Button" parent="RootVBox/Arena/Player1Half/Margin/VBox" unique_id=333931403]
+custom_minimum_size = Vector2(260, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
+theme_override_colors/font_hover_color = Color(0.9372549, 0.87058824, 0.74509805, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_ready_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ready_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ready_hover")
+text = "READY UP"
+
+[node name="VSeparator" type="Panel" parent="RootVBox/Arena" unique_id=222222001]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_divider_v")
+
+[node name="CenterCol" type="VBoxContainer" parent="RootVBox/Arena" unique_id=1594982940]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="MarginCenter" type="MarginContainer" parent="RootVBox/Arena/CenterCol" unique_id=333333001]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 32
+
+[node name="InnerVBox" type="VBoxContainer" parent="RootVBox/Arena/CenterCol/MarginCenter" unique_id=333333002]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="DivTop" type="Panel" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=333333003]
+custom_minimum_size = Vector2(1, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_divider_v")
+
+[node name="VSRing" type="Panel" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=1267007335]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_vs")
+
+[node name="VSLabel" type="Label" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/VSRing" unique_id=1254352220]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.788, 0.663, 0.431, 1)
+theme_override_font_sizes/font_size = 28
+text = "VS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DivMid" type="Panel" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=333333004]
+custom_minimum_size = Vector2(1, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_divider_v")
+
+[node name="DeckLabel" type="Label" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=444444001]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 30
+text = "DECK"
+horizontal_alignment = 1
+
+[node name="DeckOption" type="OptionButton" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=329319209]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
+theme_override_colors/font_hover_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
+theme_override_colors/font_hover_pressed_color = Color(0.90860194, 0.8136836, 0.6482804, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_deck_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yg8gm")
+theme_override_styles/hover = SubResource("StyleBoxFlat_deck_hover")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_gqa7q")
+alignment = 1
+selected = 0
+item_count = 1
+popup/item_0/text = "Dragons"
+popup/item_0/id = 0
+
+[node name="ModeLabel" type="Label" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=444444002]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 22
+text = "MODE"
+horizontal_alignment = 1
+
+[node name="ModeRow" type="HBoxContainer" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=687500758]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="OptionButton" type="OptionButton" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/ModeRow" unique_id=429209721]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
+theme_override_colors/font_hover_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
+theme_override_colors/font_hover_pressed_color = Color(0.9098039, 0.8117647, 0.64705884, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_s3paf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_sup6t")
+theme_override_styles/hover = SubResource("StyleBoxFlat_idhfa")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_03jl0")
+alignment = 1
+selected = 0
+item_count = 3
+popup/item_0/text = "Signle Game"
+popup/item_0/id = 0
+popup/item_1/text = "Match"
+popup/item_1/id = 1
+popup/item_2/text = "Best of 5"
+popup/item_2/id = 2
+
+[node name="LegalityLabel" type="Label" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=444444003]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 22
+text = "LEGALITY"
+horizontal_alignment = 1
+
+[node name="LegalityRow" type="HBoxContainer" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=1400809977]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LegalityButton" type="OptionButton" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/LegalityRow" unique_id=1300257575]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
+theme_override_colors/font_hover_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
+theme_override_colors/font_hover_pressed_color = Color(0.9098039, 0.8117647, 0.64705884, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_vmftg")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_r753w")
+theme_override_styles/hover = SubResource("StyleBoxFlat_b6u2u")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yesx4")
+alignment = 1
+selected = 0
+item_count = 4
+popup/item_0/text = "STANDART"
+popup/item_0/id = 0
+popup/item_1/text = "DRAFT"
+popup/item_1/id = 1
+popup/item_2/text = "PANTHEON"
+popup/item_2/id = 2
+popup/item_3/text = "N/A"
+popup/item_3/id = 3
+
+[node name="DivBot" type="Panel" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=333333005]
+custom_minimum_size = Vector2(1, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_divider_v")
+
+[node name="StartButton" type="Button" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=707197102]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.13333334, 0.7411765, 0.20392157, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_start_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_start_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_start_hover")
+text = "START DUEL"
+
+[node name="ExitButton" type="Button" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=551317004]
+custom_minimum_size = Vector2(200, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.9411765, 0, 0.105882354, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_lolwk")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nsj2m")
+theme_override_styles/hover = SubResource("StyleBoxFlat_wgubu")
+text = "Exit Lobby"
+
+[node name="VSeparator2" type="Panel" parent="RootVBox/Arena" unique_id=222222002]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_divider_v")
+
+[node name="Player2Half" type="PanelContainer" parent="RootVBox/Arena" unique_id=1833807192]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_transparent")
+
+[node name="Margin" type="MarginContainer" parent="RootVBox/Arena/Player2Half" unique_id=888222001]
+layout_mode = 2
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 0
+
+[node name="VBox" type="VBoxContainer" parent="RootVBox/Arena/Player2Half/Margin" unique_id=457409139]
+layout_mode = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="AvatarFrame" type="Panel" parent="RootVBox/Arena/Player2Half/Margin/VBox" unique_id=51223957]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_avatar")
+
+[node name="PlayerIdentity" type="VBoxContainer" parent="RootVBox/Arena/Player2Half/Margin/VBox" unique_id=648392056]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PlayerSide" type="Label" parent="RootVBox/Arena/Player2Half/Margin/VBox/PlayerIdentity" unique_id=1641190899]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 12
+text = "PLAYER II"
+horizontal_alignment = 1
+
+[node name="NameInput" type="LineEdit" parent="RootVBox/Arena/Player2Half/Margin/VBox/PlayerIdentity" unique_id=1122132155]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_placeholder_color = Color(1, 1, 1, 0.9)
+theme_override_font_sizes/font_size = 38
+placeholder_text = "Player 2"
+alignment = 1
+editable = false
+flat = true
+
+[node name="ProgressBar" type="Panel" parent="RootVBox/Arena/Player2Half/Margin/VBox" unique_id=999625259]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bar_bg")
+
+[node name="Fill" type="Panel" parent="RootVBox/Arena/Player2Half/Margin/VBox/ProgressBar" unique_id=999625260]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bar_p2")
+
+[node name="StatusRow" type="HBoxContainer" parent="RootVBox/Arena/Player2Half/Margin/VBox" unique_id=267064264]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Dot" type="ColorRect" parent="RootVBox/Arena/Player2Half/Margin/VBox/StatusRow" unique_id=1967382419]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(1, 1, 1, 0.15)
+
+[node name="StatusLabel" type="Label" parent="RootVBox/Arena/Player2Half/Margin/VBox/StatusRow" unique_id=1019138388]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9411765, 0, 0.105882354, 1)
+theme_override_font_sizes/font_size = 13
+text = "NOT READY"
+
+[node name="ReadyButton" type="Button" parent="RootVBox/Arena/Player2Half/Margin/VBox" unique_id=1894843809]
+custom_minimum_size = Vector2(260, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
+theme_override_colors/font_hover_color = Color(0.9372549, 0.87058824, 0.74509805, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_ready_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ready_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ready_hover")
+text = "READY UP"

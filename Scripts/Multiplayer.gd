@@ -20,6 +20,7 @@ var is_my_turn: bool = false
 var USER_PHOTO_PATH = "user://Player_Image.png"
 var DEFAULT_PHOTO_PATH = "res://Assets/Textures/Player Info/Player_photos/Player_Image.png"
 var OPPONENT_PHOTO_FILENAME = "temp_opponent_photo.png"
+var _registered_lobby_port: int = -1
 
 const LOBBY_FILE = "user://local_lobbies.json"
 
@@ -54,8 +55,8 @@ func _ready():
 	$PhotoPreview.visible = false
 	_cleanup_temp_files()
 
-func _notification(what):
-	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+func _notification(noti):
+	if noti == NOTIFICATION_WM_CLOSE_REQUEST:
 		_cleanup_temp_files()
 		_unregister_lobby()
 
@@ -74,7 +75,12 @@ func _on_check_button_toggled(is_pressed: bool):
 		port.visible = true
 
 func _on_cancel_button_pressed():
+	reset_ui()
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+
+func _exit_tree() -> void:
+	_cleanup_temp_files()
+	_unregister_lobby()
 
 func _on_host_button_pressed() -> void:
 	var entered_name = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer/Name.text.strip_edges()
@@ -105,12 +111,22 @@ func _on_host_button_pressed() -> void:
 	else:
 		if not validate_ip_and_port():
 			return
+		var lobbies = _load_lobbies()
+		for lobby in lobbies:
+			if lobby is Dictionary and int(lobby.get("port", -1)) == int(port.text) and lobby.get("player_count", 0) > 0:
+				show_popup("A lobby is already active on port " + port.text + ".")
+				reset_ui()
+				return
 		var config = ConfigFile.new()
 		config.set_value("Player", "Name", name_to_use)
 		config.save("user://player_config.cfg")
 		disable_buttons()
 		peer = ENetMultiplayerPeer.new()
-		peer.create_server(int(port.text))
+		var error = peer.create_server(int(port.text))
+		if error != OK:
+			show_popup("Failed to create ENet server on port " + port.text + ". Port might be in use.")
+			reset_ui()
+			return
 		multiplayer.multiplayer_peer = peer
 		_register_lobby(name_to_use, int(port.text))
 		var player_scene = player_field_scene.instantiate()
@@ -182,7 +198,7 @@ func _on_join_button_pressed() -> void:
 				show_popup("Lobby is full (2/2 players).")
 				_refresh_lobby_list()
 				return
-			if target_lobby.player_count <= 0:
+			if not _is_lobby_alive(target_lobby):
 				show_popup("Lobby is old and closed.")
 				_refresh_lobby_list()
 				return
@@ -280,8 +296,8 @@ func is_valid_ip(ip: String) -> bool:
 			return false
 	return true
 
-func is_valid_port(p: int) -> bool:
-	return p >= 0 and p <= 65535
+func is_valid_port(valid_port: int) -> bool:
+	return valid_port >= 0 and valid_port <= 65535
 
 func _on_connect_timeout():
 	if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
@@ -304,19 +320,19 @@ func _on_file_selected(path: String):
 		show_popup("Failed to load image from " + path)
 
 func _apply_player_photo_to_field(field_node: Node):
-	var tex = null
+	var texture = null
 	if FileAccess.file_exists(USER_PHOTO_PATH):
 		var img = Image.load_from_file(USER_PHOTO_PATH)
 		if img:
-			tex = ImageTexture.create_from_image(img)
-	if not tex and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
-		tex = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
-	if tex:
+			texture = ImageTexture.create_from_image(img)
+	if not texture and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
+		texture = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
+	if texture:
 		var player_info = field_node.find_child("Player_Info", true, false)
 		if player_info:
-			var poly = player_info.get_node_or_null("Polygon2D")
-			if poly:
-				poly.texture = tex
+			var polygon = player_info.get_node_or_null("Polygon2D")
+			if polygon:
+				polygon.texture = texture
 
 func _get_opponent_photo_path() -> String:
 	var base_path = ""
@@ -351,20 +367,20 @@ func receive_opponent_photo(photo_data: PackedByteArray):
 			_apply_opponent_photo_to_field(opp_field)
 
 func _apply_opponent_photo_to_field(field_node: Node):
-	var tex = null
+	var texture = null
 	var opp_photo_path = _get_opponent_photo_path()
 	if FileAccess.file_exists(opp_photo_path):
 		var img = Image.load_from_file(opp_photo_path)
 		if img:
-			tex = ImageTexture.create_from_image(img)
-	if not tex and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
-		tex = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
-	if tex:
+			texture = ImageTexture.create_from_image(img)
+	if not texture and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
+		texture = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
+	if texture:
 		var opp_info = field_node.find_child("Opponents_Info", true, false)
 		if opp_info:
-			var poly = opp_info.get_node_or_null("Polygon2D")
-			if poly:
-				poly.texture = tex
+			var polygon = opp_info.get_node_or_null("Polygon2D")
+			if polygon:
+				polygon.texture = texture
 
 func on_peer_connected(peer_id):
 	if multiplayer.is_server():
@@ -415,6 +431,7 @@ func on_peer_disconnected(peer_id):
 		if host_chat_node:
 			host_chat_node.add_message("System", name_left + " left the game")
 		peer_names.erase(peer_id)
+	_cleanup_temp_files()
 
 @rpc("any_peer", "reliable")
 func show_turn_popup(message: String):
@@ -918,6 +935,7 @@ func disable_buttons():
 	$PhotoPreview.visible = false
 
 func reset_ui():
+	_unregister_lobby()
 	$Panel.visible = true
 	$CanvasLayer.visible = true
 	$CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer/HostButton.disabled = false
@@ -945,7 +963,6 @@ func reset_ui():
 	peer_names.clear()
 	if connect_timer:
 		connect_timer.stop()
-	_unregister_lobby()
 
 func get_or_create_opponent_card(card_manager, uuid: String, slug: String) -> Node:
 	var opp_field = card_manager.get_parent()
@@ -1457,6 +1474,7 @@ func lobby_is_full_callback():
 
 func _refresh_lobby_list():
 	item_list.clear()
+	_cleanup_dead_lobbies()
 	current_lobbies = _load_lobbies()
 	var visible_lobbies = []
 	for lobby in current_lobbies:
@@ -1468,6 +1486,16 @@ func _refresh_lobby_list():
 		var text = lobby.host_name + " (" + count_str + ") - Status: " + status
 		item_list.add_item(text)
 		item_list.set_item_metadata(item_list.get_item_count() - 1, lobby)
+
+func _cleanup_dead_lobbies():
+	var lobbies = _load_lobbies()
+	var now = Time.get_unix_time_from_system()
+	var alive = []
+	for lobby in lobbies:
+		var last = lobby.get("last_seen", 0)
+		if now - last < 15.0:
+			alive.append(lobby)
+	_save_lobbies(alive)
 
 func _load_lobbies() -> Array:
 	if not FileAccess.file_exists(LOBBY_FILE):
@@ -1493,43 +1521,73 @@ func _save_lobbies(lobbies: Array):
 	file.close()
 
 func _register_lobby(host_name: String, host_port: int):
+	_registered_lobby_port = host_port
 	var lobbies = _load_lobbies()
-	var my_id = multiplayer.get_unique_id()
 	var found = false
 	for lobby in lobbies:
-		if lobby.host_id == my_id:
+		if lobby.port == host_port:
 			lobby.host_name = host_name
-			lobby.port = host_port
 			lobby.player_count = 1
+			lobby.last_seen = Time.get_unix_time_from_system()
 			found = true
 			break
 	if not found:
 		lobbies.append({
-			"host_id": my_id,
-			"host_name": host_name,
-			"ip": "localhost",
-			"port": host_port,
-			"player_count": 1})
+		"host_id": multiplayer.get_unique_id(),
+		"host_name": host_name,
+		"ip": "localhost",
+		"port": host_port,
+		"player_count": 1,
+		"last_seen": Time.get_unix_time_from_system()})
+		_save_lobbies(lobbies)
+		_start_heartbeat()
+
+func _start_heartbeat():
+	if has_node("HeartbeatTimer"):
+		return
+	var timer = Timer.new()
+	timer.name = "HeartbeatTimer"
+	timer.wait_time = 5.0
+	timer.autostart = true
+	timer.timeout.connect(_on_heartbeat)
+	add_child(timer)
+
+func _on_heartbeat():
+	if _registered_lobby_port == -1:
+		return
+	var lobbies = _load_lobbies()
+	for lobby in lobbies:
+		if lobby.port == _registered_lobby_port:
+			lobby.last_seen = Time.get_unix_time_from_system()
+			break
 	_save_lobbies(lobbies)
+	
+func _is_lobby_alive(lobby: Dictionary) -> bool:
+	var last = lobby.get("last_seen", 0)
+	var now = Time.get_unix_time_from_system()
+	return (now - last) < 15.0
 
 func _unregister_lobby():
-	if not multiplayer.has_multiplayer_peer() or not multiplayer.is_server():
+	var target_port = _registered_lobby_port
+	if target_port == -1:
 		return
+	if has_node("HeartbeatTimer"):
+		get_node("HeartbeatTimer").queue_free()
 	var lobbies = _load_lobbies()
-	var my_id = multiplayer.get_unique_id()
 	var new_lobbies = []
 	for lobby in lobbies:
-		if lobby.host_id != my_id:
+		if lobby.port != target_port:
 			new_lobbies.append(lobby)
 	_save_lobbies(new_lobbies)
+	_registered_lobby_port = -1
 
 func _update_lobby_player_count(count: int):
-	if not multiplayer.has_multiplayer_peer() or not multiplayer.is_server():
+	var target_port = _registered_lobby_port
+	if target_port == -1:
 		return
 	var lobbies = _load_lobbies()
-	var my_id = multiplayer.get_unique_id()
 	for lobby in lobbies:
-		if lobby.host_id == my_id:
+		if lobby.port == target_port:
 			lobby.player_count = count
 			break
 	_save_lobbies(lobbies)

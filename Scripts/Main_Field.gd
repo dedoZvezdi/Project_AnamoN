@@ -162,16 +162,16 @@ func add_card_to_field(card, position = null):
 			card.apply_champion_life_delta(champion_life_delta)
 		card.global_position = global_position + Vector2(0, -20)
 		card.z_index = 400
-		var ci = card.get_node_or_null("CardImage")
-		var cib = card.get_node_or_null("CardImageBack")
-		if ci and cib:
-			cib.z_index = -1
-			ci.z_index = 0
-			cib.visible = false
-			ci.visible = true
-		var ap = card.get_node_or_null("AnimationPlayer")
-		if ap and ap.has_animation("card_flip"):
-			ap.play("card_flip")
+		var card_image = card.get_node_or_null("CardImage")
+		var card_image_back = card.get_node_or_null("CardImageBack")
+		if card_image and card_image_back:
+			card_image_back.z_index = -1
+			card_image.z_index = 0
+			card_image_back.visible = false
+			card_image.visible = true
+		var anim_player = card.get_node_or_null("AnimationPlayer")
+		if anim_player and anim_player.has_animation("card_flip"):
+			anim_player.play("card_flip")
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
 		if card.has_method("show_card_info"):
@@ -194,13 +194,13 @@ func add_card_to_field(card, position = null):
 		else:
 			card.global_position = global_position
 		card.z_index = 350
-		var ci2 = card.get_node_or_null("CardImage")
-		var cib2 = card.get_node_or_null("CardImageBack")
-		if ci2 and cib2:
-			cib2.z_index = -1
-			ci2.z_index = 0
-			cib2.visible = false
-			ci2.visible = true
+		var card_image_s = card.get_node_or_null("CardImage")
+		var card_image_back_s = card.get_node_or_null("CardImageBack")
+		if card_image_s and card_image_back_s:
+			card_image_back_s.z_index = -1
+			card_image_s.z_index = 0
+			card_image_back_s.visible = false
+			card_image_s.visible = true
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
 	else:
@@ -213,13 +213,13 @@ func add_card_to_field(card, position = null):
 			card.set_current_field(self)
 		if position != null:
 			card.global_position = position
-			var ci2 = card.get_node_or_null("CardImage")
-			var cib2 = card.get_node_or_null("CardImageBack")
-			if ci2 and cib2:
-				cib2.z_index = -1
-				ci2.z_index = 0
-				cib2.visible = false
-				ci2.visible = true
+			var card_image_s = card.get_node_or_null("CardImage")
+			var card_image_back_s = card.get_node_or_null("CardImageBack")
+			if card_image_s and card_image_back_s:
+				card_image_back_s.z_index = -1
+				card_image_s.z_index = 0
+				card_image_back_s.visible = false
+				card_image_s.visible = true
 
 func notify_card_transformed(card):
 	if card == current_champion_card and not is_champion_card(card):

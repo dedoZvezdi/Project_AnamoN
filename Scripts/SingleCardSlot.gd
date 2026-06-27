@@ -33,14 +33,14 @@ func _setup_progress_bar():
 	progress_bar.min_value = 0
 	progress_bar.max_value = 1.0
 	progress_bar.value = 0
-	var progress_size = Vector2(100, 100)
+	var progress_size = Vector2(128, 128)
 	progress_bar.custom_minimum_size = progress_size
 	progress_bar.size = progress_size
 	progress_bar.position = -progress_size / 2
 	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	progress_bar.visible = false
 	progress_bar.top_level = true
-	progress_bar.z_index = 2000
+	progress_bar.z_index = max(1, cards_in_graveyard.size() + 1)
 	progress_bar.z_as_relative = false
 	var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
 	for y in range(128):
@@ -57,6 +57,7 @@ func _process(delta):
 	if is_holding_left:
 		hold_timer += delta
 		if progress_bar:
+			max(1, cards_in_graveyard.size() + 1)
 			progress_bar.value = hold_timer / HOLD_DURATION
 			progress_bar.visible = true
 			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
@@ -288,11 +289,11 @@ func add_card_to_slot(card, at_index: int = -1):
 	if final_card.has_method("show_card_front"):
 		final_card.show_card_front()
 	else:
-		var ci = final_card.get_node_or_null("CardImage")
-		var cib = final_card.get_node_or_null("CardImageBack")
-		if ci and cib:
-			ci.visible = true
-			cib.visible = false
+		var card_image = final_card.get_node_or_null("CardImage")
+		var card_image_back = final_card.get_node_or_null("CardImageBack")
+		if card_image and card_image_back:
+			card_image.visible = true
+			card_image_back.visible = false
 	final_card.rotation = 0.0
 	if at_index != -1 and at_index < cards_in_graveyard.size():
 		cards_in_graveyard.insert(at_index, final_card)
