@@ -10,6 +10,8 @@ extends Node2D
 @onready var item_list: ItemList = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/ItemList
 @onready var refresh_button: Button = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer/RefreshButton
 
+var lobby_scene = preload("res://Scenes/Lobby.tscn")
+var current_lobby = null
 var current_lobbies = []
 var peer = null
 var peer_names = {}
@@ -99,14 +101,12 @@ func _on_host_button_pressed() -> void:
 			reset_ui()
 			return
 		multiplayer.multiplayer_peer = peer
-		var player_scene = player_field_scene.instantiate()
-		add_child(player_scene)
-		_apply_player_photo_to_field(player_scene)
 		multiplayer.peer_connected.connect(on_peer_connected)
-		var chat_node = player_scene.get_node("Chat")
-		if chat_node:
-			chat_node.player_name = name_to_use
-			peer_names[multiplayer.get_unique_id()] = name_to_use
+		multiplayer.peer_disconnected.connect(on_peer_disconnected)
+		current_lobby = lobby_scene.instantiate()
+		add_child(current_lobby)
+		peer_names[multiplayer.get_unique_id()] = name_to_use
+		current_lobby.setup_host(name_to_use)
 		show_popup("WebSocket server started on port " + port.text + "\n\nNow run in terminal:\ncloudflared tunnel --url http://localhost:" + port.text + "\n\nThen share the https:// URL with your friend!")
 	else:
 		if not validate_ip_and_port():
@@ -129,15 +129,12 @@ func _on_host_button_pressed() -> void:
 			return
 		multiplayer.multiplayer_peer = peer
 		_register_lobby(name_to_use, int(port.text))
-		var player_scene = player_field_scene.instantiate()
-		add_child(player_scene)
-		_apply_player_photo_to_field(player_scene)
 		multiplayer.peer_connected.connect(on_peer_connected)
 		multiplayer.peer_disconnected.connect(on_peer_disconnected)
-		var chat_node = player_scene.get_node("Chat")
-		if chat_node:
-			chat_node.player_name = name_to_use
-			peer_names[multiplayer.get_unique_id()] = name_to_use
+		current_lobby = lobby_scene.instantiate()
+		add_child(current_lobby)
+		peer_names[multiplayer.get_unique_id()] = name_to_use
+		current_lobby.setup_host(name_to_use)
 
 func _on_join_button_pressed() -> void:
 	var entered_name = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer/Name.text.strip_edges()
@@ -160,28 +157,19 @@ func _on_join_button_pressed() -> void:
 		multiplayer.connected_to_server.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
-			var player_scene = player_field_scene.instantiate()
-			add_child(player_scene)
-			_apply_player_photo_to_field(player_scene)
-			var opponent_scene = opponent_field_scene.instantiate()
-			opponent_scene.name = "OpponentField"
-			add_child(opponent_scene)
-			_apply_opponent_photo_to_field(opponent_scene)
-			_send_my_photo_to_peer(1)
-			player_scene.client_set_up()
-			var chat_node = player_scene.get_node("Chat")
-			if chat_node:
-				chat_node.player_name = name_to_use
-			rpc("receive_opponent_name", name_to_use)
-			rpc_id(1, "notify_host_of_join", name_to_use)
+			current_lobby = lobby_scene.instantiate()
+			add_child(current_lobby)
 			peer_names[multiplayer.get_unique_id()] = name_to_use
-			var pantheon = player_scene.get_node_or_null("PANTHEON")
-			if pantheon and pantheon.has_method("get_pantheon_cards"):
-				rpc_id(1, "sync_initial_pantheon", multiplayer.get_unique_id(), pantheon.get_pantheon_cards()))
+			current_lobby.setup_client(name_to_use)
+			_send_my_photo_to_lobby(1)
+			rpc("receive_opponent_name_lobby", name_to_use))
 		multiplayer.connection_failed.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
 			show_popup("Failed to connect to WebSocket server. Check the URL.")
+			reset_ui())
+		multiplayer.server_disconnected.connect(func():
+			show_popup("The Host closed the lobby.")
 			reset_ui())
 		connect_timer.start()
 	else:
@@ -216,28 +204,19 @@ func _on_join_button_pressed() -> void:
 		multiplayer.connected_to_server.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
-			var player_scene = player_field_scene.instantiate()
-			add_child(player_scene)
-			_apply_player_photo_to_field(player_scene)
-			var opponent_scene = opponent_field_scene.instantiate()
-			opponent_scene.name = "OpponentField"
-			add_child(opponent_scene)
-			_apply_opponent_photo_to_field(opponent_scene)
-			_send_my_photo_to_peer(1)
-			player_scene.client_set_up()
-			var chat_node = player_scene.get_node("Chat")
-			if chat_node:
-				chat_node.player_name = name_to_use
-			rpc("receive_opponent_name", name_to_use)
-			rpc_id(1, "notify_host_of_join", name_to_use)
+			current_lobby = lobby_scene.instantiate()
+			add_child(current_lobby)
 			peer_names[multiplayer.get_unique_id()] = name_to_use
-			var pantheon = player_scene.get_node_or_null("PANTHEON")
-			if pantheon and pantheon.has_method("get_pantheon_cards"):
-				rpc_id(1, "sync_initial_pantheon", multiplayer.get_unique_id(), pantheon.get_pantheon_cards()))
+			current_lobby.setup_client(name_to_use)
+			_send_my_photo_to_lobby(1)
+			rpc("receive_opponent_name_lobby", name_to_use))
 		multiplayer.connection_failed.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
 			show_popup("There is no host with such IP and port.")
+			reset_ui())
+		multiplayer.server_disconnected.connect(func():
+			show_popup("The Host closed the lobby.")
 			reset_ui())
 		connect_timer.start()
 
@@ -273,9 +252,16 @@ func validate_ip_and_port() -> bool:
 	return true
 
 func _close_existing_dialogs():
-	for child in get_tree().current_scene.get_children():
+	_close_dialogs_recursive(get_tree().current_scene)
+
+func _close_dialogs_recursive(node: Node):
+	for child in node.get_children():
 		if child is AcceptDialog:
+			child.exclusive = false
+			child.hide()
 			child.queue_free()
+		else:
+			_close_dialogs_recursive(child)
 
 func show_popup(message: String):
 	_close_existing_dialogs()
@@ -345,15 +331,9 @@ func _get_opponent_photo_path() -> String:
 	return base_path.path_join(OPPONENT_PHOTO_FILENAME)
 
 func _send_my_photo_to_peer(peer_id: int):
-	var photo_path = ""
-	if FileAccess.file_exists(USER_PHOTO_PATH):
-		photo_path = USER_PHOTO_PATH
-	elif ResourceLoader.exists(DEFAULT_PHOTO_PATH):
-		photo_path = DEFAULT_PHOTO_PATH
-	if photo_path != "":
-		var data = FileAccess.get_file_as_bytes(photo_path)
-		if data.size() > 0:
-			rpc_id(peer_id, "receive_opponent_photo", data)
+	var data = _get_my_photo_as_png_bytes()
+	if data.size() > 0:
+		rpc_id(peer_id, "receive_opponent_photo", data)
 
 @rpc("any_peer", "reliable")
 func receive_opponent_photo(photo_data: PackedByteArray):
@@ -390,48 +370,70 @@ func on_peer_connected(peer_id):
 				if peer and peer_id in multiplayer.get_peers():
 					peer.disconnect_peer(peer_id)).call_deferred()
 			return
-	if not has_node("OpponentField"):
-		var opponent_scene = opponent_field_scene.instantiate()
-		opponent_scene.name = "OpponentField"
-		add_child(opponent_scene)
-		_apply_opponent_photo_to_field(opponent_scene)
-		_send_my_photo_to_peer(peer_id)
-		get_node("PlayerField").host_set_up()
-		if multiplayer.is_server():
-			randomize()
-			var host_goes_first = randi() % 2 == 0
-			if host_goes_first:
-				is_my_turn = true
-				show_turn_popup("You are going FIRST!")
-				rpc_id(peer_id, "show_turn_popup", "You are going SECOND!")
-			else:
-				is_my_turn = false
-				show_turn_popup("You are going SECOND!")
-				rpc_id(peer_id, "show_turn_popup", "You are going FIRST!")
-		var phases = get_node_or_null("PlayerField/Phases")
-		if phases and phases.has_method("update_phase_visuals"):
-			phases.update_phase_visuals()
-		var player_field = get_node_or_null("PlayerField")
-		if player_field:
-			var pantheon = player_field.get_node_or_null("PANTHEON")
-			if pantheon and pantheon.has_method("get_pantheon_cards"):
-				rpc_id(peer_id, "sync_initial_pantheon", multiplayer.get_unique_id(), pantheon.get_pantheon_cards())
-	var host_chat = get_node("PlayerField/Chat")
-	if host_chat:
-		rpc_id(peer_id, "receive_opponent_name", host_chat.player_name)
-	if multiplayer.is_server():
 		_update_lobby_player_count(multiplayer.get_peers().size() + 1)
+		if current_lobby:
+			_send_my_photo_to_lobby(peer_id)
+			rpc_id(peer_id, "receive_opponent_name_lobby", peer_names.get(multiplayer.get_unique_id(), "Host"))
+			rpc_id(peer_id, "receive_host_ready_state", current_lobby.p1_ready)
 
 func on_peer_disconnected(peer_id):
 	if multiplayer.is_server():
 		_update_lobby_player_count(multiplayer.get_peers().size() + 1)
+		if current_lobby:
+			current_lobby.on_client_disconnected()
+	else:
+		if peer_id == 1:
+			show_popup("Host disconnected.")
+			reset_ui()
 	if peer_names.has(peer_id):
-		var name_left = peer_names[peer_id]
-		var host_chat_node = get_node_or_null("PlayerField/Chat")
-		if host_chat_node:
-			host_chat_node.add_message("System", name_left + " left the game")
 		peer_names.erase(peer_id)
 	_cleanup_temp_files()
+
+func _send_my_photo_to_lobby(peer_id: int):
+	var data = _get_my_photo_as_png_bytes()
+	if data.size() > 0:
+		rpc_id(peer_id, "receive_opponent_photo_lobby", data)
+
+func _get_my_photo_as_png_bytes() -> PackedByteArray:
+	var img: Image = null
+	if FileAccess.file_exists(USER_PHOTO_PATH):
+		img = Image.load_from_file(USER_PHOTO_PATH)
+	if not img and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
+		var tex = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
+		if tex is Texture2D:
+			img = tex.get_image()
+	if img:
+		return img.save_png_to_buffer()
+	return PackedByteArray()
+
+@rpc("any_peer", "reliable")
+func receive_opponent_photo_lobby(photo_data: PackedByteArray):
+	var save_path = _get_opponent_photo_path()
+	var file = FileAccess.open(save_path, FileAccess.WRITE)
+	if file:
+		file.store_buffer(photo_data)
+		file.close()
+	var img = Image.new()
+	var err = img.load_png_from_buffer(photo_data)
+	if err != OK:
+		err = img.load_jpg_from_buffer(photo_data)
+	if err != OK:
+		err = img.load_webp_from_buffer(photo_data)
+	if err == OK:
+		var texture = ImageTexture.create_from_image(img)
+		if current_lobby:
+			current_lobby.apply_opponent_photo_direct(texture)
+
+@rpc("any_peer", "reliable")
+func receive_opponent_name_lobby(names: String):
+	peer_names[multiplayer.get_remote_sender_id()] = names
+	if current_lobby:
+		current_lobby.set_opponent_name(names)
+
+@rpc("any_peer", "reliable")
+func receive_host_ready_state(is_ready: bool):
+	if current_lobby and not multiplayer.is_server():
+		current_lobby.sync_ready_state(1, is_ready)
 
 @rpc("any_peer", "reliable")
 func show_turn_popup(message: String):
@@ -954,12 +956,19 @@ func reset_ui():
 	if multiplayer.multiplayer_peer != null:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null
+	var signals_to_clear = [multiplayer.peer_connected, multiplayer.peer_disconnected, multiplayer.connected_to_server, multiplayer.connection_failed, multiplayer.server_disconnected]
+	for signals in signals_to_clear:
+		for connects in signals.get_connections():
+			signals.disconnect(connects.callable)
 	if peer:
 		peer.close()
 		peer = null
 	for child in get_children():
-		if child.name == "PlayerField" or child.name == "OpponentField":
+		if child.name == "PlayerField" or child.name == "OpponentField" or child.name == "Lobby":
 			child.queue_free()
+	if current_lobby:
+		current_lobby.queue_free()
+		current_lobby = null
 	peer_names.clear()
 	if connect_timer:
 		connect_timer.stop()
@@ -1110,9 +1119,9 @@ func _find_opponent_card_by_uuid(root_node, target_uuid):
 	if root_node.has_meta("uuid") and root_node.get_meta("uuid") == target_uuid:
 		return root_node
 	for child in root_node.get_children():
-		var res = _find_opponent_card_by_uuid(child, target_uuid)
-		if res:
-			return res
+		var result = _find_opponent_card_by_uuid(child, target_uuid)
+		if result:
+			return result
 	return null
 
 @rpc("any_peer", "reliable")
