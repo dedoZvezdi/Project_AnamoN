@@ -27,6 +27,9 @@ corner_radius_bottom_right = 1024
 corner_radius_bottom_left = 1024
 corner_detail = 20
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uhbti"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
 bg_color = Color(1, 1, 1, 0.06)
 corner_radius_top_left = 2
@@ -324,6 +327,9 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 shadow_size = 30
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kr8xt"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_p2"]
 bg_color = Color(1, 0.627451, 0.23529412, 0.8)
 corner_radius_top_left = 2
@@ -418,6 +424,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_placeholder_color = Color(1, 1, 1, 0.9)
 theme_override_font_sizes/font_size = 38
+theme_override_styles/focus = SubResource("StyleBoxFlat_uhbti")
 placeholder_text = "Player 1"
 alignment = 1
 editable = false
@@ -541,10 +548,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_yg8gm")
 theme_override_styles/hover = SubResource("StyleBoxFlat_deck_hover")
 theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_gqa7q")
 alignment = 1
-selected = 0
-item_count = 1
-popup/item_0/text = "Dragons"
-popup/item_0/id = 0
 
 [node name="ModeLabel" type="Label" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=444444002]
 layout_mode = 2
@@ -572,7 +575,7 @@ theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_03jl0")
 alignment = 1
 selected = 0
 item_count = 3
-popup/item_0/text = "Signle Game"
+popup/item_0/text = "Single Game"
 popup/item_0/id = 0
 popup/item_1/text = "Match"
 popup/item_1/id = 1
@@ -605,7 +608,7 @@ theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yesx4")
 alignment = 1
 selected = 0
 item_count = 4
-popup/item_0/text = "STANDART"
+popup/item_0/text = "STANDARD"
 popup/item_0/id = 0
 popup/item_1/text = "DRAFT"
 popup/item_1/id = 1
@@ -688,6 +691,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_placeholder_color = Color(1, 1, 1, 0.9)
 theme_override_font_sizes/font_size = 38
+theme_override_styles/focus = SubResource("StyleBoxFlat_kr8xt")
 placeholder_text = "Player 2"
 alignment = 1
 editable = false

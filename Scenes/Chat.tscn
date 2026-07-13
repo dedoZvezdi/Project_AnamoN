@@ -2,33 +2,78 @@
 
 [ext_resource type="Script" uid="uid://dddogrjplyi36" path="res://Scripts/Chat.gd" id="1_yc4ao"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yc4ao"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v1gob"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jw32o"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rgh2o"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbw6q"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
 [node name="Chat" type="Node2D" unique_id=1967406674]
 script = ExtResource("1_yc4ao")
 
-[node name="Panel" type="Panel" parent="." unique_id=1537548537]
-offset_left = 1502.0
-offset_top = 581.0
-offset_right = 1887.0
-offset_bottom = 1057.0
-
 [node name="Send" type="Button" parent="." unique_id=621029934]
 offset_left = 1806.0
-offset_top = 1007.0
+offset_top = 1005.0
 offset_right = 1885.0
-offset_bottom = 1055.0
+offset_bottom = 1053.0
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_yc4ao")
 text = "SEND"
 
 [node name="Message" type="LineEdit" parent="." unique_id=851550926]
 offset_left = 1502.0
-offset_top = 1007.0
-offset_right = 1805.0
-offset_bottom = 1057.0
-placeholder_text = "Message"
+offset_top = 1005.0
+offset_right = 1806.0
+offset_bottom = 1055.0
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_placeholder_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_v1gob")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jw32o")
+placeholder_text = " Message"
 
 [node name="TextEdit" type="RichTextLabel" parent="." unique_id=941147514]
 offset_left = 1502.0
 offset_top = 581.0
 offset_right = 1885.0
 offset_bottom = 1007.0
+theme_override_colors/default_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_rgh2o")
+theme_override_styles/focus = SubResource("StyleBoxFlat_pbw6q")
 bbcode_enabled = true
 scroll_following = true

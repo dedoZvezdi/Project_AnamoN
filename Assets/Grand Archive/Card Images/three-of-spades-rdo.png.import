@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/three-of-spades-rdo.png-6a11c4ef8ea357bc4faef
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

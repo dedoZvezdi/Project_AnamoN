@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/carpsong-coda-hvn.png-5f48c95065df5cf5627868c
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

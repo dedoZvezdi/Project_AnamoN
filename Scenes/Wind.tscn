@@ -1,10 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://8bexacpcoqme"]
+[gd_scene format=3 uid="uid://8bexacpcoqme"]
 
 [ext_resource type="Texture2D" uid="uid://cbnmahc5t0nuq" path="res://Assets/Grand Archive/Elements/wind.png" id="1_ceua7"]
 
-[node name="Wind" type="Node2D"]
+[node name="Wind" type="Node2D" unique_id=1257674496]
 scale = Vector2(0.5, 0.5)
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=555520978]
 modulate = Color(1, 1, 1, 0.498039)
 texture = ExtResource("1_ceua7")

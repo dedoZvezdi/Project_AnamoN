@@ -5,7 +5,7 @@ extends Node2D
 
 @onready var server: LineEdit = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer/IP_Address
 @onready var port: LineEdit = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer/PORT
-@onready var check: CheckButton = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer/CheckButton
+@onready var check: CheckButton = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer/HBoxContainer/CheckButton
 @onready var cancel_button: Button = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer/CancelButton
 @onready var item_list: ItemList = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/ItemList
 @onready var refresh_button: Button = $CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer/RefreshButton
@@ -294,10 +294,10 @@ func _on_change_photo_button_pressed():
 	$FileDialog.popup_centered()
 
 func _on_file_selected(path: String):
-	var img = Image.load_from_file(path)
-	if img:
-		img.resize(85, 85)
-		var err = img.save_png(USER_PHOTO_PATH)
+	var image = Image.load_from_file(path)
+	if image:
+		image.resize(85, 85)
+		var err = image.save_png(USER_PHOTO_PATH)
 		if err == OK:
 			pass
 		else:
@@ -308,9 +308,9 @@ func _on_file_selected(path: String):
 func _apply_player_photo_to_field(field_node: Node):
 	var texture = null
 	if FileAccess.file_exists(USER_PHOTO_PATH):
-		var img = Image.load_from_file(USER_PHOTO_PATH)
-		if img:
-			texture = ImageTexture.create_from_image(img)
+		var image = Image.load_from_file(USER_PHOTO_PATH)
+		if image:
+			texture = ImageTexture.create_from_image(image)
 	if not texture and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
 		texture = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
 	if texture:
@@ -350,9 +350,15 @@ func _apply_opponent_photo_to_field(field_node: Node):
 	var texture = null
 	var opp_photo_path = _get_opponent_photo_path()
 	if FileAccess.file_exists(opp_photo_path):
-		var img = Image.load_from_file(opp_photo_path)
-		if img:
-			texture = ImageTexture.create_from_image(img)
+		var photo_data = FileAccess.get_file_as_bytes(opp_photo_path)
+		var image = Image.new()
+		var err = image.load_png_from_buffer(photo_data)
+		if err != OK:
+			err = image.load_jpg_from_buffer(photo_data)
+		if err != OK:
+			err = image.load_webp_from_buffer(photo_data)
+		if err == OK:
+			texture = ImageTexture.create_from_image(image)
 	if not texture and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
 		texture = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
 	if texture:
@@ -375,15 +381,37 @@ func on_peer_connected(peer_id):
 			_send_my_photo_to_lobby(peer_id)
 			rpc_id(peer_id, "receive_opponent_name_lobby", peer_names.get(multiplayer.get_unique_id(), "Host"))
 			rpc_id(peer_id, "receive_host_ready_state", current_lobby.p1_ready)
+			if current_lobby.mode_option and current_lobby.legality_option:
+				current_lobby.rpc_id(peer_id, "sync_lobby_settings", current_lobby.mode_option.selected, current_lobby.legality_option.selected)
 
 func on_peer_disconnected(peer_id):
+	var in_game = has_node("PlayerField") or has_node("OpponentField")
 	if multiplayer.is_server():
 		_update_lobby_player_count(multiplayer.get_peers().size() + 1)
-		if current_lobby:
+		if in_game:
+			var opp_name = peer_names.get(peer_id, "Opponent")
+			show_popup(opp_name + " left the game.")
+			if current_lobby:
+				current_lobby.queue_free()
+				current_lobby = null
+			if has_node("PlayerField"):
+				get_node("PlayerField").queue_free()
+			if has_node("OpponentField"):
+				get_node("OpponentField").queue_free()
+			reset_ui()
+		elif current_lobby:
 			current_lobby.on_client_disconnected()
 	else:
 		if peer_id == 1:
-			show_popup("Host disconnected.")
+			show_popup("Host left the game." if in_game else "Host disconnected.")
+			if in_game:
+				if current_lobby:
+					current_lobby.queue_free()
+					current_lobby = null
+				if has_node("PlayerField"):
+					get_node("PlayerField").queue_free()
+				if has_node("OpponentField"):
+					get_node("OpponentField").queue_free()
 			reset_ui()
 	if peer_names.has(peer_id):
 		peer_names.erase(peer_id)
@@ -395,15 +423,15 @@ func _send_my_photo_to_lobby(peer_id: int):
 		rpc_id(peer_id, "receive_opponent_photo_lobby", data)
 
 func _get_my_photo_as_png_bytes() -> PackedByteArray:
-	var img: Image = null
+	var image: Image = null
 	if FileAccess.file_exists(USER_PHOTO_PATH):
-		img = Image.load_from_file(USER_PHOTO_PATH)
-	if not img and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
-		var tex = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
-		if tex is Texture2D:
-			img = tex.get_image()
-	if img:
-		return img.save_png_to_buffer()
+		image = Image.load_from_file(USER_PHOTO_PATH)
+	if not image and ResourceLoader.exists(DEFAULT_PHOTO_PATH):
+		var texture = ResourceLoader.load(DEFAULT_PHOTO_PATH, "", ResourceLoader.CACHE_MODE_REPLACE)
+		if texture is Texture2D:
+			image = texture.get_image()
+	if image:
+		return image.save_png_to_buffer()
 	return PackedByteArray()
 
 @rpc("any_peer", "reliable")
@@ -413,14 +441,14 @@ func receive_opponent_photo_lobby(photo_data: PackedByteArray):
 	if file:
 		file.store_buffer(photo_data)
 		file.close()
-	var img = Image.new()
-	var err = img.load_png_from_buffer(photo_data)
+	var image = Image.new()
+	var err = image.load_png_from_buffer(photo_data)
 	if err != OK:
-		err = img.load_jpg_from_buffer(photo_data)
+		err = image.load_jpg_from_buffer(photo_data)
 	if err != OK:
-		err = img.load_webp_from_buffer(photo_data)
+		err = image.load_webp_from_buffer(photo_data)
 	if err == OK:
-		var texture = ImageTexture.create_from_image(img)
+		var texture = ImageTexture.create_from_image(image)
 		if current_lobby:
 			current_lobby.apply_opponent_photo_direct(texture)
 
@@ -1490,7 +1518,11 @@ func _refresh_lobby_list():
 		if lobby.player_count > 0:
 			visible_lobbies.append(lobby)
 	for lobby in visible_lobbies:
-		var status = "Open" if lobby.player_count < 2 else "Closed"
+		var status = "Open"
+		if lobby.get("in_game", false):
+			status = "In game"
+		elif lobby.player_count >= 2:
+			status = "Closed"
 		var count_str = str(int(lobby.player_count)) + "/2"
 		var text = lobby.host_name + " (" + count_str + ") - Status: " + status
 		item_list.add_item(text)
@@ -1610,3 +1642,41 @@ func _on_item_selected(index: int):
 func _on_item_activated(index: int):
 	_on_item_selected(index)
 	_on_join_button_pressed()
+
+func _set_lobby_in_game():
+	var target_port = _registered_lobby_port
+	if target_port == -1:
+		return
+	var lobbies = _load_lobbies()
+	for lobby in lobbies:
+		if lobby.port == target_port:
+			lobby.in_game = true
+			break
+	_save_lobbies(lobbies)
+
+func start_game_instances():
+	if multiplayer.is_server():
+		_set_lobby_in_game()
+	if current_lobby:
+		current_lobby.visible = false
+	if not has_node("PlayerField"):
+		var p_field = player_field_scene.instantiate()
+		p_field.name = "PlayerField"
+		add_child(p_field)
+		_apply_player_photo_to_field(p_field)
+	if not has_node("OpponentField"):
+		var o_field = opponent_field_scene.instantiate()
+		o_field.name = "OpponentField"
+		add_child(o_field)
+		_apply_opponent_photo_to_field(o_field)
+	if multiplayer.is_server():
+		var host_first = (randi() % 2 == 0)
+		var peers = multiplayer.get_peers()
+		if peers.size() > 0:
+			var client_id = peers[0]
+			if host_first:
+				show_turn_popup("You are going FIRST!")
+				rpc_id(client_id, "show_turn_popup", "You are going SECOND!")
+			else:
+				show_turn_popup("You are going SECOND!")
+				rpc_id(client_id, "show_turn_popup", "You are going FIRST!")

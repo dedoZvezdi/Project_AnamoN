@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://bwyxwauuywjcq" path="res://Scripts/Opponent_GA_DECK.gd" id="1_q2nea"]
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_eulnh"]
 
-[node name="OpponentDeck" type="Node2D"]
+[node name="OpponentDeck" type="Node2D" unique_id=1439981426]
 script = ExtResource("1_q2nea")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1000066736]
 rotation = 3.14159
 scale = Vector2(0.192, 0.192)
 texture = ExtResource("2_eulnh")

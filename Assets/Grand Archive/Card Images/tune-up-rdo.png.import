@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/tune-up-rdo.png-dddd4a0869a6c40a8d799c60a7b21
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

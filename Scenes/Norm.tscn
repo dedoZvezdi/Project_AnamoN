@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://cw3lmoyxw8aue"]
+[gd_scene format=3 uid="uid://cw3lmoyxw8aue"]
 
 [ext_resource type="Texture2D" uid="uid://452iukjgd5fw" path="res://Assets/Grand Archive/Elements/norm.png" id="1_vmwgn"]
 
-[node name="Norm" type="Node2D"]
+[node name="Norm" type="Node2D" unique_id=92729000]
 scale = Vector2(0.5, 0.5)
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=885819161]
 texture = ExtResource("1_vmwgn")

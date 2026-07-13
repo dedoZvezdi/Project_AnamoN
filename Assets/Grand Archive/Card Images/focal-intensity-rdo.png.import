@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/focal-intensity-rdo.png-2ad11b98b84cc30e31395
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

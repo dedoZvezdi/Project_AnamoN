@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://cf80o7nhfih73" path="res://Scripts/Opponent_MAT_DECK.gd" id="1_m2f7w"]
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_3wosv"]
 
-[node name="OpponentMatDeck" type="Node2D"]
+[node name="OpponentMatDeck" type="Node2D" unique_id=105322603]
 script = ExtResource("1_m2f7w")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1123291151]
 rotation = 3.14159
 scale = Vector2(0.192, 0.192)
 texture = ExtResource("2_3wosv")

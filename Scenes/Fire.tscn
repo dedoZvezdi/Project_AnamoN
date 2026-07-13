@@ -1,10 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://d2q27vj536tlk"]
+[gd_scene format=3 uid="uid://d2q27vj536tlk"]
 
 [ext_resource type="Texture2D" uid="uid://bstwac16wwl37" path="res://Assets/Grand Archive/Elements/fire.png" id="1_t8fvv"]
 
-[node name="Fire" type="Node2D"]
+[node name="Fire" type="Node2D" unique_id=2019280202]
 scale = Vector2(0.5, 0.5)
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1619061194]
 modulate = Color(1, 1, 1, 0.498039)
 texture = ExtResource("1_t8fvv")

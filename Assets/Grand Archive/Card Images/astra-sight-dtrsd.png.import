@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/astra-sight-dtrsd.png-0b925f85e488d994108eb0c
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

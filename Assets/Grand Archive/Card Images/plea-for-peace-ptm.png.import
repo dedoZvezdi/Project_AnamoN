@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/plea-for-peace-ptm.png-6e9de3703a9d1d74b3ac4d
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

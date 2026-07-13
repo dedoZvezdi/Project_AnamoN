@@ -14,6 +14,9 @@ extends Control
 @onready var p2_avatar_frame: Panel = $RootVBox/Arena/Player2Half/Margin/VBox/AvatarFrame
 @onready var start_button: Button = $RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/StartButton
 @onready var exit_button: Button = $RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/ExitButton
+@onready var deck_option: OptionButton = $RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/DeckOption
+@onready var mode_option: OptionButton = $RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/ModeRow/OptionButton
+@onready var legality_option: OptionButton = $RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/LegalityRow/LegalityButton
 
 const READY_COLOR = Color(0.133, 0.741, 0.204, 1.0)
 const NOT_READY_COLOR = Color(0.941, 0, 0.106, 1.0)
@@ -22,13 +25,21 @@ const FILL_DURATION = 0.6
 
 var p1_ready := false
 var p2_ready := false
+var p1_has_deck := false
+var p2_has_deck := false
 var p1_photo_rect: TextureRect
 var p2_photo_rect: TextureRect
 
 func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT, Control.PRESET_MODE_MINSIZE, 0)
-	size = get_viewport_rect().size
-	get_tree().root.size_changed.connect(func(): size = get_viewport_rect().size)
+	if not get_parent() is Window and not get_parent() is CanvasLayer:
+		set_anchors_preset(Control.PRESET_TOP_LEFT)
+		size = get_viewport_rect().size
+		position = Vector2.ZERO
+		get_tree().root.size_changed.connect(func():
+			size = get_viewport_rect().size
+			position = Vector2.ZERO)
+	else:
+		set_anchors_preset(Control.PRESET_FULL_RECT)
 	p1_progress_fill.anchor_left = 0.0
 	p1_progress_fill.anchor_right = 0.0
 	p2_progress_fill.anchor_right = 1.0
@@ -37,6 +48,13 @@ func _ready() -> void:
 	p2_ready_btn.pressed.connect(_on_p2_ready_pressed)
 	exit_button.pressed.connect(_on_exit_pressed)
 	start_button.pressed.connect(_on_start_pressed)
+	if mode_option:
+		mode_option.item_selected.connect(_on_mode_selected)
+	if legality_option:
+		legality_option.item_selected.connect(_on_legality_selected)
+	if deck_option:
+		deck_option.item_selected.connect(_on_deck_selected)
+	_refresh_deck_options()
 	var circle_shader = Shader.new()
 	circle_shader.code = """
 shader_type canvas_item;
@@ -81,6 +99,8 @@ func setup_host(player_name: String):
 	start_button.visible = true
 	_apply_local_photo(p1_photo_rect)
 	p2_name_input.text = "Waiting..."
+	if mode_option: mode_option.disabled = false
+	if legality_option: legality_option.disabled = false
 	
 func setup_client(player_name: String):
 	p2_name_input.text = player_name
@@ -89,6 +109,8 @@ func setup_client(player_name: String):
 	start_button.visible = false
 	_apply_local_photo(p2_photo_rect)
 	p1_name_input.text = "Waiting..."
+	if mode_option: mode_option.disabled = true
+	if legality_option: legality_option.disabled = true
 
 func set_opponent_name(player_name: String):
 	if multiplayer.is_server():
@@ -137,6 +159,7 @@ func on_client_disconnected():
 	p2_name_input.text = "Waiting..."
 	p2_photo_rect.texture = null
 	p2_ready = false
+	p2_has_deck = false
 	_update_player_ui(p2_ready, p2_ready_btn, p2_status_label, p2_status_dot, p2_progress_fill, true)
 	check_start_button()
 
@@ -163,7 +186,8 @@ func sync_ready_state(player_num: int, is_ready: bool):
 
 func check_start_button():
 	if multiplayer.is_server():
-		start_button.disabled = not (p1_ready and p2_ready)
+		var is_2_players = multiplayer.get_peers().size() == 1
+		start_button.disabled = not (is_2_players and p1_ready and p2_ready and p1_has_deck and p2_has_deck)
 
 func _update_player_ui(is_ready: bool, btn: Button, label: Label, dot: ColorRect, fill: Panel, is_right_to_left: bool) -> void:
 	btn.text = "READY UP" if !is_ready else "READY!"
@@ -189,20 +213,100 @@ func _on_exit_pressed():
 		multiplayer_node.reset_ui()
 
 func _on_start_pressed():
-	if multiplayer.is_server() and p1_ready and p2_ready:
-		print("Start game clicked. (Placeholder for starting the game)")
-		var dialog = AcceptDialog.new()
-		dialog.dialog_text = "Game starting... (Test Mode)"
-		dialog.title = "INFO"
-		add_child(dialog)
-		dialog.popup_centered()
+	if multiplayer.is_server() and not start_button.disabled:
+		var multiplayer_node = get_parent()
+		if multiplayer_node and multiplayer_node.has_method("start_game_instances"):
+			multiplayer_node.start_game_instances()
 		rpc("sync_start_game")
 
 @rpc("any_peer", "reliable")
 func sync_start_game():
-	print("Sync Start game received. (Placeholder)")
-	var dialog = AcceptDialog.new()
-	dialog.dialog_text = "Game starting... (Test Mode)"
-	dialog.title = "INFO"
-	add_child(dialog)
-	dialog.popup_centered()
+	var multiplayer_node = get_parent()
+	if multiplayer_node and multiplayer_node.has_method("start_game_instances"):
+		multiplayer_node.start_game_instances()
+
+func _on_mode_selected(_index: int):
+	if multiplayer.is_server():
+		rpc("sync_lobby_settings", mode_option.selected, legality_option.selected)
+
+func _on_legality_selected(_index: int):
+	_refresh_deck_options()
+	if multiplayer.is_server():
+		rpc("sync_lobby_settings", mode_option.selected, legality_option.selected)
+
+func _on_deck_selected(_index: int):
+	var has_deck = deck_option.selected >= 0 and deck_option.get_item_count() > 0
+	if multiplayer.is_server():
+		p1_has_deck = has_deck
+		rpc("sync_deck_state", 1, p1_has_deck)
+	else:
+		p2_has_deck = has_deck
+		rpc("sync_deck_state", 2, p2_has_deck)
+	check_start_button()
+
+@rpc("any_peer", "reliable")
+func sync_deck_state(player_num: int, has_deck: bool):
+	if player_num == 1:
+		p1_has_deck = has_deck
+	else:
+		p2_has_deck = has_deck
+	check_start_button()
+
+@rpc("authority", "reliable")
+func sync_lobby_settings(mode_idx: int, legality_idx: int):
+	if mode_option: mode_option.selected = mode_idx
+	if legality_option: 
+		var old_legality = legality_option.selected
+		legality_option.selected = legality_idx
+		if old_legality != legality_idx:
+			_refresh_deck_options()
+
+func _refresh_deck_options():
+	if not deck_option or not legality_option: return
+	var old_selected_name = ""
+	if deck_option.get_item_count() > 0 and deck_option.selected >= 0:
+		old_selected_name = deck_option.get_item_text(deck_option.selected)
+	deck_option.clear()
+	var legality_text = legality_option.get_item_text(legality_option.selected)
+	var decks_dir_path = OS.get_executable_path().get_base_dir().path_join("Decks")
+	if OS.has_feature("editor") or not DirAccess.dir_exists_absolute(decks_dir_path):
+		decks_dir_path = "res://Decks"
+	var dir = DirAccess.open(decks_dir_path)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if not dir.current_is_dir() and file_name.ends_with(".gad"):
+				var file = FileAccess.open(decks_dir_path.path_join(file_name), FileAccess.READ)
+				if file:
+					var json = JSON.new()
+					var error = json.parse(file.get_as_text())
+					if error == OK and typeof(json.data) == TYPE_DICTIONARY:
+						var data = json.data
+						var is_legal = false
+						if data.has("legal_formats"):
+							for format in data["legal_formats"]:
+								if format == legality_text or legality_text == "N/A":
+									is_legal = true
+									break
+						else:
+							is_legal = true
+							
+						if is_legal and data.has("deck_name"):
+							deck_option.add_item(str(data["deck_name"]))
+			file_name = dir.get_next()
+	if deck_option.get_item_count() > 0:
+		var found_idx = -1
+		for i in range(deck_option.get_item_count()):
+			if deck_option.get_item_text(i) == old_selected_name:
+				found_idx = i
+				break
+		if found_idx != -1:
+			deck_option.selected = found_idx
+			_on_deck_selected(found_idx)
+		else:
+			deck_option.selected = 0
+			_on_deck_selected(0)
+	else:
+		deck_option.selected = -1
+		_on_deck_selected(-1)

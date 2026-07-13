@@ -115,54 +115,48 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mv32a"]
 size = Vector2(245.613, 344.672)
 
-[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_r8ami"]
-points = PackedVector2Array(0, -268.532, 120.84, 0, 0, 260, -120, 0)
-
-[node name="Card" type="Node2D"]
+[node name="Card" type="Node2D" unique_id=1990241951]
 z_index = -2
 texture_filter = 2
 position = Vector2(599.5, 300)
 scale = Vector2(0.35, 0.35)
 script = ExtResource("1_mv32a")
 
-[node name="CardImageBack" type="Sprite2D" parent="."]
+[node name="CardImageBack" type="Sprite2D" parent="." unique_id=116166230]
 rotation = 3.14159
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_qrb68")
 
-[node name="CardImage" type="Sprite2D" parent="."]
+[node name="CardImage" type="Sprite2D" parent="." unique_id=1688715660]
 z_index = -1
 rotation = 3.14159
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_qrb68")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_h8wm0")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=355424545]
+libraries/ = SubResource("AnimationLibrary_h8wm0")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=1958276524]
 collision_layer = 64
 collision_mask = 64
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=325091956]
 shape = SubResource("RectangleShape2D_mv32a")
 
-
-[node name="LineageViewWindow" type="Window" parent="."]
+[node name="LineageViewWindow" type="Window" parent="." unique_id=963411153]
 auto_translate_mode = 1
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
 
-[node name="ScrollContainer" type="ScrollContainer" parent="LineageViewWindow"]
+[node name="ScrollContainer" type="ScrollContainer" parent="LineageViewWindow" unique_id=1124214866]
 offset_right = 600.0
 offset_bottom = 142.0
 
-[node name="GridContainer" type="GridContainer" parent="LineageViewWindow/ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="LineageViewWindow/ScrollContainer" unique_id=1336715642]
 custom_minimum_size = Vector2(600, 142)
 layout_mode = 2
 columns = 1024
 
-[node name="Control" parent="LineageViewWindow/ScrollContainer/GridContainer" instance=ExtResource("4_r8ami")]
+[node name="Control" parent="LineageViewWindow/ScrollContainer/GridContainer" unique_id=328817143 instance=ExtResource("4_r8ami")]
 layout_mode = 2

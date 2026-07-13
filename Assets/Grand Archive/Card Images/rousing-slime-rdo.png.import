@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/rousing-slime-rdo.png-6b1a0c7884d02e6e9b166bd
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

@@ -4,16 +4,204 @@
 [ext_resource type="PackedScene" uid="uid://bhkcqcx0pu1b5" path="res://Scenes/Player_Field.tscn" id="2_idj7w"]
 [ext_resource type="PackedScene" uid="uid://c02vjgxjinwdx" path="res://Scenes/Opponent_Field.tscn" id="3_kln2b"]
 [ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="4_rgh2o"]
+[ext_resource type="Texture2D" uid="uid://ctvm7q0h1hvmk" path="res://Assets/Textures/Toggle/toggle-off.png" id="6_vy5pj"]
+[ext_resource type="Texture2D" uid="uid://dq75273sesuwr" path="res://Assets/Textures/Toggle/toggle-on.png" id="8_4kpch"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pbw6q"]
 texture = ExtResource("4_rgh2o")
 
-[sub_resource type="Gradient" id="Gradient_rgh2o"]
-colors = PackedColorArray(1, 1, 1, 1, 0.2159017, 0.21590173, 0.2159017, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w1nw0"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_header"]
-gradient = SubResource("Gradient_rgh2o")
-fill_from = Vector2(0, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mjqtt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hbrnk"]
+bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.60784316)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bmxlf"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_color = Color(0.8, 0.8, 0.8, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rgh2o"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbw6q"]
+bg_color = Color(0.7411765, 0.13725491, 0.20392157, 0.21960784)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v1gob"]
+bg_color = Color(0.8745098, 0.15294118, 0.023529412, 0.12156863)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7411765, 0.13333334, 0.20392157, 0.54901963)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e2xty"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grg3l"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jw32o"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8862745, 0.77254903, 0.4862745, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0dddo"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o4c56"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7qva1"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.21960784)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k3sha"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.12156863)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.13333334, 0.7411765, 0.20392157, 0.54901963)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lolwk"]
+bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.60784316)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_50glp"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_color = Color(0.8, 0.8, 0.8, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4kpch"]
+bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.60784316)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vy5pj"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_color = Color(0.8, 0.8, 0.8, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pk2ls"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frkhe"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.21960784)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h1m7h"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.12156863)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.13333334, 0.7411765, 0.20392157, 0.54901963)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="Main" type="Node2D" unique_id=514279848]
 script = ExtResource("1_r150o")
@@ -43,69 +231,83 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -487.0
+offset_left = -535.0
 offset_top = -400.0
-offset_right = 487.0
-offset_bottom = 359.0
+offset_right = 535.0
+offset_bottom = 360.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
-
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PanelContainer" unique_id=1844412255]
-layout_mode = 2
-color = Color(0.050980393, 0.050980393, 0.050980393, 0.9019608)
+theme_override_styles/panel = SubResource("StyleBoxFlat_w1nw0")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PanelContainer" unique_id=1260342187]
 layout_mode = 2
 
-[node name="ColorRect" type="TextureRect" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=849482765]
-custom_minimum_size = Vector2(960, 30)
+[node name="Label" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=2038344739]
+self_modulate = Color(0.7882353, 0.6627451, 0.43137255, 1)
 layout_mode = 2
-texture = SubResource("GradientTexture2D_header")
-expand_mode = 1
-
-[node name="Label" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/ColorRect" unique_id=2038344739]
-modulate = Color(0, 0, 0, 1)
-self_modulate = Color(0, 0, 0, 1)
-layout_mode = 0
-offset_right = 1065.5
-offset_bottom = 30.0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0)
-theme_override_font_sizes/font_size = 20
-text = "LAN or CF"
+theme_override_constants/line_spacing = 3
+theme_override_font_sizes/font_size = 22
+theme_override_styles/focus = SubResource("StyleBoxFlat_mjqtt")
+text = "LAN or Claudflare"
 horizontal_alignment = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=1316848687]
 layout_mode = 2
 theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer" unique_id=480110969]
+custom_minimum_size = Vector2(0, 720)
 layout_mode = 2
 
 [node name="HBoxNameContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=1041474622]
 layout_mode = 2
-theme_override_constants/separation = 60
+theme_override_constants/separation = 35
 
-[node name="Label" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer" unique_id=1492579183]
+[node name="LabelNickname" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer" unique_id=1492579183]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 20
 text = "Nickname:"
 
 [node name="Name" type="LineEdit" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer" unique_id=1305576283]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_hbrnk")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bmxlf")
 alignment = 1
 
-[node name="CheckButton" type="CheckButton" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer" unique_id=731010286]
-custom_minimum_size = Vector2(100, 0)
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer" unique_id=819408254]
 layout_mode = 2
-text = "LAN / CF"
+
+[node name="LabelLan" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer/HBoxContainer" unique_id=116023484]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+text = "LAN"
+
+[node name="CheckButton" type="CheckButton" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer/HBoxContainer" unique_id=731010286]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_icons/checked = ExtResource("6_vy5pj")
+theme_override_icons/unchecked = ExtResource("8_4kpch")
+
+[node name="LabelClaudflare" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer/HBoxContainer" unique_id=57521635]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+text = "Claudflare"
 
 [node name="ItemList" type="ItemList" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=646024003]
 custom_minimum_size = Vector2(0, 600)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 
 [node name="HBoxButtonsContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=1210522404]
 layout_mode = 2
@@ -115,16 +317,33 @@ alignment = 1
 [node name="CancelButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer" unique_id=1753074363]
 custom_minimum_size = Vector2(135, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.9411765, 0, 0.105882354, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_rgh2o")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pbw6q")
+theme_override_styles/hover = SubResource("StyleBoxFlat_v1gob")
 text = "Cancel"
 
 [node name="RefreshButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer" unique_id=1155147563]
 custom_minimum_size = Vector2(135, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_e2xty")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_grg3l")
+theme_override_styles/hover = SubResource("StyleBoxFlat_jw32o")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_0dddo")
 text = "Refresh"
 
 [node name="JoinButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer" unique_id=1368440957]
 custom_minimum_size = Vector2(135, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.13333334, 0.7411765, 0.20392157, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_o4c56")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_7qva1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_k3sha")
 text = "Join"
 
 [node name="HBoxHostContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=857378389]
@@ -135,21 +354,35 @@ alignment = 1
 [node name="IP_Address" type="LineEdit" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer" unique_id=1950617224]
 custom_minimum_size = Vector2(700, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_placeholder_color = Color(0.3922031, 0.3126582, 0.16438076, 0.6627451)
+theme_override_styles/normal = SubResource("StyleBoxFlat_lolwk")
+theme_override_styles/focus = SubResource("StyleBoxFlat_50glp")
 placeholder_text = "PUBLIC IP"
 alignment = 1
 
 [node name="PORT" type="LineEdit" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer" unique_id=518561486]
 custom_minimum_size = Vector2(190, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_placeholder_color = Color(0.39215687, 0.3137255, 0.16470589, 0.6627451)
+theme_override_styles/normal = SubResource("StyleBoxFlat_4kpch")
+theme_override_styles/focus = SubResource("StyleBoxFlat_vy5pj")
 placeholder_text = "PORT"
 alignment = 1
 
 [node name="HostButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxHostContainer" unique_id=1134001902]
 custom_minimum_size = Vector2(135, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.13333334, 0.7411765, 0.20392157, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_pk2ls")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_frkhe")
+theme_override_styles/hover = SubResource("StyleBoxFlat_h1m7h")
 text = "Host"
 
 [node name="ChangePhotoButton" type="Button" parent="." unique_id=1158501524]
+visible = false
 offset_left = 134.0
 offset_top = 1099.0
 offset_right = 284.0
@@ -157,6 +390,7 @@ offset_bottom = 1134.0
 text = "Change Photo"
 
 [node name="PhotoPreview" type="TextureRect" parent="." unique_id=128062011]
+visible = false
 offset_left = 39.0
 offset_top = 1099.0
 offset_right = 124.0

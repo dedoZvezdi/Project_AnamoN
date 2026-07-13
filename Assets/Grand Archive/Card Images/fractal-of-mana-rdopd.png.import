@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/fractal-of-mana-rdopd.png-53c87e3a7d1ac8fc2ff
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

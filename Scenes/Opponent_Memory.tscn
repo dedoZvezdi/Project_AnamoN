@@ -1,19 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://dulc360ofen1q"]
+[gd_scene format=3 uid="uid://dulc360ofen1q"]
 
 [ext_resource type="Script" uid="uid://wc8ncosv7lvn" path="res://Scripts/OpponentMemory.gd" id="1_memgd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_i1n11"]
 size = Vector2(649, 69.5)
 
-[node name="OpponentMemory" type="Node2D"]
+[node name="OpponentMemory" type="Node2D" unique_id=573600877]
 script = ExtResource("1_memgd")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=1355448484]
 light_mask = 2
 visibility_layer = 2
 collision_layer = 128
 collision_mask = 128
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1961219076]
 position = Vector2(0, 30.75)
 shape = SubResource("RectangleShape2D_i1n11")

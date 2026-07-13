@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/sable-remnant-rdo.png-699f5c7a9d1d361c7a4bb2b
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

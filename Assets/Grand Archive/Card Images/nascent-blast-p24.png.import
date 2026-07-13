@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/nascent-blast-p24.png-aa03776262d749a3ee96fec
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

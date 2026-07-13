@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/Progress_Red.png-83f8466eae62c192695a8e3a0637
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

@@ -1,10 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cxd2mvn6wykfl"]
+[gd_scene format=3 uid="uid://cxd2mvn6wykfl"]
 
 [ext_resource type="Texture2D" uid="uid://dwhfxqo8my7jf" path="res://Assets/Grand Archive/Elements/water.png" id="1_5v6ty"]
 
-[node name="Water" type="Node2D"]
+[node name="Water" type="Node2D" unique_id=853475986]
 scale = Vector2(0.5, 0.5)
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=627219556]
 modulate = Color(1, 1, 1, 0.498039)
 texture = ExtResource("1_5v6ty")

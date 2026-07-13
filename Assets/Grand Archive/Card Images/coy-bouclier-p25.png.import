@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/coy-bouclier-p25.png-1880ad8fec5b99b639d158b9
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

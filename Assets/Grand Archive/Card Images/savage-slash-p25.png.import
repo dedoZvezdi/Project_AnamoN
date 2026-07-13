@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/savage-slash-p25.png-cdb687e2e72e7085942f1fcd
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

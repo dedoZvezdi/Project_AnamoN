@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/right-of-realm-rdo.png-97dafb9d0bdec2f0d1f3cd
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

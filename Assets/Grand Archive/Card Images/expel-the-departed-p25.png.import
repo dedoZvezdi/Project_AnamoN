@@ -17,6 +17,7 @@ dest_files=["res://.godot/imported/expel-the-departed-p25.png-2535c8d6ccca1135d2
 
 compress/mode=0
 compress/high_quality=false
+compress/high_quality_mode=0
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

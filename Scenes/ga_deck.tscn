@@ -6,37 +6,37 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bas7d"]
 size = Vector2(500, 700)
 
-[node name="Deck" type="Node2D"]
+[node name="Deck" type="Node2D" unique_id=689814827]
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=523399539]
 texture = ExtResource("1_8vpbr")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=701764795]
 collision_layer = 4
 collision_mask = 4
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=716206222]
 shape = SubResource("RectangleShape2D_bas7d")
 
-[node name="PopupMenu" type="PopupMenu" parent="."]
+[node name="PopupMenu" type="PopupMenu" parent="." unique_id=1942132116]
 size = Vector2i(100, 50)
 
-[node name="DeckViewWindow" type="Window" parent="."]
+[node name="DeckViewWindow" type="Window" parent="." unique_id=522525823]
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
 
-[node name="PopupMenu" type="PopupMenu" parent="DeckViewWindow"]
+[node name="PopupMenu" type="PopupMenu" parent="DeckViewWindow" unique_id=1371315731]
 size = Vector2i(100, 50)
 
-[node name="ScrollContainer" type="ScrollContainer" parent="DeckViewWindow"]
+[node name="ScrollContainer" type="ScrollContainer" parent="DeckViewWindow" unique_id=620117697]
 offset_right = 600.0
 offset_bottom = 142.0
 
-[node name="GridContainer" type="GridContainer" parent="DeckViewWindow/ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="DeckViewWindow/ScrollContainer" unique_id=1620129238]
 custom_minimum_size = Vector2(600, 142)
 layout_mode = 2
 columns = 1024
 
-[node name="Control" parent="DeckViewWindow/ScrollContainer/GridContainer" instance=ExtResource("2_yhn4k")]
+[node name="Control" parent="DeckViewWindow/ScrollContainer/GridContainer" unique_id=1779504644 instance=ExtResource("2_yhn4k")]
 layout_mode = 2
