@@ -40,6 +40,39 @@ corner_radius_bottom_left = 8
 bg_color = Color(0.6, 0.6, 0.6, 0)
 border_color = Color(0.8, 0.8, 0.8, 0)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1p5hy"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2w5on"]
+bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.60784316)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sxkr1"]
+bg_color = Color(0.84705883, 0.7254902, 0.5058824, 0.27450982)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fq0cl"]
+bg_color = Color(0.84705883, 0.7254902, 0.5058824, 0.09803922)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rgh2o"]
 bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
 border_width_left = 2
@@ -278,6 +311,7 @@ text = "Nickname:"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/caret_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_hbrnk")
 theme_override_styles/focus = SubResource("StyleBoxFlat_bmxlf")
 alignment = 1
@@ -308,6 +342,13 @@ text = "Claudflare"
 custom_minimum_size = Vector2(0, 600)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hovered_color = Color(0.900999, 0.7805571, 0.46474707, 1)
+theme_override_colors/font_hovered_selected_color = Color(0.94437265, 0.87773085, 0.77091026, 1)
+theme_override_colors/font_selected_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_1p5hy")
+theme_override_styles/hovered = SubResource("StyleBoxFlat_2w5on")
+theme_override_styles/hovered_selected_focus = SubResource("StyleBoxFlat_sxkr1")
+theme_override_styles/selected = SubResource("StyleBoxFlat_fq0cl")
 
 [node name="HBoxButtonsContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=1210522404]
 layout_mode = 2
@@ -356,6 +397,7 @@ custom_minimum_size = Vector2(700, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_placeholder_color = Color(0.3922031, 0.3126582, 0.16438076, 0.6627451)
+theme_override_colors/caret_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_lolwk")
 theme_override_styles/focus = SubResource("StyleBoxFlat_50glp")
 placeholder_text = "PUBLIC IP"
@@ -366,6 +408,7 @@ custom_minimum_size = Vector2(190, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_placeholder_color = Color(0.39215687, 0.3137255, 0.16470589, 0.6627451)
+theme_override_colors/caret_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_4kpch")
 theme_override_styles/focus = SubResource("StyleBoxFlat_vy5pj")
 placeholder_text = "PORT"

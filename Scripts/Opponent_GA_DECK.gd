@@ -67,8 +67,9 @@ func add_to_bottom(slug: String, uuid: String = ""):
 	increment_deck_size()
 
 func set_highlight(is_highlighted: bool):
-	if has_node("Sprite2D"):
+	if has_node("ShadowPanel"):
 		if is_highlighted:
-			$Sprite2D.modulate = Color(1.5, 0.5, 0.5, 0.9)
+			$ShadowPanel.modulate = Color(1.5, 0.5, 0.5, 0.9)
+			$ShadowPanel.visible = true
 		else:
-			$Sprite2D.modulate = Color(1, 1, 1, 1)
+			$ShadowPanel.visible = false

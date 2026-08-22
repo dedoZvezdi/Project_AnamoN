@@ -166,12 +166,17 @@ func on_client_disconnected():
 func _on_p1_ready_pressed() -> void:
 	p1_ready = !p1_ready
 	_update_player_ui(p1_ready, p1_ready_btn, p1_status_label, p1_status_dot, p1_progress_fill, false)
+	deck_option.disabled = p1_ready
+	if multiplayer.is_server():
+		mode_option.disabled = p1_ready
+		legality_option.disabled = p1_ready
 	rpc("sync_ready_state", 1, p1_ready)
 	check_start_button()
 
 func _on_p2_ready_pressed() -> void:
 	p2_ready = !p2_ready
 	_update_player_ui(p2_ready, p2_ready_btn, p2_status_label, p2_status_dot, p2_progress_fill, true)
+	deck_option.disabled = p2_ready
 	rpc("sync_ready_state", 2, p2_ready)
 
 @rpc("any_peer", "reliable")
@@ -215,9 +220,15 @@ func _on_exit_pressed():
 func _on_start_pressed():
 	if multiplayer.is_server() and not start_button.disabled:
 		var multiplayer_node = get_parent()
-		if multiplayer_node and multiplayer_node.has_method("start_game_instances"):
-			multiplayer_node.start_game_instances()
 		rpc("sync_start_game")
+		if multiplayer_node:
+			var mode_idx = mode_option.selected if mode_option else 0
+			if "_game_mode" in multiplayer_node:
+				multiplayer_node._game_mode = mode_idx
+			if multiplayer_node.has_method("rpc"):
+				multiplayer_node.rpc("rpc_sync_game_mode", mode_idx)
+			if multiplayer_node.has_method("start_game_instances"):
+				multiplayer_node.start_game_instances()
 
 @rpc("any_peer", "reliable")
 func sync_start_game():
@@ -268,16 +279,15 @@ func _refresh_deck_options():
 		old_selected_name = deck_option.get_item_text(deck_option.selected)
 	deck_option.clear()
 	var legality_text = legality_option.get_item_text(legality_option.selected)
-	var decks_dir_path = OS.get_executable_path().get_base_dir().path_join("Decks")
-	if OS.has_feature("editor") or not DirAccess.dir_exists_absolute(decks_dir_path):
-		decks_dir_path = "res://Decks"
+	var decks_dir_path = GamePaths.get_decks_dir_path()
 	var dir = DirAccess.open(decks_dir_path)
 	if dir:
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
 		while file_name != "":
 			if not dir.current_is_dir() and file_name.ends_with(".gad"):
-				var file = FileAccess.open(decks_dir_path.path_join(file_name), FileAccess.READ)
+				var full_path = decks_dir_path.path_join(file_name)
+				var file = FileAccess.open(full_path, FileAccess.READ)
 				if file:
 					var json = JSON.new()
 					var error = json.parse(file.get_as_text())
@@ -291,9 +301,9 @@ func _refresh_deck_options():
 									break
 						else:
 							is_legal = true
-							
 						if is_legal and data.has("deck_name"):
 							deck_option.add_item(str(data["deck_name"]))
+							deck_option.set_item_metadata(deck_option.get_item_count() - 1, full_path)
 			file_name = dir.get_next()
 	if deck_option.get_item_count() > 0:
 		var found_idx = -1
@@ -310,3 +320,25 @@ func _refresh_deck_options():
 	else:
 		deck_option.selected = -1
 		_on_deck_selected(-1)
+
+func get_selected_deck_data() -> Dictionary:
+	if not deck_option or deck_option.selected < 0 or deck_option.get_item_count() == 0:
+		return {}
+	
+	var file_path = deck_option.get_item_metadata(deck_option.selected)
+	if file_path == null or file_path == "":
+		return {}
+
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	if file:
+		var json = JSON.new()
+		var error = json.parse(file.get_as_text())
+		if error == OK and typeof(json.data) == TYPE_DICTIONARY:
+			var data = json.data
+			return {
+				"main_deck": data.get("main_deck", []),
+				"mat_deck": data.get("mat_deck", []),
+				"pantheon_deck": data.get("pantheon_deck", []),
+				"side_deck": data.get("side_deck", []),
+			}
+	return {}

@@ -4,6 +4,17 @@
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_qrb68"]
 [ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="4_r8ami"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qrb68"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 20
+shadow_color = Color(1, 1, 1, 1)
+shadow_size = 40
+
 [sub_resource type="Animation" id="Animation_h8wm0"]
 length = 0.001
 tracks/0/type = "value"
@@ -132,6 +143,39 @@ z_index = -1
 rotation = 3.14159
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_qrb68")
+
+[node name="ShadowPanel" type="Panel" parent="." unique_id=697740777]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 124.28589
+offset_top = 171.42847
+offset_right = 372.85718
+offset_bottom = 514.2854
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 3.1415927
+theme_override_styles/panel = SubResource("StyleBoxFlat_qrb68")
+
+[node name="Level" type="Label" parent="." unique_id=306683656]
+offset_left = 133.51636
+offset_top = 119.633606
+offset_right = 277.51666
+offset_bottom = 173.6336
+theme_override_font_sizes/font_size = 32
+vertical_alignment = 1
+
+[node name="PowerLifeDurSpeed" type="Label" parent="." unique_id=897306200]
+offset_left = -180.0
+offset_top = -219.42853
+offset_right = 180.0
+offset_bottom = -163.42853
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=355424545]
 libraries/ = SubResource("AnimationLibrary_h8wm0")

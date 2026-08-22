@@ -3,7 +3,6 @@ extends Node2D
 @onready var logo_menu = $LogoMenu
 @onready var scroll_vbox = $LogoMenu/MainVBox/ScrollSection/ScrollVBox
 @onready var fixed_vbox = $LogoMenu/MainVBox/FixedVBox
-@onready var separator = $LogoMenu/MainVBox/Separator
 @onready var scroll_section = $LogoMenu/MainVBox/ScrollSection
 @onready var Logo_view_window = $LogoViewWindow
 @onready var grid_container = $LogoViewWindow/ScrollContainer/GridContainer
@@ -33,8 +32,8 @@ var life_value := 0
 var custom_counters := {}
 var counter_labels := {}
 var chat_node = null
-var add_counter_dialog: AcceptDialog
-var counter_name_input: LineEdit
+@onready var add_counter_dialog: AcceptDialog = $LogoCounterDialog
+@onready var counter_name_input: LineEdit = $LogoCounterDialog/VBoxContainer/CounterNameInput
 var original_menu_pos: Vector2 = Vector2.ZERO
 var player_name: String = "Player"
 var token_slugs : Array = []
@@ -49,45 +48,36 @@ func _ready():
 	custom_counters["Debuff"] = 0
 	custom_counters["Enlighten"] = 0
 	custom_counters["Omen"] = 0
+	custom_counters["Damage"] = 0
+	custom_counters["Life"] = 0
+	custom_counters["Level"] = 0
+	custom_counters["Durability"] = 0
+	custom_counters["Power"] = 0
 	build_main_menu()
 	setup_status_labels()
-	setup_counter_input_dialog()
+	add_counter_dialog.confirmed.connect(_on_counter_name_confirmed)
 	for c_name in custom_counters.keys():
 		create_counter_label(c_name)
 	update_status_display()
 	find_chat_node()
+	Logo_view_window.hide()
 	Logo_view_window.close_requested.connect(_on_logo_view_close)
 	Logo_view_window.visibility_changed.connect(_on_logo_view_visibility_changed)
+	
+	Logo_mastery_view_window.hide()
 	Logo_mastery_view_window.close_requested.connect(_on_logo_mastery_view_close)
 	Logo_mastery_view_window.visibility_changed.connect(_on_logo_mastery_view_visibility_changed)
+	
+	Logo_status_view_window.hide()
 	Logo_status_view_window.close_requested.connect(_on_logo_status_view_close)
 	Logo_status_view_window.visibility_changed.connect(_on_logo_status_view_visibility_changed)
 	call_deferred("populate_tokens")
 	call_deferred("populate_mastery")
 	call_deferred("populate_status")
-	Logo_view_window.hide()
-	Logo_mastery_view_window.hide()
-	Logo_status_view_window.hide()
 	var config = ConfigFile.new()
 	var err = config.load("user://player_config.cfg")
 	if err == OK:
 		player_name = config.get_value("Player", "Name", "Player")
-
-func setup_counter_input_dialog():
-	add_counter_dialog = AcceptDialog.new()
-	add_counter_dialog.title = "Add New Counter"
-	add_counter_dialog.size = Vector2(300, 120)
-	var vbox = VBoxContainer.new()
-	var label = Label.new()
-	label.text = "Enter counter name:"
-	counter_name_input = LineEdit.new()
-	counter_name_input.placeholder_text = "Counter name..."
-	counter_name_input.max_length = 17
-	vbox.add_child(label)
-	vbox.add_child(counter_name_input)
-	add_counter_dialog.add_child(vbox)
-	add_child(add_counter_dialog)
-	add_counter_dialog.confirmed.connect(_on_counter_name_confirmed)
 
 func _on_counter_name_confirmed():
 	var counter_name = counter_name_input.text.strip_edges()
@@ -276,17 +266,15 @@ func clear_custom_menu():
 	for child in fixed_vbox.get_children():
 		fixed_vbox.remove_child(child)
 		child.queue_free()
-	separator.hide()
 	scroll_section.custom_minimum_size = Vector2.ZERO
 	scroll_section.size = Vector2.ZERO
 	logo_menu.custom_minimum_size = Vector2.ZERO
-	logo_menu.size = Vector2.ZERO
 
 func add_custom_item(label_text: String, id: int, metadata: Dictionary = {}, is_fixed: bool = false):
 	var button = Button.new()
 	button.text = label_text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.add_theme_font_size_override("font_size", 14)
+	button.add_theme_font_size_override("font_size", 17)
 	button.pressed.connect(func(): _on_custom_item_pressed(id, metadata))
 	button.flat = false
 	if is_fixed:
@@ -300,16 +288,11 @@ func _on_custom_item_pressed(id: int, metadata: Dictionary):
 func finalize_custom_menu():
 	scroll_section.custom_minimum_size = Vector2.ZERO
 	logo_menu.custom_minimum_size = Vector2.ZERO
-	logo_menu.size = Vector2.ZERO
 	await get_tree().process_frame
 	var scroll_item_count = scroll_vbox.get_child_count()
 	var fixed_item_count = fixed_vbox.get_child_count()
 	var total_items = scroll_item_count + fixed_item_count
 	var max_visible_total = 9
-	if scroll_item_count > 0 and fixed_item_count > 0:
-		separator.show()
-	else:
-		separator.hide()
 	if total_items > 0:
 		var sample_item = null
 		if scroll_item_count > 0:
@@ -325,7 +308,6 @@ func finalize_custom_menu():
 				scroll_section.custom_minimum_size.y = item_height * scroll_item_count
 	else:
 		scroll_section.custom_minimum_size.y = 0
-	logo_menu.size = Vector2.ZERO
 	await get_tree().process_frame
 	logo_menu.size = Vector2.ZERO
 	adjust_custom_menu_position()
@@ -358,7 +340,7 @@ func build_counters_menu():
 	add_custom_item("Add", 501)
 	for counter_name in custom_counters.keys():
 		add_custom_item(counter_name + " +", 700, {"action": "increase", "counter": counter_name})
-		if counter_name != "Buff" and counter_name != "Debuff" and counter_name != "Enlighten" and counter_name != "Omen":
+		if counter_name != "Buff" and counter_name != "Debuff":
 			add_custom_item(counter_name + " -", 700, {"action": "decrease", "counter": counter_name})
 	add_custom_item("Back", 999, {}, true)
 	finalize_custom_menu()
@@ -533,7 +515,9 @@ func _handle_menu_action(id, metadata = {}):
 			$LogoStatusViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 		elif id == 103:
 			logo_menu.hide()
-			send_to_chat("Surrendered")
+			var main_scene = get_tree().current_scene
+			if main_scene and main_scene.has_method("surrender_game"):
+				main_scene.surrender_game()
 	elif showing_dice_menu:
 		if id == 999:
 			build_main_menu()
@@ -622,7 +606,6 @@ func _handle_menu_action(id, metadata = {}):
 				elif action == "decrease":
 					custom_counters[counter_name] -= 1
 				update_status_display()
-				build_counters_menu()
 
 func fetch_slugs_by_type(target_type: String) -> Array:
 	var slugs = []

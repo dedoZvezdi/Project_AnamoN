@@ -82,9 +82,16 @@ func _reset_hold():
 		progress_bar.visible = false
 
 func update_deck_view():
+	if banish_view_window and not banish_view_window.visible:
+		return
+	var current_update = Time.get_ticks_msec()
+	set_meta("update_id", current_update)
 	for child in grid_container.get_children():
 		child.queue_free()
+	var count = 0
 	for card in cards_in_banish:
+		if get_meta("update_id") != current_update or (banish_view_window and not banish_view_window.visible):
+			return
 		if not is_instance_valid(card):
 			continue
 		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.get_name())
@@ -102,6 +109,10 @@ func update_deck_view():
 			if ResourceLoader.exists(image_path):
 				tex_rect.texture = load(image_path)
 		grid_container.move_child(card_display, 0)
+		count += 1
+		if count >= 8:
+			count = 0
+			await get_tree().process_frame
 
 func setup_deck_view():
 	banish_view_window.close_requested.connect(_on_deck_view_close)
@@ -212,8 +223,8 @@ func show_card_front(card):
 		card.set_meta("is_face_down", false)
 
 func show_grid_view():
-	update_deck_view()
 	banish_view_window.popup_centered()
+	update_deck_view()
 	$BanishViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
 	$BanishViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 
@@ -306,6 +317,9 @@ func set_card_marked(uuid: String, is_marked: bool):
 	if is_marked:
 		if not uuid in marked_uuids:
 			marked_uuids.append(uuid)
+			get_tree().create_timer(0.3).timeout.connect(func():
+				if uuid in marked_uuids:
+					set_card_marked(uuid, false))
 	else:
 		marked_uuids.erase(uuid)
 	update_top_card_visual()
@@ -314,11 +328,16 @@ func set_card_marked(uuid: String, is_marked: bool):
 
 func update_top_card_visual():
 	if cards_in_banish.is_empty():
+		if has_node("ShadowPanel"):
+			$ShadowPanel.visible = false
 		return
 	var top_card = cards_in_banish[-1]
-	if not is_instance_valid(top_card):
-		return
-	if marked_uuids.size() > 0:
-		top_card.modulate = Color(1.5, 0.5, 0.5, 0.9)
-	else:
+	if is_instance_valid(top_card):
 		top_card.modulate = Color(1, 1, 1)
+	if marked_uuids.size() > 0:
+		if has_node("ShadowPanel"):
+			$ShadowPanel.modulate = Color(1.5, 0.5, 0.5, 0.9)
+			$ShadowPanel.visible = true
+	else:
+		if has_node("ShadowPanel"):
+			$ShadowPanel.visible = false

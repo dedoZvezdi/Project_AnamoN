@@ -8,6 +8,10 @@ var current_mastery_card = null
 var champion_life_delta := 0
 var first_champion_summoned = false
 var imperial_seal_turn_count = 0
+var apotheosis_rite_active: bool = false
+var sacramental_rite_active: bool = false
+var transcendental_rite_active: bool = false
+var transcendental_rite_turn_count: int = 0
 
 func adjust_champion_life_delta(delta):
 	champion_life_delta += int(delta)
@@ -30,48 +34,23 @@ func activate_champion_elements(card):
 	if not elements_node:
 		return
 	if card_slug.contains("prismatic-sanctuary"):
-		for e_name in ["Fire", "Water", "Wind"]:
-			var e_node = elements_node.get_node_or_null(e_name)
-			if e_node and e_node.has_method("activate"):
-				e_node.activate()
+		PrismaticSanctuaryEffect.apply_activation(elements_node, false)
 	elif card_slug.contains("prismatic-perseverance"):
-		for e_name in ["Norm", "Fire", "Water", "Wind", "Astra", "Umbra", "Arcane", "Exia", "Crux", "Tera", "Neos", "Luxem"]:
-			var e_node = elements_node.get_node_or_null(e_name)
-			if e_node and e_node.has_method("activate"):
-				e_node.activate()
-	elif card_slug.contains("imperial-seal"):
-		if card.has_meta("is_given") and card.get_meta("is_given"):
-			card.set_meta("is_given", false)
-			return
-		imperial_seal_turn_count += 1
-		for e_name in ["Fire", "Water", "Wind"]:
-			var e_node = elements_node.get_node_or_null(e_name)
-			if e_node and e_node.has_method("activate"):
-				e_node.activate()
+		PrismaticPerseveranceEffect.apply_activation(elements_node, false)
 	elif card_slug.contains("prismatic-spirit"):
-		var norm = elements_node.get_node_or_null("Norm")
-		if norm and norm.has_method("activate"):
-			norm.activate()
-		var original_owner = 0
-		if "original_owner_id" in card:
-			original_owner = card.original_owner_id
-		var my_id = 0
-		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
-		if multiplayer_node and multiplayer_node.has_method("multiplayer"):
-			my_id = multiplayer_node.multiplayer.get_unique_id()
-		elif multiplayer:
-			my_id = multiplayer.get_unique_id()
-		if original_owner == 0 or original_owner == my_id:
-			_show_prismatic_selection(card)
+		PrismaticSpiritEffect.apply_activation(card, elements_node, false)
 	if "champion_lineage" in card:
 		for entry in card.champion_lineage:
 			var slug = entry.get("slug", "")
 			if slug.contains("prismatic-spirit"):
 				var chosen = entry.get("chosen_elements", [])
-				for e_name in chosen:
-					var e_node = elements_node.get_node_or_null(e_name)
-					if e_node and e_node.has_method("activate"):
-						e_node.activate()
+				PrismaticSpiritEffect.apply_lineage_activation(elements_node, chosen, false)
+			var entry_element = entry.get("element", "")
+			if entry_element != "":
+				var cap_name = str(entry_element).capitalize()
+				var e_node = elements_node.get_node_or_null(cap_name)
+				if e_node and e_node.has_method("activate"):
+					e_node.activate()
 	if is_champion_card(card):
 		var card_info_ref = find_card_information_reference()
 		if not card_info_ref or not card_info_ref.card_database_reference:
@@ -95,32 +74,35 @@ func deactivate_card_elements(card):
 	if not card or not is_instance_valid(card):
 		return
 	var card_slug = get_card_slug(card)
-	if not (card_slug.contains("prismatic-sanctuary") or card_slug.contains("prismatic-perseverance") or card_slug.contains("prismatic-spirit")):
-		pass
 	var root = get_tree().current_scene
 	var elements_node = get_parent().get_node_or_null("Elements")
 	if not elements_node:
 		if root and root.has_method("find_child"):
 			elements_node = root.find_child("Elements", true, false)	
 	if elements_node:
-		var elements_to_deactivate = []
-		if card_slug.contains("prismatic-sanctuary"):
-			elements_to_deactivate = ["Fire", "Water", "Wind"]
-		elif card_slug.contains("prismatic-perseverance"):
-			elements_to_deactivate = ["Norm", "Fire", "Water", "Wind", "Astra", "Umbra", "Arcane", "Exia", "Crux", "Tera", "Neos", "Luxem"]
-		for e_name in elements_to_deactivate:
-			var e_node = elements_node.get_node_or_null(e_name)
-			if e_node and e_node.has_method("deactivate"):
-				e_node.deactivate()
+		if card_slug.contains("prismatic-perseverance"):
+			PrismaticPerseveranceEffect.apply_deactivation(elements_node, false)
+		elif card_slug.contains("prismatic-sanctuary"):
+			PrismaticSanctuaryEffect.apply_deactivation(elements_node, false)
+		if is_champion_card(card):
+			var element_name = _get_element_for_slug(card_slug)
+			if element_name != "":
+				var cap_name = str(element_name).capitalize()
+				var e_node = elements_node.get_node_or_null(cap_name)
+				if e_node and e_node.has_method("deactivate"):
+					e_node.deactivate()
 		if "champion_lineage" in card:
 			for entry in card.champion_lineage:
 				var slug = entry.get("slug", "")
 				if slug.contains("prismatic-spirit"):
 					var chosen = entry.get("chosen_elements", [])
-					for e_name in chosen:
-						var e_node = elements_node.get_node_or_null(e_name)
-						if e_node and e_node.has_method("deactivate"):
-							e_node.deactivate()
+					PrismaticSpiritEffect.remove_lineage_activation(elements_node, chosen, false)
+				var entry_element = entry.get("element", "")
+				if entry_element != "":
+					var cap_name = str(entry_element).capitalize()
+					var e_node = elements_node.get_node_or_null(cap_name)
+					if e_node and e_node.has_method("deactivate"):
+						e_node.deactivate()
 
 @warning_ignore("shadowed_variable_base_class")
 func add_card_to_field(card, position = null):
@@ -151,7 +133,8 @@ func add_card_to_field(card, position = null):
 					var lineage_data = {
 						"slug": get_card_slug(current_champion_card),
 						"uuid": current_champion_card.uuid if "uuid" in current_champion_card else "",
-						"chosen_elements": current_champion_card.chosen_elements if "chosen_elements" in current_champion_card else []}
+						"chosen_elements": current_champion_card.chosen_elements if "chosen_elements" in current_champion_card else [],
+						"element": _get_element_for_slug(get_card_slug(current_champion_card))}
 					card.add_to_lineage(lineage_data)
 				remove_previous_champions()
 			current_champion_card = card
@@ -179,6 +162,12 @@ func add_card_to_field(card, position = null):
 		var card_info_ref = find_card_information_reference()
 		if card_info_ref and card_info_ref.has_method("show_card_preview"):
 			card_info_ref.show_card_preview(card)
+		if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
+			var tree = get_tree()
+			if tree and tree.current_scene:
+				var main_node = tree.get_root().get_node_or_null("Main")
+				if not main_node: main_node = tree.current_scene if tree.current_scene.name == "Main" else null
+				if main_node: LuBuIndomitableTitanEffect.refresh_all_cards_visuals(main_node)
 	elif is_mastery_card(card):
 		var card_already_in_field = card in cards_in_field
 		if not card_already_in_field:
@@ -187,7 +176,7 @@ func add_card_to_field(card, position = null):
 			current_mastery_card = card
 			cards_in_field.append(card)
 			card_in_slot = true
-			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance") or get_card_slug(card).contains("imperial-seal"):
+			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance"):
 				activate_champion_elements(card)
 		if position != null:
 			card.global_position = position
@@ -207,7 +196,7 @@ func add_card_to_field(card, position = null):
 		if not (card in cards_in_field):
 			cards_in_field.append(card)
 			card_in_slot = true
-			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance") or get_card_slug(card).contains("imperial-seal"):
+			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance"):
 				activate_champion_elements(card)
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
@@ -221,11 +210,21 @@ func add_card_to_field(card, position = null):
 				card_image_back_s.visible = false
 				card_image_s.visible = true
 
-func notify_card_transformed(card):
+func notify_card_transformed(card, old_slug: String = ""):
 	if card == current_champion_card and not is_champion_card(card):
 		current_champion_card = null
+		if old_slug != "" and _is_slug_champion(old_slug):
+			_deactivate_element_by_slug(old_slug)
 	elif is_champion_card(card):
+		if old_slug != "" and _is_slug_champion(old_slug):
+			_deactivate_element_by_slug(old_slug)
 		activate_champion_elements(card)
+	if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
+		var tree = get_tree()
+		if tree and tree.current_scene:
+			var main_node = tree.get_root().get_node_or_null("Main")
+			if not main_node: main_node = tree.current_scene if tree.current_scene.name == "Main" else null
+			if main_node: LuBuIndomitableTitanEffect.refresh_all_cards_visuals(main_node)
 
 func remove_previous_champions():
 	if current_champion_card and is_instance_valid(current_champion_card):
@@ -237,6 +236,12 @@ func remove_previous_champions():
 		current_champion_card.queue_free()
 		deactivate_card_elements(current_champion_card)
 		current_champion_card = null
+		if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
+			var tree = get_tree()
+			if tree and tree.current_scene:
+				var main_node = tree.get_root().get_node_or_null("Main")
+				if not main_node: main_node = tree.current_scene if tree.current_scene.name == "Main" else null
+				if main_node: LuBuIndomitableTitanEffect.refresh_all_cards_visuals(main_node)
 		
 func is_champion_card(card) -> bool:
 	if not card or not is_instance_valid(card):
@@ -341,6 +346,7 @@ func clear_imperial_seal_activations():
 			elements_node = root.find_child("Elements", true, false)
 	if not elements_node:
 		imperial_seal_turn_count = 0
+		transcendental_rite_turn_count = 0
 		return
 	while imperial_seal_turn_count > 0:
 		for e_name in ["Fire", "Water", "Wind"]:
@@ -348,15 +354,35 @@ func clear_imperial_seal_activations():
 			if e_node and e_node.has_method("deactivate"):
 				e_node.deactivate()
 		imperial_seal_turn_count -= 1
+	while transcendental_rite_turn_count > 0:
+		for e_name in ["Fire", "Water", "Wind"]:
+			var e_node = elements_node.get_node_or_null(e_name)
+			if e_node and e_node.has_method("deactivate"):
+				e_node.deactivate()
+		transcendental_rite_turn_count -= 1
 
-func _show_prismatic_selection(card):
-	var popup_script = load("res://Scripts/PrismaticSelectionPopup.gd")
-	if popup_script:
-		var popup = CanvasLayer.new()
-		popup.layer = 100
-		popup.set_script(popup_script)
-		get_tree().root.add_child(popup)
-		popup.selection_confirmed.connect(func(elements):
-			card.chosen_elements = elements
-			if card.has_meta("chosen_elements"):
-				card.set_meta("chosen_elements", elements))
+func _is_slug_champion(slug: String) -> bool:
+	var card_info_ref = find_card_information_reference()
+	if card_info_ref and card_info_ref.has_method("is_card_of_type"):
+		return card_info_ref.is_card_of_type(slug, "CHAMPION")
+	return false
+
+func _get_element_for_slug(slug: String) -> String:
+	var card_info_ref = find_card_information_reference()
+	if card_info_ref and card_info_ref.has_method("get_card_element"):
+		return card_info_ref.get_card_element(slug)
+	return ""
+
+func _deactivate_element_by_slug(slug: String):
+	var element_name = _get_element_for_slug(slug)
+	if element_name == "":
+		return
+	var elements_node = get_parent().get_node_or_null("Elements")
+	if not elements_node:
+		elements_node = get_tree().current_scene.find_child("Elements", true, false)
+	if not elements_node:
+		return
+	var cap_name = str(element_name).capitalize()
+	var e_node = elements_node.get_node_or_null(cap_name)
+	if e_node and e_node.has_method("deactivate"):
+		e_node.deactivate()

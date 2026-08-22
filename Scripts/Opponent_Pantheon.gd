@@ -55,6 +55,11 @@ func animate_flip(side_index):
 func update_visuals(side_index):
 	var sprite = left_image if side_index == 0 else right_image
 	var area = left_area if side_index == 0 else right_area
+	if pantheon_cards[side_index] == "":
+		sprite.visible = false
+		if area:
+			area.get_node("CollisionShape2D").disabled = true
+		return
 	sprite.visible = true
 	if area:
 		area.get_node("CollisionShape2D").disabled = false

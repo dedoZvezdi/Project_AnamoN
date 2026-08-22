@@ -1,8 +1,8 @@
 extends Node2D
 
-@onready var message: LineEdit = $Message
-@onready var text_edit: RichTextLabel = $TextEdit
-@onready var Send_edit: Button = $Send
+@onready var message: LineEdit = $Control/Message
+@onready var text_edit: RichTextLabel = $Control/TextEdit
+@onready var Send_edit: Button = $Control/Send
 
 var msg: String
 var player_name: String = "Player"

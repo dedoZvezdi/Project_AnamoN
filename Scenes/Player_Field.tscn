@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://bhkcqcx0pu1b5"]
 
 [ext_resource type="Script" uid="uid://btk4g07uwv3gi" path="res://Scripts/CardManager.gd" id="1_8whdk"]
-[ext_resource type="Script" uid="uid://dn6i6yhtowm6r" path="res://Scripts/Game_SetUp.gd" id="1_uld4x"]
 [ext_resource type="Texture2D" uid="uid://ctvk61fkpt3vm" path="res://Assets/Textures/Field_ga.png" id="2_uld4x"]
 [ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="3_xb57x"]
 [ext_resource type="PackedScene" uid="uid://bhhjuuiiuqcoi" path="res://Scenes/ga_deck.tscn" id="4_kym08"]
@@ -27,8 +26,95 @@
 [ext_resource type="PackedScene" uid="uid://d4lnbcibqak3y" path="res://Scenes/Pantheon.tscn" id="26_xuc2h"]
 [ext_resource type="Script" uid="uid://dtl8d6lqww58o" path="res://Scripts/PlayerElements.gd" id="new_script_player_elements"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_md12f"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_g5k7o"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ysa1c"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1swxn"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.21960784)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_86bus"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.12156863)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.13333334, 0.7411765, 0.20392157, 0.54901963)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hrudh"]
+bg_color = Color(0.14117648, 0.12941177, 0.101960786, 0.5137255)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xftee"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ss27m"]
+bg_color = Color(0.7411765, 0.13725491, 0.20392157, 0.21960784)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2hex1"]
+bg_color = Color(0.8745098, 0.15294118, 0.023529412, 0.12156863)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7411765, 0.13333334, 0.20392157, 0.54901963)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="PlayerField" type="Node2D" unique_id=260745692]
-script = ExtResource("1_uld4x")
 
 [node name="CardManager" type="Node2D" parent="." unique_id=745441006]
 script = ExtResource("1_8whdk")
@@ -94,3 +180,74 @@ position = Vector2(-1454, 0)
 [node name="Player_Info" parent="." unique_id=980618565 instance=ExtResource("25_kym08")]
 
 [node name="PANTHEON" parent="." unique_id=653400742 instance=ExtResource("26_xuc2h")]
+
+[node name="EndGamePopup" type="CanvasLayer" parent="." unique_id=571830537]
+visible = false
+
+[node name="InputBlocker" type="ColorRect" parent="EndGamePopup" unique_id=585562704]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.4)
+
+[node name="Panel" type="Panel" parent="EndGamePopup" unique_id=2105525862]
+offset_left = 760.0
+offset_top = 440.0
+offset_right = 1160.0
+offset_bottom = 640.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_md12f")
+
+[node name="CenterContainer" type="CenterContainer" parent="EndGamePopup/Panel" unique_id=114354857]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_g5k7o")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="EndGamePopup/Panel/CenterContainer" unique_id=1657214284]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ResultLabel" type="Label" parent="EndGamePopup/Panel/CenterContainer/VBoxContainer" unique_id=422146771]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EndGamePopup/Panel/CenterContainer/VBoxContainer" unique_id=1399978072]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="RematchButton" type="Button" parent="EndGamePopup/Panel/CenterContainer/VBoxContainer/HBoxContainer" unique_id=831869275]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.13333334, 0.7411765, 0.20392157, 1)
+theme_override_colors/font_disabled_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_ysa1c")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1swxn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_86bus")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_hrudh")
+text = "Rematch"
+
+[node name="LeaveButton" type="Button" parent="EndGamePopup/Panel/CenterContainer/VBoxContainer/HBoxContainer" unique_id=1004324035]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.9411765, 0, 0.105882354, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_xftee")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ss27m")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2hex1")
+text = "Leave"

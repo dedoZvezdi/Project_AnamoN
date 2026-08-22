@@ -2,6 +2,32 @@
 
 [ext_resource type="Script" uid="uid://dddogrjplyi36" path="res://Scripts/Chat.gd" id="1_yc4ao"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mr5cl"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tj4fr"]
+bg_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sodvm"]
+bg_color = Color(0.70980394, 0.5882353, 0.36078432, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_md12f"]
+VScrollBar/styles/grabber = SubResource("StyleBoxFlat_mr5cl")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_tj4fr")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_sodvm")
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yc4ao"]
 bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
 border_width_left = 2
@@ -9,6 +35,25 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yhn4k"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xpb52"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8862745, 0.77254903, 0.4862745, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -47,27 +92,43 @@ bg_color = Color(0.6, 0.6, 0.6, 0)
 [node name="Chat" type="Node2D" unique_id=1967406674]
 script = ExtResource("1_yc4ao")
 
-[node name="Send" type="Button" parent="." unique_id=621029934]
+[node name="Control" type="Control" parent="." unique_id=1573835502]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = SubResource("Theme_md12f")
+
+[node name="Send" type="Button" parent="Control" unique_id=621029934]
+layout_mode = 0
 offset_left = 1806.0
 offset_top = 1005.0
 offset_right = 1885.0
-offset_bottom = 1053.0
+offset_bottom = 1055.0
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_yc4ao")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yhn4k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_xpb52")
 text = "SEND"
 
-[node name="Message" type="LineEdit" parent="." unique_id=851550926]
+[node name="Message" type="LineEdit" parent="Control" unique_id=851550926]
+layout_mode = 0
 offset_left = 1502.0
 offset_top = 1005.0
 offset_right = 1806.0
 offset_bottom = 1055.0
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_placeholder_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/caret_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_v1gob")
 theme_override_styles/focus = SubResource("StyleBoxFlat_jw32o")
 placeholder_text = " Message"
+alignment = 1
 
-[node name="TextEdit" type="RichTextLabel" parent="." unique_id=941147514]
+[node name="TextEdit" type="RichTextLabel" parent="Control" unique_id=941147514]
+layout_mode = 0
 offset_left = 1502.0
 offset_top = 581.0
 offset_right = 1885.0

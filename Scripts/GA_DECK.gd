@@ -3,12 +3,7 @@ extends Node2D
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const HOLD_DURATION = 0.8
 
-var player_deck = ["anthem-of-vitality-ftc","excalibur-reflected-edge-dtr1e",
-"lu-bu-indomitable-titan-hvn1e-cur","aesan-protector-doa1e","accompanying-guard-alc-alter",
-"aetheric-calibration-dtrsd","acolyte-of-cultivation-p25","academy-guide-p24", 
-"absolving-flames-amb","acolyte-of-cultivation-amb","acolyte-of-cultivation-amb",
-"anathemas-end-alc","acolyte-of-cultivation-amb","arcane-disposition-doap",
-"arthur-young-heir-evp","allied-warpriestess-alc"]
+var player_deck = []
 var card_database_reference
 var selected_card_slug: String = ""
 var selected_card_uuid: String = ""
@@ -23,12 +18,6 @@ var progress_bar: TextureProgressBar
 
 func _ready() -> void:
 	add_to_group("deck_zones")
-	var deck_with_uuids = []
-	for slug in player_deck:
-		var card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
-		deck_with_uuids.append({"slug": slug, "uuid": card_uuid})
-	player_deck = deck_with_uuids
-	player_deck.shuffle()
 	card_database_reference = preload("res://Scripts/CardDatabase.gd")
 	setup_context_menu()
 	setup_deck_view()
@@ -36,6 +25,14 @@ func _ready() -> void:
 	$Area2D.input_event.connect(_on_area_2d_input_event)
 	if not $Area2D.mouse_exited.is_connected(_on_mouse_exited):
 		$Area2D.mouse_exited.connect(_on_mouse_exited)
+	update_deck_state()
+
+func load_deck_data(slugs: Array):
+	player_deck = []
+	for slug in slugs:
+		var card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
+		player_deck.append({"slug": slug, "uuid": card_uuid})
+	player_deck.shuffle()
 	update_deck_state()
 	call_deferred("_sync_initial_decks")
 
@@ -160,22 +157,33 @@ func _on_context_menu_pressed(id):
 func update_deck_view():
 	if not deck_view_window.visible:
 		return
+	var current_update = Time.get_ticks_msec()
+	set_meta("update_id", current_update)
 	for child in grid_container.get_children():
 		child.queue_free()
+	var count = 0
 	for card_data in player_deck:
+		if get_meta("update_id") != current_update or not deck_view_window.visible:
+			return
 		var card_display = create_card_display(card_data["slug"], card_data["uuid"])
 		if card_data.has("z_index"):
 			card_display.set_meta("deck_z_index", card_data["z_index"])
 		grid_container.add_child(card_display)
-	grid_container.call_deferred("queue_sort")
+		count += 1
+		if count >= 8:
+			count = 0
+			await get_tree().process_frame
+	if get_meta("update_id") == current_update and deck_view_window.visible:
+		grid_container.call_deferred("queue_sort")
 
 func show_deck_view():
 	deck_view_window.popup_centered()
 	update_deck_view()
 	$DeckViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
 	$DeckViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
-	if has_node("Sprite2D"):
-		$Sprite2D.modulate = Color(0.5, 0.5, 1.5, 0.9)
+	if has_node("ShadowPanel"):
+		$ShadowPanel.modulate = Color(0.5, 0.5, 1.5, 0.9)
+		$ShadowPanel.visible = true
 	var main_node = get_tree().get_root().get_node_or_null("Main")
 	if main_node:
 		main_node.rpc("sync_deck_highlight", multiplayer.get_unique_id(), true)
@@ -367,14 +375,14 @@ func _animate_deck_card_to_zone(slug: String, card_uuid: String, target_pos: Vec
 		if zone_node.name == "BANISH":
 			zone_node.call(zone_method, proxy_card, face_down)
 		elif zone_node.name == "MEMORY":
-			zone_node.call(zone_method, proxy_card, true)
+			zone_node.call(zone_method, proxy_card, false)
 		else:
 			zone_node.call(zone_method, proxy_card)
 
 func _on_deck_view_close():
 	deck_view_window.hide()
-	if has_node("Sprite2D"):
-		$Sprite2D.modulate = Color(1, 1, 1, 1)
+	if has_node("ShadowPanel"):
+		$ShadowPanel.visible = false
 	var main_node = get_tree().get_root().get_node_or_null("Main")
 	if main_node:
 		main_node.rpc("sync_deck_highlight", multiplayer.get_unique_id(), false)

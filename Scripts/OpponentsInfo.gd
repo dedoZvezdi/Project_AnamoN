@@ -83,5 +83,5 @@ func calculate_current_life(card, base_life: int) -> int:
 		life_mod = int(mods.get("life", 0))
 	var counter_mod = 0
 	if counters and counters is Dictionary:
-		counter_mod = int(counters.get("Buff", 0)) - int(counters.get("Debuff", 0))
+		counter_mod = int(counters.get("Buff", 0)) - int(counters.get("Debuff", 0)) + int(counters.get("Life", 0)) - int(counters.get("Damage", 0))
 	return max(0, base_life + life_mod + counter_mod)

@@ -1,6 +1,6 @@
 extends Node2D
 
-var pantheon_cards = ["lesser-boon-of-rakko-pp1", "greater-boon-of-isis-rdop"]
+var pantheon_cards = ["", ""]
 var is_flipped = [false, false]
 var card_information_reference = null
 
@@ -18,6 +18,16 @@ func _ready():
 	left_area.connect("mouse_entered", _on_mouse_entered.bind(0))
 	right_area.connect("mouse_entered", _on_mouse_entered.bind(1))
 	_find_card_info()
+	update_visuals(0)
+	update_visuals(1)
+
+func load_deck_data(slugs: Array):
+	pantheon_cards = ["", ""]
+	for slug in slugs:
+		if slug.begins_with("lesser-boon"):
+			pantheon_cards[0] = slug
+		elif slug.begins_with("greater-boon"):
+			pantheon_cards[1] = slug
 	update_visuals(0)
 	update_visuals(1)
 

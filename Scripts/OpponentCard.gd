@@ -21,13 +21,20 @@ var is_marked = false
 var hold_timer = 0.0
 var is_holding_left = false
 var progress_bar: TextureProgressBar
+var mark_tween: Tween
 
 const HOLD_DURATION = 0.8
 
 @onready var lineage_view_window = $LineageViewWindow
 @onready var grid_container = $LineageViewWindow/ScrollContainer/GridContainer
+@onready var card_level_lable = $Level
+@onready var card_PLDS_lable = $PowerLifeDurSpeed
 
 func _ready() -> void:
+	if card_level_lable:
+		card_level_lable.text = ""
+	if card_PLDS_lable:
+		card_PLDS_lable.text = ""
 	if get_parent() and get_parent().has_method("connect_card_signals"):
 		get_parent().connect_card_signals(self)
 	find_card_information_reference()
@@ -69,11 +76,14 @@ func _on_area_2d_mouse_entered() -> void:
 		emit_signal("hovered", self)
 		if card_information_reference:
 			card_information_reference.show_card_preview(self)
+		show_card_info()
 
 func _on_area_2d_mouse_exited() -> void:
 	mouse_inside = false
 	_reset_hold()
 	emit_signal("hovered_off", self)
+	if is_in_main_field():
+		hide_card_info()
 
 func _is_card_in_restricted_zones() -> bool:
 	if is_revealed_by_opponent:
@@ -171,8 +181,10 @@ func set_opponent_reveal_status(revealed: bool, skip_animation: bool = false):
 				emit_signal("hovered", self)
 				if card_information_reference:
 					card_information_reference.show_card_preview(self)
+				show_card_info()
 		else:
 			emit_signal("hovered_off", self)
+			hide_card_info()
 	var parent_node = get_parent()
 	if parent_node and parent_node.has_method("enforce_z_ordering"):
 		parent_node.enforce_z_ordering()
@@ -235,6 +247,9 @@ func set_opponent_reveal_status(revealed: bool, skip_animation: bool = false):
 		emit_signal("visuals_changed")
 
 func remote_transform(new_slug: String):
+	var old_slug = ""
+	if has_meta("slug"):
+		old_slug = get_meta("slug")
 	set_meta("slug", new_slug)
 	if is_marked:
 		set_marked(false)
@@ -248,7 +263,7 @@ func remote_transform(new_slug: String):
 		anim_player.play("card_flip")
 	runtime_modifiers = {"level": 0, "power": 0, "life": 0, "durability": 0}
 	if current_field and current_field.has_method("notify_card_transformed"):
-		current_field.notify_card_transformed(self)
+		current_field.notify_card_transformed(self, old_slug)
 	emit_signal("visuals_changed")
 
 func add_to_lineage(lineage_data: Dictionary):
@@ -335,8 +350,8 @@ func is_champion_card() -> bool:
 		return false
 	var data = db.cards_db[slug]
 	if data.has("types") and data["types"] is Array:
-		for t in data["types"]:
-			if str(t).to_upper() == "CHAMPION":
+		for type in data["types"]:
+			if str(type).to_upper() == "CHAMPION":
 				return true
 	if data.has("edition_id") and not data.has("parent_orientation_slug"):
 		var base_slug = find_base_card_for_edition(data["edition_id"], db)
@@ -377,18 +392,21 @@ func _on_lineage_window_close():
 		lineage_view_window.hide()
 
 func animate_lineage_banish(slug: String, lineage_uuid: String):
-	if slug.contains("prismatic-spirit"):
-		for entry in champion_lineage:
-			if entry.get("uuid", "") == lineage_uuid:
-				var chosen = entry.get("chosen_elements", [])
-				var scene_root = get_tree().current_scene
-				var elements = scene_root.find_child("OpponentElements", true, false)
-				if elements:
-					for e_name in chosen:
-						var e_node = elements.get_node_or_null("Opponent" + e_name)
-						if e_node and e_node.has_method("deactivate"):
-							e_node.deactivate()
-				break
+	for entry in champion_lineage:
+		if entry.get("uuid", "") == lineage_uuid:
+			var scene_root = get_tree().current_scene
+			var elements = scene_root.find_child("OpponentElements", true, false)
+			if elements:
+				if slug.contains("prismatic-spirit"):
+					var chosen = entry.get("chosen_elements", [])
+					PrismaticSpiritEffect.remove_lineage_activation(elements, chosen, true)
+				var entry_element = entry.get("element", "")
+				if entry_element != "":
+					var cap_name = str(entry_element).capitalize()
+					var e_node = elements.get_node_or_null("Opponent" + cap_name)
+					if e_node and e_node.has_method("deactivate"):
+						e_node.deactivate()
+			break
 
 	remove_from_lineage_by_uuid(lineage_uuid)
 	if lineage_view_window and lineage_view_window.visible:
@@ -437,9 +455,20 @@ func animate_lineage_banish(slug: String, lineage_uuid: String):
 		else:
 			visual_card.queue_free())
 
-func animate_send_to_lineage(card_to_move: Node, card_slug: String, card_uuid: String, chosen_el: Array = []):
+func animate_send_to_lineage(card_to_move: Node, card_slug: String, card_uuid: String, chosen_el: Array = [], element_name: String = ""):
 	var final_callback = func():
-		add_to_lineage({"slug": card_slug, "uuid": card_uuid, "chosen_elements": chosen_el})
+		add_to_lineage({"slug": card_slug, "uuid": card_uuid, "chosen_elements": chosen_el, "element": element_name})
+		if element_name != "" or (card_slug.contains("prismatic-spirit") and chosen_el.size() > 0):
+			var scene_root = get_tree().current_scene
+			var opp_elements = scene_root.find_child("OpponentElements", true, false)
+			if opp_elements:
+				if element_name != "":
+					var cap_name = str(element_name).capitalize()
+					var e_node = opp_elements.get_node_or_null("Opponent" + cap_name)
+					if e_node and e_node.has_method("activate"):
+						e_node.activate()
+				if card_slug.contains("prismatic-spirit"):
+					PrismaticSpiritEffect.apply_lineage_activation(opp_elements, chosen_el, true)
 		if card_to_move and is_instance_valid(card_to_move):
 			if card_to_move.get_parent():
 				if card_to_move.get_parent().has_method("remove_card_from_field"):
@@ -514,9 +543,121 @@ func set_marked(value: bool):
 		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 		if multiplayer_node and multiplayer_node.has_method("rpc"):
 			multiplayer_node.rpc("sync_set_card_marked", multiplayer.get_unique_id(), uuid, is_marked)
+	if is_marked:
+		get_tree().create_timer(0.3).timeout.connect(func():
+			if is_marked:
+				set_marked(false))
 
 func update_visuals_based_on_mark():
+	if mark_tween and mark_tween.is_valid():
+		mark_tween.kill()
 	if is_marked:
-		modulate = Color(1.5, 0.5, 0.5, 0.9)
+		if has_node("ShadowPanel"):
+			if not $ShadowPanel.visible:
+				$ShadowPanel.modulate = Color(1.5, 0.5, 0.5, 0.0)
+				$ShadowPanel.visible = true
+			else:
+				$ShadowPanel.modulate = Color(1.5, 0.5, 0.5, $ShadowPanel.modulate.a)
+			mark_tween = create_tween()
+			mark_tween.tween_property($ShadowPanel, "modulate:a", 0.9, 0.2)
 	else:
-		modulate = Color(1, 1, 1, 1)
+		if has_node("ShadowPanel") and $ShadowPanel.visible:
+			mark_tween = create_tween()
+			mark_tween.tween_property($ShadowPanel, "modulate:a", 0.0, 0.4)
+			mark_tween.tween_callback(func(): $ShadowPanel.visible = false)
+
+func show_card_info():
+	if not mouse_inside:
+		return
+	if not card_information_reference:
+		return
+	var card_slug = get_slug_from_card()
+	if card_slug == "":
+		return
+	if card_level_lable:
+		card_level_lable.text = ""
+	if card_PLDS_lable:
+		card_PLDS_lable.text = ""
+	var card_database = card_information_reference.card_database_reference
+	if not card_database or not card_database.cards_db.has(card_slug):
+		return
+	var level_to_display = null
+	var plds_text_to_display = ""
+	var data = card_database.cards_db[card_slug]
+	if data.has("level") and data["level"] != null:
+		level_to_display = data["level"]
+	plds_text_to_display = _build_plds_text_effective(data)
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
+		if base_slug and card_database.cards_db.has(base_slug):
+			var base_data = card_database.cards_db[base_slug]
+			if base_data.has("level") and base_data["level"] != null:
+				level_to_display = base_data["level"]
+			if plds_text_to_display == "":
+				plds_text_to_display = _build_plds_text_effective(base_data)
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database.cards_db.has(parent_slug):
+			var parent_data = card_database.cards_db[parent_slug]
+			if parent_data.has("level") and parent_data["level"] != null:
+				level_to_display = parent_data["level"]
+			if plds_text_to_display == "":
+				plds_text_to_display = _build_plds_text_effective(parent_data)
+	if level_to_display != null:
+		if is_in_main_field():
+			var temp_mods = runtime_modifiers.duplicate()
+			if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
+				temp_mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(self, data, temp_mods)
+			var lvl_eff = int(level_to_display) + int(temp_mods.get("level", 0)) + attached_counters.get("Level", 0)
+			level_to_display = lvl_eff
+		else:
+			var lvl_eff = int(level_to_display) + attached_counters.get("Level", 0)
+			level_to_display = lvl_eff
+		if card_level_lable:
+			card_level_lable.text = "LV. %s" % str(level_to_display)
+	if plds_text_to_display != "" and card_PLDS_lable:
+		card_PLDS_lable.text = plds_text_to_display
+
+func hide_card_info():
+	if card_level_lable:
+		card_level_lable.text = ""
+	if card_PLDS_lable:
+		card_PLDS_lable.text = ""
+
+func _build_plds_text_effective(data: Dictionary) -> String:
+	var parts: Array[String] = []
+	var mods = runtime_modifiers.duplicate() if is_in_main_field() else {"level": 0, "power": 0, "life": 0, "durability": 0}
+	if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
+		mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(self, data, mods)
+	var buff_count = attached_counters.get("Buff", 0)
+	var debuff_count = attached_counters.get("Debuff", 0)
+	var counter_mod = buff_count - debuff_count
+	var pow_counter = attached_counters.get("Power", 0)
+	var dur_counter = attached_counters.get("Durability", 0)
+	if data.has("power") and data["power"] != null:
+		var value = int(data["power"]) + int(mods.get("power", 0)) + counter_mod + pow_counter
+		value = max(0, value)
+		parts.append("POW. %s" % str(value))
+	if data.has("life") and data["life"] != null:
+		var life_count = attached_counters.get("Life", 0)
+		var damage_count = attached_counters.get("Damage", 0)
+		var sec_val = int(data["life"]) + int(mods.get("life", 0)) + counter_mod + (life_count - damage_count)
+		sec_val = max(0, sec_val)
+		parts.append("LIFE %s" % str(sec_val))
+	if data.has("durability") and data["durability"] != null:
+		var thirth_val = int(data["durability"]) + int(mods.get("durability", 0)) + dur_counter
+		thirth_val = max(0, thirth_val)
+		parts.append("DUR. %s" % str(thirth_val))
+	if data.has("speed") and data["speed"] != null:
+		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
+			if data["speed"] == 1:
+				parts.append("SPD. FAST")
+			elif data["speed"] == 0:
+				parts.append("SPD. SLOW")
+			else:
+				parts.append("SPEED %s" % str(data["speed"]))
+		elif typeof(data["speed"]) == TYPE_BOOL:
+			parts.append("FAST" if data["speed"] else "SLOW")
+		else:
+			parts.append("SPEED ?")
+	return " - ".join(parts)

@@ -30,6 +30,14 @@ func _ready():
 		current_scroll_y = scroll_container.scroll_vertical
 		scroll_container.gui_input.connect(_on_scroll_container_gui_input)
 		gui_input.connect(_on_grid_gui_input)
+		
+func _find_deck_building():
+	var node = self
+	while node:
+		if node.get_script() and node.get_script().resource_path.ends_with("Deck_Building.gd"):
+			return node
+		node = node.get_parent()
+	return null
 
 func _get_back_texture() -> Texture2D:
 	if _texture_cache.has("__back"):
@@ -183,6 +191,6 @@ func _drop_data(_pos, drop_data_value):
 		var slug = drop_data_value.get("slug", "")
 		var source_zone = drop_data_value.get("zone", "")
 		if source_zone != "deck_building_results":
-			var deck_building = get_tree().current_scene
+			var deck_building = _find_deck_building()
 			if deck_building and deck_building.has_method("handle_drop_on_results"):
 				deck_building.handle_drop_on_results(slug, source_zone, null)

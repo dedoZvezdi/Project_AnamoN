@@ -23,6 +23,21 @@ var USER_PHOTO_PATH = "user://Player_Image.png"
 var DEFAULT_PHOTO_PATH = "res://Assets/Textures/Player Info/Player_photos/Player_Image.png"
 var OPPONENT_PHOTO_FILENAME = "temp_opponent_photo.png"
 var _registered_lobby_port: int = -1
+var _rematch_requested_local: bool = false
+var _rematch_requested_remote: bool = false
+var _continue_requested_local: bool = false
+var _continue_requested_remote: bool = false
+var _game_mode: int = 0
+var _wins_local: int = 0
+var _wins_remote: int = 0
+var _original_deck_data: Dictionary = {}
+var _current_deck_data: Dictionary = {}
+var _sideboard_ready_local: bool = false
+var _sideboard_ready_remote: bool = false
+var _deck_building_instance = null
+var _series_started: bool = false
+var _match_is_over: bool = false
+var deck_building_scene = preload("res://Scenes/Deck_Building.tscn")
 
 const LOBBY_FILE = "user://local_lobbies.json"
 
@@ -56,6 +71,7 @@ func _ready():
 	$FileDialog.add_filter("*.jpeg", "JPEG Images")
 	$PhotoPreview.visible = false
 	_cleanup_temp_files()
+	SceneCache.start_preload()
 
 func _notification(noti):
 	if noti == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -81,6 +97,7 @@ func _on_cancel_button_pressed():
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 func _exit_tree() -> void:
+	SceneCache.clear_cache()
 	_cleanup_temp_files()
 	_unregister_lobby()
 
@@ -256,7 +273,7 @@ func _close_existing_dialogs():
 
 func _close_dialogs_recursive(node: Node):
 	for child in node.get_children():
-		if child is AcceptDialog:
+		if child is AcceptDialog and child.name != "LogoCounterDialog":
 			child.exclusive = false
 			child.hide()
 			child.queue_free()
@@ -385,12 +402,13 @@ func on_peer_connected(peer_id):
 				current_lobby.rpc_id(peer_id, "sync_lobby_settings", current_lobby.mode_option.selected, current_lobby.legality_option.selected)
 
 func on_peer_disconnected(peer_id):
-	var in_game = has_node("PlayerField") or has_node("OpponentField")
+	var in_game = has_node("PlayerField") or has_node("OpponentField") or _deck_building_instance != null
 	if multiplayer.is_server():
 		_update_lobby_player_count(multiplayer.get_peers().size() + 1)
 		if in_game:
 			var opp_name = peer_names.get(peer_id, "Opponent")
 			show_popup(opp_name + " left the game.")
+			_free_sideboard_instance()
 			if current_lobby:
 				current_lobby.queue_free()
 				current_lobby = null
@@ -398,6 +416,7 @@ func on_peer_disconnected(peer_id):
 				get_node("PlayerField").queue_free()
 			if has_node("OpponentField"):
 				get_node("OpponentField").queue_free()
+			_reset_series_state()
 			reset_ui()
 		elif current_lobby:
 			current_lobby.on_client_disconnected()
@@ -405,6 +424,7 @@ func on_peer_disconnected(peer_id):
 		if peer_id == 1:
 			show_popup("Host left the game." if in_game else "Host disconnected.")
 			if in_game:
+				_free_sideboard_instance()
 				if current_lobby:
 					current_lobby.queue_free()
 					current_lobby = null
@@ -412,6 +432,7 @@ func on_peer_disconnected(peer_id):
 					get_node("PlayerField").queue_free()
 				if has_node("OpponentField"):
 					get_node("OpponentField").queue_free()
+				_reset_series_state()
 			reset_ui()
 	if peer_names.has(peer_id):
 		peer_names.erase(peer_id)
@@ -589,7 +610,7 @@ func sync_move_to_graveyard(player_id: int, uuid: String, slug: String, from_dec
 					opp_grave.add_card_to_slot(card)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_banish(player_id: int, uuid: String, slug: String, face_down: bool, from_deck: bool = false):
+func sync_move_to_banish(player_id: int, uuid: String, slug: String, face_down: bool, from_deck: bool = false, from_mat_deck: bool = false):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -612,11 +633,11 @@ func sync_move_to_banish(player_id: int, uuid: String, slug: String, face_down: 
 				var opp_main = opp_field.get_node_or_null("OpponentMainField")
 				if opp_main and opp_main.has_method("remove_card_from_field"):
 					opp_main.remove_card_from_field(card)
-				if from_deck:
+				if from_deck or from_mat_deck:
 					var target_pos = opp_banish.global_position
 					if opp_banish.has_node("Area2D/CollisionShape2D"):
 						target_pos = opp_banish.get_node("Area2D/CollisionShape2D").global_position
-					_animate_opponent_card_from_deck(card, target_pos, !face_down, true, opp_banish, "add_card_to_slot", face_down)
+					_animate_opponent_card_from_deck(card, target_pos, !face_down, true, opp_banish, "add_card_to_slot", face_down, 0.0, from_mat_deck)
 				elif opp_banish and opp_banish.has_method("add_card_to_slot"):
 					card.visible = true
 					opp_banish.add_card_to_slot(card, face_down)
@@ -1142,10 +1163,16 @@ func sync_card_transform(player_id: int, uuid: String, new_slug: String):
 		card.remote_transform(new_slug)
 
 func _find_opponent_card_by_uuid(root_node, target_uuid):
+	if root_node.name.contains("CardDisplay") or root_node.name.contains("LineageViewWindow"):
+		return null
+	var is_match = false
 	if root_node.has_method("get_uuid") and root_node.get_uuid() == target_uuid:
-		return root_node
-	if root_node.has_meta("uuid") and root_node.get_meta("uuid") == target_uuid:
-		return root_node
+		is_match = true
+	elif root_node.has_meta("uuid") and root_node.get_meta("uuid") == target_uuid:
+		is_match = true
+	if is_match:
+		if root_node.has_method("get_runtime_modifiers") or root_node.name.contains("OpponentCard") or root_node.name.contains("Card"):
+			return root_node
 	for child in root_node.get_children():
 		var result = _find_opponent_card_by_uuid(child, target_uuid)
 		if result:
@@ -1176,7 +1203,7 @@ func sync_banish_lineage_card(player_id: int, champion_uuid: String, lineage_uui
 		champion_card.animate_lineage_banish(lineage_slug, lineage_uuid)
 
 @rpc("any_peer", "reliable")
-func sync_move_to_lineage(player_id: int, champion_uuid: String, card_uuid: String, card_slug: String, chosen_elements: Array = []):
+func sync_move_to_lineage(player_id: int, champion_uuid: String, card_uuid: String, card_slug: String, chosen_elements: Array = [], element: String = ""):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote:
 		return
@@ -1190,7 +1217,7 @@ func sync_move_to_lineage(player_id: int, champion_uuid: String, card_uuid: Stri
 	if not card_to_move:
 		pass
 	if champion_card.has_method("animate_send_to_lineage"):
-		champion_card.animate_send_to_lineage(card_to_move, card_slug, card_uuid, chosen_elements)
+		champion_card.animate_send_to_lineage(card_to_move, card_slug, card_uuid, chosen_elements, element)
 
 @rpc("any_peer", "reliable")
 func sync_give_control(player_id: int, stats: Dictionary):
@@ -1289,7 +1316,7 @@ func _convert_opponent_to_local_banish(opp_card: Node, slug: String, uuid: Strin
 		if card_manager.has_method("connect_card_signals"):
 			card_manager.connect_card_signals(new_card)
 	new_card.global_position = opp_card.global_position
-	new_card.rotation_degrees = opp_card.rotation_degrees
+	new_card.rotation_degrees = opp_card.rotation_degrees + 180.0
 	new_card.z_index = 1000
 	if face_down:
 		var front = new_card.get_node_or_null("CardImage")
@@ -1655,20 +1682,68 @@ func _set_lobby_in_game():
 	_save_lobbies(lobbies)
 
 func start_game_instances():
+	_match_is_over = false
 	if multiplayer.is_server():
 		_set_lobby_in_game()
+	var deck_data = {}
+	if _series_started and _current_deck_data.size() > 0:
+		deck_data = _current_deck_data
+	elif current_lobby and current_lobby.has_method("get_selected_deck_data"):
+		deck_data = current_lobby.get_selected_deck_data()
+	if not _series_started and deck_data.size() > 0:
+		_original_deck_data = deck_data.duplicate(true)
+		_current_deck_data = deck_data.duplicate(true)
+		_series_started = true
 	if current_lobby:
 		current_lobby.visible = false
-	if not has_node("PlayerField"):
-		var p_field = player_field_scene.instantiate()
-		p_field.name = "PlayerField"
-		add_child(p_field)
-		_apply_player_photo_to_field(p_field)
-	if not has_node("OpponentField"):
-		var o_field = opponent_field_scene.instantiate()
-		o_field.name = "OpponentField"
-		add_child(o_field)
-		_apply_opponent_photo_to_field(o_field)
+	_free_sideboard_instance()
+	if has_node("PlayerField"):
+		var old_pf = get_node("PlayerField")
+		old_pf.name = "PlayerField_old"
+		old_pf.queue_free()
+	if has_node("OpponentField"):
+		var old_of = get_node("OpponentField")
+		old_of.name = "OpponentField_old"
+		old_of.queue_free()
+	await get_tree().process_frame
+	var preloaded = SceneCache.get_preloaded()
+	var player_field = null
+	var opponent_field = null
+	if preloaded != null and typeof(preloaded) == TYPE_DICTIONARY:
+		player_field = preloaded.get("pf")
+		opponent_field = preloaded.get("of")
+	if player_field:
+		player_field.name = "PlayerField"
+		if not player_field.is_inside_tree():
+			add_child(player_field)
+	else:
+		player_field = player_field_scene.instantiate()
+		player_field.name = "PlayerField"
+		add_child(player_field)
+	player_field.visible = true
+	player_field.process_mode = Node.PROCESS_MODE_INHERIT
+	_apply_player_photo_to_field(player_field)
+	if deck_data.size() > 0:
+		var ga_deck = player_field.get_node_or_null("GA_DECK")
+		if ga_deck and ga_deck.has_method("load_deck_data") and deck_data.has("main_deck"):
+			ga_deck.load_deck_data(deck_data["main_deck"])
+		var mat_deck = player_field.get_node_or_null("MAT_DECK")
+		if mat_deck and mat_deck.has_method("load_deck_data") and deck_data.has("mat_deck"):
+			mat_deck.load_deck_data(deck_data["mat_deck"])
+		var pantheon = player_field.get_node_or_null("PANTHEON")
+		if pantheon and pantheon.has_method("load_deck_data") and deck_data.has("pantheon_deck"):
+			pantheon.load_deck_data(deck_data["pantheon_deck"])
+	if opponent_field:
+		opponent_field.name = "OpponentField"
+		if not opponent_field.is_inside_tree():
+			add_child(opponent_field)
+	else:
+		opponent_field = opponent_field_scene.instantiate()
+		opponent_field.name = "OpponentField"
+		add_child(opponent_field)
+	opponent_field.visible = true
+	opponent_field.process_mode = Node.PROCESS_MODE_INHERIT
+	_apply_opponent_photo_to_field(opponent_field)
 	if multiplayer.is_server():
 		var host_first = (randi() % 2 == 0)
 		var peers = multiplayer.get_peers()
@@ -1680,3 +1755,312 @@ func start_game_instances():
 			else:
 				show_turn_popup("You are going SECOND!")
 				rpc_id(client_id, "show_turn_popup", "You are going FIRST!")
+	_deferred_sync_pantheon()
+	SceneCache.start_preload()
+
+func _deferred_sync_pantheon():
+	await get_tree().process_frame
+	var player_field = get_node_or_null("PlayerField")
+	if player_field:
+		var pantheon = player_field.get_node_or_null("PANTHEON")
+		if pantheon:
+			var cards = pantheon.get_pantheon_cards()
+			rpc("sync_initial_pantheon", multiplayer.get_unique_id(), cards)
+
+func _disable_field_input(player_field: Node):
+	var input_manager = player_field.get_node_or_null("InputManager")
+	if input_manager:
+		input_manager.set_process_input(false)
+	var phases = player_field.get_node_or_null("Phases")
+	if phases:
+		phases.set_process_input(false)
+	for child in player_field.get_children():
+		if child.name == "Chat" or child.name == "EndGamePopup":
+			continue
+		_disable_area2d_recursive(child)
+
+func _disable_area2d_recursive(node: Node):
+	if node is Area2D:
+		node.input_pickable = false
+	for child in node.get_children():
+		_disable_area2d_recursive(child)
+
+func surrender_game():
+	rpc("rpc_report_game_end", multiplayer.get_unique_id())
+
+@rpc("any_peer", "call_local", "reliable")
+func rpc_report_game_end(loser_id: int):
+	if not multiplayer.is_server():
+		return
+	if _match_is_over:
+		return
+	_match_is_over = true
+	var host_lost = (1 == loser_id)
+	if host_lost:
+		_wins_remote += 1
+	else:
+		_wins_local += 1
+	rpc("rpc_show_end_game", loser_id, _wins_local, _wins_remote)
+
+@rpc("any_peer", "call_local", "reliable")
+func rpc_show_end_game(loser_id: int, host_wins_local: int, host_wins_remote: int):
+	_rematch_requested_local = false
+	_rematch_requested_remote = false
+	_continue_requested_local = false
+	_continue_requested_remote = false
+	if not multiplayer.is_server():
+		_match_is_over = true
+		_wins_remote = host_wins_local
+		_wins_local = host_wins_remote
+	var i_lost = (multiplayer.get_unique_id() == loser_id)
+	var series_over = (_game_mode == 0 or _is_series_over())
+	var player_field = get_node_or_null("PlayerField")
+	if not player_field or not player_field.has_node("EndGamePopup"):
+		return
+	var popup = player_field.get_node("EndGamePopup")
+	var label = popup.get_node("Panel/CenterContainer/VBoxContainer/ResultLabel")
+	var action_button = popup.get_node("Panel/CenterContainer/VBoxContainer/HBoxContainer/RematchButton")
+	var leave_button = popup.get_node("Panel/CenterContainer/VBoxContainer/HBoxContainer/LeaveButton")
+	if _game_mode == 0:
+		if i_lost:
+			label.text = "You Lose"
+			label.add_theme_color_override("font_color", Color.RED)
+		else:
+			label.text = "You Win"
+			label.add_theme_color_override("font_color", Color.GREEN)
+	else:
+		if series_over:
+			if _wins_local > _wins_remote:
+				label.text = "You Win (" + str(_wins_local) + "-" + str(_wins_remote) + ")"
+				label.add_theme_color_override("font_color", Color.GREEN)
+			else:
+				label.text = "You Lose (" + str(_wins_local) + "-" + str(_wins_remote) + ")"
+				label.add_theme_color_override("font_color", Color.RED)
+		else:
+			if i_lost:
+				label.text = "You Lose (" + str(_wins_local) + "-" + str(_wins_remote) + ")"
+				label.add_theme_color_override("font_color", Color.RED)
+			else:
+				label.text = "You Win (" + str(_wins_local) + "-" + str(_wins_remote) + ")"
+				label.add_theme_color_override("font_color", Color.GREEN)
+	if action_button.pressed.is_connected(_on_rematch_pressed):
+		action_button.pressed.disconnect(_on_rematch_pressed)
+	if action_button.pressed.is_connected(_on_continue_pressed):
+		action_button.pressed.disconnect(_on_continue_pressed)
+	if leave_button.pressed.is_connected(_on_leave_pressed):
+		leave_button.pressed.disconnect(_on_leave_pressed)
+	leave_button.pressed.connect(_on_leave_pressed)
+	action_button.disabled = false	
+	if series_over:
+		action_button.pressed.connect(_on_rematch_pressed.bind(action_button))
+		action_button.text = "Rematch"
+	else:
+		action_button.pressed.connect(_on_continue_pressed.bind(action_button))
+		action_button.text = "Continue"
+	popup.visible = true
+	_disable_field_input(player_field)
+
+func _get_wins_needed() -> int:
+	if _game_mode == 1: return 2
+	if _game_mode == 2: return 3
+	return 1
+
+func _is_series_over() -> bool:
+	var needed = _get_wins_needed()
+	return _wins_local >= needed or _wins_remote >= needed
+
+func _enter_sideboard_phase():
+	_sideboard_ready_local = false
+	_sideboard_ready_remote = false
+	var player_field = get_node_or_null("PlayerField")
+	if player_field:
+		player_field.visible = false
+	var opponent_field = get_node_or_null("OpponentField")
+	if opponent_field:
+		opponent_field.visible = false
+	var canvas = CanvasLayer.new()
+	canvas.name = "SideboardCanvas"
+	canvas.layer = 100
+	_deck_building_instance = deck_building_scene.instantiate()
+	canvas.add_child(_deck_building_instance)
+	add_child(canvas)
+	if _deck_building_instance.has_method("enter_sideboard_mode"):
+		var mode_str = "Match" if _game_mode == 1 else "Best of 5"
+		var score_text = "Mode: " + mode_str + "\nYou " + str(_wins_local) + " - " + str(_wins_remote) + " Opponent"
+		_deck_building_instance.enter_sideboard_mode(_current_deck_data, Callable(self, "_on_sideboard_ok"), score_text)
+
+func _on_sideboard_ok(modified_decks: Dictionary):
+	_current_deck_data = modified_decks.duplicate(true)
+	_sideboard_ready_local = true
+	rpc("rpc_sideboard_ready")
+
+func _exit_sideboard_phase():
+	_free_sideboard_instance()
+	start_game_instances()
+
+@rpc("any_peer", "call_local", "reliable")
+func rpc_sideboard_ready():
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != multiplayer.get_unique_id():
+		_sideboard_ready_remote = true
+	if _sideboard_ready_local and _sideboard_ready_remote:
+		_exit_sideboard_phase()
+
+@rpc("any_peer", "reliable")
+func rpc_sync_game_mode(mode: int):
+	_game_mode = mode
+
+func _on_rematch_pressed(button: Button):
+	button.disabled = true
+	button.text = "Waiting..."
+	_rematch_requested_local = true
+	rpc("rpc_request_rematch")
+
+func _on_continue_pressed(button: Button):
+	button.disabled = true
+	button.text = "Waiting..."
+	_continue_requested_local = true
+	rpc("rpc_request_continue")
+
+func _on_leave_pressed():
+	rpc("rpc_leave_match")
+	_cleanup_and_leave()
+
+@rpc("any_peer", "reliable")
+func sync_set_champion_lineage(player_id: int, uuid: String, lineage: Array):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		var opp_main = opp_field.get_node_or_null("OpponentMainField")
+		if opp_main and "cards_in_field" in opp_main:
+			for card in opp_main.cards_in_field:
+				if "uuid" in card and card.uuid == uuid:
+					if "champion_lineage" in card:
+						card.champion_lineage = lineage.duplicate(true)
+					break
+
+@rpc("any_peer", "reliable")
+func sync_apply_damage_to_champion(player_id: int, damage_amount: int):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var player_field = get_node_or_null("PlayerField")
+	if player_field:
+		var current_champ = player_field.get("current_champion_card")
+		if not current_champ:
+			var main_field = player_field.get_node_or_null("MAINFIELD")
+			if main_field:
+				current_champ = main_field.get("current_champion_card")
+		if current_champ and current_champ.has_method("add_damage_counters"):
+			current_champ.add_damage_counters(damage_amount)
+
+@rpc("any_peer", "call_local", "reliable")
+func rpc_request_rematch():
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != multiplayer.get_unique_id():
+		_rematch_requested_remote = true
+	if _rematch_requested_local and _rematch_requested_remote:
+		restart_match()
+
+@rpc("any_peer", "call_local", "reliable")
+func rpc_request_continue():
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != multiplayer.get_unique_id():
+		_continue_requested_remote = true
+	if _continue_requested_local and _continue_requested_remote:
+		var player_field = get_node_or_null("PlayerField")
+		if player_field and player_field.has_node("EndGamePopup"):
+			player_field.get_node("EndGamePopup").visible = false
+		_enter_sideboard_phase()
+
+@rpc("any_peer", "call_local", "reliable")
+func rpc_leave_match():
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != multiplayer.get_unique_id():
+		show_popup("Opponent left the match.")
+		_cleanup_and_leave()
+
+func _cleanup_and_leave():
+	_free_sideboard_instance()
+	if current_lobby:
+		current_lobby.queue_free()
+		current_lobby = null
+	if has_node("PlayerField"):
+		var player_field = get_node("PlayerField")
+		player_field.name = "PlayerField_old"
+		player_field.queue_free()
+	if has_node("OpponentField"):
+		var opponent_field = get_node("OpponentField")
+		opponent_field.name = "OpponentField_old"
+		opponent_field.queue_free()
+	_reset_series_state()
+	reset_ui()
+
+func restart_match():
+	_rematch_requested_local = false
+	_rematch_requested_remote = false
+	_continue_requested_local = false
+	_continue_requested_remote = false
+	_wins_local = 0
+	_wins_remote = 0
+	_match_is_over = false
+	_current_deck_data = _original_deck_data.duplicate(true)
+	_series_started = false
+	start_game_instances()
+
+func _reset_series_state():
+	_game_mode = 0
+	_wins_local = 0
+	_wins_remote = 0
+	_match_is_over = false
+	_original_deck_data = {}
+	_current_deck_data = {}
+	_series_started = false
+	_sideboard_ready_local = false
+	_sideboard_ready_remote = false
+
+func _free_sideboard_instance():
+	if _deck_building_instance:
+		_deck_building_instance.queue_free()
+		_deck_building_instance = null
+	if has_node("SideboardCanvas"):
+		get_node("SideboardCanvas").queue_free()
+
+@rpc("any_peer", "reliable")
+func sync_prismatic_elements(player_id: int, card_uuid: String, elements: Array):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var opp_field = get_node_or_null("OpponentField")
+	if opp_field:
+		var card = _find_opponent_card_by_uuid(opp_field, card_uuid)
+		if card:
+			card.chosen_elements = elements
+			if card.has_method("set_meta"):
+				card.set_meta("chosen_elements", elements)
+
+@rpc("any_peer", "reliable")
+func sync_imperial_seal_activate(player_id: int, _card_uuid: String):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote: return
+	ImperialSealEffect.apply_opponent_activation(get_tree().current_scene)
+
+@rpc("any_peer", "reliable")
+func sync_apotheosis_rite_activate(player_id: int):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote: return
+	ApotheosisRiteEffect.apply_opponent_activation(get_tree().current_scene)
+
+@rpc("any_peer", "reliable")
+func sync_sacramental_rite_activate(player_id: int):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote: return
+	SacramentalRiteEffect.apply_opponent_activation(get_tree().current_scene)
+
+@rpc("any_peer", "reliable")
+func sync_transcendental_rite_activate(player_id: int):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote: return
+	TranscendentalRiteEffect.apply_opponent_activation(get_tree().current_scene)
