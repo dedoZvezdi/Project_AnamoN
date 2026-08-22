@@ -374,6 +374,9 @@ func finish_drag():
 		if player_hand_reference and card in player_hand_reference.player_hand:
 			player_hand_reference.remove_card_from_hand(card)
 		if card_slot_found.name == "MEMORY":
+			if drag_source_was_main_field:
+				if card.has_method("revert_if_transformed"):
+					card.revert_if_transformed()
 			var target_idx = -1
 			if card_slot_found == source_memory_slot:
 				target_idx = original_memory_index
@@ -428,6 +431,9 @@ func finish_drag():
 			card.scale = normal_scale
 			card.z_index = base_z_index
 		elif card_slot_found.name == "GRAVEYARD":
+			if drag_source_was_main_field:
+				if card.has_method("revert_if_transformed"):
+					card.revert_if_transformed()
 			if card_slot_found == original_source_node:
 				remove_card_from_original_slot()
 				if card_slot_found.has_method("add_card_to_slot_precise"):
@@ -444,6 +450,9 @@ func finish_drag():
 						multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), uuid, slug, was_from_ga_deck)
 			card.scale = normal_scale
 		elif card_slot_found.name == "BANISH":
+			if drag_source_was_main_field:
+				if card.has_method("revert_if_transformed"):
+					card.revert_if_transformed()
 			var face_down := false
 			if card_slot_found == original_source_node:
 				face_down = original_is_face_down
@@ -455,7 +464,7 @@ func finish_drag():
 			else:
 				if card.has_meta("banish_face_down"):
 					face_down = card.get_meta("banish_face_down") == true
-				card_slot_found.add_card_to_slot(card, face_down)
+				card_slot_found.add_card_to_slot(card, face_down, -1, true)
 				var slug = get_card_slug(card)
 				if slug != "":
 					var uuid = get_card_uuid(card)
@@ -494,6 +503,9 @@ func finish_drag():
 			return
 		if player_hand_reference:
 			var was_in_hand = (player_hand_reference.dragging_card_from_hand == card)
+			if not was_in_hand and drag_source_was_main_field:
+				if card.has_method("revert_if_transformed"):
+					card.revert_if_transformed()
 			player_hand_reference.add_card_to_hand(card)
 			card.z_index = base_z_index
 			if not was_in_hand:

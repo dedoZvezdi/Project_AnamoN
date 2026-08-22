@@ -1,21 +1,291 @@
 [gd_scene format=3 uid="uid://tuaxoo7p7gs"]
 
+[ext_resource type="Texture2D" uid="uid://cjqeimppj2qc7" path="res://Assets/Textures/Checks/adjust.svg" id="1_646k0"]
 [ext_resource type="Texture2D" uid="uid://dtq5vw2bx7em6" path="res://Assets/Textures/Player Info/Progress_Blue.png" id="1_prog"]
+[ext_resource type="Texture2D" uid="uid://b5xdd3h3qg1wq" path="res://Assets/Textures/Checks/nest.svg" id="2_efosg"]
+[ext_resource type="Texture2D" uid="uid://dqy87tgapqhxe" path="res://Assets/Textures/Checks/check_box.svg" id="2_ipgag"]
 [ext_resource type="Texture2D" uid="uid://e5jfv2giu16v" path="res://Assets/Textures/Player Info/Over_Blue.png" id="2_over"]
+[ext_resource type="Texture2D" uid="uid://cifllxiovgmbv" path="res://Assets/Textures/Checks/check_box_outline_blank.svg" id="3_646k0"]
 [ext_resource type="Texture2D" uid="uid://c3nmqngrjlvg3" path="res://Assets/Textures/Player Info/Progress_Red_Mirrored.png" id="3_prog_m"]
 [ext_resource type="Texture2D" uid="uid://s0qmkyd0dly0" path="res://Assets/Textures/Player Info/Over_Red_Mirrored.png" id="4_over_m"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_md12f"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w1nw0"]
 bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 40
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ppjuv"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_w1nw0"]
+color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+grow_begin = 2.0
+grow_end = 2.0
+thickness = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mr5cl"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.60784316)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_md12f"]
+bg_color = Color(0, 0, 0, 0.4)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.788, 0.663, 0.431, 1)
+border_blend = true
 corner_radius_top_left = 1024
 corner_radius_top_right = 1024
 corner_radius_bottom_right = 1024
 corner_radius_bottom_left = 1024
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inset"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ipgag"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_646k0"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8862745, 0.77254903, 0.4862745, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider_track"]
+bg_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_efosg"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4eoc7"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_74x7w"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ys4a0"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_highlight"]
+content_margin_left = 12.0
+content_margin_top = 9.0
+content_margin_right = 12.0
+content_margin_bottom = 9.0
+bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.60784316)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mjqtt"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_outline"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tb1co"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c4sal"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8862745, 0.77254903, 0.4862745, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_primary"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xuc2h"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.21960784)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vx5jb"]
+bg_color = Color(0.13333334, 0.7411765, 0.20392157, 0.12156863)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.13333334, 0.7411765, 0.20392157, 0.54901963)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_danger"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g5k7o"]
+bg_color = Color(0.7411765, 0.13725491, 0.20392157, 0.21960784)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_64y2i"]
+bg_color = Color(0.8745098, 0.15294118, 0.023529412, 0.12156863)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7411765, 0.13333334, 0.20392157, 0.54901963)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="Settings" type="Control" unique_id=2052770899]
 layout_mode = 3
@@ -39,23 +309,22 @@ offset_right = 475.0
 offset_bottom = 320.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_w1nw0")
 
 [node name="HBox" type="HBoxContainer" parent="Window" unique_id=2043603567]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -4.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 0
+theme_override_constants/separation = -2
 
 [node name="Sidebar" type="PanelContainer" parent="Window/HBox" unique_id=878706909]
 custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
-
-[node name="SidebarBG" type="ColorRect" parent="Window/HBox/Sidebar" unique_id=659182086]
-layout_mode = 2
-color = Color(0, 0, 0, 0.2)
+theme_override_styles/panel = SubResource("StyleBoxFlat_ppjuv")
 
 [node name="VBox" type="VBoxContainer" parent="Window/HBox/Sidebar" unique_id=1718374469]
 layout_mode = 2
@@ -64,23 +333,30 @@ theme_override_constants/separation = 0
 [node name="HeaderMargin" type="MarginContainer" parent="Window/HBox/Sidebar/VBox" unique_id=45522099]
 layout_mode = 2
 theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 30
+theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 30
+theme_override_constants/margin_bottom = 24
 
-[node name="Header" type="Label" parent="Window/HBox/Sidebar/VBox/HeaderMargin" unique_id=1884855079]
+[node name="HeaderHBox" type="HBoxContainer" parent="Window/HBox/Sidebar/VBox/HeaderMargin" unique_id=760129901]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "SETTINGS"
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Header" type="Label" parent="Window/HBox/Sidebar/VBox/HeaderMargin/HeaderHBox" unique_id=180113852]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.89, 0.776, 0.561, 1)
+theme_override_font_sizes/font_size = 26
+text = "Settings"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="HSeparator" type="HSeparator" parent="Window/HBox/Sidebar/VBox" unique_id=1497526589]
 layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_w1nw0")
 
 [node name="NavMargin" type="MarginContainer" parent="Window/HBox/Sidebar/VBox" unique_id=1800341564]
 layout_mode = 2
-theme_override_constants/margin_top = 20
+theme_override_constants/margin_top = 16
 
 [node name="NavButtons" type="VBoxContainer" parent="Window/HBox/Sidebar/VBox/NavMargin" unique_id=766147826]
 layout_mode = 2
@@ -89,10 +365,9 @@ theme_override_constants/separation = 0
 [node name="GeneralBtn" type="Button" parent="Window/HBox/Sidebar/VBox/NavMargin/NavButtons" unique_id=95599966]
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.4862745, 0.45882353, 0.39607844, 1)
+theme_override_colors/font_pressed_color = Color(0.89, 0.776, 0.561, 1)
+theme_override_colors/font_hover_color = Color(0.89, 0.776, 0.561, 1)
 text = "General"
 flat = true
 alignment = 0
@@ -100,10 +375,9 @@ alignment = 0
 [node name="HealthBarsBtn" type="Button" parent="Window/HBox/Sidebar/VBox/NavMargin/NavButtons" unique_id=2077208259]
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.4862745, 0.45882353, 0.39607844, 1)
+theme_override_colors/font_pressed_color = Color(0.89, 0.776, 0.561, 1)
+theme_override_colors/font_hover_color = Color(0.89, 0.776, 0.561, 1)
 text = "Health Bars"
 flat = true
 alignment = 0
@@ -111,10 +385,9 @@ alignment = 0
 [node name="UIHighlightsBtn" type="Button" parent="Window/HBox/Sidebar/VBox/NavMargin/NavButtons" unique_id=1102354520]
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.4862745, 0.45882353, 0.39607844, 1)
+theme_override_colors/font_pressed_color = Color(0.89, 0.776, 0.561, 1)
+theme_override_colors/font_hover_color = Color(0.89, 0.776, 0.561, 1)
 text = "UI Highlights"
 flat = true
 alignment = 0
@@ -128,34 +401,36 @@ theme_override_constants/separation = 0
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 30
+theme_override_constants/margin_top = 32
 theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 30
+theme_override_constants/margin_bottom = 32
 
 [node name="TabContainer" type="TabContainer" parent="Window/HBox/MainArea/MainContent" unique_id=951518009]
 layout_mode = 2
+theme_override_constants/side_margin = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_mr5cl")
 current_tab = 0
 tabs_visible = false
 
 [node name="General" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer" unique_id=619588473]
 layout_mode = 2
-theme_override_constants/separation = 15
+theme_override_constants/separation = 24
 metadata/_tab_index = 0
 
 [node name="ProfileTitle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General" unique_id=30637770]
 layout_mode = 2
+alignment = 1
 
 [node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileTitle" unique_id=267526082]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
+theme_override_font_sizes/font_size = 24
 text = "Profile"
-
-[node name="Line" type="HSeparator" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileTitle" unique_id=1447445782]
-layout_mode = 2
-size_flags_horizontal = 3
+uppercase = true
 
 [node name="ProfileCard" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General" unique_id=955204398]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
 [node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard" unique_id=1973613874]
 layout_mode = 2
@@ -166,43 +441,68 @@ theme_override_constants/margin_bottom = 20
 
 [node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin" unique_id=1283838301]
 layout_mode = 2
-theme_override_constants/separation = 25
+theme_override_constants/separation = 112
+alignment = 1
 
-[node name="AvatarPanel" type="Panel" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox" unique_id=979023545]
-custom_minimum_size = Vector2(100, 100)
+[node name="VBoxContainer" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox" unique_id=64594563]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBoxContainer" unique_id=521289433]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
+theme_override_font_sizes/font_size = 17
+text = "Old Avatar"
+horizontal_alignment = 1
+
+[node name="AvatarPanel" type="Panel" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBoxContainer" unique_id=979023545]
+custom_minimum_size = Vector2(110, 110)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_md12f")
 
-[node name="VBox" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox" unique_id=2054339751]
-layout_mode = 2
-size_flags_vertical = 4
-
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBox" unique_id=521289433]
-layout_mode = 2
-text = "Player Avatar"
-
-[node name="Spacer" type="Control" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBox" unique_id=362562723]
-custom_minimum_size = Vector2(0, 10)
+[node name="VBoxContainer2" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox" unique_id=1150711575]
 layout_mode = 2
 
-[node name="ChooseBtn" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBox" unique_id=699088033]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBoxContainer2" unique_id=340541744]
 layout_mode = 2
-text = "Choose Image"
+size_flags_vertical = 0
+theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
+theme_override_font_sizes/font_size = 17
+text = "New Avatar"
+horizontal_alignment = 1
+
+[node name="AvatarPanel" type="Panel" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBoxContainer2" unique_id=1513500613]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_md12f")
+
+[node name="ChooseButton" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox" unique_id=699088033]
+custom_minimum_size = Vector2(145, 45)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(0.788, 0.663, 0.431, 1)
+theme_override_colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_inset")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ipgag")
+theme_override_styles/hover = SubResource("StyleBoxFlat_646k0")
+text = "Change Profile"
 
 [node name="AudioTitle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General" unique_id=2043673057]
 layout_mode = 2
+alignment = 1
 
 [node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/AudioTitle" unique_id=1191217107]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
+theme_override_font_sizes/font_size = 24
 text = "Audio"
-
-[node name="Line" type="HSeparator" parent="Window/HBox/MainArea/MainContent/TabContainer/General/AudioTitle" unique_id=1259671286]
-layout_mode = 2
-size_flags_horizontal = 3
+uppercase = true
 
 [node name="AudioCard" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General" unique_id=1355143790]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
 [node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/AudioCard" unique_id=1559115349]
 layout_mode = 2
@@ -221,11 +521,17 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/AudioCard/Margin/VBox/MasterVol" unique_id=2061529768]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
 text = "Master Volume"
 
 [node name="HSlider" type="HSlider" parent="Window/HBox/MainArea/MainContent/TabContainer/General/AudioCard/Margin/VBox/MasterVol" unique_id=2006438179]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_icons/grabber = ExtResource("1_646k0")
+theme_override_icons/grabber_highlight = ExtResource("2_efosg")
+theme_override_styles/slider = SubResource("StyleBoxFlat_slider_track")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_efosg")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_4eoc7")
 value = 75.0
 
 [node name="SFXVol" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/AudioCard/Margin/VBox" unique_id=1058623987]
@@ -234,11 +540,17 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/AudioCard/Margin/VBox/SFXVol" unique_id=1038472664]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
 text = "Sound Effects"
 
 [node name="HSlider" type="HSlider" parent="Window/HBox/MainArea/MainContent/TabContainer/General/AudioCard/Margin/VBox/SFXVol" unique_id=1203678847]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_icons/grabber = ExtResource("1_646k0")
+theme_override_icons/grabber_highlight = ExtResource("2_efosg")
+theme_override_styles/slider = SubResource("StyleBoxFlat_slider_track")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_74x7w")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_ys4a0")
 value = 100.0
 
 [node name="HealthBars" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer" unique_id=1470813217]
@@ -249,24 +561,24 @@ metadata/_tab_index = 1
 
 [node name="Title" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars" unique_id=1806939284]
 layout_mode = 2
+alignment = 1
 
 [node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/Title" unique_id=2131791218]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
+theme_override_font_sizes/font_size = 24
 text = "Health Bar Assets"
-
-[node name="Line" type="HSeparator" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/Title" unique_id=46738561]
-layout_mode = 2
-size_flags_horizontal = 3
+uppercase = true
 
 [node name="CardsHBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars" unique_id=889178362]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 30
+theme_override_constants/separation = 24
 
 [node name="MyPlayer" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox" unique_id=937521587]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
 [node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer" unique_id=654602499]
 layout_mode = 2
@@ -281,45 +593,67 @@ theme_override_constants/separation = 8
 
 [node name="Title" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=1142703309]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.89, 0.776, 0.561, 1)
+theme_override_font_sizes/font_size = 21
 text = "My Player"
+horizontal_alignment = 1
 
 [node name="SyncCheck" type="CheckBox" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=710838422]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_font_sizes/font_size = 13
+theme_override_icons/checked = ExtResource("2_ipgag")
+theme_override_icons/unchecked = ExtResource("3_646k0")
 button_pressed = true
-text = "Sync Progress & Diagram"
+text = "Synchronize Colors"
 
 [node name="FillLabel" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=51681343]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_font_sizes/font_size = 12
 text = "Fill Layer"
 
-[node name="FillCycle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=1714663439]
+[node name="FillCyclePanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=719458567]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inset")
+
+[node name="FillCycleMargin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/FillCyclePanel" unique_id=1226087363]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="FillCycle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/FillCyclePanel/FillCycleMargin" unique_id=1714663439]
 layout_mode = 2
 
-[node name="BtnL" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/FillCycle" unique_id=228711768]
+[node name="ButtonLeft" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/FillCyclePanel/FillCycleMargin/FillCycle" unique_id=228711768]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.6862745, 0.57254905, 0.25882354, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 text = "◀"
 flat = true
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/FillCycle" unique_id=1870475977]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/FillCyclePanel/FillCycleMargin/FillCycle" unique_id=1870475977]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.788, 0.663, 0.431, 1)
 theme_override_font_sizes/font_size = 14
 text = "BLUE"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="BtnR" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/FillCycle" unique_id=1421114698]
+[node name="ButtonRight" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/FillCyclePanel/FillCycleMargin/FillCycle" unique_id=1421114698]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.6862745, 0.57254905, 0.25882354, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 text = "▶"
 flat = true
 
@@ -329,48 +663,59 @@ layout_mode = 2
 
 [node name="DiagLabel" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=1091343050]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_font_sizes/font_size = 12
 text = "Diagram Layer"
 
-[node name="DiagCycle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=724988767]
+[node name="DiagCyclePanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=2143103862]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inset")
+
+[node name="DiagCycleMargin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/DiagCyclePanel" unique_id=1317670584]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="DiagCycle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/DiagCyclePanel/DiagCycleMargin" unique_id=724988767]
 layout_mode = 2
 
-[node name="BtnL" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/DiagCycle" unique_id=1136093544]
+[node name="ButtonLeft" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/DiagCyclePanel/DiagCycleMargin/DiagCycle" unique_id=1136093544]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.6862745, 0.57254905, 0.25882354, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 text = "◀"
 flat = true
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/DiagCycle" unique_id=231967414]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/DiagCyclePanel/DiagCycleMargin/DiagCycle" unique_id=231967414]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.788, 0.663, 0.431, 1)
 theme_override_font_sizes/font_size = 14
 text = "BLUE"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="BtnR" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/DiagCycle" unique_id=1209501338]
+[node name="ButtonRight" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/DiagCyclePanel/DiagCycleMargin/DiagCycle" unique_id=1209501338]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.6862745, 0.57254905, 0.25882354, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 text = "▶"
 flat = true
 
-[node name="PreviewSep" type="HSeparator" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=346344713]
-layout_mode = 2
-
 [node name="PreviewSpacer" type="Control" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=147676068]
-custom_minimum_size = Vector2(0, 5)
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
 [node name="PreviewTitle" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox" unique_id=2008414238]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 18
 text = "LIVE PREVIEW"
 horizontal_alignment = 1
 uppercase = true
@@ -383,14 +728,16 @@ size_flags_vertical = 3
 custom_minimum_size = Vector2(250, 45)
 layout_mode = 2
 
-[node name="StackBG" type="ColorRect" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/PreviewCenter/PreviewStack" unique_id=1878074441]
+[node name="StackBorder" type="Panel" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/PreviewCenter/PreviewStack" unique_id=186527771]
+custom_minimum_size = Vector2(260, 60)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.2)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inset")
 
 [node name="Prog" type="TextureRect" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/MyPlayer/Margin/VBox/PreviewCenter/PreviewStack" unique_id=1632968429]
 layout_mode = 1
@@ -417,6 +764,7 @@ stretch_mode = 5
 [node name="Opponent" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox" unique_id=2078961867]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
 [node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent" unique_id=1097475743]
 layout_mode = 2
@@ -431,45 +779,67 @@ theme_override_constants/separation = 8
 
 [node name="Title" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=1657809855]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.89, 0.776, 0.561, 1)
+theme_override_font_sizes/font_size = 21
 text = "Opponent"
+horizontal_alignment = 1
 
 [node name="SyncCheck" type="CheckBox" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=1566381510]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_font_sizes/font_size = 13
+theme_override_icons/checked = ExtResource("2_ipgag")
+theme_override_icons/unchecked = ExtResource("3_646k0")
 button_pressed = true
-text = "Sync Progress & Diagram"
+text = "Synchronize Colors"
 
 [node name="FillLabel" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=556314777]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_font_sizes/font_size = 12
 text = "Fill Layer"
 
-[node name="FillCycle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=685052592]
+[node name="FillCyclePanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=773477461]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inset")
+
+[node name="FillCycleMargin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/FillCyclePanel" unique_id=1715213371]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="FillCycle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/FillCyclePanel/FillCycleMargin" unique_id=685052592]
 layout_mode = 2
 
-[node name="BtnL" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/FillCycle" unique_id=1485422106]
+[node name="ButtonLeft" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/FillCyclePanel/FillCycleMargin/FillCycle" unique_id=1485422106]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.6862745, 0.57254905, 0.25882354, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 text = "◀"
 flat = true
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/FillCycle" unique_id=792004224]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/FillCyclePanel/FillCycleMargin/FillCycle" unique_id=792004224]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.788, 0.663, 0.431, 1)
 theme_override_font_sizes/font_size = 14
 text = "RED"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="BtnR" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/FillCycle" unique_id=944130001]
+[node name="ButtonRight" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/FillCyclePanel/FillCycleMargin/FillCycle" unique_id=944130001]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.6861123, 0.57255554, 0.25844312, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 text = "▶"
 flat = true
 
@@ -479,48 +849,59 @@ layout_mode = 2
 
 [node name="DiagLabel" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=2043508670]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_font_sizes/font_size = 12
 text = "Diagram Layer"
 
-[node name="DiagCycle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=560534490]
+[node name="DiagCyclePanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=212689915]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inset")
+
+[node name="DiagCycleMargin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/DiagCyclePanel" unique_id=722060618]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="DiagCycle" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/DiagCyclePanel/DiagCycleMargin" unique_id=560534490]
 layout_mode = 2
 
-[node name="BtnL" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/DiagCycle" unique_id=286765007]
+[node name="ButtonLeft" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/DiagCyclePanel/DiagCycleMargin/DiagCycle" unique_id=286765007]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.6862745, 0.57254905, 0.25882354, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 text = "◀"
 flat = true
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/DiagCycle" unique_id=609525406]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/DiagCyclePanel/DiagCycleMargin/DiagCycle" unique_id=609525406]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.788, 0.663, 0.431, 1)
 theme_override_font_sizes/font_size = 14
 text = "RED"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="BtnR" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/DiagCycle" unique_id=312525397]
+[node name="ButtonRight" type="Button" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/DiagCyclePanel/DiagCycleMargin/DiagCycle" unique_id=312525397]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.6862745, 0.57254905, 0.25882354, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 text = "▶"
 flat = true
 
-[node name="PreviewSep" type="HSeparator" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=386663385]
-layout_mode = 2
-
 [node name="PreviewSpacer" type="Control" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=1925650646]
-custom_minimum_size = Vector2(0, 5)
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
 [node name="PreviewTitle" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox" unique_id=1363490794]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 18
 text = "LIVE PREVIEW"
 horizontal_alignment = 1
 uppercase = true
@@ -533,14 +914,16 @@ size_flags_vertical = 3
 custom_minimum_size = Vector2(250, 45)
 layout_mode = 2
 
-[node name="StackBG" type="ColorRect" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/PreviewCenter/PreviewStack" unique_id=86569352]
+[node name="StackBorder" type="Panel" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/PreviewCenter/PreviewStack" unique_id=840952906]
+custom_minimum_size = Vector2(260, 60)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.2)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inset")
 
 [node name="Prog" type="TextureRect" parent="Window/HBox/MainArea/MainContent/TabContainer/HealthBars/CardsHBox/Opponent/Margin/VBox/PreviewCenter/PreviewStack" unique_id=626368149]
 layout_mode = 1
@@ -572,176 +955,169 @@ metadata/_tab_index = 2
 
 [node name="Title" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights" unique_id=1366649365]
 layout_mode = 2
+alignment = 1
 
 [node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Title" unique_id=1152609022]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
+theme_override_font_sizes/font_size = 24
 text = "Color Highlights"
-
-[node name="Line" type="HSeparator" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Title" unique_id=334372596]
-layout_mode = 2
-size_flags_horizontal = 3
+uppercase = true
 
 [node name="Grid" type="GridContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights" unique_id=419728637]
 layout_mode = 2
-theme_override_constants/h_separation = 30
-theme_override_constants/v_separation = 15
+theme_override_constants/h_separation = 28
+theme_override_constants/v_separation = 14
 columns = 2
 
 [node name="PlayerCardsPanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid" unique_id=1828246849]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_highlight")
 
-[node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/PlayerCardsPanel" unique_id=716516131]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 12
-
-[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/PlayerCardsPanel/Margin" unique_id=1892056469]
+[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/PlayerCardsPanel" unique_id=1892056469]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/PlayerCardsPanel/Margin/HBox" unique_id=1417477624]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/PlayerCardsPanel/HBox" unique_id=1417477624]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_font_sizes/font_size = 14
 text = "Player Cards"
 
-[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/PlayerCardsPanel/Margin/HBox" unique_id=713696367]
-custom_minimum_size = Vector2(36, 36)
+[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/PlayerCardsPanel/HBox" unique_id=713696367]
+custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 color = Color(0.5, 0.5, 1, 0.9)
 
 [node name="OpponentCardsPanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid" unique_id=1260868143]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_highlight")
 
-[node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/OpponentCardsPanel" unique_id=1021963659]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 12
-
-[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/OpponentCardsPanel/Margin" unique_id=1265846552]
+[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/OpponentCardsPanel" unique_id=1265846552]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/OpponentCardsPanel/Margin/HBox" unique_id=1886582942]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/OpponentCardsPanel/HBox" unique_id=1886582942]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_font_sizes/font_size = 14
 text = "Opponent Cards"
 
-[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/OpponentCardsPanel/Margin/HBox" unique_id=655907643]
-custom_minimum_size = Vector2(36, 36)
+[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/OpponentCardsPanel/HBox" unique_id=655907643]
+custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 color = Color(1, 0.5, 0.5, 0.9)
 
 [node name="MemorySlotPanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid" unique_id=436827758]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_highlight")
 
-[node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/MemorySlotPanel" unique_id=866300997]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 12
-
-[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/MemorySlotPanel/Margin" unique_id=1269707409]
+[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/MemorySlotPanel" unique_id=1269707409]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/MemorySlotPanel/Margin/HBox" unique_id=223457864]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/MemorySlotPanel/HBox" unique_id=223457864]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_font_sizes/font_size = 14
 text = "Memory Slot"
 
-[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/MemorySlotPanel/Margin/HBox" unique_id=1752683343]
-custom_minimum_size = Vector2(36, 36)
+[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/MemorySlotPanel/HBox" unique_id=1752683343]
+custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 color = Color(0.7, 1, 0.7, 1)
 
 [node name="CardsInDeckPanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid" unique_id=35369940]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_highlight")
 
-[node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/CardsInDeckPanel" unique_id=1580749323]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 12
-
-[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/CardsInDeckPanel/Margin" unique_id=184837531]
+[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/CardsInDeckPanel" unique_id=184837531]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/CardsInDeckPanel/Margin/HBox" unique_id=134341531]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/CardsInDeckPanel/HBox" unique_id=134341531]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_font_sizes/font_size = 14
 text = "Cards in Deck"
 
-[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/CardsInDeckPanel/Margin/HBox" unique_id=159815493]
-custom_minimum_size = Vector2(36, 36)
+[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/CardsInDeckPanel/HBox" unique_id=159815493]
+custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 color = Color(1, 0.5, 0.5, 1)
 
 [node name="ProgressBarFocusPanel" type="PanelContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid" unique_id=1314429666]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_highlight")
 
-[node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/ProgressBarFocusPanel" unique_id=1311914482]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 12
-
-[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/ProgressBarFocusPanel/Margin" unique_id=260262702]
+[node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/ProgressBarFocusPanel" unique_id=260262702]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/ProgressBarFocusPanel/Margin/HBox" unique_id=397133380]
+[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/ProgressBarFocusPanel/HBox" unique_id=397133380]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_font_sizes/font_size = 14
 text = "Progress Bar Focus"
 
-[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/ProgressBarFocusPanel/Margin/HBox" unique_id=2002252158]
-custom_minimum_size = Vector2(36, 36)
+[node name="ColorPicker" type="ColorPickerButton" parent="Window/HBox/MainArea/MainContent/TabContainer/UIHighlights/Grid/ProgressBarFocusPanel/HBox" unique_id=2002252158]
+custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 color = Color(0.2, 0.8, 1, 1)
 
 [node name="Footer" type="PanelContainer" parent="Window/HBox/MainArea" unique_id=780667572]
+propagate_maximum_size = false
 layout_mode = 2
-
-[node name="FooterBG" type="ColorRect" parent="Window/HBox/MainArea/Footer" unique_id=1530915996]
-layout_mode = 2
-color = Color(0, 0, 0, 0.2)
+theme_override_styles/panel = SubResource("StyleBoxFlat_mjqtt")
 
 [node name="Margin" type="MarginContainer" parent="Window/HBox/MainArea/Footer" unique_id=1000854036]
 layout_mode = 2
 theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 20
+theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_bottom = 18
 
 [node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/Footer/Margin" unique_id=1327205110]
 layout_mode = 2
-theme_override_constants/separation = 15
+theme_override_constants/separation = 16
 
 [node name="RestoreDefaultsBtn" type="Button" parent="Window/HBox/MainArea/Footer/Margin/HBox" unique_id=1959736936]
+custom_minimum_size = Vector2(100, 35)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54, 0.54, 0.62, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_outline")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tb1co")
+theme_override_styles/hover = SubResource("StyleBoxFlat_c4sal")
 text = "Restore Defaults"
 
 [node name="Spacer" type="Control" parent="Window/HBox/MainArea/Footer/Margin/HBox" unique_id=1615630430]
 layout_mode = 2
 size_flags_horizontal = 3
+offset_transform_enabled = true
 
-[node name="ExitBtn" type="Button" parent="Window/HBox/MainArea/Footer/Margin/HBox" unique_id=1874732785]
+[node name="ApplyButton" type="Button" parent="Window/HBox/MainArea/Footer/Margin/HBox" unique_id=384293379]
+custom_minimum_size = Vector2(100, 35)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-text = "Exit"
-
-[node name="ApplyBtn" type="Button" parent="Window/HBox/MainArea/Footer/Margin/HBox" unique_id=384293379]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.13333334, 0.7411765, 0.20392157, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_xuc2h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_vx5jb")
 text = "Apply Changes"
+
+[node name="ExitButton" type="Button" parent="Window/HBox/MainArea/Footer/Margin/HBox" unique_id=1874732785]
+custom_minimum_size = Vector2(90, 35)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.9411765, 0, 0.105882354, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_danger")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_g5k7o")
+theme_override_styles/hover = SubResource("StyleBoxFlat_64y2i")
+text = "Exit"

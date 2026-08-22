@@ -1,133 +1,64 @@
 extends Control
 
-@onready var info_panel = null
-@onready var info_area = $Info/Area2D
-@onready var quit_area = $Quit_button/Area2D
-@onready var local_area = $Local_button/Area2D
-@onready var online_area = $Online_button/Area2D
-@onready var decks_area = $Decks_button/Area2D
-@onready var settings_area = $Settings/Area2D
-@onready var volume_area = $Volume/Area2D
-@onready var music_area = $Music/Area2D
+@onready var info_panel = $InfoPanel
+@onready var settings_button = $SettingsButton
+@onready var volume_button = $VolumeButton
+@onready var music_button = $MusicButton
 
-const COLOR_NORMAL = Color(1.0, 1.0, 1.0)
-const COLOR_HOVER = Color(0.7, 0.7, 0.7)
-const COLOR_PRESSED = Color(0.2, 0.2, 0.2)
+var tex_vol_on = preload("res://Assets/Textures/Main Menu Buttons/volume-on.png")
+var tex_vol_off = preload("res://Assets/Textures/Main Menu Buttons/volume-off.png")
+var tex_music_on = preload("res://Assets/Textures/Main Menu Buttons/music-on.png")
+var tex_music_off = preload("res://Assets/Textures/Main Menu Buttons/music-off.png")
+var is_music_on = true
+var is_volume_on = true
 
 func _ready():
 	$Menu_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_setup_info_panel()
 	_toggle_info()
-
-func _setup_info_panel():
-	info_panel = PanelContainer.new()
-	info_panel.name = "InfoPanel"
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.05, 0.05, 0.1, 0.95)
-	style.set_corner_radius_all(12)
-	style.set_content_margin_all(20)
-	style.border_width_left = 2
-	style.border_width_top = 2
-	style.border_width_right = 2
-	style.border_width_bottom = 2
-	style.border_color = Color(0.8, 0.1, 0.1, 1.0)
-	style.shadow_size = 15
-	style.shadow_color = Color(0, 0, 0, 0.6)
-	info_panel.add_theme_stylebox_override("panel", style)
-	var label = RichTextLabel.new()
-	label.bbcode_enabled = true
-	label.fit_content = true
-	label.custom_minimum_size = Vector2(400, 0)
-	var text = "[center]"
-	text += "[color=red][font_size=26][b]Beta Version 0.2.0[/b][/font_size][/color]\n\n"
-	text += "[color=white][font_size=18]"
-	text += "AnamoN is a fan-based game aiming to allow players to play multiple TCGs in a single application. "
-	text += "It is currently in beta, so many features are experimental and may not work as intended.\n\n"
-	text += "[b]Future Plans:[/b]\n"
-	text += "• [color=orange]Near Future:[/color] Servers, sound effects, and ease-of-use settings.\n"
-	text += "• [color=orange]Distant Future:[/color] Support for 4 or more players."
-	text += "[/font_size][/color]"
-	text += "[/center]"
-	label.text = text
-	info_panel.add_child(label)
-	add_child(info_panel)
-	info_panel.hide()
-
-func _process(_delta):
-	_update_hover_states()
-
-func _update_hover_states():
-	var buttons = [$Online_button, $Local_button, $Decks_button, $Quit_button, $Settings, $Volume, $Music, $Info]
-	for button in buttons:
-		var area = button.get_node_or_null("Area2D")
-		if area and is_mouse_over_area(area):
-			if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-				var target_color = COLOR_HOVER
-				target_color.a = button.modulate.a
-				button.modulate = target_color
-		else:
-			var target_color = COLOR_NORMAL
-			target_color.a = button.modulate.a
-			button.modulate = target_color
-
-func _input(event):
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			if is_mouse_over_area(info_area):
-				$Info.modulate = COLOR_PRESSED
-				_toggle_info()
-			elif is_mouse_over_area(quit_area):
-				$Quit_button.modulate = COLOR_PRESSED
-				get_tree().quit()
-			elif is_mouse_over_area(local_area):
-				$Local_button.modulate = COLOR_PRESSED
-				get_tree().change_scene_to_file("res://Scenes/Main.tscn")
-			elif is_mouse_over_area(online_area):
-				$Online_button.modulate = COLOR_PRESSED
-				print("Online button pressed")
-			elif is_mouse_over_area(decks_area):
-				$Decks_button.modulate = COLOR_PRESSED
-				get_tree().change_scene_to_file("res://Scenes/Deck_Building.tscn")
-			elif is_mouse_over_area(settings_area):
-				$Settings.modulate = COLOR_PRESSED
-				print("Settings button pressed")
-			elif is_mouse_over_area(volume_area):
-				$Volume.modulate = COLOR_PRESSED
-				_apply_special_effect($Volume)
-			elif is_mouse_over_area(music_area):
-				$Music.modulate = COLOR_PRESSED
-				_apply_special_effect($Music)
-		else:
-			var buttons = [$Info, $Quit_button, $Local_button, $Online_button, $Decks_button, $Settings, $Volume, $Music]
-			for button in buttons:
-				var color = COLOR_NORMAL
-				color.a = button.modulate.a
-				button.modulate = color
-
-func _apply_special_effect(node: Sprite2D):
-	if node.rotation_degrees != 0:
-		node.modulate.a = 1.0
-		node.rotation_degrees = 0
-	else:
-		node.modulate.a = 0.7
-		var angle = randf_range(7.0, 15.0)
-		if randf() > 0.5:
-			angle = -angle
-		node.rotation_degrees = angle
+	$OnlineButton.pressed.connect(_on_online_pressed)
+	$LocalButton.pressed.connect(_on_local_pressed)
+	$DecksButton.pressed.connect(_on_decks_pressed)
+	$QuitButton.pressed.connect(_on_quit_pressed)
+	$InfoButton.pressed.connect(_toggle_info)
+	settings_button.pressed.connect(_on_settings_pressed)
+	volume_button.pressed.connect(_on_volume_pressed)
+	music_button.pressed.connect(_on_music_pressed)
 
 func _toggle_info():
 	info_panel.visible = !info_panel.visible
 	if info_panel.visible:
 		await get_tree().process_frame
-		info_panel.global_position = $Info.global_position - Vector2(info_panel.size.x + 20, info_panel.size.y + 20)
+		info_panel.global_position = $InfoButton.global_position - Vector2(info_panel.size.x, info_panel.size.y)
 
-func is_mouse_over_area(area: Area2D) -> bool:
-	var collision_shape = area.get_node_or_null("CollisionShape2D")
-	if not collision_shape or not collision_shape.shape or collision_shape.disabled:
-		return false
-	var local_point = area.get_local_mouse_position()
-	var shape = collision_shape.shape
-	if shape is RectangleShape2D:
-		var rect = Rect2(-shape.size / 2, shape.size)
-		return rect.has_point(local_point)
-	return false
+func _on_online_pressed():
+	print("Online button pressed")
+
+func _on_local_pressed():
+	get_tree().change_scene_to_file("res://Scenes/Main.tscn")
+
+func _on_decks_pressed():
+	get_tree().change_scene_to_file("res://Scenes/Deck_Building.tscn")
+
+func _on_quit_pressed():
+	get_tree().quit()
+
+func _on_settings_pressed():
+	print("Settings button pressed")
+
+func _on_volume_pressed():
+	is_volume_on = !is_volume_on
+	if is_volume_on:
+		volume_button.icon = tex_vol_on
+		print("Volume is ON")
+	else:
+		volume_button.icon = tex_vol_off
+		print("Volume is OFF")
+
+func _on_music_pressed():
+	is_music_on = !is_music_on
+	if is_music_on:
+		music_button.icon = tex_music_on
+		print("Music is ON")
+	else:
+		music_button.icon = tex_music_off
+		print("Music is OFF")

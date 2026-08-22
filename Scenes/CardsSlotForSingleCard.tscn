@@ -6,6 +6,34 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3muqk"]
 size = Vector2(92, 132)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4tah1"]
+draw_center = false
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(1, 1, 1, 1)
+shadow_size = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kphy1"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wejov"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="CardsSlotForSignleCard" type="Node2D" unique_id=802075313]
 script = ExtResource("1_yk7di")
 
@@ -16,6 +44,14 @@ collision_mask = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=183021862]
 shape = SubResource("RectangleShape2D_3muqk")
 
+[node name="ShadowPanel" type="Panel" parent="." unique_id=754678061]
+visible = false
+offset_left = -46.0
+offset_top = -66.0
+offset_right = 46.0
+offset_bottom = 66.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_4tah1")
+
 [node name="GraveyardViewWindow" type="Window" parent="." unique_id=1609381763]
 size = Vector2i(600, 142)
 visible = false
@@ -23,6 +59,11 @@ unresizable = true
 
 [node name="PopupMenu" type="PopupMenu" parent="GraveyardViewWindow" unique_id=167838588]
 size = Vector2i(100, 50)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_disabled_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_kphy1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_wejov")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="GraveyardViewWindow" unique_id=928919010]
 offset_right = 600.0

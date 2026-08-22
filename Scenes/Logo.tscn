@@ -2,6 +2,168 @@
 
 [ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="1_gukjj"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gukjj"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5eusq"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fdbsd"]
+bg_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ru6fv"]
+bg_color = Color(0.70980394, 0.5882353, 0.36078432, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_yhn4k"]
+Button/colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+Button/colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+Button/colors/font_hover_pressed_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+Button/colors/font_pressed_color = Color(0.8, 0.8, 0.8, 1)
+Button/font_sizes/font_size = 20
+Button/styles/hover = SubResource("StyleBoxFlat_gukjj")
+Button/styles/normal = SubResource("StyleBoxFlat_button_normal")
+PanelContainer/colors/bg_color = Color(0.05, 0.05, 0.05, 0.95)
+ScrollContainer/colors/bg_color = Color(0.02, 0.02, 0.02, 0.95)
+VScrollBar/styles/grabber = SubResource("StyleBoxFlat_5eusq")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_fdbsd")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_ru6fv")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gk3dt"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xn1w4"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+expand_margin_left = 5.0
+expand_margin_top = 35.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6moe3"]
+content_margin_bottom = 10.0
+bg_color = Color(0.5489626, 0.5489626, 0.54896253, 0.60784316)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aiifa"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1uisn"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8862745, 0.77254903, 0.4862745, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xktw0"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5e8w5"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="Theme" id="Theme_hp46n"]
+AcceptDialog/constants/close_h_offset = 23
+AcceptDialog/styles/embedded_border = SubResource("StyleBoxFlat_xn1w4")
+AcceptDialog/styles/panel = SubResource("StyleBoxFlat_6moe3")
+Button/colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+Button/colors/font_focus_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+Button/colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+Button/colors/font_hover_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+Button/colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+Button/styles/focus = SubResource("StyleBoxFlat_aiifa")
+Button/styles/hover = SubResource("StyleBoxFlat_1uisn")
+Button/styles/normal = SubResource("StyleBoxFlat_xktw0")
+Button/styles/pressed = SubResource("StyleBoxFlat_5e8w5")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_02aom"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iv3e1"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp46n"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
 [node name="Logo" type="Node2D" unique_id=516982437]
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1188845047]
@@ -14,6 +176,13 @@ polygon = PackedVector2Array(-3, -35, -9, -29, -38, -19, -45, -23, -44, -7, -56,
 [node name="LogoMenu" type="PanelContainer" parent="." unique_id=1101697654]
 visible = false
 z_index = 2000
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_yhn4k")
+theme_override_styles/panel = SubResource("StyleBoxFlat_gk3dt")
 
 [node name="MainVBox" type="VBoxContainer" parent="LogoMenu" unique_id=1094107958]
 layout_mode = 2
@@ -28,12 +197,7 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
-theme_override_constants/separation = 0
-
-[node name="Separator" type="HSeparator" parent="LogoMenu/MainVBox" unique_id=489742845]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 0
+theme_override_constants/separation = 1
 
 [node name="FixedVBox" type="VBoxContainer" parent="LogoMenu/MainVBox" unique_id=574980550]
 layout_mode = 2
@@ -42,6 +206,7 @@ theme_override_constants/separation = 0
 
 [node name="LogoViewWindow" type="Window" parent="." unique_id=1676907393]
 auto_translate_mode = 1
+oversampling_override = 1.0
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
@@ -60,6 +225,7 @@ layout_mode = 2
 
 [node name="LogoMasteryViewWindow" type="Window" parent="." unique_id=544854343]
 auto_translate_mode = 1
+oversampling_override = 1.0
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
@@ -78,6 +244,7 @@ layout_mode = 2
 
 [node name="LogoStatusViewWindow" type="Window" parent="." unique_id=1022757827]
 auto_translate_mode = 1
+oversampling_override = 1.0
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
@@ -93,3 +260,37 @@ columns = 1024
 
 [node name="Control" parent="LogoStatusViewWindow/ScrollContainer/GridContainer" unique_id=797281537 instance=ExtResource("1_gukjj")]
 layout_mode = 2
+
+[node name="LogoCounterDialog" type="AcceptDialog" parent="." unique_id=941071206]
+transparent_bg = true
+oversampling_override = 1.0
+title = "Add New Counter"
+position = Vector2i(0, 36)
+size = Vector2i(250, 120)
+transparent = true
+theme = SubResource("Theme_hp46n")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LogoCounterDialog" unique_id=206915453]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 248.0
+offset_bottom = 75.0
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="LogoCounterDialog/VBoxContainer" unique_id=175581722]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_styles/focus = SubResource("StyleBoxFlat_02aom")
+text = "Enter counter name:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CounterNameInput" type="LineEdit" parent="LogoCounterDialog/VBoxContainer" unique_id=1199266961]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_placeholder_color = Color(0.7882353, 0.6627451, 0.43137255, 0.4862745)
+theme_override_styles/normal = SubResource("StyleBoxFlat_iv3e1")
+theme_override_styles/focus = SubResource("StyleBoxFlat_hp46n")
+placeholder_text = "Counter name..."
+alignment = 1
+max_length = 17

@@ -22,8 +22,9 @@ func _ready() -> void:
 		default_texture = preview_sprite.texture
 	card_manager_reference = get_parent().get_node_or_null("CardManager")
 	card_database_reference = load("res://Scripts/CardDatabase.gd").new()
-	card_database_reference.initialize_database()
-	card_database_reference.load_all_cards_data()
+	if not card_database_reference._is_initialized:
+		card_database_reference.initialize_database()
+		card_database_reference.load_all_cards_data()
 	if card_manager_reference:
 		set_process(true)
 
@@ -203,6 +204,8 @@ func _update_card_display(slug: String):
 						if edition.get("flavor"):
 							effect_to_display = edition["flavor"]
 							break
+	if _has_ascendant_bonus(slug):
+		types_to_display += " ASCENDANT"
 	if name_to_display and name_to_display.strip_edges() != "":
 		var cleaned_name = fix_weird_quotes_and_dashes(name_to_display.strip_edges())
 		card_name_label.append_text("[center][b]%s[/b][/center]" % cleaned_name)
@@ -213,7 +216,7 @@ func _update_card_display(slug: String):
 		card_types_lable.append_text("[center]%s[/center]" % types_to_display)
 	if level_to_display != null:
 		var lvl_eff = int(level_to_display) + int(mods.get("level", 0))
-		level_to_display = max(0, lvl_eff)
+		level_to_display = lvl_eff
 		card_level_lable.append_text("[left]LV. %s[/left]" % str(level_to_display))
 	if element_to_display != null:
 		card_element_lable.append_text("[center]%s[/center]" % str(element_to_display))
@@ -309,8 +312,28 @@ func get_effective_mods_for_card() -> Dictionary:
 				var counters = last_displayed_card.get_attached_counters()
 				var buff = int(counters.get("Buff", 0))
 				var debuff = int(counters.get("Debuff", 0))
-				mods["power"] += (buff - debuff)
-				mods["life"] += (buff - debuff)
+				var life_count = int(counters.get("Life", 0))
+				var damage_count = int(counters.get("Damage", 0))
+				var pow_counter = int(counters.get("Power", 0))
+				var dur_counter = int(counters.get("Durability", 0))
+				var lvl_counter = int(counters.get("Level", 0))
+				mods["level"] += lvl_counter
+				mods["power"] += (buff - debuff) + pow_counter
+				mods["durability"] += dur_counter
+				mods["life"] += (buff - debuff) + (life_count - damage_count)
+		var data = {}
+		if card_database_reference and card_database_reference.cards_db.has(get_slug_from_card(last_displayed_card)):
+			data = card_database_reference.cards_db[get_slug_from_card(last_displayed_card)]
+			if data.has("edition_id") and not data.has("parent_orientation_slug"):
+				var base_slug = find_base_card_for_edition(data["edition_id"])
+				if base_slug and card_database_reference.cards_db.has(base_slug):
+					data = card_database_reference.cards_db[base_slug]
+			elif data.has("parent_orientation_slug"):
+				var parent_slug = data["parent_orientation_slug"]
+				if card_database_reference.cards_db.has(parent_slug):
+					data = card_database_reference.cards_db[parent_slug]
+		if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
+			mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(last_displayed_card, data, mods)
 	return mods
 
 func clear_preview():
@@ -425,4 +448,19 @@ func is_card_of_type(slug: String, target_type: String) -> bool:
 				for types in parent_data["types"]:
 					if str(types).to_upper() == target_upper:
 						return true		
+	return false
+
+func _has_ascendant_bonus(_slug: String) -> bool:
+	if not last_displayed_card: return false
+	if not is_instance_valid(last_displayed_card): return false
+	var field = null
+	if "current_field" in last_displayed_card:
+		field = last_displayed_card.current_field
+	if not field: return false
+	if field.name == "MAINFIELD" and (field.get("apotheosis_rite_active") or field.get("sacramental_rite_active") or field.get("transcendental_rite_active")):
+		if field.get("current_champion_card") == last_displayed_card:
+			return true
+	elif field.name == "OpponentMainField" and (field.get("apotheosis_rite_active") or field.get("sacramental_rite_active") or field.get("transcendental_rite_active")):
+		if field.get("current_champion_card") == last_displayed_card:
+			return true
 	return false

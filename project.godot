@@ -18,6 +18,10 @@ boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/show_image=false
 config/icon="uid://bh4b1t4rtb1d4"
 
+[autoload]
+
+SceneCache="*res://Scripts/SceneCache.gd"
+
 [display]
 
 window/size/viewport_width=1920
@@ -29,3 +33,7 @@ window/vsync/vsync_mode=2
 [dotnet]
 
 project/assembly_name="New Game Project"
+
+[gui]
+
+theme/custom_font="uid://b4axdl71eloth"

@@ -1,13 +1,16 @@
 extends Node
 
 var db
-var cards_db = {}
+static var cards_db = {}
+static var _is_initialized = false
 
 func _ready():
-	initialize_database()
-	load_all_cards_data()
+	if not _is_initialized:
+		initialize_database()
+		load_all_cards_data()
 
 func initialize_database():
+	if _is_initialized: return true
 	db = SQLite.new()
 	db.path = "res://Data/SQLite.db"
 	if not db.open_db():
@@ -16,6 +19,7 @@ func initialize_database():
 	return true
 
 func load_all_cards_data():
+	if _is_initialized: return
 	load_base_cards()
 	load_legalities()
 	load_legality_formats()
@@ -30,6 +34,7 @@ func load_all_cards_data():
 	load_orientation_subtypes()
 	load_orientation_elements()
 	load_orientation_editions()
+	_is_initialized = true
 
 func load_base_cards():
 	var query = """

@@ -1,41 +1,117 @@
 [gd_scene format=3 uid="uid://cpn7rtonc8qd4"]
 
-[ext_resource type="Texture2D" uid="uid://ccr45jmyj0a4j" path="res://Assets/Textures/Phases/Wake_up_phase.png" id="1_k4q3m"]
-[ext_resource type="Texture2D" uid="uid://poj1n62xse1b" path="res://Assets/Textures/Phases/Next_Square_Button.png" id="2_b2tv2"]
-[ext_resource type="Texture2D" uid="uid://dpfqqgyyq2iqe" path="res://Assets/Textures/Phases/Back_Square_Button.png" id="3_2s5uk"]
+[ext_resource type="Texture2D" uid="uid://d25yl77dnssdc" path="res://Assets/Textures/Phases/arrow-right.png" id="3_b2tv2"]
+[ext_resource type="Texture2D" uid="uid://deuvr4ajacylb" path="res://Assets/Textures/Phases/arrow-left.png" id="4_b2tv2"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_xvtyr"]
-size = Vector2(200.30518, 200.30534)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sodvm"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 7
+border_width_top = 7
+border_width_right = 7
+border_width_bottom = 7
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 20
+corner_radius_bottom_right = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lfhol"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_color = Color(0.8, 0.8, 0.8, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_md12f"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 7
+border_width_top = 7
+border_width_right = 7
+border_width_bottom = 7
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mr5cl"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 7
+border_width_top = 7
+border_width_right = 7
+border_width_bottom = 7
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tj4fr"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 7
+border_width_top = 7
+border_width_right = 7
+border_width_bottom = 7
+border_color = Color(0.8862745, 0.77254903, 0.4862745, 1)
+border_blend = true
+corner_radius_top_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2s5uk"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 7
+border_width_top = 7
+border_width_right = 7
+border_width_bottom = 7
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ucosy"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 7
+border_width_top = 7
+border_width_right = 7
+border_width_bottom = 7
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r7mf3"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 7
+border_width_top = 7
+border_width_right = 7
+border_width_bottom = 7
+border_color = Color(0.8862745, 0.77254903, 0.4862745, 1)
+border_blend = true
+corner_radius_top_right = 20
+corner_radius_bottom_left = 20
 
 [node name="Phases" type="Node2D" unique_id=1636317912]
 
-[node name="Phases" type="Sprite2D" parent="." unique_id=285543134]
-position = Vector2(1683.0001, 104)
-scale = Vector2(0.41, 0.41)
-texture = ExtResource("1_k4q3m")
+[node name="PhasesLabel" type="Label" parent="." unique_id=1251607200]
+offset_left = 1563.0
+offset_top = 63.0
+offset_right = 1803.0
+offset_bottom = 145.0
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_sodvm")
+theme_override_styles/focus = SubResource("StyleBoxFlat_lfhol")
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="NextSquareButton" type="Sprite2D" parent="." unique_id=17137411]
-position = Vector2(1844, 104)
-scale = Vector2(0.41124892, 0.41124892)
-texture = ExtResource("2_b2tv2")
+[node name="LeftArrowButton" type="Button" parent="." unique_id=2036789263]
+offset_left = 1481.0
+offset_top = 63.0
+offset_right = 1563.0
+offset_bottom = 145.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_md12f")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_mr5cl")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tj4fr")
+icon = ExtResource("4_b2tv2")
 
-[node name="NextArea2D" type="Area2D" parent="NextSquareButton" unique_id=1496434223]
-collision_layer = 64
-collision_mask = 64
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NextSquareButton/NextArea2D" unique_id=1395646279]
-shape = SubResource("RectangleShape2D_xvtyr")
-
-[node name="BackSquareButton" type="Sprite2D" parent="." unique_id=1412667652]
-position = Vector2(1521.9999, 104.00001)
-scale = Vector2(0.40937495, 0.40937495)
-texture = ExtResource("3_2s5uk")
-
-[node name="BackArea2D" type="Area2D" parent="BackSquareButton" unique_id=650733625]
-collision_layer = 64
-collision_mask = 64
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BackSquareButton/BackArea2D" unique_id=497145644]
-position = Vector2(0.00024414063, -3.0517578e-05)
-scale = Vector2(1.0000002, 1.0000002)
-shape = SubResource("RectangleShape2D_xvtyr")
+[node name="RightArrowButton" type="Button" parent="." unique_id=1300866680]
+offset_left = 1803.0
+offset_top = 63.000004
+offset_right = 1885.0
+offset_bottom = 145.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_2s5uk")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ucosy")
+theme_override_styles/hover = SubResource("StyleBoxFlat_r7mf3")
+icon = ExtResource("3_b2tv2")

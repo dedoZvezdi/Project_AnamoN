@@ -3,6 +3,15 @@
 [ext_resource type="Script" uid="uid://bwyxwauuywjcq" path="res://Scripts/Opponent_GA_DECK.gd" id="1_q2nea"]
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_eulnh"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_md12f"]
+draw_center = false
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(1, 1, 1, 1)
+shadow_size = 15
+
 [node name="OpponentDeck" type="Node2D" unique_id=1439981426]
 script = ExtResource("1_q2nea")
 
@@ -10,3 +19,11 @@ script = ExtResource("1_q2nea")
 rotation = 3.14159
 scale = Vector2(0.192, 0.192)
 texture = ExtResource("2_eulnh")
+
+[node name="ShadowPanel" type="Panel" parent="." unique_id=1409545874]
+visible = false
+offset_left = -48.0
+offset_top = -67.0
+offset_right = 48.0
+offset_bottom = 67.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_md12f")

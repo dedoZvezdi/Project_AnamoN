@@ -91,14 +91,30 @@ func _reset_hold():
 		progress_bar.value = 0
 		progress_bar.visible = false
 
+func _find_deck_building():
+	var node = self
+	while node:
+		if node.get_script() and node.get_script().resource_path.ends_with("Deck_Building.gd"):
+			return node
+		node = node.get_parent()
+	return null
+
+func _is_in_deck_builder() -> bool:
+	return _find_deck_building() != null
+
 func _on_mouse_entered():
 	self.scale = Vector2(1, 1)
 	self.z_index = 100
 	if _is_face_down_opponent_banish():
 		return
-	var card_info_node = get_tree().get_current_scene().get_node_or_null("CardInformation")
-	if not card_info_node:
-		card_info_node = get_tree().get_current_scene().get_node_or_null("PlayerField/CardInformation")
+	var card_info_node = null
+	var db = _find_deck_building()
+	if db and db.get_node_or_null("CardInformation"):
+		card_info_node = db.get_node("CardInformation")
+	else:
+		card_info_node = get_tree().get_current_scene().get_node_or_null("CardInformation")
+		if not card_info_node:
+			card_info_node = get_tree().get_current_scene().get_node_or_null("PlayerField/CardInformation")
 	if card_info_node and card_info_node.has_method("show_card_info"):
 		card_info_node.show_card_info(card_slug)
 
@@ -151,7 +167,7 @@ func _is_in_opponent_zone() -> bool:
 
 func _gui_input(event):
 	if event is InputEventMouseMotion:
-		if get_tree().current_scene.name == "Deck_Building":
+		if _is_in_deck_builder():
 			if _is_deck_builder_pressing and event.position.distance_to(_deck_builder_drag_start_pos) > 5:
 				_is_deck_builder_pressing = false
 				var drag_data = _create_deck_builder_drag_data()
@@ -161,9 +177,10 @@ func _gui_input(event):
 					accept_event()
 			return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-		if get_tree().current_scene.name == "Deck_Building":
-			if get_tree().current_scene.has_method("handle_right_click"):
-				get_tree().current_scene.handle_right_click(self)
+		var db_rc = _find_deck_building()
+		if db_rc:
+			if db_rc.has_method("handle_right_click"):
+				db_rc.handle_right_click(self)
 			accept_event()
 			return
 		if zone == "lineage":
@@ -173,7 +190,7 @@ func _gui_input(event):
 			emit_signal("request_popup_menu", card_slug, current_uuid)
 			accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if get_tree().current_scene.name == "Deck_Building":
+		if _is_in_deck_builder():
 			if event.pressed:
 				_is_deck_builder_pressing = true
 				_deck_builder_drag_start_pos = event.position
@@ -204,6 +221,13 @@ func _gui_input(event):
 				var card_manager = get_tree().current_scene.get_node("PlayerField/CardManager")
 				if card_manager and card_manager.has_method("request_mark_opponent_card"):
 					card_manager.request_mark_opponent_card(zone, uuid, is_marked)
+				if is_marked:
+					get_tree().create_timer(0.3).timeout.connect(func():
+						if get_meta("is_marked"):
+							set_meta("is_marked", false)
+							modulate = Color(1, 1, 1)
+							if card_manager and card_manager.has_method("request_mark_opponent_card"):
+								card_manager.request_mark_opponent_card(zone, uuid, false))
 				accept_event()
 				return
 			if not is_holding:
@@ -302,7 +326,11 @@ func _create_deck_builder_drag_data():
 	var source_zone = zone
 	if source_zone == "" and has_meta("zone"):
 		source_zone = get_meta("zone")
-	var deck_building = get_tree().current_scene
+	var deck_building = _find_deck_building()
+	if deck_building and deck_building.has_method("is_drag_active") and deck_building.is_drag_active():
+		return null
+	if deck_building and deck_building.has_method("is_ready_waiting") and deck_building.is_ready_waiting():
+		return null
 	var original_index = -1
 	if source_zone != "deck_building_results" and deck_building:
 		if has_meta("deck_grid_index"):
@@ -328,8 +356,7 @@ func _create_deck_builder_drag_data():
 func _get_drag_data(_pos):
 	if zone == "lineage" or zone == "lineage_opponent":
 		return null
-	var is_deck_builder = get_tree().current_scene.name == "Deck_Building"
-	if is_deck_builder:
+	if _is_in_deck_builder():
 		var drag_data = _create_deck_builder_drag_data()
 		if drag_data:
 			set_drag_preview(drag_data.preview)
@@ -370,7 +397,7 @@ func create_real_card_for_drag():
 	return real_card
 
 func _can_drop_data(pos, data):
-	if get_tree().current_scene.name == "Deck_Building":
+	if _is_in_deck_builder():
 		if data is Dictionary and data.get("type") == "deck_builder":
 			var parent = get_parent()
 			if parent and parent.has_method("_can_drop_data"):
@@ -380,7 +407,7 @@ func _can_drop_data(pos, data):
 	return typeof(data) == TYPE_STRING and data != card_slug
 
 func _drop_data(pos, data):
-	if get_tree().current_scene.name == "Deck_Building":
+	if _is_in_deck_builder():
 		if data is Dictionary and data.get("type") == "deck_builder":
 			var parent = get_parent()
 			if parent and parent.has_method("_drop_data"):

@@ -6,6 +6,88 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bas7d"]
 size = Vector2(500, 700)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_md12f"]
+draw_center = false
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(1, 1, 1, 1)
+shadow_size = 70
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xpb52"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fdbsd"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_es8r6"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gukjj"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mt6rq"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nee6h"]
+bg_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d2koy"]
+bg_color = Color(0.70980394, 0.5882353, 0.36078432, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_bcrn8"]
+HScrollBar/styles/grabber = SubResource("StyleBoxFlat_mt6rq")
+HScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_nee6h")
+HScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_d2koy")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yhn4k"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_es8r6"]
+
 [node name="Deck" type="Node2D" unique_id=689814827]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=523399539]
@@ -18,24 +100,48 @@ collision_mask = 4
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=716206222]
 shape = SubResource("RectangleShape2D_bas7d")
 
+[node name="ShadowPanel" type="Panel" parent="." unique_id=1461106484]
+visible = false
+offset_left = -250.0
+offset_top = -351.0
+offset_right = 251.0
+offset_bottom = 350.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_md12f")
+
 [node name="PopupMenu" type="PopupMenu" parent="." unique_id=1942132116]
+oversampling_override = 1.0
 size = Vector2i(100, 50)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_separator_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_xpb52")
+theme_override_styles/hover = SubResource("StyleBoxFlat_fdbsd")
 
 [node name="DeckViewWindow" type="Window" parent="." unique_id=522525823]
+oversampling_override = 1.0
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
 
 [node name="PopupMenu" type="PopupMenu" parent="DeckViewWindow" unique_id=1371315731]
+oversampling_override = 1.0
 size = Vector2i(100, 50)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_separator_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_es8r6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_gukjj")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="DeckViewWindow" unique_id=620117697]
 offset_right = 600.0
 offset_bottom = 142.0
+theme = SubResource("Theme_bcrn8")
+theme_override_styles/panel = SubResource("StyleBoxFlat_yhn4k")
 
 [node name="GridContainer" type="GridContainer" parent="DeckViewWindow/ScrollContainer" unique_id=1620129238]
 custom_minimum_size = Vector2(600, 142)
 layout_mode = 2
+theme = SubResource("Theme_es8r6")
 columns = 1024
 
 [node name="Control" parent="DeckViewWindow/ScrollContainer/GridContainer" unique_id=1779504644 instance=ExtResource("2_yhn4k")]

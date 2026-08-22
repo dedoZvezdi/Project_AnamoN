@@ -57,7 +57,7 @@ func _process(delta):
 	if is_holding_left:
 		hold_timer += delta
 		if progress_bar:
-			max(1, cards_in_graveyard.size() + 1)
+			progress_bar.z_index = max(1, cards_in_graveyard.size() + 1)
 			progress_bar.value = hold_timer / HOLD_DURATION
 			progress_bar.visible = true
 			progress_bar.global_position = get_global_mouse_position() - progress_bar.size / 2
@@ -76,9 +76,16 @@ func _reset_hold():
 		progress_bar.visible = false
 
 func update_deck_view():
+	if graveyard_view_window and not graveyard_view_window.visible:
+		return
+	var current_update = Time.get_ticks_msec()
+	set_meta("update_id", current_update)
 	for child in grid_container.get_children():
 		child.queue_free()
+	var count = 0
 	for card in cards_in_graveyard:
+		if get_meta("update_id") != current_update or (graveyard_view_window and not graveyard_view_window.visible):
+			return
 		var card_slug = card.get_meta("slug") if card.has_meta("slug") else (card.card_name if card.has_method("card_name") else card.name)
 		var card_uuid = card.uuid if "uuid" in card else ""
 		var card_display = create_card_display(card_slug, card_uuid)
@@ -87,6 +94,10 @@ func update_deck_view():
 			card_display.set_meta("is_marked", true)
 		grid_container.add_child(card_display)
 		grid_container.move_child(card_display, 0)
+		count += 1
+		if count >= 8:
+			count = 0
+			await get_tree().process_frame
 
 func setup_deck_view():
 	graveyard_view_window.close_requested.connect(_on_deck_view_close)
@@ -251,8 +262,8 @@ func _on_graveyard_deck_animation_completed(card, slug: String, card_uuid: Strin
 		update_deck_view()
 
 func show_grid_view():
-	update_deck_view()
 	graveyard_view_window.popup_centered()
+	update_deck_view()
 	$GraveyardViewWindow/ScrollContainer.call_deferred("set", "scroll_horizontal", 0)
 	$GraveyardViewWindow/ScrollContainer.call_deferred("set", "scroll_vertical", 0)
 
@@ -373,6 +384,9 @@ func set_card_marked(uuid: String, is_marked: bool):
 	if is_marked:
 		if not uuid in marked_uuids:
 			marked_uuids.append(uuid)
+			get_tree().create_timer(0.3).timeout.connect(func():
+				if uuid in marked_uuids:
+					set_card_marked(uuid, false))
 	else:
 		marked_uuids.erase(uuid)
 	update_top_card_visual()
@@ -381,14 +395,16 @@ func set_card_marked(uuid: String, is_marked: bool):
 
 func update_top_card_visual():
 	if cards_in_graveyard.is_empty():
-		return
-	var top_card = cards_in_graveyard[-1]
-	if not is_instance_valid(top_card):
+		if has_node("ShadowPanel"):
+			$ShadowPanel.visible = false
 		return
 	if marked_uuids.size() > 0:
-		top_card.modulate = Color(0.5, 0.5, 1.5, 0.9)
+		if has_node("ShadowPanel"):
+			$ShadowPanel.modulate = Color(0.5, 0.5, 1.5, 0.9)
+			$ShadowPanel.visible = true
 	else:
-		top_card.modulate = Color(1, 1, 1)
+		if has_node("ShadowPanel"):
+			$ShadowPanel.visible = false
 
 func add_card_to_slot_precise(card, left_uuid: String, right_uuid: String, fallback_index: int):
 	var target_array_index = -1

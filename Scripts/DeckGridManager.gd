@@ -14,6 +14,10 @@ const MARGIN_RIGHT_SCROLL := 8.0
 const MARGIN_RIGHT_NO_SCROLL := 2.0
 const V_GAP := 2.0
 
+static var _texture_cache := {}
+static var _loading_slugs := {}
+
+var _back_texture: Texture2D = null
 var target_scroll_y: float = 0.0
 var current_scroll_y: float = 0.0
 var scroll_container: ScrollContainer = null
@@ -25,6 +29,7 @@ var _card_tweens: Dictionary = {}
 var _illegal_highlight_keys: Dictionary = {}
 
 func _ready():
+	_back_texture = _get_back_texture()
 	scroll_container = get_parent() as ScrollContainer
 	if scroll_container:
 		target_scroll_y = scroll_container.scroll_vertical
@@ -58,28 +63,65 @@ func _adjust_target_scroll(amount: float):
 		current_scroll_y = scroll_container.scroll_vertical
 		target_scroll_y = scroll_container.scroll_vertical
 	target_scroll_y = clamp(target_scroll_y + amount, 0, max(0, max_scroll))
-static var _texture_cache := {}
+
+
+func _get_back_texture() -> Texture2D:
+	if _texture_cache.has("__back"):
+		return _texture_cache["__back"]
+	var back_path = "res://Assets/Textures/ga_back.png"
+	var texture = load(back_path)
+	_texture_cache["__back"] = texture
+	return texture
+
+func _request_texture(slug: String):
+	if _texture_cache.has(slug):
+		return
+	if _loading_slugs.has(slug):
+		return
+	var image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+	if ResourceLoader.exists(image_path) or FileAccess.file_exists(image_path + ".import"):
+		ResourceLoader.load_threaded_request(image_path)
+		_loading_slugs[slug] = image_path
+	else:
+		_texture_cache[slug] = _get_back_texture()
+
+func _check_pending_textures():
+	if _loading_slugs.is_empty():
+		return
+	var done := []
+	for slug in _loading_slugs:
+		var path = _loading_slugs[slug]
+		var status = ResourceLoader.load_threaded_get_status(path)
+		if status == ResourceLoader.THREAD_LOAD_LOADED:
+			var tex = ResourceLoader.load_threaded_get(path)
+			_texture_cache[slug] = tex
+			done.append(slug)
+		elif status == ResourceLoader.THREAD_LOAD_FAILED or status == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+			_texture_cache[slug] = _get_back_texture()
+			done.append(slug)
+	for slug in done:
+		_loading_slugs.erase(slug)
+
+func _apply_loaded_textures():
+	for card in card_displays:
+		if is_instance_valid(card) and card.visible:
+			var texture_rect = card.get_node_or_null("TextureRect")
+			if texture_rect and texture_rect.texture == _back_texture:
+				var slug = card.get_meta("slug") if card.has_meta("slug") else ""
+				if slug != "" and _texture_cache.has(slug):
+					var tex = _texture_cache[slug]
+					if tex != _back_texture:
+						texture_rect.texture = tex
 
 func _get_cached_texture(slug: String) -> Texture2D:
 	if _texture_cache.has(slug):
 		return _texture_cache[slug]
-	var image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
-	var texture: Texture2D = null
-	if ResourceLoader.exists(image_path) or FileAccess.file_exists(image_path + ".import"):
-		texture = load(image_path)
-	else:
-		var back_path = "res://Assets/Textures/ga_back.png"
-		if _texture_cache.has("__back"):
-			texture = _texture_cache["__back"]
-		else:
-			if ResourceLoader.exists(back_path):
-				texture = load(back_path)
-				_texture_cache["__back"] = texture
-	if texture:
-		_texture_cache[slug] = texture
-	return texture
+	_request_texture(slug)
+	return _get_back_texture()
 
 func _process(delta):
+	_check_pending_textures()
+	_apply_loaded_textures()
 	if scroll_container:
 		var actual_scroll = scroll_container.scroll_vertical
 		var last_set_scroll = int(round(current_scroll_y))
@@ -344,6 +386,14 @@ func _calc_phantom_index(mouse_pos: Vector2) -> int:
 	var target_index = row * max_columns + col
 	return clamp(target_index, 0, card_slugs.size())
 
+func _find_deck_building():
+	var node = self
+	while node:
+		if node.get_script() and node.get_script().resource_path.ends_with("Deck_Building.gd"):
+			return node
+		node = node.get_parent()
+	return null
+
 func clear_phantom():
 	if _phantom_index != -1 or _is_drag_hovering:
 		_phantom_index = -1
@@ -354,7 +404,7 @@ func _can_drop_data(pos, data) -> bool:
 	if data is Dictionary and data.get("type") == "deck_builder":
 		var slug = data.get("slug", "")
 		var source_zone = data.get("zone", "")
-		var deck_building = get_tree().current_scene
+		var deck_building = _find_deck_building()
 		if deck_building and deck_building.has_method("can_accept_in_grid"):
 			var can_accept = deck_building.can_accept_in_grid(slug, source_zone, grid_type)
 			if can_accept:
@@ -371,7 +421,7 @@ func _drop_data(_pos, data):
 	if data is Dictionary and data.get("type") == "deck_builder":
 		var slug = data.get("slug", "")
 		var source_zone = data.get("zone", "")
-		var deck_building = get_tree().current_scene
+		var deck_building = _find_deck_building()
 		if deck_building and deck_building.has_method("handle_drop_on_grid"):
 			var drop_idx = _phantom_index
 			_phantom_index = -1

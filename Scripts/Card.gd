@@ -28,6 +28,7 @@ var current_direction = "North"
 var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
 var is_tweening: bool = false
+var mark_tween: Tween
 var original_owner_id = 0
 var chosen_elements := []
 var is_marked = false
@@ -99,7 +100,7 @@ func _ready() -> void:
 	area.input_event.connect(_on_area_2d_input_event)
 	find_card_information_reference()
 	if card_level_lable:
-		card_level_lable.clear()
+		card_level_lable.text = ""
 	_setup_progress_bar()
 	if lineage_view_window:
 		if not lineage_view_window.close_requested.is_connected(_on_lineage_window_close):
@@ -128,9 +129,29 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 		if result:
 			return result
 	return null
+func get_original_slug_for_restrictions() -> String:
+	var current_slug = get_slug_from_card()
+	var stripped_slug = current_slug.to_lower().replace("-", "").replace("_", "")
+	if stripped_slug.contains("lubu"):
+		return current_slug
+	if not card_information_reference or not card_information_reference.card_database_reference:
+		return current_slug
+	var db = card_information_reference.card_database_reference.cards_db
+	var data = db.get(current_slug, {})
+	if data.has("parent_orientation_slug"):
+		var target = get_transform_target(current_slug)
+		return target if target != "" else data["parent_orientation_slug"]
+	if data.has("edition_id"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_information_reference.card_database_reference)
+		if base_slug and db.has(base_slug):
+			var base_data = db[base_slug]
+			if base_data.has("parent_orientation_slug"):
+				var target = get_transform_target(current_slug)
+				return target if target != "" else base_data["parent_orientation_slug"]
+	return current_slug
 
 func is_champion_card() -> bool:
-	return is_slug_champion(get_slug_from_card())
+	return is_slug_champion(get_original_slug_for_restrictions())
 
 func is_slug_champion(card_slug: String) -> bool:
 	if card_slug == "":
@@ -166,7 +187,7 @@ func is_slug_champion(card_slug: String) -> bool:
 	return false
 
 func is_regalia_card() -> bool:
-	var card_slug = get_slug_from_card()
+	var card_slug = get_original_slug_for_restrictions()
 	if card_slug == "":
 		return false
 	if not card_information_reference or not card_information_reference.card_database_reference:
@@ -270,10 +291,10 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 					popup_menu.add_item("Destroy", 7)
 					var slug = get_slug_from_card()
 					if is_shifting_currents_card():
-						if current_direction != "North": popup_menu.add_item("North", 20)
-						if current_direction != "East": popup_menu.add_item("East", 21)
-						if current_direction != "South": popup_menu.add_item("South", 22)
-						if current_direction != "West": popup_menu.add_item("West", 23)
+						if current_direction != "North": popup_menu.add_item("North", 16)
+						if current_direction != "East": popup_menu.add_item("East", 17)
+						if current_direction != "South": popup_menu.add_item("South", 18)
+						if current_direction != "West": popup_menu.add_item("West", 19)
 					if is_transformable_card(slug) and not is_champion_card():
 						var target_slug = get_transform_target(slug)
 						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
@@ -288,21 +309,25 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 			else:
 				if is_in_memory_slot() or is_in_hand():
 					if not is_publicly_revealed:
-						popup_menu.add_item("Show", 10)
+						popup_menu.add_item("Show", 9)
 					else:
-						popup_menu.add_item("Hide", 11)
+						popup_menu.add_item("Hide", 10)
 					if is_in_memory_slot():
 						var has_hidden = _has_hidden_cards_in_container()
 						var has_revealed = _has_revealed_cards_in_container()
 						if has_hidden:
-							popup_menu.add_item("Show All", 12)
+							popup_menu.add_item("Show All", 11)
 						if has_revealed:
-							popup_menu.add_item("Hide All", 13)
+							popup_menu.add_item("Hide All", 12)
+						popup_menu.add_item("Return All to Hand ", 15)
 				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
 					popup_menu.add_item("Banish Face Down", 1)
-					if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()) and not is_regalia_card():
-						popup_menu.add_item("Go to Top Deck", 2)
-						popup_menu.add_item("Go to Bottom Deck", 3)
+					if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
+						if is_regalia_card():
+							popup_menu.add_item("Return to Mat Deck", 20)
+						else:
+							popup_menu.add_item("Go to Top Deck", 2)
+							popup_menu.add_item("Go to Bottom Deck", 3)
 				if is_in_main_field():
 					if is_rotated:
 						popup_menu.add_item("Awake", 4)
@@ -312,12 +337,14 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						if current_field and current_field.name == "MAINFIELD":
 							if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
 								if "current_champion_card" in current_field and current_field.current_champion_card != null:
-									popup_menu.add_item("Move to Lineage", 14)
+									popup_menu.add_item("Move to Lineage", 13)
 					if not is_champion_card() and not is_token() and not is_mastery() and not is_status():
 						var opponent_field = get_tree().get_root().find_child("OpponentField", true, false)
 						if opponent_field:
-							popup_menu.add_item("Give Control", 15)
+							popup_menu.add_item("Give Control", 14)
 					var slug = get_slug_from_card()
+					if (slug.contains("imperial-seal") or slug.contains("apotheosis-rite") or slug.contains("sacramental-rite") or slug.contains("transcendental-rite")) and current_field and current_field.name == "MAINFIELD":
+						popup_menu.add_item("Activate", 21)
 					if is_transformable_card(slug) and not is_champion_card():
 						var target_slug = get_transform_target(slug)
 						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
@@ -400,12 +427,19 @@ func _reset_hold():
 func open_lineage_window():
 	if not lineage_view_window or not grid_container:
 		return
+	var current_update = Time.get_ticks_msec()
+	set_meta("update_id", current_update)
+	lineage_view_window.popup_centered()
 	var children = grid_container.get_children()
 	if children.size() > 0:
 		children[0].visible = false
 	for i in range(1, children.size()):
 		children[i].queue_free()
-	for lineage_data in champion_lineage:
+	var count = 0
+	for i in range(champion_lineage.size() - 1, -1, -1):
+		var lineage_data = champion_lineage[i]
+		if get_meta("update_id") != current_update:
+			return
 		var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
 		var card_display = card_display_scene.instantiate()
 		card_display.set_meta("slug", lineage_data.get("slug", ""))
@@ -414,7 +448,10 @@ func open_lineage_window():
 		if not card_display.card_held.is_connected(_on_lineage_card_held):
 			card_display.card_held.connect(_on_lineage_card_held)
 		grid_container.add_child(card_display)
-	lineage_view_window.popup_centered()
+		count += 1
+		if count >= 8:
+			count = 0
+			await get_tree().process_frame
 
 func _on_lineage_window_close():
 	if lineage_view_window:
@@ -450,19 +487,24 @@ func banish_lineage_card():
 	if banish_node == null:
 		return
 	var target_uuid = selected_lineage_card_uuid
-	if selected_lineage_card_slug.contains("prismatic-spirit"):
-		for entry in champion_lineage:
-			if entry.get("uuid", "") == target_uuid:
-				var chosen = entry.get("chosen_elements", [])
-				var scene_root = get_tree().current_scene
-				var elements = scene_root.find_child("Elements", true, false)
-				if elements:
-					for e_name in chosen:
-						var e_node = elements.get_node_or_null(e_name)
-						if e_node and e_node.has_method("deactivate"):
-							e_node.deactivate()
-				break
+	for entry in champion_lineage:
+		if entry.get("uuid", "") == target_uuid:
+			var scene_root = get_tree().current_scene
+			var elements = scene_root.find_child("Elements", true, false)
+			if elements:
+				if selected_lineage_card_slug.contains("prismatic-spirit"):
+					var chosen = entry.get("chosen_elements", [])
+					PrismaticSpiritEffect.remove_lineage_activation(elements, chosen, false)
+				var entry_element = entry.get("element", "")
+				if entry_element != "":
+					var cap_name = str(entry_element).capitalize()
+					var e_node = elements.get_node_or_null(cap_name)
+					if e_node and e_node.has_method("deactivate"):
+						e_node.deactivate()
+			break
 	remove_from_lineage_by_uuid(target_uuid)
+	if is_in_other_orientation(selected_lineage_card_slug):
+		selected_lineage_card_slug = get_transform_target(selected_lineage_card_slug)
 	var card_scene = load("res://Scenes/Card.tscn")
 	var new_card = card_scene.instantiate()
 	new_card.set_meta("slug", selected_lineage_card_slug)
@@ -509,10 +551,14 @@ func move_to_lineage():
 		return
 	var card_slug = get_slug_from_card()
 	var card_uuid = get_uuid()
+	var element_name = ""
+	if is_slug_champion(card_slug):
+		if card_information_reference and card_information_reference.has_method("get_card_element"):
+			element_name = card_information_reference.get_card_element(card_slug)
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		var chosen = chosen_elements if chosen_elements.size() > 0 else []
-		multiplayer_node.rpc("sync_move_to_lineage", multiplayer.get_unique_id(), champion.get_uuid(), card_uuid, card_slug, chosen)
+		multiplayer_node.rpc("sync_move_to_lineage", multiplayer.get_unique_id(), champion.get_uuid(), card_uuid, card_slug, chosen, element_name)
 	z_index = -1
 	var tween = create_tween()
 	tween.set_parallel(true)
@@ -520,9 +566,20 @@ func move_to_lineage():
 	tween.tween_property(self, "rotation_degrees", original_rotation, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.set_parallel(false)
 	tween.tween_callback(func():
-		var data = {"slug": card_slug, "uuid": card_uuid, "chosen_elements": chosen_elements if chosen_elements.size() > 0 else []}
+		var data = {"slug": card_slug, "uuid": card_uuid, "chosen_elements": chosen_elements if chosen_elements.size() > 0 else [], "element": element_name}
 		if champion.has_method("add_to_lineage"):
 			champion.add_to_lineage(data)
+		if is_slug_champion(card_slug) and (element_name != "" or (card_slug.contains("prismatic-spirit") and chosen_elements.size() > 0)):
+			var scene_root = get_tree().current_scene
+			var elements_node = scene_root.find_child("Elements", true, false)
+			if elements_node:
+				if element_name != "":
+					var cap_name = str(element_name).capitalize()
+					var e_node = elements_node.get_node_or_null(cap_name)
+					if e_node and e_node.has_method("activate"):
+						e_node.activate()
+				if card_slug.contains("prismatic-spirit"):
+					PrismaticSpiritEffect.apply_lineage_activation(elements_node, chosen_elements, false)
 		remove_from_current_position())
 
 func find_champion_on_field():
@@ -534,6 +591,30 @@ func find_champion_on_field():
 			return field.current_champion_card
 	return null
 
+func is_in_other_orientation(check_slug: String = "") -> bool:
+	var target_slug = check_slug
+	if target_slug == "":
+		target_slug = get_slug_from_card()
+	if not card_information_reference or not card_information_reference.card_database_reference:
+		return false
+	var db = card_information_reference.card_database_reference
+	if not db or not db.get("cards_db"):
+		return false
+	var data = db.cards_db.get(target_slug, {})
+	if data.has("parent_orientation_slug"):
+		return true
+	if data.has("edition_id"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], db)
+		if base_slug and db.cards_db.has(base_slug):
+			var base_data = db.cards_db[base_slug]
+			if base_data.has("parent_orientation_slug"):
+				return true
+	return false
+
+func revert_if_transformed():
+	if is_in_other_orientation():
+		transform_card()
+
 func transform_card():
 	var slug = get_slug_from_card()
 	var new_slug = get_transform_target(slug)
@@ -544,7 +625,7 @@ func transform_card():
 		set_marked(false)
 	_update_card_image(new_slug)
 	if current_field and current_field.has_method("notify_card_transformed"):
-		current_field.notify_card_transformed(self)
+		current_field.notify_card_transformed(self, slug)
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
 		multiplayer_node.rpc("sync_card_transform", multiplayer.get_unique_id(), get_uuid(), new_slug)
@@ -564,7 +645,9 @@ func transform_card():
 						add_to_lineage(entry)
 				var lineage_data = {
 					"slug": current_field.get_card_slug(previous),
-					"uuid": previous.uuid if "uuid" in previous else ""}
+					"uuid": previous.uuid if "uuid" in previous else "",
+					"chosen_elements": previous.chosen_elements if "chosen_elements" in previous else [],
+					"element": _get_element_for_slug(current_field.get_card_slug(previous))}
 				add_to_lineage(lineage_data)
 				current_field.remove_previous_champions()
 			current_field.current_champion_card = self
@@ -592,6 +675,11 @@ func remote_transform(new_slug: String):
 		show_card_info()
 		card_information_reference.show_card_preview(self)
 
+func _get_element_for_slug(slug: String) -> String:
+	if card_information_reference and card_information_reference.has_method("get_card_element"):
+		return card_information_reference.get_card_element(slug)
+	return ""
+
 func _update_card_image(card_slug: String):
 	var card_image_path = "res://Assets/Grand Archive/Card Images/" + card_slug + ".png"
 	var texture = null
@@ -609,15 +697,17 @@ func _update_card_image(card_slug: String):
 		$CardImage.z_index = 0
 
 func show_card_info():
+	if not mouse_inside:
+		return
 	if not card_information_reference:
 		return
 	var card_slug = get_slug_from_card()
 	if card_slug == "":
 		return
 	if card_level_lable:
-		card_level_lable.clear()
+		card_level_lable.text = ""
 	if card_PLDS_lable:
-		card_PLDS_lable.clear()
+		card_PLDS_lable.text = ""
 	var card_database = card_information_reference.card_database_reference
 	if not card_database or not card_database.cards_db.has(card_slug):
 		return
@@ -645,18 +735,23 @@ func show_card_info():
 				plds_text_to_display = _build_plds_text_effective(parent_data)
 	if level_to_display != null:
 		if is_in_main_field():
-			var lvl_eff = int(level_to_display) + int(runtime_modifiers.get("level", 0))
-			level_to_display = max(0, lvl_eff)
+			var temp_mods = runtime_modifiers
+			temp_mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(self, data, temp_mods)
+			var lvl_eff = int(level_to_display) + int(temp_mods.get("level", 0)) + attached_counters.get("Level", 0)
+			level_to_display = lvl_eff
+		else:
+			var lvl_eff = int(level_to_display) + attached_counters.get("Level", 0)
+			level_to_display = lvl_eff
 		if card_level_lable:
-			card_level_lable.append_text("[left][font_size=32]LV. %s[/font_size][/left]" % str(level_to_display))
+			card_level_lable.text = "LV. %s" % str(level_to_display)
 	if plds_text_to_display != "" and card_PLDS_lable:
-		card_PLDS_lable.append_text("[right][font_size=26]%s[/font_size][/right]" % plds_text_to_display)
+		card_PLDS_lable.text = plds_text_to_display
 
 func hide_card_info():
 	if card_level_lable:
-		card_level_lable.clear()
+		card_level_lable.text = ""
 	if card_PLDS_lable:
-		card_PLDS_lable.clear()
+		card_PLDS_lable.text = ""
 
 func _build_plds_text(data: Dictionary) -> String:
 	var parts: Array[String] = []
@@ -683,19 +778,24 @@ func _build_plds_text(data: Dictionary) -> String:
 func _build_plds_text_effective(data: Dictionary) -> String:
 	var parts: Array[String] = []
 	var mods = runtime_modifiers if is_in_main_field() else {"level": 0, "power": 0, "life": 0, "durability": 0}
+	mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(self, data, mods)
 	var buff_count = attached_counters.get("Buff", 0)
 	var debuff_count = attached_counters.get("Debuff", 0)
 	var counter_mod = buff_count - debuff_count
+	var pow_counter = attached_counters.get("Power", 0)
+	var dur_counter = attached_counters.get("Durability", 0)
 	if data.has("power") and data["power"] != null:
-		var value = int(data["power"]) + int(mods.get("power", 0)) + counter_mod
+		var value = int(data["power"]) + int(mods.get("power", 0)) + counter_mod + pow_counter
 		value = max(0, value)
 		parts.append("POW. %s" % str(value))
 	if data.has("life") and data["life"] != null:
-		var sec_val = int(data["life"]) + int(mods.get("life", 0)) + counter_mod
+		var life_count = attached_counters.get("Life", 0)
+		var damage_count = attached_counters.get("Damage", 0)
+		var sec_val = int(data["life"]) + int(mods.get("life", 0)) + counter_mod + (life_count - damage_count)
 		sec_val = max(0, sec_val)
 		parts.append("LIFE %s" % str(sec_val))
 	if data.has("durability") and data["durability"] != null:
-		var thirth_val = int(data["durability"]) + int(mods.get("durability", 0))
+		var thirth_val = int(data["durability"]) + int(mods.get("durability", 0)) + dur_counter
 		thirth_val = max(0, thirth_val)
 		parts.append("DUR. %s" % str(thirth_val))
 	if data.has("speed") and data["speed"] != null:
@@ -738,16 +838,24 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 		6: destroy_token()
 		7: destroy_mastery()
 		8: destroy_status()
-		10: reveal_to_opponent()
-		11: hide_from_opponent()
-		12: reveal_all_in_memory()
-		13: hide_all_in_memory()
-		14: move_to_lineage()
-		15: give_control_to_opponent()
-		20: set_direction("North")
-		21: set_direction("East")
-		22: set_direction("South")
-		23: set_direction("West")
+		9: reveal_to_opponent()
+		10: hide_from_opponent()
+		11: reveal_all_in_memory()
+		12: hide_all_in_memory()
+		13: move_to_lineage()
+		14: give_control_to_opponent()
+		15: return_all_memory_to_hand()
+		16: set_direction("North")
+		17: set_direction("East")
+		18: set_direction("South")
+		19: set_direction("West")
+		20: go_to_mat_deck()
+		21:
+			var s = get_slug_from_card()
+			if "imperial-seal" in s: ImperialSealEffect.activate_seal(self)
+			elif "apotheosis-rite" in s: ApotheosisRiteEffect.activate_rite(self)
+			elif "sacramental-rite" in s: SacramentalRiteEffect.activate_rite(self)
+			elif "transcendental-rite" in s: TranscendentalRiteEffect.activate_rite(self)
 
 func rotate_card():
 	if not is_in_main_field():
@@ -889,15 +997,11 @@ func apply_logo_status_to_self(logo_node):
 		var new_mod_pow = max(-base_pow, proposed_pow)
 		runtime_modifiers["power"] = new_mod_pow
 	if data.has("life") and data["life"] != null and logo_node.life_value != 0:
-		var base_life = int(data["life"]) 
-		var old_life = int(runtime_modifiers.get("life", 0))
-		var proposed_life = old_life + int(logo_node.life_value)
-		var new_mod_life = max(-base_life, proposed_life)
-		runtime_modifiers["life"] = new_mod_life
-		var applied_delta = new_mod_life - old_life
-		if applied_delta != 0 and current_field and current_field.has_method("is_champion_card") and current_field.is_champion_card(self):
-			if current_field.has_method("adjust_champion_life_delta"):
-				current_field.adjust_champion_life_delta(applied_delta)
+		var applied_delta = int(logo_node.life_value)
+		if applied_delta > 0:
+			attached_counters["Life"] = attached_counters.get("Life", 0) + applied_delta
+		elif applied_delta < 0:
+			attached_counters["Damage"] = attached_counters.get("Damage", 0) + abs(applied_delta)
 	if logo_node.custom_counters.size() > 0:
 		for counter_name in logo_node.custom_counters.keys():
 			var delta_val_count = int(logo_node.custom_counters[counter_name])
@@ -922,13 +1026,15 @@ func apply_logo_status_to_self(logo_node):
 			for key in attached_counters.keys():
 				if attached_counters[key] == 0:
 					keys_to_remove.append(key)
+				elif attached_counters[key] < 0 and (key == "Life" or key == "Damage"):
+					keys_to_remove.append(key)
 			for key in keys_to_remove:
 				attached_counters.erase(key)
 	logo_node.reset_all_status_values()
 	if card_level_lable:
-		card_level_lable.clear()
+		card_level_lable.text = ""
 	if card_PLDS_lable:
-		card_PLDS_lable.clear()
+		card_PLDS_lable.text = ""
 	show_card_info()
 	if card_information_reference and mouse_inside and not is_dragging:
 		card_information_reference.show_card_preview(self)
@@ -946,10 +1052,15 @@ func apply_champion_life_delta(delta):
 		var new_mod_life = max(-base_life, int(delta))
 		runtime_modifiers["life"] = new_mod_life
 		if card_level_lable:
-			card_level_lable.clear()
+			card_level_lable.text = ""
 		if card_PLDS_lable:
-			card_PLDS_lable.clear()
+			card_PLDS_lable.text = ""
 		sync_stats_to_opponent()
+
+func add_damage_counters(amount: int):
+	attached_counters["Damage"] = attached_counters.get("Damage", 0) + amount
+	show_card_info()
+	sync_stats_to_opponent()
 
 func can_be_marked() -> bool:
 	var parent = current_field if current_field else get_parent()
@@ -970,18 +1081,43 @@ func set_marked(value: bool):
 		var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 		if multiplayer_node and multiplayer_node.has_method("rpc"):
 			multiplayer_node.rpc("sync_set_card_marked", multiplayer.get_unique_id(), get_uuid(), is_marked)
+	if is_marked:
+		get_tree().create_timer(0.3).timeout.connect(func():
+			if is_marked:
+				set_marked(false))
 
 func update_visuals_based_on_mark():
+	if mark_tween and mark_tween.is_valid():
+		mark_tween.kill()
+
 	if is_marked:
-		modulate = Color(0.5, 0.5, 1.5, 0.9)
+		if has_node("ShadowPanel"):
+			if not $ShadowPanel.visible:
+				$ShadowPanel.modulate = Color(0.5, 0.5, 1.5, 0.0)
+				$ShadowPanel.visible = true
+			else:
+				$ShadowPanel.modulate = Color(0.5, 0.5, 1.5, $ShadowPanel.modulate.a)
+			mark_tween = create_tween()
+			mark_tween.tween_property($ShadowPanel, "modulate:a", 0.9, 0.2)
 	else:
-		modulate = Color(1, 1, 1, 1)
+		if has_node("ShadowPanel") and $ShadowPanel.visible:
+			mark_tween = create_tween()
+			mark_tween.tween_property($ShadowPanel, "modulate:a", 0.0, 0.4)
+			mark_tween.tween_callback(func(): $ShadowPanel.visible = false)
 		sync_stats_to_opponent()
 
 func is_in_banish() -> bool:
 	return current_field != null and current_field.is_in_group("rotated_slots")
 
 func go_to_banish_face_down():
+	go_to_banish(true)
+
+func go_to_banish_face_up():
+	go_to_banish(false)
+
+func go_to_banish(is_face_down: bool = true):
+	if is_in_main_field():
+		revert_if_transformed()
 	var scene = get_tree().get_current_scene()
 	if scene == null:
 		return
@@ -989,7 +1125,7 @@ func go_to_banish_face_down():
 	if banish_node == null:
 		return
 	if original_owner_id != 0 and original_owner_id != multiplayer.get_unique_id():
-		_return_to_original_owner_banish()
+		_return_to_original_owner_banish(is_face_down)
 		return
 	var player_hand_node = scene.find_child("PlayerHand", true, false)
 	if player_hand_node and player_hand_node.has_method("remove_card_from_hand"):
@@ -1002,19 +1138,19 @@ func go_to_banish_face_down():
 		elif current_field.has_method("remove_card_from_slot"):
 			current_field.remove_card_from_slot(self)
 	if banish_node.has_method("add_card_to_slot"):
-		banish_node.add_card_to_slot(self, true)
+		banish_node.add_card_to_slot(self, is_face_down)
 	var multiplayer_node = get_tree().get_root().get_node("Main")
 	if multiplayer_node:
 		var slug = get_slug_from_card()
 		if slug != "":
-			multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), get_uuid(), slug, true)
+			multiplayer_node.rpc("sync_move_to_banish", multiplayer.get_unique_id(), get_uuid(), slug, is_face_down)
 
-func _return_to_original_owner_banish():
+func _return_to_original_owner_banish(is_face_down: bool = true):
 	var scene = get_tree().get_current_scene()
 	if not scene: return
 	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
 	if multiplayer_node and multiplayer_node.has_method("rpc"):
-		multiplayer_node.rpc("sync_return_to_owner_banish", original_owner_id, get_uuid(), get_slug_from_card(), true)
+		multiplayer_node.rpc("sync_return_to_owner_banish", original_owner_id, get_uuid(), get_slug_from_card(), is_face_down)
 	var opp_field = scene.find_child("OpponentField", true, false)
 	var target_pos = global_position
 	if opp_field:
@@ -1027,22 +1163,23 @@ func _return_to_original_owner_banish():
 	var anim_player = get_node_or_null("AnimationPlayer")
 	var front = get_node_or_null("CardImage")
 	var back = get_node_or_null("CardImageBack")
-	if anim_player and anim_player.has_animation("card_flip"):
-		anim_player.play("card_flip")
-		var timer = get_tree().create_timer(0.1)
-		timer.timeout.connect(func():
+	if is_face_down:
+		if anim_player and anim_player.has_animation("card_flip"):
+			anim_player.play("card_flip")
+			var timer = get_tree().create_timer(0.1)
+			timer.timeout.connect(func():
+				if front: front.visible = false
+				if back: back.visible = true)
+		else:
 			if front: front.visible = false
-			if back: back.visible = true)
-	else:
-		if front: front.visible = false
-		if back: back.visible = true
+			if back: back.visible = true
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(self, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "rotation_degrees", -90.0, 0.5)
 	tween.set_parallel(false)
 	tween.tween_callback(func():
-		_convert_to_opponent_banish_visuals(target_pos, true))
+		_convert_to_opponent_banish_visuals(target_pos, is_face_down))
 
 func _convert_to_opponent_banish_visuals(final_pos, face_down):
 	var scene = get_tree().get_current_scene()
@@ -1108,6 +1245,8 @@ func remove_from_current_position():
 	queue_free()
 
 func go_to_top_deck():
+	if is_in_main_field():
+		revert_if_transformed()
 	var slug = get_slug_from_card()
 	if slug == "":
 		return
@@ -1120,6 +1259,8 @@ func go_to_top_deck():
 		animate_card_to_deck(deck_node.global_position, slug, uuid, true)
 
 func go_to_bottom_deck():
+	if is_in_main_field():
+		revert_if_transformed()
 	var slug = get_slug_from_card()
 	if slug == "":
 		return
@@ -1130,6 +1271,47 @@ func go_to_bottom_deck():
 	var deck_node = deck_nodes[0]
 	if deck_node.has_method("add_to_bottom"):
 		animate_card_to_deck(deck_node.global_position, slug, uuid, false)
+
+func go_to_mat_deck():
+	if is_in_main_field():
+		revert_if_transformed()
+	var slug = get_slug_from_card()
+	if slug == "":
+		return
+	_prepare_for_deck_move()
+	var mat_deck_nodes = get_tree().get_nodes_in_group("mat_deck_zones")
+	if mat_deck_nodes.size() == 0:
+		return
+	var mat_deck_node = mat_deck_nodes[0]
+	if mat_deck_node.has_method("add_to_top"):
+		animate_card_to_mat_deck(mat_deck_node.global_position, slug, uuid)
+
+func animate_card_to_mat_deck(deck_position: Vector2, slug: String, card_uuid: String):
+	if $Area2D.input_event.is_connected(_on_area_2d_input_event):
+		$Area2D.input_event.disconnect(_on_area_2d_input_event)
+	$Area2D.set_deferred("monitoring", false)
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_move_to_mat_deck", multiplayer.get_unique_id(), card_uuid, true)
+	z_index = 2
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "global_position", deck_position, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "rotation_degrees", 0.0, 0.3)
+	tween.tween_property(self, "scale", Vector2(0.3, 0.3), 0.4)
+	tween.set_parallel(false)
+	var mid_timer = get_tree().create_timer(0.2)
+	mid_timer.timeout.connect(func(): $CardImage.texture = load("res://Assets/Textures/ga_back.png"))
+	await tween.finished
+	_on_mat_deck_animation_completed(slug, card_uuid)
+
+func _on_mat_deck_animation_completed(slug: String, card_uuid: String):
+	var mat_deck_nodes = get_tree().get_nodes_in_group("mat_deck_zones")
+	if mat_deck_nodes.size() > 0:
+		var mat_deck_node = mat_deck_nodes[0]
+		if mat_deck_node.has_method("add_to_top"):
+			mat_deck_node.add_to_top(slug, card_uuid)
+	queue_free()
 
 func _prepare_for_deck_move():
 	for tween in get_tree().get_processed_tweens():
@@ -1297,6 +1479,35 @@ func hide_all_in_memory():
 				card.is_publicly_revealed = false
 				card._update_local_card_visuals(false)
 		sync_all_reveal_state(false)
+
+func return_all_memory_to_hand():
+	var memory_slot = find_parent_container()
+	if not memory_slot:
+		return
+	var cards_to_return = memory_slot.cards_in_slot.duplicate()
+	var player_hand = get_tree().get_root().find_child("PlayerHand", true, false)
+	if not player_hand:
+		return
+	_process_return_queue(cards_to_return, memory_slot, player_hand)
+
+func _process_return_queue(cards_to_return: Array, memory_slot: Node, player_hand: Node):
+	for card in cards_to_return:
+		if not is_instance_valid(card):
+			continue
+		if memory_slot.has_method("remove_card_from_memory"):
+			memory_slot.remove_card_from_memory(card)
+		if player_hand.has_method("return_card_to_hand"):
+			player_hand.return_card_to_hand(card)
+		if "is_publicly_revealed" in card:
+			card.is_publicly_revealed = false
+		if card.has_method("_update_local_card_visuals"):
+			card._update_local_card_visuals(false)
+		elif memory_slot.has_method("show_card_back"):
+			memory_slot.show_card_back(card)
+		if player_hand.has_signal("animation_finished"):
+			await player_hand.animation_finished
+		else:
+			await get_tree().create_timer(0.3).timeout
 
 func find_parent_container():
 	var parent = get_parent()

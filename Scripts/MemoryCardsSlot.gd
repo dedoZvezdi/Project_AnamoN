@@ -344,11 +344,19 @@ func _highlight_card_at_index(index: int):
 	for i in range(cards_in_slot.size()):
 		var card = cards_in_slot[i]
 		if card and is_instance_valid(card):
-			card.modulate = Color(1, 1, 1, 1)
+			if card.has_node("ShadowPanel"):
+				if "mark_tween" in card and card.mark_tween and card.mark_tween.is_valid():
+					card.mark_tween.kill()
+				card.get_node("ShadowPanel").visible = false
 	if index >= 0 and index < cards_in_slot.size():
 		var card = cards_in_slot[index]
 		if card and is_instance_valid(card):
-			card.modulate = Color(0.7, 1.3, 0.7, 1)
+			if card.has_node("ShadowPanel"):
+				if "mark_tween" in card and card.mark_tween and card.mark_tween.is_valid():
+					card.mark_tween.kill()
+				var shadow = card.get_node("ShadowPanel")
+				shadow.visible = true
+				shadow.modulate = Color(0.7, 1.3, 0.7, 1)
 
 func _clear_current_highlight():
 	for i in range(cards_in_slot.size()):
@@ -356,8 +364,6 @@ func _clear_current_highlight():
 		if card and is_instance_valid(card):
 			if card.has_method("update_visuals_based_on_mark"):
 				card.update_visuals_based_on_mark()
-			else:
-				card.modulate = Color(1, 1, 1, 1)
 
 func reset_card_colors():
 	_clear_current_highlight()

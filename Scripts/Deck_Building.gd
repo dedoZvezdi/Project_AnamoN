@@ -33,6 +33,12 @@ extends Control
 @onready var delete_button = $DeckPanel/DeleteButton
 @onready var save_button = $DeckPanel/SaveButton
 @onready var save_as_button = $DeckPanel/SaveAsButton
+@onready var restore_button = $RestoreButton
+@onready var ok_button = $OkButton
+@onready var deck_panel = $DeckPanel
+@onready var search_panel = $SearchPanel
+@onready var results_area = $ResultsArea
+@onready var score_label = $ScoreLabel
 
 const SAVE_PATH = "user://deck_builder_prefs.cfg"
 const MAIN_NAME_LIMIT := 4
@@ -43,6 +49,10 @@ var _drag_slug := ""
 var _drag_source_zone := ""
 var _drag_was_dropped := false
 var _drag_original_index: int = -1
+var _sideboard_mode = false
+var _sideboard_original_decks = {}
+var _sideboard_callback: Callable
+var _is_ready_waiting = false
 var _deck_version: int = 0
 var _can_accept_cache: Dictionary = {}
 var _decks_dir_path: String = ""
@@ -50,6 +60,8 @@ var _available_decks: Dictionary = {}
 var _current_deck_filename: String = ""
 var _last_deck_filename: String = ""
 var _delete_confirm_dialog: ConfirmationDialog = null
+var _deck_saved_tween: Tween
+var _deck_saved_label: Label
 
 func _increment_deck_version():
 	_deck_version += 1
@@ -88,73 +100,38 @@ func _ready():
 		legality_option.add_item("PANTHEON")
 		legality_option.selected = _last_legality_idx
 		legality_option.item_selected.connect(_on_legality_selected)
-	var db = card_info.card_database_reference
 	if element_option:
 		element_option.add_item("Any")
-		if db and db.cards_db:
-			var elements_set = {}
-			for key in db.cards_db:
-				var card_data = db.cards_db[key]
-				if card_data.has("element") and card_data["element"] != null:
-					var element = str(card_data["element"]).strip_edges()
-					if element != "" and element != "null":
-						elements_set[element] = true
-			var elements_list = elements_set.keys()
-			elements_list.sort()
-			for element in elements_list:
+	if type_option:
+		type_option.add_item("Any")
+	if subtype_option:
+		subtype_option.add_item("Any")
+	if class_option:
+		class_option.add_item("Any")
+	if Engine.has_meta("DeckBuilderFilters"):
+		var filters = Engine.get_meta("DeckBuilderFilters")
+		if element_option and filters.has("elements"):
+			for element in filters["elements"]:
 				element_option.add_item(element)
+		if type_option and filters.has("types"):
+			for type in filters["types"]:
+				type_option.add_item(type)
+		if subtype_option and filters.has("subtypes"):
+			for subtype in filters["subtypes"]:
+				subtype_option.add_item(subtype)
+		if class_option and filters.has("classes"):
+			for classes in filters["classes"]:
+				class_option.add_item(classes)
+	if element_option:
 		element_option.selected = 0
 		element_option.get_popup().max_size = Vector2i(1000, 165)
 	if type_option:
-		type_option.add_item("Any")
-		if db and db.cards_db:
-			var types_set = {}
-			for key in db.cards_db:
-				var card_data = db.cards_db[key]
-				if card_data.has("types") and card_data["types"] is Array:
-					for type in card_data["types"]:
-						var type_str = str(type).strip_edges()
-						var type_upper = type_str.to_upper()
-						if type_str != "" and type_str != "null" and type_upper != "TOKEN" and type_upper != "MASTERY" and type_upper != "STATUS":
-							types_set[type_str] = true
-			var types_list = types_set.keys()
-			types_list.sort()
-			for type in types_list:
-				type_option.add_item(type)
 		type_option.selected = 0
 		type_option.get_popup().max_size = Vector2i(1000, 165)
 	if subtype_option:
-		subtype_option.add_item("Any")
-		if db and db.cards_db:
-			var subtypes_set = {}
-			for key in db.cards_db:
-				var card_data = db.cards_db[key]
-				if card_data.has("subtypes") and card_data["subtypes"] is Array:
-					for subtype in card_data["subtypes"]:
-						var sub_str = str(subtype).strip_edges()
-						if sub_str != "" and sub_str != "null":
-							subtypes_set[sub_str] = true
-			var subtypes_list = subtypes_set.keys()
-			subtypes_list.sort()
-			for subtype in subtypes_list:
-				subtype_option.add_item(subtype)
 		subtype_option.selected = 0
 		subtype_option.get_popup().max_size = Vector2i(1000, 165)
 	if class_option:
-		class_option.add_item("Any")
-		if db and db.cards_db:
-			var classes_set = {}
-			for key in db.cards_db:
-				var card_data = db.cards_db[key]
-				if card_data.has("classes") and card_data["classes"] is Array:
-					for classes in card_data["classes"]:
-						var class_str = str(classes).strip_edges()
-						if class_str != "" and class_str != "null":
-							classes_set[class_str] = true
-			var classes_list = classes_set.keys()
-			classes_list.sort()
-			for classes in classes_list:
-				class_option.add_item(classes)
 		class_option.selected = 0
 		class_option.get_popup().max_size = Vector2i(1000, 165)
 	if cost_mem_edit:
@@ -169,6 +146,8 @@ func _ready():
 		life_edit.text_changed.connect(_on_digits_only_changed.bind(life_edit))
 	if power_edit:
 		power_edit.text_changed.connect(_on_digits_only_changed.bind(power_edit))
+	if score_label:
+		score_label.visible = false
 	if search_line_edit:
 		search_line_edit.gui_input.connect(_on_field_gui_input)
 	if cost_mem_edit:
@@ -199,6 +178,10 @@ func _ready():
 		save_as_button.pressed.connect(_on_save_as_pressed)
 	if delete_button:
 		delete_button.pressed.connect(_on_delete_pressed)
+	if restore_button:
+		restore_button.pressed.connect(_on_restore_pressed)
+	if ok_button:
+		ok_button.pressed.connect(_on_ok_pressed)
 	if deck_option_button:
 		deck_option_button.item_selected.connect(_on_deck_selected)
 		deck_option_button.pressed.connect(_on_deck_option_pressed)
@@ -336,6 +319,11 @@ func _count_card_name_in_zones(card_name: String, zones: Array) -> int:
 	return count
 
 func can_add_card_to_zone(slug: String, target_zone: String) -> bool:
+	if _sideboard_mode:
+		if target_zone == "side_deck":
+			return true
+		var correct_deck = determine_deck_for_slug(slug)
+		return target_zone == correct_deck
 	var legality = _get_selected_legality()
 	if legality != "N/A":
 		if legality == "STANDARD":
@@ -594,6 +582,8 @@ func _on_clear_search_pressed():
 		class_option.selected = 0
 
 func _on_exit_pressed():
+	if _sideboard_mode:
+		return
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 func _get_base_card_data(slug: String) -> Dictionary:
@@ -682,6 +672,30 @@ func update_all_labels():
 				greater_count += 1
 		pantheon_deck_label.text = "L/G Boon (" + str(lesser_count) + "/" + str(greater_count) + ")"
 	_refresh_name_limit_visuals()
+	if _sideboard_mode:
+		_check_sideboard_validity()
+
+func _check_sideboard_validity():
+	var format_name = _get_selected_legality()
+	if format_name == "N/A":
+		if ok_button:
+			ok_button.disabled = false
+		return
+	var main_slugs = []
+	var mat_slugs = []
+	var side_slugs = []
+	var pantheon_slugs = []
+	if main_deck_grid:
+		main_slugs = _get_slugs_from_grid(main_deck_grid).filter(func(s): return s != "")
+	if mat_deck_grid:
+		mat_slugs = _get_slugs_from_grid(mat_deck_grid).filter(func(s): return s != "")
+	if side_deck_grid:
+		side_slugs = _get_slugs_from_grid(side_deck_grid).filter(func(s): return s != "")
+	if pantheon_deck_grid:
+		pantheon_slugs = _get_slugs_from_grid(pantheon_deck_grid).filter(func(s): return s != "")
+	var is_valid = _is_legal_format(format_name, main_slugs, mat_slugs, side_slugs, pantheon_slugs)
+	if ok_button:
+		ok_button.disabled = not is_valid
 
 func handle_right_click(card_display):
 	var zone = ""
@@ -692,6 +706,8 @@ func handle_right_click(card_display):
 		if card_display.has_meta("slug"):
 			slug = card_display.get_meta("slug")
 	if slug == "":
+		return
+	if _sideboard_mode:
 		return
 	if zone == "deck_building_results":
 		_add_card_to_correct_deck_right_click(slug)
@@ -751,6 +767,22 @@ func can_accept_in_grid(slug: String, source_zone: String, target_grid_type: Str
 	if _can_accept_cache.has(cache_key):
 		return _can_accept_cache[cache_key]
 	var result = false
+	if _sideboard_mode:
+		if source_zone == "deck_building_results" or target_grid_type == "deck_building_results":
+			_can_accept_cache[cache_key] = false
+			return false
+		if source_zone == target_grid_type:
+			_can_accept_cache[cache_key] = true
+			return true
+		var correct_deck = determine_deck_for_slug(slug)
+		if target_grid_type == "side_deck":
+			result = not _is_boon(slug) or can_add_card_to_zone(slug, "side_deck")
+		elif target_grid_type == correct_deck:
+			result = can_add_card_to_zone(slug, target_grid_type)
+		else:
+			result = false
+		_can_accept_cache[cache_key] = result
+		return result
 	if source_zone == "deck_building_results" and target_grid_type == "deck_building_results":
 		result = false
 	elif source_zone != "deck_building_results" and target_grid_type == "deck_building_results":
@@ -868,6 +900,12 @@ func _remove_card_from_zone(slug: String, zone: String, index: int = -1):
 				side_deck_grid.remove_card(slug)
 	update_all_labels()
 
+func is_drag_active() -> bool:
+	return _drag_slug != ""
+
+func is_ready_waiting() -> bool:
+	return _is_ready_waiting
+
 func _add_card_back_to_zone(slug: String, zone: String, original_index: int = -1):
 	var grid = _get_grid_for_type(zone)
 	if grid:
@@ -882,6 +920,8 @@ func _add_card_back_to_zone(slug: String, zone: String, original_index: int = -1
 		update_all_labels()
 
 func handle_drop_on_results(_slug: String, _source_zone: String, _card_display):
+	if _sideboard_mode:
+		return
 	register_drag_drop()
 	update_all_labels()
 
@@ -1052,16 +1092,7 @@ func _on_search_pressed():
 		results_grid.set_data(slugs_to_show)
 
 func _init_decks_dir():
-	if OS.has_feature("standalone"):
-		_decks_dir_path = OS.get_executable_path().get_base_dir().path_join("Decks")
-	else:
-		_decks_dir_path = "res://Decks"
-	var dir = DirAccess.open(_decks_dir_path)
-	if not dir:
-		DirAccess.make_dir_absolute(_decks_dir_path)
-
-var _deck_saved_tween: Tween
-var _deck_saved_label: Label
+	_decks_dir_path = GamePaths.ensure_decks_dir_exists()
 
 func _create_deck_saved_label():
 	_deck_saved_label = Label.new()
@@ -1070,7 +1101,7 @@ func _create_deck_saved_label():
 	_deck_saved_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_deck_saved_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_deck_saved_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_deck_saved_label.position = Vector2(-50, 200)
+	_deck_saved_label.position = Vector2(-50, 203)
 	_deck_saved_label.size = Vector2(100, 30)
 	_deck_saved_label.modulate.a = 0.0
 	add_child(_deck_saved_label)
@@ -1228,8 +1259,7 @@ func _save_current_deck_state(deck_name: String, file_name: String):
 		"main_deck": _get_slugs_from_grid(main_deck_grid),
 		"mat_deck": _get_slugs_from_grid(mat_deck_grid),
 		"side_deck": _get_slugs_from_grid(side_deck_grid),
-		"pantheon_deck": _get_slugs_from_grid(pantheon_deck_grid)
-	}
+		"pantheon_deck": _get_slugs_from_grid(pantheon_deck_grid)}
 	var file = FileAccess.open(_decks_dir_path.path_join(file_name), FileAccess.WRITE)
 	if file:
 		file.store_string(JSON.stringify(data, "\t"))
@@ -1343,3 +1373,84 @@ func _is_legal_format(format_name: String, main_slugs: Array, mat_slugs: Array, 
 		if lesser_count != 1 or greater_count != 1: return false
 		return true
 	return false
+
+func enter_sideboard_mode(deck_data: Dictionary, callback: Callable = Callable(), score_text: String = ""):
+	_sideboard_mode = true
+	_is_ready_waiting = false
+	_sideboard_callback = callback
+	_sideboard_original_decks = deck_data.duplicate(true)
+	if deck_panel:
+		deck_panel.visible = false
+	if search_panel:
+		search_panel.visible = false
+	if results_area:
+		results_area.visible = false
+	if restore_button:
+		restore_button.visible = true
+		restore_button.disabled = false
+	if ok_button:
+		ok_button.visible = true
+		ok_button.disabled = false
+		ok_button.text = "READY"
+	if score_label:
+		score_label.visible = true
+		score_label.text = score_text
+	_load_sideboard_decks(deck_data)
+
+func _load_sideboard_decks(deck_data: Dictionary):
+	if main_deck_grid:
+		main_deck_grid.clear_cards()
+	if mat_deck_grid:
+		mat_deck_grid.clear_cards()
+	if side_deck_grid:
+		side_deck_grid.clear_cards()
+	if pantheon_deck_grid:
+		pantheon_deck_grid.clear_cards()
+	if main_deck_grid and deck_data.has("main_deck"):
+		for slug in deck_data["main_deck"]:
+			main_deck_grid.card_slugs.append(str(slug))
+		main_deck_grid._rebuild_grid()
+	if mat_deck_grid and deck_data.has("mat_deck"):
+		for slug in deck_data["mat_deck"]:
+			mat_deck_grid.card_slugs.append(str(slug))
+		mat_deck_grid._rebuild_grid()
+	if side_deck_grid and deck_data.has("side_deck"):
+		for slug in deck_data["side_deck"]:
+			side_deck_grid.card_slugs.append(str(slug))
+		side_deck_grid._rebuild_grid()
+	if pantheon_deck_grid and deck_data.has("pantheon_deck"):
+		for slug in deck_data["pantheon_deck"]:
+			pantheon_deck_grid.card_slugs.append(str(slug))
+		pantheon_deck_grid._rebuild_grid()
+	_increment_deck_version()
+	update_all_labels()
+
+func _on_restore_pressed():
+	if not _sideboard_mode:
+		return
+	_load_sideboard_decks(_sideboard_original_decks)
+	if ok_button:
+		ok_button.disabled = false
+		ok_button.text = "READY"
+	if restore_button:
+		restore_button.disabled = false
+
+func _on_ok_pressed():
+	if not _sideboard_mode:
+		return
+	if ok_button:
+		ok_button.text = "Waiting..."
+		ok_button.disabled = true
+	if restore_button:
+		restore_button.disabled = true
+	_is_ready_waiting = true
+	var current_decks = get_current_deck_data()
+	if _sideboard_callback.is_valid():
+		_sideboard_callback.call(current_decks)
+
+func get_current_deck_data() -> Dictionary:
+	return {
+		"main_deck": _get_slugs_from_grid(main_deck_grid),
+		"mat_deck": _get_slugs_from_grid(mat_deck_grid),
+		"side_deck": _get_slugs_from_grid(side_deck_grid),
+		"pantheon_deck": _get_slugs_from_grid(pantheon_deck_grid),}

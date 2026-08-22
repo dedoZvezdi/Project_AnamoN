@@ -2,9 +2,36 @@
 
 [ext_resource type="Script" uid="uid://bkfty1dvgnjap" path="res://Scripts/CardDisplay.gd" id="1_bcrn8"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cryd5"]
+bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aitk2"]
+bg_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_daewq"]
+bg_color = Color(0.70980394, 0.5882353, 0.36078432, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_soh7w"]
+HScrollBar/styles/grabber = SubResource("StyleBoxFlat_cryd5")
+HScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_aitk2")
+HScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_daewq")
+
 [node name="Control" type="Control" unique_id=826484056]
 layout_mode = 3
 anchors_preset = 0
+theme = SubResource("Theme_soh7w")
 script = ExtResource("1_bcrn8")
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=166904591]

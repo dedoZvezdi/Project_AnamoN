@@ -4,6 +4,17 @@
 [ext_resource type="Texture2D" uid="uid://yaxuiipbxmdg" path="res://Assets/Textures/ga_back.png" id="2_3p273"]
 [ext_resource type="PackedScene" uid="uid://bjmf6g1notrh7" path="res://Scenes/CardDisplay.tscn" id="4_3m7nw"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_md12f"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 20
+shadow_color = Color(1, 1, 1, 1)
+shadow_size = 40
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hael8"]
 size = Vector2(246, 344)
 
@@ -115,6 +126,25 @@ _data = {
 &"card_flip": SubResource("Animation_3p273")
 }
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_im3kg"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2hqs"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="Card" type="Node2D" unique_id=2014991079]
 z_index = -2
 texture_filter = 2
@@ -131,17 +161,28 @@ z_index = -1
 scale = Vector2(0.492, 0.492)
 texture = ExtResource("2_3p273")
 
-[node name="Level" type="RichTextLabel" parent="." unique_id=295471188]
-offset_left = -219.231
-offset_top = -171.795
-offset_right = -75.2307
-offset_bottom = -117.795
+[node name="ShadowPanel" type="Panel" parent="." unique_id=409340650]
+visible = false
+offset_left = -124.285645
+offset_top = -171.42847
+offset_right = 124.285645
+offset_bottom = 171.42847
+theme_override_styles/panel = SubResource("StyleBoxFlat_md12f")
 
-[node name="PowerLifeDurSpeed" type="RichTextLabel" parent="." unique_id=748832410]
-offset_left = -122.0
-offset_top = 172.0
-offset_right = 122.0
-offset_bottom = 228.0
+[node name="Level" type="Label" parent="." unique_id=295471188]
+offset_left = -230.65948
+offset_top = -171.79498
+offset_right = -86.65918
+offset_bottom = -117.79498
+theme_override_font_sizes/font_size = 32
+vertical_alignment = 1
+
+[node name="PowerLifeDurSpeed" type="Label" parent="." unique_id=748832410]
+offset_left = -180.0
+offset_top = 163.42847
+offset_right = 180.0
+offset_bottom = 219.42847
+theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -155,6 +196,11 @@ libraries/ = SubResource("AnimationLibrary_h8wm0")
 
 [node name="PopupMenu" type="PopupMenu" parent="." unique_id=1128451788]
 size = Vector2i(100, 50)
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_disabled_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_im3kg")
+theme_override_styles/hover = SubResource("StyleBoxFlat_g2hqs")
 
 [node name="LineageViewWindow" type="Window" parent="." unique_id=2048281838]
 auto_translate_mode = 1
