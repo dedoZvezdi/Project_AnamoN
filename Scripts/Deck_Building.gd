@@ -39,12 +39,14 @@ extends Control
 @onready var search_panel = $SearchPanel
 @onready var results_area = $ResultsArea
 @onready var score_label = $ScoreLabel
+@onready var unique_checkbox = $ResultsArea/ResultsHeader/CheckBox
 
 const SAVE_PATH = "user://deck_builder_prefs.cfg"
 const MAIN_NAME_LIMIT := 4
 const MAT_NAME_LIMIT := 1
 
 var _last_legality_idx: int = 0
+var _unique_cards_only: bool = true
 var _drag_slug := ""
 var _drag_source_zone := ""
 var _drag_was_dropped := false
@@ -68,6 +70,10 @@ func _increment_deck_version():
 	_can_accept_cache.clear()
 
 func _ready():
+	if _sideboard_mode:
+		DiscordManager.update_status("Side Decking", "Adjusting Deck in Match")
+	else:
+		DiscordManager.update_status("In Deck Builder", "Building a Deck")
 	if main_deck_grid:
 		main_deck_grid.grid_type = "main_deck"
 		main_deck_grid.max_columns = 15
@@ -150,6 +156,7 @@ func _ready():
 		score_label.visible = false
 	if search_line_edit:
 		search_line_edit.gui_input.connect(_on_field_gui_input)
+		search_line_edit.text_changed.connect(func(_text): _on_search_pressed())
 	if cost_mem_edit:
 		cost_mem_edit.gui_input.connect(_on_field_gui_input)
 	if cost_res_edit:
@@ -196,6 +203,18 @@ func _ready():
 				deck_option_button.selected = i
 				_on_deck_selected(i)
 				break
+	if unique_checkbox:
+		unique_checkbox.button_pressed = _unique_cards_only
+		unique_checkbox.toggled.connect(_on_unique_checkbox_toggled)
+	var drop_script = load("res://Scripts/ResultsDropArea.gd")
+	if results_area:
+		results_area.set_script(drop_script)
+		var results_content = results_area.get_node_or_null("ResultsContent")
+		if results_content:
+			results_content.set_script(drop_script)
+			var scroll = results_content.get_node_or_null("ScrollContainer")
+			if scroll:
+				scroll.set_script(drop_script)
 	update_all_labels()
 
 func _load_prefs():
@@ -203,15 +222,23 @@ func _load_prefs():
 	if config.load(SAVE_PATH) == OK:
 		_last_legality_idx = config.get_value("filters", "legality_idx", 0)
 		_last_deck_filename = config.get_value("filters", "last_deck_filename", "")
+		_unique_cards_only = config.get_value("filters", "unique_cards_only", true)
 	else:
 		_last_legality_idx = 0
 		_last_deck_filename = ""
+		_unique_cards_only = true
 
 func _save_prefs():
 	var config = ConfigFile.new()
 	config.set_value("filters", "legality_idx", _last_legality_idx)
 	config.set_value("filters", "last_deck_filename", _current_deck_filename)
+	config.set_value("filters", "unique_cards_only", _unique_cards_only)
 	config.save(SAVE_PATH)
+
+func _on_unique_checkbox_toggled(button_pressed: bool):
+	_unique_cards_only = button_pressed
+	_save_prefs()
+	_on_search_pressed()
 
 func _strip_non_digits(text: String) -> String:
 	var result = ""
@@ -757,10 +784,30 @@ func _add_card_to_correct_deck_right_click(slug: String):
 	elif _has_cost_memory(slug):
 		if can_add_card_to_zone(slug, "mat_deck"):
 			mat_deck_grid.add_card(slug)
+		elif can_add_card_to_zone(slug, "side_deck"):
+			side_deck_grid.add_card(slug)
 	elif can_add_card_to_zone(slug, "main_deck"):
 		main_deck_grid.add_card(slug)
+	elif can_add_card_to_zone(slug, "side_deck"):
+		side_deck_grid.add_card(slug)
 	_increment_deck_version()
 	update_all_labels()
+
+func request_add_copy_from_hold(slug: String, source_zone: String):
+	if source_zone == "deck_building_results":
+		return
+	if can_add_card_to_zone(slug, source_zone):
+		var grid = _get_grid_for_type(source_zone)
+		if grid:
+			grid.add_card(slug)
+			if source_zone == "pantheon_deck":
+				_reorder_pantheon()
+			_increment_deck_version()
+			update_all_labels()
+	elif source_zone != "side_deck" and can_add_card_to_zone(slug, "side_deck"):
+		side_deck_grid.add_card(slug)
+		_increment_deck_version()
+		update_all_labels()
 
 func can_accept_in_grid(slug: String, source_zone: String, target_grid_type: String) -> bool:
 	var cache_key = slug + "|" + source_zone + "|" + target_grid_type
@@ -1008,7 +1055,8 @@ func _on_search_pressed():
 						break
 			if is_valid and search_text != "":
 				var card_name = str(card_data.get("name", "")).to_lower()
-				if not card_name.contains(search_text):
+				var card_effect = str(card_data.get("effect_raw", "")).to_lower()
+				if not card_name.contains(search_text) and not card_effect.contains(search_text):
 					is_valid = false
 			if is_valid and selected_legality != "" and selected_legality != "N/A":
 				var is_legal_in_format = true
@@ -1080,10 +1128,16 @@ func _on_search_pressed():
 				if not has_class:
 					is_valid = false
 			if is_valid and card_data.has("editions"):
-				for edition in card_data["editions"]:
-					var slug = edition["slug"]
-					if not slugs_to_show.has(slug):
-						slugs_to_show.append(slug)
+				if _unique_cards_only:
+					if card_data["editions"].size() > 0:
+						var slug = card_data["editions"][0]["slug"]
+						if not slugs_to_show.has(slug):
+							slugs_to_show.append(slug)
+				else:
+					for edition in card_data["editions"]:
+						var slug = edition["slug"]
+						if not slugs_to_show.has(slug):
+							slugs_to_show.append(slug)
 	slugs_to_show.sort()
 	var results_header_label = $ResultsArea/ResultsHeader/LabelLeft
 	if results_header_label:
@@ -1375,6 +1429,7 @@ func _is_legal_format(format_name: String, main_slugs: Array, mat_slugs: Array, 
 	return false
 
 func enter_sideboard_mode(deck_data: Dictionary, callback: Callable = Callable(), score_text: String = ""):
+	DiscordManager.update_status("Side Decking", "Adjusting Deck in Match")
 	_sideboard_mode = true
 	_is_ready_waiting = false
 	_sideboard_callback = callback

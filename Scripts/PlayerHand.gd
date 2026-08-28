@@ -25,7 +25,7 @@ var dragging_card_from_hand = null
 var external_preview_index := -1
 
 func _ready() -> void:
-	center_screen_x = get_viewport().size.x / 2
+	center_screen_x = get_viewport_rect().size.x / 2
 	hand_field_left = center_screen_x - HAND_FIELD_WIDTH / 2.0
 	hand_field_right = center_screen_x + HAND_FIELD_WIDTH / 2.0
 	add_to_group("player_hand")
@@ -279,7 +279,7 @@ func bring_card_to_front(card):
 		return
 	hovered_card = card
 	card.z_index = HAND_Z_INDEX + 2000
-	var screen_height = get_viewport().size.y
+	var screen_height = get_viewport_rect().size.y
 	var texture_height = 1000
 	if card.has_node("CardImage") and card.get_node("CardImage").texture:
 		texture_height = card.get_node("CardImage").texture.get_size().y

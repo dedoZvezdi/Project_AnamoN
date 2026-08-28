@@ -10,6 +10,8 @@ var is_holding_left = false
 var progress_bar: TextureProgressBar
 var _is_deck_builder_pressing = false
 var _deck_builder_drag_start_pos = Vector2.ZERO
+var deck_builder_hold_timer = 0.0
+var deck_builder_drag_canceled = false
 
 signal request_popup_menu(slug, uuid)
 signal card_drag_started(card_display)
@@ -83,6 +85,15 @@ func _process(delta):
 	else:
 		if progress_bar and progress_bar.visible:
 			progress_bar.visible = false
+	if _is_deck_builder_pressing:
+		if zone != "deck_building_results" and zone != "":
+			deck_builder_hold_timer += delta
+			if deck_builder_hold_timer >= 1.5:
+				deck_builder_hold_timer -= 1.5
+				deck_builder_drag_canceled = true
+				var db = _find_deck_building()
+				if db and db.has_method("request_add_copy_from_hold"):
+					db.request_add_copy_from_hold(card_slug, zone)
 
 func _reset_hold():
 	is_holding_left = false
@@ -168,7 +179,7 @@ func _is_in_opponent_zone() -> bool:
 func _gui_input(event):
 	if event is InputEventMouseMotion:
 		if _is_in_deck_builder():
-			if _is_deck_builder_pressing and event.position.distance_to(_deck_builder_drag_start_pos) > 5:
+			if _is_deck_builder_pressing and not deck_builder_drag_canceled and event.position.distance_to(_deck_builder_drag_start_pos) > 5:
 				_is_deck_builder_pressing = false
 				var drag_data = _create_deck_builder_drag_data()
 				if drag_data:
@@ -192,11 +203,21 @@ func _gui_input(event):
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if _is_in_deck_builder():
 			if event.pressed:
+				if event.double_click:
+					if zone == "deck_building_results":
+						var db_rc = _find_deck_building()
+						if db_rc and db_rc.has_method("handle_right_click"):
+							db_rc.handle_right_click(self)
+						accept_event()
+						return
 				_is_deck_builder_pressing = true
 				_deck_builder_drag_start_pos = event.position
+				deck_builder_hold_timer = 0.0
+				deck_builder_drag_canceled = false
 				accept_event()
 			else:
 				_is_deck_builder_pressing = false
+				deck_builder_drag_canceled = false
 				accept_event()
 			return
 		if zone == "lineage":

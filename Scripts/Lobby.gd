@@ -17,6 +17,7 @@ extends Control
 @onready var deck_option: OptionButton = $RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/DeckOption
 @onready var mode_option: OptionButton = $RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/ModeRow/OptionButton
 @onready var legality_option: OptionButton = $RootVBox/Arena/CenterCol/MarginCenter/InnerVBox/LegalityRow/LegalityButton
+@onready var p2_kick_overlay: Control = $RootVBox/Arena/Player2Half/Margin/VBox/AvatarFrame/Label
 
 const READY_COLOR = Color(0.133, 0.741, 0.204, 1.0)
 const NOT_READY_COLOR = Color(0.941, 0, 0.106, 1.0)
@@ -31,6 +32,7 @@ var p1_photo_rect: TextureRect
 var p2_photo_rect: TextureRect
 
 func _ready() -> void:
+	DiscordManager.update_status("In Lobby", "Looking for Battle")
 	if not get_parent() is Window and not get_parent() is CanvasLayer:
 		set_anchors_preset(Control.PRESET_TOP_LEFT)
 		size = get_viewport_rect().size
@@ -91,6 +93,35 @@ void fragment() {
 	p2_photo_rect.offset_right = -2
 	p2_photo_rect.offset_bottom = -2
 	check_start_button()
+	p2_avatar_frame.gui_input.connect(_on_p2_avatar_gui_input)
+	p2_avatar_frame.mouse_entered.connect(_on_p2_avatar_hover)
+	p2_avatar_frame.mouse_exited.connect(_on_p2_avatar_unhover)
+	if p2_kick_overlay:
+		p2_kick_overlay.get_parent().remove_child(p2_kick_overlay)
+		p2_avatar_frame.add_child(p2_kick_overlay)
+
+func _on_p2_avatar_hover():
+	if multiplayer.is_server() and multiplayer.get_peers().size() > 0:
+		p2_kick_overlay.visible = true
+	else:
+		p2_avatar_frame.mouse_default_cursor_shape = Control.CURSOR_ARROW
+
+func _on_p2_avatar_unhover():
+	p2_kick_overlay.visible = false
+	p2_kick_overlay.modulate = Color(1, 1, 1, 1)
+
+func _on_p2_avatar_gui_input(event: InputEvent):
+	if multiplayer.is_server() and multiplayer.get_peers().size() > 0:
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				p2_kick_overlay.modulate = Color(0.5, 0.5, 0.5, 1)
+			else:
+				var opp_id = multiplayer.get_peers()[0]
+				var multiplayer_node = get_parent()
+				if multiplayer_node and multiplayer_node.has_method("kick_peer"):
+					multiplayer_node.kick_peer(opp_id)
+				p2_kick_overlay.visible = false
+				p2_kick_overlay.modulate = Color(1, 1, 1, 1)
 
 func setup_host(player_name: String):
 	p1_name_input.text = player_name
@@ -101,6 +132,7 @@ func setup_host(player_name: String):
 	p2_name_input.text = "Waiting..."
 	if mode_option: mode_option.disabled = false
 	if legality_option: legality_option.disabled = false
+	_update_master_server()
 	
 func setup_client(player_name: String):
 	p2_name_input.text = player_name
@@ -156,6 +188,8 @@ func apply_opponent_photo_direct(texture: Texture2D):
 			p1_photo_rect.texture = texture
 
 func on_client_disconnected():
+	if p2_kick_overlay: p2_kick_overlay.visible = false
+	p2_avatar_frame.mouse_default_cursor_shape = Control.CURSOR_ARROW
 	p2_name_input.text = "Waiting..."
 	p2_photo_rect.texture = null
 	p2_ready = false
@@ -239,11 +273,20 @@ func sync_start_game():
 func _on_mode_selected(_index: int):
 	if multiplayer.is_server():
 		rpc("sync_lobby_settings", mode_option.selected, legality_option.selected)
+		_update_master_server()
 
 func _on_legality_selected(_index: int):
 	_refresh_deck_options()
 	if multiplayer.is_server():
 		rpc("sync_lobby_settings", mode_option.selected, legality_option.selected)
+		_update_master_server()
+		
+func _update_master_server():
+	if GlobalData and GlobalData.has_method("update_room_info"):
+		if mode_option and legality_option:
+			var mode_text = mode_option.get_item_text(mode_option.selected)
+			var legality_text = legality_option.get_item_text(legality_option.selected)
+			GlobalData.update_room_info(mode_text, legality_text)
 
 func _on_deck_selected(_index: int):
 	var has_deck = deck_option.selected >= 0 and deck_option.get_item_count() > 0
@@ -324,11 +367,9 @@ func _refresh_deck_options():
 func get_selected_deck_data() -> Dictionary:
 	if not deck_option or deck_option.selected < 0 or deck_option.get_item_count() == 0:
 		return {}
-	
 	var file_path = deck_option.get_item_metadata(deck_option.selected)
 	if file_path == null or file_path == "":
 		return {}
-
 	var file = FileAccess.open(file_path, FileAccess.READ)
 	if file:
 		var json = JSON.new()
@@ -339,6 +380,5 @@ func get_selected_deck_data() -> Dictionary:
 				"main_deck": data.get("main_deck", []),
 				"mat_deck": data.get("mat_deck", []),
 				"pantheon_deck": data.get("pantheon_deck", []),
-				"side_deck": data.get("side_deck", []),
-			}
+				"side_deck": data.get("side_deck", []),}
 	return {}

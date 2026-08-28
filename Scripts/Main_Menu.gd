@@ -13,6 +13,7 @@ var is_music_on = true
 var is_volume_on = true
 
 func _ready():
+	DiscordManager.update_status("In Main Menu", "Preparing for Battle")
 	$Menu_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_toggle_info()
 	$OnlineButton.pressed.connect(_on_online_pressed)
@@ -31,9 +32,11 @@ func _toggle_info():
 		info_panel.global_position = $InfoButton.global_position - Vector2(info_panel.size.x, info_panel.size.y)
 
 func _on_online_pressed():
-	print("Online button pressed")
+	GlobalData.origin_scene = "res://Scenes/Server_Lobby.tscn"
+	get_tree().change_scene_to_file("res://Scenes/Server_Lobby.tscn")
 
 func _on_local_pressed():
+	GlobalData.origin_scene = "res://Scenes/Main.tscn"
 	get_tree().change_scene_to_file("res://Scenes/Main.tscn")
 
 func _on_decks_pressed():

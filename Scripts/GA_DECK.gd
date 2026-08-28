@@ -241,7 +241,7 @@ func move_card_to_bottom():
 	if card_index == -1:
 		return
 	var card_data = player_deck[card_index]
-	card_data["z_index"] = -1
+	card_data["z_index"] = 1
 	player_deck.remove_at(card_index)
 	player_deck.append(card_data)
 	var chat_node = get_tree().current_scene.find_child("Chat", true, false)

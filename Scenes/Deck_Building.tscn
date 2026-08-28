@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="1_2xl88"]
 [ext_resource type="Script" uid="uid://i6x8mhmwp681" path="res://Scripts/Deck_Building.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://db2eqitvw1e27" path="res://Scenes/CardInformation.tscn" id="2_cardinfo"]
+[ext_resource type="Texture2D" uid="uid://dqy87tgapqhxe" path="res://Assets/Textures/Checks/check_box.svg" id="4_1swxn"]
+[ext_resource type="Texture2D" uid="uid://cifllxiovgmbv" path="res://Assets/Textures/Checks/check_box_outline_blank.svg" id="5_ss27m"]
 [ext_resource type="Script" uid="uid://b0vtq8nt708y5" path="res://Scripts/DeckGridManager.gd" id="deck_grid_script"]
 [ext_resource type="Script" uid="uid://coi14bj72unlx" path="res://Scripts/VirtualizedCardGrid.gd" id="virtual_grid_script"]
 
@@ -1401,6 +1403,22 @@ offset_top = -11.0
 offset_right = 410.0
 offset_bottom = 19.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="CheckBox" type="CheckBox" parent="ResultsArea/ResultsHeader" unique_id=335195622]
+layout_mode = 0
+offset_left = 266.0
+offset_top = -1.0
+offset_right = 410.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_focus_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_pressed_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_icons/checked = ExtResource("4_1swxn")
+theme_override_icons/unchecked = ExtResource("5_ss27m")
+text = "Unique Only"
+alignment = 1
 
 [node name="LabelLeft" type="Label" parent="ResultsArea/ResultsHeader" unique_id=559803244]
 layout_mode = 0

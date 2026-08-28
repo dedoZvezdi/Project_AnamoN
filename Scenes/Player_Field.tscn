@@ -22,7 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://cpn7rtonc8qd4" path="res://Scenes/Phases.tscn" id="20_ovfrf"]
 [ext_resource type="Script" uid="uid://cjdv252o1hnhq" path="res://Scripts/Phases.gd" id="21_h2qut"]
 [ext_resource type="PackedScene" uid="uid://kv77quhf6roj" path="res://Scenes/Chat.tscn" id="22_bg3cw"]
-[ext_resource type="PackedScene" uid="uid://dpfq6k4bgsvnc" path="res://Scenes/player_info.tscn" id="25_kym08"]
+[ext_resource type="PackedScene" uid="uid://dpfq6k4bgsvnc" path="res://Scenes/Player_Info.tscn" id="25_kym08"]
 [ext_resource type="PackedScene" uid="uid://d4lnbcibqak3y" path="res://Scenes/Pantheon.tscn" id="26_xuc2h"]
 [ext_resource type="Script" uid="uid://dtl8d6lqww58o" path="res://Scripts/PlayerElements.gd" id="new_script_player_elements"]
 
