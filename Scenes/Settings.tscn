@@ -441,35 +441,11 @@ theme_override_constants/margin_bottom = 20
 
 [node name="HBox" type="HBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin" unique_id=1283838301]
 layout_mode = 2
-theme_override_constants/separation = 112
+theme_override_constants/separation = 335
 alignment = 1
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox" unique_id=64594563]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBoxContainer" unique_id=521289433]
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
-theme_override_font_sizes/font_size = 17
-text = "Old Avatar"
-horizontal_alignment = 1
-
-[node name="AvatarPanel" type="Panel" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBoxContainer" unique_id=979023545]
-custom_minimum_size = Vector2(110, 110)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_md12f")
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox" unique_id=1150711575]
 layout_mode = 2
-
-[node name="Label" type="Label" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBoxContainer2" unique_id=340541744]
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_colors/font_color = Color(0.8901961, 0.7764706, 0.56078434, 1)
-theme_override_font_sizes/font_size = 17
-text = "New Avatar"
-horizontal_alignment = 1
 
 [node name="AvatarPanel" type="Panel" parent="Window/HBox/MainArea/MainContent/TabContainer/General/ProfileCard/Margin/HBox/VBoxContainer2" unique_id=1513500613]
 custom_minimum_size = Vector2(110, 110)

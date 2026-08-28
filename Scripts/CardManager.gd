@@ -33,6 +33,7 @@ var drag_card_was_marked = false
 var drag_source_was_main_field = false
 
 func _ready() -> void:
+	DiscordManager.update_status("In a Match", "Dueling")
 	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
 	player_hand_reference = $"../PlayerHand"
 	update_screen_size()

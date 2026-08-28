@@ -397,11 +397,11 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_info")
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 bbcode_enabled = true
-text = "[center][color=red][font_size=30]Beta Version 0.2.0[/font_size][/color]
+text = "[center][color=red][font_size=30]Beta Version 0.2.1[/font_size][/color]
 
 [color=white][font_size=19]AnamoN is a fan-based game aiming to allow players to play multiple TCGs in a single application. It is currently in beta, so many features are experimental and may not work as intended.
 
 [b]Future Plans:[/b]
-• [color=gold]Near Future:[/color] Servers, sound effects, and ease-of-use settings.
+• [color=gold]Near Future:[/color] Sound effects, and ease-of-use settings.
 • [color=gold]Distant Future:[/color] Support for 4 or more players.[/font_size][/color][/center]"
 fit_content = true

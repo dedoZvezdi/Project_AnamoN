@@ -1,0 +1,121 @@
+[gd_scene format=3 uid="uid://b20tf5pt50c6x"]
+
+[ext_resource type="Script" uid="uid://dgkfvf0glggl1" path="res://Scripts/RoomItem.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kwgbo"]
+bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.60784316)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_md12f"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mr5cl"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+border_blend = true
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="RoomItem" type="PanelContainer" unique_id=125239087]
+custom_minimum_size = Vector2(0, 80)
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_kwgbo")
+script = ExtResource("1_script")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=105205210]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="MainRow" type="HBoxContainer" parent="MarginContainer" unique_id=1536847818]
+layout_mode = 2
+
+[node name="InfoCol" type="VBoxContainer" parent="MarginContainer/MainRow" unique_id=971348693]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+alignment = 1
+
+[node name="CreatorName" type="Label" parent="MarginContainer/MainRow/InfoCol" unique_id=966503125]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Creator Name"
+
+[node name="ModeDetails" type="Label" parent="MarginContainer/MainRow/InfoCol" unique_id=843248338]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="RoomMessage" type="Label" parent="MarginContainer/MainRow" unique_id=999999999]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Looking for a match..."
+horizontal_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="PlayerCol" type="HBoxContainer" parent="MarginContainer/MainRow" unique_id=711430685]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+alignment = 2
+
+[node name="Player1PanelIcon" type="Panel" parent="MarginContainer/MainRow/PlayerCol" unique_id=538856276]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_md12f")
+
+[node name="VSLabel" type="Label" parent="MarginContainer/MainRow/PlayerCol" unique_id=103064385]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+text = " VS "
+
+[node name="Player2PanelIcon" type="Panel" parent="MarginContainer/MainRow/PlayerCol" unique_id=1092907661]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_mr5cl")
+
+[node name="Control" type="Control" parent="MarginContainer/MainRow/PlayerCol" unique_id=136776644]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="PlayerCount" type="Label" parent="MarginContainer/MainRow/PlayerCol" unique_id=1566667756]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "1/2"
+
+[node name="JoinButton" type="Button" parent="." unique_id=68660491]
+layout_mode = 2
+flat = true

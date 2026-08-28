@@ -64,7 +64,6 @@ func _adjust_target_scroll(amount: float):
 		target_scroll_y = scroll_container.scroll_vertical
 	target_scroll_y = clamp(target_scroll_y + amount, 0, max(0, max_scroll))
 
-
 func _get_back_texture() -> Texture2D:
 	if _texture_cache.has("__back"):
 		return _texture_cache["__back"]

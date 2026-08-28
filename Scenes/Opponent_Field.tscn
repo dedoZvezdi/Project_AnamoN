@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://bbtnckf2a2use" path="res://Scenes/Opponent_Elements.tscn" id="8_xqfjh"]
 [ext_resource type="PackedScene" uid="uid://dulc360ofen1q" path="res://Scenes/Opponent_Memory.tscn" id="9_4t60u"]
 [ext_resource type="PackedScene" uid="uid://c8w8ptylfbntf" path="res://Scenes/Opponent_Logo.tscn" id="10_4t60u"]
-[ext_resource type="PackedScene" uid="uid://rv16vxqlf50e" path="res://Scenes/opponents_info.tscn" id="12_ypfnt"]
+[ext_resource type="PackedScene" uid="uid://rv16vxqlf50e" path="res://Scenes/Opponents_Info.tscn" id="12_ypfnt"]
 [ext_resource type="PackedScene" uid="uid://c11oeig6hpbc1" path="res://Scenes/Opponent_Pantheon.tscn" id="13_admix"]
 [ext_resource type="Script" uid="uid://dk06c13rk3fwj" path="res://Scripts/OpponentFieldElements.gd" id="14_4t60u"]
 

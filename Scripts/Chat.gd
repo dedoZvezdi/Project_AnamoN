@@ -38,6 +38,8 @@ func send_message():
 
 func send_message_to_peer():
 	rpc("receive_message", player_name, msg)
+	if GlobalData.is_online_match:
+		GlobalData.send_chat_copy(player_name, msg)
 
 @rpc("any_peer", "reliable")
 func receive_message(sender: String, received_msg: String):
@@ -46,6 +48,8 @@ func receive_message(sender: String, received_msg: String):
 func send_system_message(system_msg: String):
 	add_message("System", system_msg)
 	rpc("receive_system_message", system_msg)
+	if GlobalData.is_online_match:
+		GlobalData.send_chat_copy("System", system_msg)
 
 @rpc("any_peer", "reliable")
 func receive_system_message(system_msg: String):

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://7g36h22timd3"]
+[gd_scene format=3 uid="uid://bxkob67p6jf84"]
 
 [ext_resource type="Script" uid="uid://da3g2yfmrve2s" path="res://Scripts/Lobby.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="2_lolwk"]
@@ -149,6 +149,18 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 shadow_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e2erd"]
+bg_color = Color(0.14117648, 0.12941177, 0.101960786, 0.5137255)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider_v"]
 bg_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
@@ -396,6 +408,18 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 shadow_size = 30
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kg0wl"]
+bg_color = Color(0.14117648, 0.12941177, 0.101960786, 0.5137255)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lolwk"]
 bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
 border_width_left = 2
@@ -439,6 +463,18 @@ corner_radius_top_left = 2
 corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_87otr"]
+bg_color = Color(0.14117648, 0.12941177, 0.101960786, 0.5137255)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="Lobby" type="Control" unique_id=325265899]
 layout_mode = 3
@@ -532,6 +568,7 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_uhbti")
 placeholder_text = "Player 1"
 alignment = 1
 editable = false
+selecting_enabled = false
 flat = true
 
 [node name="ProgressBar" type="Panel" parent="RootVBox/Arena/Player1Half/Margin/VBox" unique_id=355625259]
@@ -571,10 +608,12 @@ size_flags_horizontal = 4
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_pressed_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
 theme_override_colors/font_hover_color = Color(0.9372549, 0.87058824, 0.74509805, 1)
+theme_override_colors/font_disabled_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_ready_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ready_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ready_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_e2erd")
 text = "READY UP"
 
 [node name="VSeparator" type="Panel" parent="RootVBox/Arena" unique_id=222222001]
@@ -739,10 +778,12 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_hover_color = Color(0.13333334, 0.7411765, 0.20392157, 1)
+theme_override_colors/font_disabled_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_start_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_start_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_start_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_kg0wl")
 text = "START DUEL"
 
 [node name="ExitButton" type="Button" parent="RootVBox/Arena/CenterCol/MarginCenter/InnerVBox" unique_id=551317004]
@@ -786,6 +827,21 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_avatar")
 
+[node name="Label" type="Label" parent="RootVBox/Arena/Player2Half/Margin/VBox/AvatarFrame" unique_id=999999998]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "KICK"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="PlayerIdentity" type="VBoxContainer" parent="RootVBox/Arena/Player2Half/Margin/VBox" unique_id=648392056]
 layout_mode = 2
 theme_override_constants/separation = 8
@@ -806,6 +862,7 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_kr8xt")
 placeholder_text = "Player 2"
 alignment = 1
 editable = false
+selecting_enabled = false
 flat = true
 
 [node name="ProgressBar" type="Panel" parent="RootVBox/Arena/Player2Half/Margin/VBox" unique_id=999625259]
@@ -845,8 +902,10 @@ size_flags_horizontal = 4
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_pressed_color = Color(0.94509804, 0.88235295, 0.7764706, 0.827451)
 theme_override_colors/font_hover_color = Color(0.9372549, 0.87058824, 0.74509805, 1)
+theme_override_colors/font_disabled_color = Color(0.40392157, 0.40392157, 0.40392157, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_ready_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ready_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ready_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_87otr")
 text = "READY UP"

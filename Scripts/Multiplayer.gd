@@ -59,13 +59,32 @@ func _ready():
 			$PhotoPreview.texture = ImageTexture.create_from_image(img)
 	elif ResourceLoader.exists(DEFAULT_PHOTO_PATH):
 		$PhotoPreview.texture = load(DEFAULT_PHOTO_PATH)
-	if not has_node("ConnectTimer"):
+	if has_node("ConnectTimer"):
+		connect_timer = get_node("ConnectTimer")
+	else:
 		connect_timer = Timer.new()
 		connect_timer.name = "ConnectTimer"
+		add_child(connect_timer)
+	if GlobalData and "auto_host" in GlobalData:
+		if GlobalData.auto_host:
+			GlobalData.auto_host = false
+			$CanvasLayer.hide()
+			server.text = "127.0.0.1"
+			port.text = str(GlobalData.target_port)
+			_on_host_button_pressed()
+		elif GlobalData.auto_join:
+			GlobalData.auto_join = false
+			$CanvasLayer.hide()
+			server.text = GlobalData.target_ip
+			port.text = str(GlobalData.target_port)
+			_on_join_button_pressed()
+	if GlobalData and GlobalData.has_signal("server_error"):
+		if not GlobalData.server_error.is_connected(show_popup):
+			GlobalData.server_error.connect(show_popup)
+	if not connect_timer.timeout.is_connected(_on_connect_timeout):
 		connect_timer.wait_time = 10.0
 		connect_timer.one_shot = true
 		connect_timer.timeout.connect(_on_connect_timeout)
-		add_child(connect_timer)
 	$FileDialog.add_filter("*.png", "PNG Images")
 	$FileDialog.add_filter("*.jpg", "JPG Images")
 	$FileDialog.add_filter("*.jpeg", "JPEG Images")
@@ -138,14 +157,38 @@ func _on_host_button_pressed() -> void:
 		config.set_value("Player", "Name", name_to_use)
 		config.save("user://player_config.cfg")
 		disable_buttons()
-		peer = ENetMultiplayerPeer.new()
-		var error = peer.create_server(int(port.text))
-		if error != OK:
-			show_popup("Failed to create ENet server on port " + port.text + ". Port might be in use.")
-			reset_ui()
-			return
-		multiplayer.multiplayer_peer = peer
-		_register_lobby(name_to_use, int(port.text))
+		var is_online = false
+		if "is_online_match" in GlobalData:
+			is_online = GlobalData.is_online_match
+		if is_online:
+			peer = WebRTCMultiplayerPeer.new()
+			peer.create_server()
+			multiplayer.multiplayer_peer = peer
+			GlobalData.peer_connected_webrtc.connect(func(peer_id):
+				var p_conn = WebRTCPeerConnection.new()
+				p_conn.initialize({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
+				p_conn.session_description_created.connect(func(type, sdp):
+					p_conn.set_local_description(type, sdp)
+					GlobalData.send_webrtc_offer(peer_id, sdp))
+				p_conn.ice_candidate_created.connect(func(media, index, ice_name):
+					GlobalData.send_webrtc_candidate(peer_id, media, index, ice_name))
+				peer.add_peer(p_conn, peer_id)
+				p_conn.create_offer())
+			GlobalData.webrtc_answer_received.connect(func(peer_id, sdp):
+				if peer.has_peer(peer_id):
+					peer.get_peer(peer_id).connection.set_remote_description("answer", sdp))
+			GlobalData.webrtc_candidate_received.connect(func(peer_id, mid, index, sdp):
+				if peer.has_peer(peer_id):
+					peer.get_peer(peer_id).connection.add_ice_candidate(mid, index, sdp))
+		else:
+			peer = ENetMultiplayerPeer.new()
+			var error = peer.create_server(int(port.text))
+			if error != OK:
+				show_popup("Failed to create ENet server on port " + port.text + ". Port might be in use.")
+				reset_ui()
+				return
+			multiplayer.multiplayer_peer = peer
+			_register_lobby(name_to_use, int(port.text))
 		multiplayer.peer_connected.connect(on_peer_connected)
 		multiplayer.peer_disconnected.connect(on_peer_disconnected)
 		current_lobby = lobby_scene.instantiate()
@@ -186,38 +229,63 @@ func _on_join_button_pressed() -> void:
 			show_popup("Failed to connect to WebSocket server. Check the URL.")
 			reset_ui())
 		multiplayer.server_disconnected.connect(func():
-			show_popup("The Host closed the lobby.")
-			reset_ui())
+			if not (has_node("PlayerField") or has_node("OpponentField")):
+				reset_ui()
+			else:
+				show_popup("The Host closed the lobby.")
+				reset_ui())
 		connect_timer.start()
 	else:
 		if not validate_ip_and_port():
 			return
-		var lobbies = _load_lobbies()
-		var target_lobby = null
-		for lobby in lobbies:
-			if lobby is Dictionary and int(lobby.get("port", -1)) == int(port.text):
-				target_lobby = lobby
-				break
-		if target_lobby:
-			if target_lobby.player_count >= 2:
-				show_popup("Lobby is full (2/2 players).")
-				_refresh_lobby_list()
-				return
-			if not _is_lobby_alive(target_lobby):
+		var is_online = false
+		if "is_online_match" in GlobalData:
+			is_online = GlobalData.is_online_match
+		if not is_online:
+			var lobbies = _load_lobbies()
+			var target_lobby = null
+			for lobby in lobbies:
+				if lobby is Dictionary and int(lobby.get("port", -1)) == int(port.text):
+					target_lobby = lobby
+					break
+			if target_lobby:
+				if target_lobby.player_count >= 2:
+					show_popup("Lobby is full (2/2 players).")
+					_refresh_lobby_list()
+					return
+				if not _is_lobby_alive(target_lobby):
+					show_popup("Lobby is old and closed.")
+					_refresh_lobby_list()
+					return
+			else:
 				show_popup("Lobby is old and closed.")
 				_refresh_lobby_list()
 				return
-		else:
-			show_popup("Lobby is old and closed.")
-			_refresh_lobby_list()
-			return
 		var config = ConfigFile.new()
 		config.set_value("Player", "Name", name_to_use)
 		config.save("user://player_config.cfg")
 		disable_buttons()
-		peer = ENetMultiplayerPeer.new()
-		peer.create_client(server.text, int(port.text))
-		multiplayer.multiplayer_peer = peer
+		if is_online:
+			peer = WebRTCMultiplayerPeer.new()
+			peer.create_client(GlobalData.my_webrtc_id)
+			multiplayer.multiplayer_peer = peer
+			GlobalData.webrtc_offer_received.connect(func(peer_id, sdp):
+				var p_conn = WebRTCPeerConnection.new()
+				p_conn.initialize({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
+				p_conn.session_description_created.connect(func(type, lsdp):
+					p_conn.set_local_description(type, lsdp)
+					GlobalData.send_webrtc_answer(peer_id, lsdp))
+				p_conn.ice_candidate_created.connect(func(media, index, ice_name):
+					GlobalData.send_webrtc_candidate(peer_id, media, index, ice_name))
+				peer.add_peer(p_conn, peer_id, 1)
+				p_conn.set_remote_description("offer", sdp))
+			GlobalData.webrtc_candidate_received.connect(func(peer_id, mid, index, sdp):
+				if peer.has_peer(peer_id):
+					peer.get_peer(peer_id).connection.add_ice_candidate(mid, index, sdp))
+		else:
+			peer = ENetMultiplayerPeer.new()
+			peer.create_client(server.text, int(port.text))
+			multiplayer.multiplayer_peer = peer
 		multiplayer.connected_to_server.connect(func():
 			if connect_timer and connect_timer.is_stopped() == false:
 				connect_timer.stop()
@@ -233,8 +301,11 @@ func _on_join_button_pressed() -> void:
 			show_popup("There is no host with such IP and port.")
 			reset_ui())
 		multiplayer.server_disconnected.connect(func():
-			show_popup("The Host closed the lobby.")
-			reset_ui())
+			if not (has_node("PlayerField") or has_node("OpponentField")):
+				reset_ui()
+			else:
+				show_popup("The Host closed the lobby.")
+				reset_ui())
 		connect_timer.start()
 
 func validate_websocket_host() -> bool:
@@ -281,6 +352,8 @@ func _close_dialogs_recursive(node: Node):
 			_close_dialogs_recursive(child)
 
 func show_popup(message: String):
+	if GlobalData and GlobalData.get("origin_scene") == "res://Scenes/Server_Lobby.tscn":
+		GlobalData.set("last_error_message", message)
 	_close_existing_dialogs()
 	var dialog = AcceptDialog.new()
 	dialog.dialog_text = message
@@ -338,14 +411,7 @@ func _apply_player_photo_to_field(field_node: Node):
 				polygon.texture = texture
 
 func _get_opponent_photo_path() -> String:
-	var base_path = ""
-	if OS.has_feature("editor"):
-		base_path = ProjectSettings.globalize_path("res://Data/")
-	else:
-		base_path = OS.get_executable_path().get_base_dir().path_join("Data")
-	if not DirAccess.dir_exists_absolute(base_path):
-		DirAccess.make_dir_recursive_absolute(base_path)
-	return base_path.path_join(OPPONENT_PHOTO_FILENAME)
+	return "user://Opponent_Image_" + str(OS.get_process_id()) + ".png"
 
 func _send_my_photo_to_peer(peer_id: int):
 	var data = _get_my_photo_as_png_bytes()
@@ -422,8 +488,8 @@ func on_peer_disconnected(peer_id):
 			current_lobby.on_client_disconnected()
 	else:
 		if peer_id == 1:
-			show_popup("Host left the game." if in_game else "Host disconnected.")
 			if in_game:
+				show_popup("Host left the game.")
 				_free_sideboard_instance()
 				if current_lobby:
 					current_lobby.queue_free()
@@ -985,7 +1051,29 @@ func disable_buttons():
 	$ChangePhotoButton.visible = false
 	$PhotoPreview.visible = false
 
+func kick_peer(peer_id: int):
+	if peer and peer_id in multiplayer.get_peers():
+		peer.disconnect_peer(peer_id)
+		if current_lobby:
+			current_lobby.on_client_disconnected()
+
 func reset_ui():
+	if GlobalData and GlobalData.has_method("leave_room"):
+		GlobalData.leave_room()
+		GlobalData.is_online_match = false
+	if GlobalData.origin_scene == "res://Scenes/Server_Lobby.tscn":
+		_unregister_lobby()
+		if multiplayer.multiplayer_peer != null:
+			multiplayer.multiplayer_peer.close()
+			multiplayer.multiplayer_peer = null
+		var early_signals_to_clear = [multiplayer.peer_connected, multiplayer.peer_disconnected, multiplayer.connected_to_server, multiplayer.connection_failed, multiplayer.server_disconnected]
+		for signals in early_signals_to_clear:
+			for connects in signals.get_connections():
+				signals.disconnect(connects.callable)
+		if peer:
+			peer.close()
+		get_tree().change_scene_to_file("res://Scenes/Server_Lobby.tscn")
+		return
 	_unregister_lobby()
 	$Panel.visible = true
 	$CanvasLayer.visible = true
@@ -1890,11 +1978,13 @@ func _enter_sideboard_phase():
 		_deck_building_instance.enter_sideboard_mode(_current_deck_data, Callable(self, "_on_sideboard_ok"), score_text)
 
 func _on_sideboard_ok(modified_decks: Dictionary):
+	DiscordManager.update_status("Side Decking", "Waiting for Opponent")
 	_current_deck_data = modified_decks.duplicate(true)
 	_sideboard_ready_local = true
 	rpc("rpc_sideboard_ready")
 
 func _exit_sideboard_phase():
+	DiscordManager.update_status("In a Match", "Dueling")
 	_free_sideboard_instance()
 	start_game_instances()
 

@@ -53,11 +53,13 @@ offset_bottom = 66.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_4tah1")
 
 [node name="GraveyardViewWindow" type="Window" parent="." unique_id=1609381763]
+oversampling_override = 1.0
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
 
 [node name="PopupMenu" type="PopupMenu" parent="GraveyardViewWindow" unique_id=167838588]
+oversampling_override = 1.0
 size = Vector2i(100, 50)
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_disabled_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
