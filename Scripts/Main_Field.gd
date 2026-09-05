@@ -143,7 +143,7 @@ func add_card_to_field(card, position = null):
 			activate_champion_elements(card)
 		if card and is_instance_valid(card) and card.has_method("apply_champion_life_delta"):
 			card.apply_champion_life_delta(champion_life_delta)
-		card.global_position = global_position + Vector2(0, -20)
+		card.global_position = global_position + Vector2(20, -60)
 		card.z_index = 400
 		var card_image = card.get_node_or_null("CardImage")
 		var card_image_back = card.get_node_or_null("CardImageBack")

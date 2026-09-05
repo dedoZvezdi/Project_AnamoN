@@ -46,7 +46,7 @@ position = Vector2(0, 4)
 script = ExtResource("14_4t60u")
 
 [node name="OpponentMainField" parent="." unique_id=2123578278 instance=ExtResource("8_we22y")]
-position = Vector2(999, 374)
+position = Vector2(1000, 374)
 
 [node name="OpponentMemory" parent="." unique_id=1981489984 instance=ExtResource("9_4t60u")]
 position = Vector2(985, 111)

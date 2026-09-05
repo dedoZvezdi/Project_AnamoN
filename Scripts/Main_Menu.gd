@@ -13,13 +13,14 @@ var is_music_on = true
 var is_volume_on = true
 
 func _ready():
-	DiscordManager.update_status("In Main Menu", "Preparing for Battle")
+	DiscordManager.update_status("In Main Menu")
 	$Menu_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	info_panel.visible = false
 	_toggle_info()
-	$OnlineButton.pressed.connect(_on_online_pressed)
-	$LocalButton.pressed.connect(_on_local_pressed)
-	$DecksButton.pressed.connect(_on_decks_pressed)
-	$QuitButton.pressed.connect(_on_quit_pressed)
+	$VBoxContainer/OnlineButton.pressed.connect(_on_online_pressed)
+	$VBoxContainer/LocalButton.pressed.connect(_on_local_pressed)
+	$VBoxContainer/DecksButton.pressed.connect(_on_decks_pressed)
+	$VBoxContainer/QuitButton.pressed.connect(_on_quit_pressed)
 	$InfoButton.pressed.connect(_toggle_info)
 	settings_button.pressed.connect(_on_settings_pressed)
 	volume_button.pressed.connect(_on_volume_pressed)

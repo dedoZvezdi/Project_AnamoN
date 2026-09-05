@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ephdorpabol3"]
 
 [ext_resource type="Script" uid="uid://bhs4pvoon2dfx" path="res://Scripts/ServerLobby.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="2_gj6xk"]
+[ext_resource type="Texture2D" uid="uid://cf0mgjcqqbwot" path="res://Assets/Textures/background.png" id="2_gj6xk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bwmqf"]
 bg_color = Color(0.14117648, 0.12941177, 0.101960786, 0.5137255)

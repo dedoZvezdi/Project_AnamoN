@@ -42,6 +42,7 @@ func refresh_layout() -> void:
 		var normalized_x = positions[i]
 		var actual_x = center_pos.x - area_width/2.0 + normalized_x * area_width
 		active_elements[i].global_position = Vector2(actual_x, center_pos.y)
+		active_elements[i].z_index = 10
 
 func _find_layout_area() -> Area2D:
 	var player_info = get_parent().get_node_or_null("Player_Info")

@@ -154,7 +154,7 @@ func notify_card_transformed(card: Node, old_slug: String = ""):
 		current_champion_card = card
 		if not (card in cards_in_field):
 			activate_champion_elements(card)
-		card.global_position = global_position + Vector2(0, 20)
+		card.global_position = global_position + Vector2(-20, 60)
 		card.z_index = 400
 	elif card == current_champion_card:
 		current_champion_card = null
@@ -207,7 +207,7 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 		current_champion_card = card
 		if not (card in cards_in_field):
 			activate_champion_elements(card)
-		card.global_position = global_position + Vector2(0, 20)
+		card.global_position = global_position + Vector2(-20, 60)
 		if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
 			var tree = get_tree()
 			if tree and tree.current_scene:

@@ -88,8 +88,8 @@ func _process(delta):
 	if _is_deck_builder_pressing:
 		if zone != "deck_building_results" and zone != "":
 			deck_builder_hold_timer += delta
-			if deck_builder_hold_timer >= 1.5:
-				deck_builder_hold_timer -= 1.5
+			if deck_builder_hold_timer >= 0.8:
+				deck_builder_hold_timer -= 0.8
 				deck_builder_drag_canceled = true
 				var db = _find_deck_building()
 				if db and db.has_method("request_add_copy_from_hold"):

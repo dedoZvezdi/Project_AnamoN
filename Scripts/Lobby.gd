@@ -32,7 +32,7 @@ var p1_photo_rect: TextureRect
 var p2_photo_rect: TextureRect
 
 func _ready() -> void:
-	DiscordManager.update_status("In Lobby", "Looking for Battle")
+	DiscordManager.update_status("Looking for Battle")
 	if not get_parent() is Window and not get_parent() is CanvasLayer:
 		set_anchors_preset(Control.PRESET_TOP_LEFT)
 		size = get_viewport_rect().size

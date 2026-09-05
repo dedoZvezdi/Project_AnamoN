@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://digx6uetsunkk"]
 
-[ext_resource type="Texture2D" uid="uid://6yqn45vvoiby" path="res://Assets/Textures/Splash_Screen.png" id="1_cwdsd"]
 [ext_resource type="Script" uid="uid://hn6dxqoghuv5" path="res://Scripts/SplashScreenManager.gd" id="1_lgypn"]
-[ext_resource type="PackedScene" uid="uid://dqt16mao7lo7t" path="res://Scenes/Main.tscn" id="2_main"]
+[ext_resource type="Texture2D" uid="uid://cf0mgjcqqbwot" path="res://Assets/Textures/background.png" id="3_lqnct"]
+[ext_resource type="Texture2D" uid="uid://b7s7w20oa1ua4" path="res://Assets/Textures/Logo.png" id="4_pd0e7"]
 
-[node name="Splash_screen_manager" type="Control" unique_id=1983317384 node_paths=PackedStringArray("splash_screen")]
+[node name="Splash_screen_manager" type="Control" unique_id=1295077589]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,19 +12,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lgypn")
-load_scene = ExtResource("2_main")
-splash_screen = NodePath("CenterContainer/TextureRect")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=921921364]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 1)
-
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=2085524212]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1244579254]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,6 +21,244 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="CenterContainer" unique_id=788728841]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer" unique_id=1304531190]
 layout_mode = 2
-texture = ExtResource("1_cwdsd")
+texture = ExtResource("3_lqnct")
+
+[node name="LoadingBar" type="Control" parent="." unique_id=120312497]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -450.0
+offset_top = -200.0
+offset_right = 150.0
+offset_bottom = -200.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1.5, 1.5)
+
+[node name="BarBackplate" type="Polygon2D" parent="LoadingBar" unique_id=750767556]
+color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+polygon = PackedVector2Array(20, 0, 580, 0, 580, 40, 20, 40)
+
+[node name="BarBorder" type="Line2D" parent="LoadingBar" unique_id=1475921678]
+points = PackedVector2Array(20, 0, 580, 0, 580, 40, 514.5896, 40, 20, 40)
+closed = true
+width = 2.0
+default_color = Color(0.788, 0.663, 0.431, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="ChunksContainer" type="HBoxContainer" parent="LoadingBar" unique_id=705035302]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 4.0
+offset_right = 576.66675
+offset_bottom = 36.0
+theme_override_constants/separation = 3
+
+[node name="Chunk1" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=507425942]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk2" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1374425934]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk3" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1978708760]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk4" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=2055094064]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk5" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1838304077]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk6" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1472629928]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk7" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1986305929]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk8" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1013563534]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk9" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=2050256653]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk10" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=630763409]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk11" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1545394225]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk12" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=822901491]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk13" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=2012393787]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk14" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1970772615]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk15" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1814502074]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk16" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1419452131]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk17" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1828448321]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk18" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=931686960]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk19" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1028013251]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk20" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=172865252]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk21" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=929144336]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk22" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=658312820]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk23" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1674596211]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk24" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=1393834826]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="Chunk25" type="ColorRect" parent="LoadingBar/ChunksContainer" unique_id=2017106618]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.145, 0.145, 0.145, 0.608)
+
+[node name="MedallionBackplate" type="Polygon2D" parent="LoadingBar" unique_id=679944984]
+color = Color(0.05, 0.05, 0.05, 1)
+polygon = PackedVector2Array(300, -50, 370, 20, 300, 90, 230, 20)
+
+[node name="MedallionOuterBorder" type="Line2D" parent="LoadingBar" unique_id=21080558]
+points = PackedVector2Array(300, -50, 370, 20, 300, 90, 230, 20)
+closed = true
+width = 2.0
+default_color = Color(0.788, 0.663, 0.431, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="MedallionInnerBorder" type="Line2D" parent="LoadingBar" unique_id=374829754]
+points = PackedVector2Array(300, -40, 360, 20, 300, 80, 240, 20)
+closed = true
+width = 1.0
+default_color = Color(0.961, 0.89, 0.71, 0.5)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="LoadingBar" unique_id=1824386230]
+layout_mode = 0
+offset_left = 269.33337
+offset_top = -7.333313
+offset_right = 330.66675
+offset_bottom = 52.666687
+alignment = 1
+
+[node name="StatusLabel" type="Label" parent="LoadingBar/VBox" unique_id=379017765]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_font_sizes/font_size = 11
+text = "Loading Cards"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="PercentLabel" type="Label" parent="LoadingBar/VBox" unique_id=1872793135]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.788, 0.663, 0.431, 1)
+theme_override_font_sizes/font_size = 16
+text = "0%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="." unique_id=729703967]
+position = Vector2(960.00006, 350.00003)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("4_pd0e7")

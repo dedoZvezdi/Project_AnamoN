@@ -276,9 +276,9 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 			popup_menu.clear()
 			if is_token():
 				if is_in_main_field():
-					popup_menu.add_item("Destroy", 6)
+					popup_menu.add_item("Sacrifice", 6)
 					if is_rotated:
-						popup_menu.add_item("Awake", 4)
+						popup_menu.add_item("Wake Up", 4)
 					else:
 						popup_menu.add_item("Rest", 4)
 					var slug = get_slug_from_card()
@@ -288,7 +288,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 							popup_menu.add_item("Transform", 5)
 			elif is_mastery():
 				if is_in_main_field():
-					popup_menu.add_item("Destroy", 7)
+					popup_menu.add_item("Sacrifice", 7)
 					var slug = get_slug_from_card()
 					if is_shifting_currents_card():
 						if current_direction != "North": popup_menu.add_item("North", 16)
@@ -301,9 +301,9 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 							popup_menu.add_item("Transform", 5)
 			elif is_status():
 				if is_in_main_field():
-					popup_menu.add_item("Destroy", 8)
+					popup_menu.add_item("Sacrifice", 8)
 					if is_rotated:
-						popup_menu.add_item("Awake", 4)
+						popup_menu.add_item("Wake Up", 4)
 					else:
 						popup_menu.add_item("Rest", 4)
 			else:
@@ -319,7 +319,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 							popup_menu.add_item("Show All", 11)
 						if has_revealed:
 							popup_menu.add_item("Hide All", 12)
-						popup_menu.add_item("Return All to Hand ", 15)
+						popup_menu.add_item("Recollect ", 15)
 				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
 					popup_menu.add_item("Banish Face Down", 1)
 					if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
@@ -330,7 +330,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 							popup_menu.add_item("Go to Bottom Deck", 3)
 				if is_in_main_field():
 					if is_rotated:
-						popup_menu.add_item("Awake", 4)
+						popup_menu.add_item("Wake Up", 4)
 					else:
 						popup_menu.add_item("Rest", 4)
 					if not is_champion_card() and not is_token() and not is_mastery() and not is_status():
@@ -351,18 +351,7 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 							popup_menu.add_item("Transform", 5)
 			var mouse_pos = get_global_mouse_position()
 			popup_menu.reset_size()
-			var screen_size = get_viewport().get_visible_rect().size
-			var menu_size = popup_menu.get_contents_minimum_size()
-			if mouse_pos.x + menu_size.x > screen_size.x:
-				mouse_pos.x = screen_size.x - menu_size.x
-			if mouse_pos.x < 0:
-				mouse_pos.x = 0
-			if mouse_pos.y + menu_size.y > screen_size.y:
-				mouse_pos.y = screen_size.y - menu_size.y
-			if mouse_pos.y < 0:
-				mouse_pos.y = 0
-			popup_menu.position = mouse_pos
-			popup_menu.popup()
+			popup_menu.popup(Rect2(mouse_pos.x, mouse_pos.y, 0, 0))
 
 func _on_area_2d_mouse_entered() -> void:
 	mouse_inside = true
@@ -401,7 +390,7 @@ func _setup_progress_bar():
 	var tex = ImageTexture.create_from_image(img)
 	progress_bar.texture_progress = tex
 	progress_bar.modulate = Color(0.2, 0.8, 1.0)
-	get_tree().root.add_child.call_deferred(progress_bar)
+	add_child.call_deferred(progress_bar)
 
 func _process(delta):
 	if is_holding_left:
@@ -651,7 +640,7 @@ func transform_card():
 				add_to_lineage(lineage_data)
 				current_field.remove_previous_champions()
 			current_field.current_champion_card = self
-			global_position = current_field.global_position + Vector2(0, -20)
+			global_position = current_field.global_position + Vector2(20, -60)
 			z_index = 1
 			current_field.champion_life_delta = 0
 			if has_method("apply_champion_life_delta"):
@@ -999,9 +988,20 @@ func apply_logo_status_to_self(logo_node):
 	if data.has("life") and data["life"] != null and logo_node.life_value != 0:
 		var applied_delta = int(logo_node.life_value)
 		if applied_delta > 0:
-			attached_counters["Life"] = attached_counters.get("Life", 0) + applied_delta
+			var dmg = attached_counters.get("Damage", 0)
+			var cancel = min(dmg, applied_delta)
+			attached_counters["Damage"] = dmg - cancel
+			applied_delta -= cancel
+			if applied_delta > 0:
+				attached_counters["Life"] = attached_counters.get("Life", 0) + applied_delta
 		elif applied_delta < 0:
-			attached_counters["Damage"] = attached_counters.get("Damage", 0) + abs(applied_delta)
+			var applied_abs = abs(applied_delta)
+			var life_cnt = attached_counters.get("Life", 0)
+			var cancel = min(life_cnt, applied_abs)
+			attached_counters["Life"] = life_cnt - cancel
+			applied_abs -= cancel
+			if applied_abs > 0:
+				attached_counters["Damage"] = attached_counters.get("Damage", 0) + applied_abs
 	if logo_node.custom_counters.size() > 0:
 		for counter_name in logo_node.custom_counters.keys():
 			var delta_val_count = int(logo_node.custom_counters[counter_name])
@@ -1018,18 +1018,28 @@ func apply_logo_status_to_self(logo_node):
 					var cancel = min(buff, delta_val_count)
 					attached_counters["Buff"] = buff - cancel
 					delta_val_count -= cancel
+				elif counter_name == "Life":
+					var dmg = attached_counters.get("Damage", 0)
+					var cancel = min(dmg, delta_val_count)
+					attached_counters["Damage"] = dmg - cancel
+					delta_val_count -= cancel
+				elif counter_name == "Damage":
+					var life_cnt = attached_counters.get("Life", 0)
+					var cancel = min(life_cnt, delta_val_count)
+					attached_counters["Life"] = life_cnt - cancel
+					delta_val_count -= cancel
 				if delta_val_count > 0:
 					attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_val_count
 			else:
 				attached_counters[counter_name] = attached_counters.get(counter_name, 0) + delta_val_count
-			var keys_to_remove = []
-			for key in attached_counters.keys():
-				if attached_counters[key] == 0:
-					keys_to_remove.append(key)
-				elif attached_counters[key] < 0 and (key == "Life" or key == "Damage"):
-					keys_to_remove.append(key)
-			for key in keys_to_remove:
-				attached_counters.erase(key)
+	var keys_to_remove = []
+	for key in attached_counters.keys():
+		if attached_counters[key] == 0:
+			keys_to_remove.append(key)
+		elif attached_counters[key] < 0 and (key == "Life" or key == "Damage"):
+			keys_to_remove.append(key)
+	for key in keys_to_remove:
+		attached_counters.erase(key)
 	logo_node.reset_all_status_values()
 	if card_level_lable:
 		card_level_lable.text = ""
@@ -1298,7 +1308,6 @@ func animate_card_to_mat_deck(deck_position: Vector2, slug: String, card_uuid: S
 	tween.set_parallel(true)
 	tween.tween_property(self, "global_position", deck_position, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "rotation_degrees", 0.0, 0.3)
-	tween.tween_property(self, "scale", Vector2(0.3, 0.3), 0.4)
 	tween.set_parallel(false)
 	var mid_timer = get_tree().create_timer(0.2)
 	mid_timer.timeout.connect(func(): $CardImage.texture = load("res://Assets/Textures/ga_back.png"))
@@ -1341,7 +1350,6 @@ func animate_card_to_deck(deck_position: Vector2, slug: String, card_uuid: Strin
 	tween.set_parallel(true)
 	tween.tween_property(self, "global_position", deck_position, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "rotation_degrees", 0.0, 0.3)
-	tween.tween_property(self, "scale", Vector2(0.3, 0.3), 0.4)
 	tween.set_parallel(false)
 	var mid_timer = get_tree().create_timer(0.2)
 	mid_timer.timeout.connect(func(): $CardImage.texture = load("res://Assets/Textures/ga_back.png"))

@@ -1,14 +1,15 @@
 [gd_scene format=3 uid="uid://b5utnw1u5325q"]
 
-[ext_resource type="Texture2D" uid="uid://basdsfyp7hvlf" path="res://Assets/Textures/background_main_menu.png" id="1_8um5k"]
 [ext_resource type="Script" uid="uid://drmxu0xwa8rfh" path="res://Scripts/Main_Menu.gd" id="1_loo7a"]
+[ext_resource type="Texture2D" uid="uid://cf0mgjcqqbwot" path="res://Assets/Textures/background.png" id="2_xim88"]
 [ext_resource type="Texture2D" uid="uid://c0qf01uugltf1" path="res://Assets/Textures/Main Menu Buttons/settings.png" id="3_koqhg"]
 [ext_resource type="Texture2D" uid="uid://drrbrjjnflod5" path="res://Assets/Textures/Main Menu Buttons/arrow-info.png" id="3_xim88"]
 [ext_resource type="Texture2D" uid="uid://bmmv8iiysg8a0" path="res://Assets/Textures/Main Menu Buttons/music-on.png" id="5_koqhg"]
 [ext_resource type="Texture2D" uid="uid://kjwqv44fdkey" path="res://Assets/Textures/Main Menu Buttons/volume-on.png" id="5_xim88"]
+[ext_resource type="Texture2D" uid="uid://bh4b1t4rtb1d4" path="res://Assets/Textures/icon.png" id="7_koqhg"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rrcx7"]
-texture = ExtResource("1_8um5k")
+texture = ExtResource("2_xim88")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mr5cl"]
 bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
@@ -22,17 +23,17 @@ corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tj4fr"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
 border_width_bottom = 9
-border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sodvm"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
@@ -54,17 +55,17 @@ corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nrjgg"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
 border_width_bottom = 9
-border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vig0b"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
@@ -86,17 +87,17 @@ corner_radius_top_left = 20
 corner_radius_bottom_right = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mixjk"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
 border_width_bottom = 9
-border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 corner_radius_top_left = 20
 corner_radius_bottom_right = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kihqq"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
@@ -118,17 +119,17 @@ corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yxkem"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
 border_width_bottom = 9
-border_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7v4os"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
@@ -150,12 +151,12 @@ corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cmrfp"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8um5k"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
@@ -177,12 +178,12 @@ corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8e205"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2x1g0"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
@@ -204,12 +205,12 @@ corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7467j"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_riqfo"]
-bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
@@ -231,17 +232,17 @@ corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xim88"]
-bg_color = Color(0.7411765, 0.13725491, 0.20392157, 0.21960784)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 corner_radius_top_right = 20
 corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_koqhg"]
-bg_color = Color(0.8745098, 0.15294118, 0.023529412, 0.12156863)
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 0.39215687)
 border_width_left = 9
 border_width_top = 9
 border_width_right = 9
 border_width_bottom = 9
-border_color = Color(0.7411765, 0.13333334, 0.20392157, 0.54901963)
+border_color = Color(0.8862745, 0.77254903, 0.4862745, 1)
 border_blend = true
 corner_radius_top_right = 20
 corner_radius_bottom_left = 20
@@ -328,60 +329,60 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_yxkem")
 theme_override_styles/hover = SubResource("StyleBoxFlat_7v4os")
 icon = ExtResource("3_xim88")
 
-[node name="OnlineButton" type="Button" parent="." unique_id=311733109]
-layout_mode = 0
-offset_left = 660.0
-offset_top = 427.0
-offset_right = 1260.0
-offset_bottom = 567.0
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1227776275]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -630.0
+offset_right = 300.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 30
+
+[node name="OnlineButton" type="Button" parent="VBoxContainer" unique_id=311733109]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
-theme_override_font_sizes/font_size = 88
+theme_override_font_sizes/font_size = 75
 theme_override_styles/normal = SubResource("StyleBoxFlat_loo7a")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_cmrfp")
 theme_override_styles/hover = SubResource("StyleBoxFlat_8um5k")
 text = "ONLINE"
 
-[node name="LocalButton" type="Button" parent="." unique_id=1035802380]
-layout_mode = 0
-offset_left = 660.0
-offset_top = 571.0
-offset_right = 1260.0
-offset_bottom = 711.0
+[node name="LocalButton" type="Button" parent="VBoxContainer" unique_id=1035802380]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
-theme_override_font_sizes/font_size = 88
+theme_override_font_sizes/font_size = 75
 theme_override_styles/normal = SubResource("StyleBoxFlat_if7li")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_8e205")
 theme_override_styles/hover = SubResource("StyleBoxFlat_2x1g0")
 text = "LOCAL"
 
-[node name="DecksButton" type="Button" parent="." unique_id=378236684]
-layout_mode = 0
-offset_left = 660.0
-offset_top = 715.0
-offset_right = 1260.0
-offset_bottom = 855.0
+[node name="DecksButton" type="Button" parent="VBoxContainer" unique_id=378236684]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
 theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
-theme_override_font_sizes/font_size = 88
+theme_override_font_sizes/font_size = 75
 theme_override_styles/normal = SubResource("StyleBoxFlat_rrcx7")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_7467j")
 theme_override_styles/hover = SubResource("StyleBoxFlat_riqfo")
 text = "DECKS"
 
-[node name="QuitButton" type="Button" parent="." unique_id=1802518030]
-layout_mode = 0
-offset_left = 660.0
-offset_top = 859.0
-offset_right = 1260.0
-offset_bottom = 999.0
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=1802518030]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
-theme_override_colors/font_hover_color = Color(0.9411765, 0, 0.105882354, 1)
-theme_override_font_sizes/font_size = 88
+theme_override_colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+theme_override_font_sizes/font_size = 75
 theme_override_styles/normal = SubResource("StyleBoxFlat_fh7cp")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_xim88")
 theme_override_styles/hover = SubResource("StyleBoxFlat_koqhg")
@@ -397,7 +398,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_info")
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 bbcode_enabled = true
-text = "[center][color=red][font_size=30]Beta Version 0.2.1[/font_size][/color]
+text = "[center][color=red][font_size=30]Beta Version 0.2.2[/font_size][/color]
 
 [color=white][font_size=19]AnamoN is a fan-based game aiming to allow players to play multiple TCGs in a single application. It is currently in beta, so many features are experimental and may not work as intended.
 
@@ -405,3 +406,16 @@ text = "[center][color=red][font_size=30]Beta Version 0.2.1[/font_size][/color]
 • [color=gold]Near Future:[/color] Sound effects, and ease-of-use settings.
 • [color=gold]Distant Future:[/color] Support for 4 or more players.[/font_size][/color][/center]"
 fit_content = true
+
+[node name="Logo" type="TextureRect" parent="." unique_id=1836053859]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -152.99994
+offset_top = 81.0
+offset_right = 103.0
+offset_bottom = 337.0
+grow_horizontal = 2
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("7_koqhg")

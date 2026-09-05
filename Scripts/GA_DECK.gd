@@ -81,8 +81,7 @@ func setup_deck_view():
 func _on_area_2d_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			context_menu.position = get_global_mouse_position()
-			context_menu.popup()
+			context_menu.popup(Rect2(get_global_mouse_position(), Vector2.ZERO))
 		elif event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				is_holding_left = true
@@ -120,7 +119,7 @@ func _setup_progress_bar():
 	var tex = ImageTexture.create_from_image(img)
 	progress_bar.texture_progress = tex
 	progress_bar.modulate = Color(0.2, 0.8, 1.0)
-	get_tree().root.add_child.call_deferred(progress_bar)
+	add_child.call_deferred(progress_bar)
 
 func _process(delta):
 	if is_holding_left:
@@ -421,7 +420,7 @@ func add_to_bottom(slug: String, uuid: String = ""):
 	var card_uuid = uuid
 	if card_uuid == "":
 		card_uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
-	player_deck.append({"slug": slug, "uuid": card_uuid, "z_index": -1})
+	player_deck.append({"slug": slug, "uuid": card_uuid, "z_index": 1})
 	update_deck_view()
 	update_deck_state()
 
