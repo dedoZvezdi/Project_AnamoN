@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://lobbvgacwmar" path="res://Scripts/Multiplayer.gd" id="1_r150o"]
 [ext_resource type="PackedScene" uid="uid://bhkcqcx0pu1b5" path="res://Scenes/Player_Field.tscn" id="2_idj7w"]
 [ext_resource type="PackedScene" uid="uid://c02vjgxjinwdx" path="res://Scenes/Opponent_Field.tscn" id="3_kln2b"]
-[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="4_rgh2o"]
+[ext_resource type="Texture2D" uid="uid://cf0mgjcqqbwot" path="res://Assets/Textures/background.png" id="4_rgh2o"]
 [ext_resource type="Texture2D" uid="uid://ctvm7q0h1hvmk" path="res://Assets/Textures/Toggle/toggle-off.png" id="6_vy5pj"]
 [ext_resource type="Texture2D" uid="uid://dq75273sesuwr" path="res://Assets/Textures/Toggle/toggle-on.png" id="8_4kpch"]
 

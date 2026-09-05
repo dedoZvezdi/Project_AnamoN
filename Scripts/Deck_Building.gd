@@ -25,6 +25,7 @@ extends Control
 @onready var pantheon_deck_grid = $PantheonDeckContent/ScrollContainer/GridContainer
 @onready var side_deck_grid = $SideDeckContent/ScrollContainer/GridContainer
 @onready var main_deck_label = $MainDeckHeader/LabelLeft
+@onready var info_label = $MainDeckHeader/InfoLabel
 @onready var mat_deck_label = $MatDeckHeader/LabelLeft
 @onready var pantheon_deck_label = $PantheonDeckHeader/LabelLeft
 @onready var side_deck_label = $SideDeckHeader/LabelLeft
@@ -40,6 +41,7 @@ extends Control
 @onready var results_area = $ResultsArea
 @onready var score_label = $ScoreLabel
 @onready var unique_checkbox = $ResultsArea/ResultsHeader/CheckBox
+@onready var results_sort_option = $ResultsArea/ResultsHeader/SortOptionButton
 
 const SAVE_PATH = "user://deck_builder_prefs.cfg"
 const MAIN_NAME_LIMIT := 4
@@ -47,6 +49,7 @@ const MAT_NAME_LIMIT := 1
 
 var _last_legality_idx: int = 0
 var _unique_cards_only: bool = true
+var _last_sort_idx: int = 0
 var _drag_slug := ""
 var _drag_source_zone := ""
 var _drag_was_dropped := false
@@ -71,9 +74,9 @@ func _increment_deck_version():
 
 func _ready():
 	if _sideboard_mode:
-		DiscordManager.update_status("Side Decking", "Adjusting Deck in Match")
+		DiscordManager.update_status("Side Decking")
 	else:
-		DiscordManager.update_status("In Deck Builder", "Building a Deck")
+		DiscordManager.update_status("Building a Deck")
 	if main_deck_grid:
 		main_deck_grid.grid_type = "main_deck"
 		main_deck_grid.max_columns = 15
@@ -173,6 +176,9 @@ func _ready():
 	search_button.pressed.connect(_on_search_pressed)
 	if clear_search_button:
 		clear_search_button.pressed.connect(_on_clear_search_pressed)
+	if results_sort_option:
+		results_sort_option.selected = _last_sort_idx
+		results_sort_option.item_selected.connect(_on_sort_option_selected)
 	if clear_button:
 		clear_button.pressed.connect(_on_clear_deck_pressed)
 	if sort_button:
@@ -223,20 +229,28 @@ func _load_prefs():
 		_last_legality_idx = config.get_value("filters", "legality_idx", 0)
 		_last_deck_filename = config.get_value("filters", "last_deck_filename", "")
 		_unique_cards_only = config.get_value("filters", "unique_cards_only", true)
+		_last_sort_idx = config.get_value("filters", "last_sort_idx", 0)
 	else:
 		_last_legality_idx = 0
 		_last_deck_filename = ""
 		_unique_cards_only = true
+		_last_sort_idx = 0
 
 func _save_prefs():
 	var config = ConfigFile.new()
 	config.set_value("filters", "legality_idx", _last_legality_idx)
 	config.set_value("filters", "last_deck_filename", _current_deck_filename)
 	config.set_value("filters", "unique_cards_only", _unique_cards_only)
+	config.set_value("filters", "last_sort_idx", _last_sort_idx)
 	config.save(SAVE_PATH)
 
 func _on_unique_checkbox_toggled(button_pressed: bool):
 	_unique_cards_only = button_pressed
+	_save_prefs()
+	_on_search_pressed()
+
+func _on_sort_option_selected(idx: int):
+	_last_sort_idx = idx
 	_save_prefs()
 	_on_search_pressed()
 
@@ -579,10 +593,135 @@ func _on_shuffle_main_deck_pressed():
 		return
 	main_deck_grid.shuffle_cards()
 
-func _on_sort_main_deck_pressed():
-	if not main_deck_grid or main_deck_grid.get_card_count() <= 1:
+func _sort_grid_fast(grid, deck_type: String):
+	if not grid or grid.get_card_count() <= 1:
 		return
-	main_deck_grid.sort_cards_by_name(_get_card_sort_name)
+	var sort_list = []
+	var blanks = 0
+	for slug in grid.card_slugs:
+		if slug == "":
+			blanks += 1
+		else:
+			sort_list.append(_get_deck_sort_string(slug, deck_type))
+	sort_list.sort()
+	var new_slugs = []
+	for key in sort_list:
+		var parts = key.split("|")
+		if parts.size() > 1:
+			new_slugs.append(parts[1])
+	for i in range(blanks):
+		new_slugs.append("")
+	if grid.has_method("apply_sorted_slugs"):
+		grid.apply_sorted_slugs(new_slugs)
+
+func _on_sort_main_deck_pressed():
+	_sort_grid_fast(main_deck_grid, "main")
+	_sort_grid_fast(mat_deck_grid, "mat")
+	_sort_grid_fast(side_deck_grid, "side")
+
+func _get_deck_sort_string(slug: String, deck_type: String) -> String:
+	var data = _get_base_card_data(slug)
+	var rank = 0
+	if deck_type == "main": rank = _get_main_deck_rank(data)
+	elif deck_type == "mat": rank = _get_mat_deck_rank(data)
+	elif deck_type == "side": rank = _get_side_deck_rank(data)
+	var lvl = 0
+	if (deck_type == "mat" or deck_type == "side") and rank == 0:
+		lvl = int(data.get("level", 0)) if data.has("level") and data["level"] != null else -1
+	var card_name = str(data.get("name", slug)).to_lower()
+	var el_str = str(data.get("element", "")).to_upper()
+	var el_rank = _get_element_rank(el_str)
+	var cost = 0
+	if data.has("cost_reserve") and data["cost_reserve"] != null: cost = int(data["cost_reserve"])
+	elif data.has("cost_memory") and data["cost_memory"] != null: cost = int(data["cost_memory"])
+	var power = int(data["power"]) if data.has("power") and data["power"] != null else -1
+	var life = int(data["life"]) if data.has("life") and data["life"] != null else -1
+	var rank_str = "%03d" % rank
+	var lvl_str = "%03d" % clamp(lvl, -99, 999)
+	var el_rank_str = "%03d" % el_rank
+	var el_sub_str = el_str if el_rank == 0 else ""
+	var cost_shifted = clamp(cost, -99, 999) + 99
+	var cost_str = "%04d" % (9999 - cost_shifted)
+	var has_power = "0" if (data.has("power") and data["power"] != null) else "1"
+	var pow_shifted = clamp(power, -99, 999) + 99
+	var pow_str = "%s_%04d" % [has_power, 9999 - pow_shifted]
+	var life_shifted = clamp(life, -99, 999) + 99
+	var life_str = "%04d" % (9999 - life_shifted)
+	return "%s_%s_%s_%s_%s_%s_%s_%s|%s" % [rank_str, lvl_str, el_rank_str, el_sub_str, cost_str, pow_str, life_str, card_name, slug]
+
+func _get_main_deck_rank(data: Dictionary) -> int:
+	var types = data.get("types", [])
+	var is_ally = false
+	for type in types:
+		if str(type).to_upper() == "ALLY":
+			is_ally = true
+			break
+	if is_ally: return 0
+	var has_power = data.has("power") and data["power"] != null
+	var is_fast = false
+	var is_slow = false
+	var has_speed = data.has("speed") and data["speed"] != null
+	if has_speed:
+		var speed = data["speed"]
+		if typeof(speed) in [TYPE_INT, TYPE_FLOAT]:
+			if speed == 1: is_fast = true
+			else: is_slow = true
+		elif typeof(speed) == TYPE_BOOL:
+			is_fast = speed
+			is_slow = not speed
+		elif typeof(speed) == TYPE_STRING:
+			if str(speed).to_upper() == "FAST": is_fast = true
+			else: is_slow = true
+	if is_fast and has_power: return 1
+	if is_slow and has_power: return 2
+	if is_fast and not has_power: return 3
+	if is_slow and not has_power: return 4
+	if not has_speed and has_power: return 5
+	return 6
+
+func _is_champion_card(data: Dictionary) -> bool:
+	var types = data.get("types", [])
+	for type in types:
+		if str(type).to_upper() == "CHAMPION": return true
+	return false
+
+func _is_regalia_custom(data: Dictionary) -> bool:
+	var types = data.get("types", [])
+	for type in types:
+		if str(type).to_upper().begins_with("REGALIA"): return true
+	return false
+
+func _get_mat_deck_rank(data: Dictionary) -> int:
+	if _is_champion_card(data): return 0
+	if _is_regalia_custom(data): return 1
+	return 2
+
+func _get_side_deck_rank(data: Dictionary) -> int:
+	if _is_champion_card(data): return 0
+	if _is_regalia_custom(data): return 1
+	return _get_main_deck_rank(data) + 2
+
+func _get_element_rank(element: String) -> int:
+	element = element.to_upper()
+	if element == "FIRE": return 100
+	if element == "WATER": return 101
+	if element == "WIND": return 102
+	if element == "NORM": return 200
+	return 0
+
+func _get_speed_rank(data: Dictionary) -> int:
+	var has_speed = data.has("speed") and data["speed"] != null
+	if not has_speed: return 0
+	var speed = data["speed"]
+	var is_fast = false
+	if typeof(speed) in [TYPE_INT, TYPE_FLOAT]:
+		if speed == 1: is_fast = true
+	elif typeof(speed) == TYPE_BOOL:
+		is_fast = speed
+	elif typeof(speed) == TYPE_STRING:
+		if str(speed).to_upper() == "FAST": is_fast = true
+	if is_fast: return 2
+	return 1
 
 func _on_clear_search_pressed():
 	if search_line_edit:
@@ -676,6 +815,37 @@ func determine_deck_for_slug(slug: String) -> String:
 func update_all_labels():
 	if main_deck_label and main_deck_grid:
 		main_deck_label.text = "Deck: " + str(main_deck_grid.get_card_count())
+	if info_label:
+		var allies_count = 0
+		var non_allies_count = 0
+		if main_deck_grid:
+			for slug in main_deck_grid.card_slugs:
+				if slug == "": continue
+				var data = _get_base_card_data(slug)
+				if _get_main_deck_rank(data) == 0:
+					allies_count += 1
+				else:
+					non_allies_count += 1
+		var basic_count = 0
+		var advanced_count = 0
+		var all_slugs = []
+		if main_deck_grid:
+			for slug in main_deck_grid.card_slugs:
+				if slug != "": all_slugs.append(slug)
+		if mat_deck_grid:
+			for slug in mat_deck_grid.card_slugs:
+				if slug != "": all_slugs.append(slug)
+		if side_deck_grid:
+			for slug in side_deck_grid.card_slugs:
+				if slug != "": all_slugs.append(slug)
+		for slug in all_slugs:
+			var data = _get_base_card_data(slug)
+			var element = str(data.get("element", "")).to_upper().strip_edges()
+			if _get_element_rank(element) > 0:
+				basic_count += 1
+			else:
+				advanced_count += 1
+		info_label.text = "Allies " + str(allies_count) + " Non-Allies " + str(non_allies_count) + " Basic " + str(basic_count) + " Advanced " + str(advanced_count)
 	if mat_deck_label and mat_deck_grid:
 		mat_deck_label.text = "Mat Deck: " + str(mat_deck_grid.get_card_count())
 	if side_deck_label and side_deck_grid:
@@ -1030,7 +1200,7 @@ func _on_search_pressed():
 	var filter_class = ""
 	if class_option and class_option.selected > 0:
 		filter_class = class_option.get_item_text(class_option.selected).to_upper()
-	var slugs_to_show = []
+	var slugs_dict = {}
 	for key in db.cards_db:
 		var card_data = db.cards_db[key]
 		if card_data.has("legalities") and card_data.has("types"):
@@ -1131,19 +1301,62 @@ func _on_search_pressed():
 				if _unique_cards_only:
 					if card_data["editions"].size() > 0:
 						var slug = card_data["editions"][0]["slug"]
-						if not slugs_to_show.has(slug):
-							slugs_to_show.append(slug)
+						slugs_dict[slug] = true
 				else:
 					for edition in card_data["editions"]:
 						var slug = edition["slug"]
-						if not slugs_to_show.has(slug):
-							slugs_to_show.append(slug)
-	slugs_to_show.sort()
+						slugs_dict[slug] = true
+	var slugs_to_show = slugs_dict.keys()
+	var search_sort_list = []
+	var selected_sort = 0
+	if results_sort_option: selected_sort = results_sort_option.selected
+	for slug in slugs_to_show:
+		var data = _get_base_card_data(slug)
+		var cost = 0
+		if data.has("cost_reserve") and data["cost_reserve"] != null: cost = int(data["cost_reserve"])
+		elif data.has("cost_memory") and data["cost_memory"] != null: cost = int(data["cost_memory"])
+		var cost_shifted = clamp(cost, -99, 999) + 99
+		var cost_str = "%04d" % (9999 - cost_shifted)
+		var el_str = str(data.get("element", "")).to_upper()
+		var el_rank = _get_element_rank(el_str)
+		var el_rank_str = "%03d" % el_rank
+		var el_sub_str = el_str if el_rank == 0 else ""
+		var power = int(data["power"]) if data.has("power") and data["power"] != null else -1
+		var has_power = "0" if (data.has("power") and data["power"] != null) else "1"
+		var pow_shifted = clamp(power, -99, 999) + 99
+		var pow_str = "%s_%04d" % [has_power, 9999 - pow_shifted]
+		var life = int(data["life"]) if data.has("life") and data["life"] != null else -1
+		var life_shifted = clamp(life, -99, 999) + 99
+		var life_str = "%04d" % (9999 - life_shifted)
+		var speed_val = _get_speed_rank(data)
+		var speed_str = "%d" % (9 - speed_val)
+		var card_name = str(data.get("name", slug)).to_lower()
+		var prefix = ""
+		if selected_sort == 0: prefix = "%04d" % (9999 - cost_shifted)
+		elif selected_sort == 1: prefix = "%04d" % cost_shifted
+		elif selected_sort == 2: prefix = card_name
+		elif selected_sort == 3: prefix = _invert_string(card_name)
+		elif selected_sort == 4: prefix = "%s_%04d" % [has_power, 9999 - pow_shifted]
+		elif selected_sort == 5: prefix = "%s_%04d" % [has_power, pow_shifted]
+		var sort_key = "%s_%s_%s_%s_%s_%s_%s_%s|%s" % [prefix, cost_str, el_rank_str, el_sub_str, pow_str, life_str, speed_str, card_name, slug]
+		search_sort_list.append(sort_key)
+	search_sort_list.sort()
+	slugs_to_show.clear()
+	for key in search_sort_list:
+		var parts = key.split("|")
+		if parts.size() > 1:
+			slugs_to_show.append(parts[1])
 	var results_header_label = $ResultsArea/ResultsHeader/LabelLeft
 	if results_header_label:
 		results_header_label.text = "Results: " + str(slugs_to_show.size())
 	if results_grid.has_method("set_data"):
 		results_grid.set_data(slugs_to_show)
+
+func _invert_string(s: String) -> String:
+	var res = ""
+	for i in range(s.length()):
+		res += String.chr(65535 - s.unicode_at(i))
+	return res
 
 func _init_decks_dir():
 	_decks_dir_path = GamePaths.ensure_decks_dir_exists()
@@ -1351,11 +1564,8 @@ func _get_unique_name_and_filename(base_name: String) -> Array:
 
 func _on_delete_pressed():
 	if _current_deck_filename == "": return
-	var deck_name = "this"
-	if name_edit_line and name_edit_line.text != "":
-		deck_name = "'" + name_edit_line.text + "'"
 	if _delete_confirm_dialog:
-		_delete_confirm_dialog.dialog_text = "Do you want to delete " + deck_name + " deck?"
+		_delete_confirm_dialog.dialog_text = "Do you want to delete this deck?"
 		_delete_confirm_dialog.popup_centered()
 
 func _delete_confirmed():
@@ -1428,12 +1638,17 @@ func _is_legal_format(format_name: String, main_slugs: Array, mat_slugs: Array, 
 		return true
 	return false
 
-func enter_sideboard_mode(deck_data: Dictionary, callback: Callable = Callable(), score_text: String = ""):
-	DiscordManager.update_status("Side Decking", "Adjusting Deck in Match")
+func enter_sideboard_mode(deck_data: Dictionary, callback: Callable = Callable(), score_text: String = "", lobby_format: String = ""):
+	DiscordManager.update_status("Side Decking")
 	_sideboard_mode = true
 	_is_ready_waiting = false
 	_sideboard_callback = callback
 	_sideboard_original_decks = deck_data.duplicate(true)
+	if lobby_format != "" and legality_option:
+		for i in range(legality_option.get_item_count()):
+			if legality_option.get_item_text(i) == lobby_format:
+				legality_option.selected = i
+				break
 	if deck_panel:
 		deck_panel.visible = false
 	if search_panel:
@@ -1445,7 +1660,6 @@ func enter_sideboard_mode(deck_data: Dictionary, callback: Callable = Callable()
 		restore_button.disabled = false
 	if ok_button:
 		ok_button.visible = true
-		ok_button.disabled = false
 		ok_button.text = "READY"
 	if score_label:
 		score_label.visible = true
@@ -1483,9 +1697,9 @@ func _load_sideboard_decks(deck_data: Dictionary):
 func _on_restore_pressed():
 	if not _sideboard_mode:
 		return
+	_is_ready_waiting = false
 	_load_sideboard_decks(_sideboard_original_decks)
 	if ok_button:
-		ok_button.disabled = false
 		ok_button.text = "READY"
 	if restore_button:
 		restore_button.disabled = false

@@ -31,9 +31,13 @@ var source_memory_slot = null
 var original_memory_index = -1
 var drag_card_was_marked = false
 var drag_source_was_main_field = false
+var _hover_parameters = PhysicsPointQueryParameters2D.new()
 
 func _ready() -> void:
-	DiscordManager.update_status("In a Match", "Dueling")
+	_hover_parameters.collide_with_areas = true
+	_hover_parameters.collision_mask = COLLISION_MASK_CARD
+	_hover_parameters.collide_with_bodies = false
+	DiscordManager.update_status("Dueling")
 	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
 	player_hand_reference = $"../PlayerHand"
 	update_screen_size()
@@ -107,12 +111,8 @@ func can_drag_card(card) -> bool:
 		return false
 	var space_state = get_world_2d().direct_space_state
 	if space_state:
-		var parameters = PhysicsPointQueryParameters2D.new()
-		parameters.position = get_global_mouse_position()
-		parameters.collide_with_areas = true
-		parameters.collision_mask = COLLISION_MASK_CARD
-		parameters.collide_with_bodies = false
-		var result = space_state.intersect_point(parameters)
+		_hover_parameters.position = get_global_mouse_position()
+		var result = space_state.intersect_point(_hover_parameters)
 		for collision in result:
 			if collision.collider.get_parent().name == "Crystal":
 				return false
@@ -687,12 +687,8 @@ func is_card_truly_hovered(card) -> bool:
 	var space_state = get_world_2d().direct_space_state
 	if !space_state:
 		return false
-	var parameters = PhysicsPointQueryParameters2D.new()
-	parameters.position = mouse_pos
-	parameters.collide_with_areas = true
-	parameters.collision_mask = COLLISION_MASK_CARD
-	parameters.collide_with_bodies = false
-	var result = space_state.intersect_point(parameters)
+	_hover_parameters.position = mouse_pos
+	var result = space_state.intersect_point(_hover_parameters)
 	if result.size() == 0:
 		return false
 	var highest_card = null
@@ -708,12 +704,8 @@ func raycast_check_at_position(pos):
 	var space_state = get_world_2d().direct_space_state
 	if !space_state:
 		return null
-	var parameters = PhysicsPointQueryParameters2D.new()
-	parameters.position = pos
-	parameters.collide_with_areas = true
-	parameters.collision_mask = COLLISION_MASK_CARD
-	parameters.collide_with_bodies = false
-	var result = space_state.intersect_point(parameters)
+	_hover_parameters.position = pos
+	var result = space_state.intersect_point(_hover_parameters)
 	if result.size() > 0:
 		for collision in result:
 			if collision.collider.get_parent().name == "Crystal":

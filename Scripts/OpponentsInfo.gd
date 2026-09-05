@@ -1,6 +1,6 @@
 extends Control
 
-@onready var texture_progress_bar = $TextureProgressBar
+@onready var health_chunks_container = $HealthChunksContainer
 
 var card_info_node = null
 var opponent_main_field_node = null
@@ -26,29 +26,50 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 	return null
 
 func _process(_delta):
-	if not texture_progress_bar:
+	if not health_chunks_container:
 		return
 	if not opponent_main_field_node or not is_instance_valid(opponent_main_field_node):
 		_find_nodes()
 		if not opponent_main_field_node:
-			texture_progress_bar.value = 100
+			_update_chunks(25)
 			return
 	var champion = opponent_main_field_node.get("current_champion_card")
 	if not champion or not is_instance_valid(champion):
-		texture_progress_bar.value = 100
+		_update_chunks(25)
 		last_champion_instance = null
 		return
 	if champion != last_champion_instance:
 		last_champion_instance = champion
 		cached_base_life = get_base_life(champion)
 	if cached_base_life <= 0:
-		texture_progress_bar.value = 100
+		_update_chunks(25)
 		return
 	var current_life = calculate_current_life(champion, cached_base_life)
-	if current_life >= cached_base_life:
-		texture_progress_bar.value = 100
-	else:
-		texture_progress_bar.value = (float(current_life) / float(cached_base_life)) * 100
+	var visible_count = _get_visible_chunks(current_life, cached_base_life)
+	_update_chunks(visible_count)
+
+func _get_visible_chunks(current: int, base: int) -> int:
+	if current <= 0:
+		return 0
+	if current >= base:
+		return 25
+	var missing_health = base - current
+	var missing_percent = (float(missing_health) / float(base)) * 100.0
+	var removed = 0
+	if missing_percent > 0:
+		removed = max(1, floor(missing_percent / 4.0))
+	return int(clamp(25 - removed, 0, 25))
+
+func _update_chunks(visible_count: int):
+	var children = health_chunks_container.get_children()
+	var total = children.size()
+	var hidden_count = total - visible_count
+	for i in range(total):
+		var chunk = children[i]
+		if i < hidden_count:
+			chunk.modulate.a = 0.0
+		else:
+			chunk.modulate.a = 1.0
 
 func get_base_life(card) -> int:
 	if not card_info_node or not is_instance_valid(card_info_node):

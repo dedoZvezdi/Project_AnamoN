@@ -1,13 +1,9 @@
 [gd_scene format=3 uid="uid://tuaxoo7p7gs"]
 
 [ext_resource type="Texture2D" uid="uid://cjqeimppj2qc7" path="res://Assets/Textures/Checks/adjust.svg" id="1_646k0"]
-[ext_resource type="Texture2D" uid="uid://dtq5vw2bx7em6" path="res://Assets/Textures/Player Info/Progress_Blue.png" id="1_prog"]
 [ext_resource type="Texture2D" uid="uid://b5xdd3h3qg1wq" path="res://Assets/Textures/Checks/nest.svg" id="2_efosg"]
 [ext_resource type="Texture2D" uid="uid://dqy87tgapqhxe" path="res://Assets/Textures/Checks/check_box.svg" id="2_ipgag"]
-[ext_resource type="Texture2D" uid="uid://e5jfv2giu16v" path="res://Assets/Textures/Player Info/Over_Blue.png" id="2_over"]
 [ext_resource type="Texture2D" uid="uid://cifllxiovgmbv" path="res://Assets/Textures/Checks/check_box_outline_blank.svg" id="3_646k0"]
-[ext_resource type="Texture2D" uid="uid://c3nmqngrjlvg3" path="res://Assets/Textures/Player Info/Progress_Red_Mirrored.png" id="3_prog_m"]
-[ext_resource type="Texture2D" uid="uid://s0qmkyd0dly0" path="res://Assets/Textures/Player Info/Over_Red_Mirrored.png" id="4_over_m"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w1nw0"]
 bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
@@ -409,10 +405,11 @@ theme_override_constants/margin_bottom = 32
 layout_mode = 2
 theme_override_constants/side_margin = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_mr5cl")
-current_tab = 0
+current_tab = 1
 tabs_visible = false
 
 [node name="General" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer" unique_id=619588473]
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 24
 metadata/_tab_index = 0
@@ -530,7 +527,6 @@ theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_ys4a0")
 value = 100.0
 
 [node name="HealthBars" type="VBoxContainer" parent="Window/HBox/MainArea/MainContent/TabContainer" unique_id=1470813217]
-visible = false
 layout_mode = 2
 theme_override_constants/separation = 15
 metadata/_tab_index = 1
@@ -722,7 +718,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("1_prog")
 expand_mode = 1
 stretch_mode = 5
 
@@ -733,7 +728,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_over")
 expand_mode = 1
 stretch_mode = 5
 
@@ -908,7 +902,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_prog_m")
 expand_mode = 1
 stretch_mode = 5
 
@@ -919,7 +912,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("4_over_m")
 expand_mode = 1
 stretch_mode = 5
 

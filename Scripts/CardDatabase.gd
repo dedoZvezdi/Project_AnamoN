@@ -1,6 +1,9 @@
 extends Node
 
 var db
+var res_path = "res://Data/SQLite.db"
+var user_path = "user://SQLite.db"
+
 static var cards_db = {}
 static var _is_initialized = false
 
@@ -11,8 +14,14 @@ func _ready():
 
 func initialize_database():
 	if _is_initialized: return true
+	if not FileAccess.file_exists(user_path):
+		var file_data = FileAccess.get_file_as_bytes(res_path)
+		var user_file = FileAccess.open(user_path, FileAccess.WRITE)
+		if user_file:
+			user_file.store_buffer(file_data)
+			user_file.close()
 	db = SQLite.new()
-	db.path = "res://Data/SQLite.db"
+	db.path = user_path
 	if not db.open_db():
 		push_error("Failed to open database")
 		return false

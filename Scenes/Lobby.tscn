@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bxkob67p6jf84"]
 
 [ext_resource type="Script" uid="uid://da3g2yfmrve2s" path="res://Scripts/Lobby.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://0xoleotcsp57" path="res://Assets/Textures/background.png" id="2_lolwk"]
+[ext_resource type="Texture2D" uid="uid://cf0mgjcqqbwot" path="res://Assets/Textures/background.png" id="2_lolwk"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_sfhbt"]
 

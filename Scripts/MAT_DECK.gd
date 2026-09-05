@@ -55,7 +55,7 @@ func _setup_progress_bar():
 	var tex = ImageTexture.create_from_image(img)
 	progress_bar.texture_progress = tex
 	progress_bar.modulate = Color(0.2, 0.8, 1.0)
-	get_tree().root.add_child.call_deferred(progress_bar)
+	add_child.call_deferred(progress_bar)
 
 func _process(delta):
 	if is_holding_left:

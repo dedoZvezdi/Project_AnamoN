@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://dpfq6k4bgsvnc"]
 
 [ext_resource type="Script" uid="uid://bsrg4y8nojlly" path="res://Scripts/PlayerInfo.gd" id="1_jgqti"]
-[ext_resource type="Texture2D" uid="uid://e5jfv2giu16v" path="res://Assets/Textures/Player Info/Over_Blue.png" id="2_un3a0"]
-[ext_resource type="Texture2D" uid="uid://dtq5vw2bx7em6" path="res://Assets/Textures/Player Info/Progress_Blue.png" id="3_uliol"]
 [ext_resource type="Texture2D" uid="uid://bsfe2cbkcwbrn" path="res://Assets/Textures/Player Info/Player_photos/Player_Image.png" id="4_m477e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g5k7o"]
@@ -12,24 +10,211 @@ size = Vector2(213, 14)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 430.0
-offset_bottom = 100.0
+offset_bottom = 101.0
 script = ExtResource("1_jgqti")
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="." unique_id=547984301]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-value = 60.0
-texture_over = ExtResource("2_un3a0")
-texture_progress = ExtResource("3_uliol")
-
-[node name="Polygon2D" type="Polygon2D" parent="." unique_id=931093571]
-texture = ExtResource("4_m477e")
-polygon = PackedVector2Array(43, 6, 9, 26, 9, 66, 44, 86, 78, 66, 78, 26)
+[node name="HealthBackplate" type="Polygon2D" parent="." unique_id=689633297]
+position = Vector2(-11, -10)
+color = Color(0.04, 0.06, 0.1, 0.95)
+polygon = PackedVector2Array(100, 40, 208, 40, 220, 18, 429, 18, 440, 30, 440, 60, 428, 82, 109, 82, 100, 82)
 
 [node name="ElementsArea2D" type="Area2D" parent="." unique_id=1365677033]
+z_index = 5
+position = Vector2(0, 10)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ElementsArea2D" unique_id=1134057314]
-position = Vector2(315.5, 14)
+position = Vector2(314.5, 12)
 shape = SubResource("RectangleShape2D_g5k7o")
 disabled = true
+
+[node name="HealthBorderLine" type="Line2D" parent="." unique_id=898871240]
+position = Vector2(-11, -10)
+points = PackedVector2Array(100, 82, 111, 82, 428, 82, 440, 60, 440, 30, 429, 18, 220, 18, 208, 40, 100, 40)
+width = 2.0
+default_color = Color(0, 0.7490196, 1, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="HealthChunksContainer" type="HBoxContainer" parent="." unique_id=901002194]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 36.0
+offset_right = 422.0
+offset_bottom = 67.0
+theme_override_constants/separation = 2
+
+[node name="Chunk1" type="ColorRect" parent="HealthChunksContainer" unique_id=1559174666]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.2, 0.8, 1)
+
+[node name="Chunk2" type="ColorRect" parent="HealthChunksContainer" unique_id=823067129]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.23, 0.81, 1)
+
+[node name="Chunk3" type="ColorRect" parent="HealthChunksContainer" unique_id=526938169]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.26, 0.82, 1)
+
+[node name="Chunk4" type="ColorRect" parent="HealthChunksContainer" unique_id=1876118535]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.29, 0.83, 1)
+
+[node name="Chunk5" type="ColorRect" parent="HealthChunksContainer" unique_id=976707732]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.32, 0.83, 1)
+
+[node name="Chunk6" type="ColorRect" parent="HealthChunksContainer" unique_id=1259634757]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.35, 0.84, 1)
+
+[node name="Chunk7" type="ColorRect" parent="HealthChunksContainer" unique_id=1863061512]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.38, 0.85, 1)
+
+[node name="Chunk8" type="ColorRect" parent="HealthChunksContainer" unique_id=1588954287]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.41, 0.86, 1)
+
+[node name="Chunk9" type="ColorRect" parent="HealthChunksContainer" unique_id=1311458065]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.44, 0.87, 1)
+
+[node name="Chunk10" type="ColorRect" parent="HealthChunksContainer" unique_id=1730730728]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.47, 0.88, 1)
+
+[node name="Chunk11" type="ColorRect" parent="HealthChunksContainer" unique_id=1799493078]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.5, 0.88, 1)
+
+[node name="Chunk12" type="ColorRect" parent="HealthChunksContainer" unique_id=1737907803]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.53, 0.89, 1)
+
+[node name="Chunk13" type="ColorRect" parent="HealthChunksContainer" unique_id=1205500786]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.56, 0.9, 1)
+
+[node name="Chunk14" type="ColorRect" parent="HealthChunksContainer" unique_id=1606767847]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.59, 0.91, 1)
+
+[node name="Chunk15" type="ColorRect" parent="HealthChunksContainer" unique_id=367497218]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.62, 0.92, 1)
+
+[node name="Chunk16" type="ColorRect" parent="HealthChunksContainer" unique_id=1449130840]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.65, 0.93, 1)
+
+[node name="Chunk17" type="ColorRect" parent="HealthChunksContainer" unique_id=3325509]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.68, 0.93, 1)
+
+[node name="Chunk18" type="ColorRect" parent="HealthChunksContainer" unique_id=544644102]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.71, 0.94, 1)
+
+[node name="Chunk19" type="ColorRect" parent="HealthChunksContainer" unique_id=394037575]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.74, 0.95, 1)
+
+[node name="Chunk20" type="ColorRect" parent="HealthChunksContainer" unique_id=910120300]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.77, 0.96, 1)
+
+[node name="Chunk21" type="ColorRect" parent="HealthChunksContainer" unique_id=1725930205]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.8, 0.97, 1)
+
+[node name="Chunk22" type="ColorRect" parent="HealthChunksContainer" unique_id=1427411788]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.83, 0.98, 1)
+
+[node name="Chunk23" type="ColorRect" parent="HealthChunksContainer" unique_id=2032820183]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.86, 0.98, 1)
+
+[node name="Chunk24" type="ColorRect" parent="HealthChunksContainer" unique_id=1021045754]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.89, 0.99, 1)
+
+[node name="Chunk25" type="Control" parent="HealthChunksContainer" unique_id=1699898315]
+custom_minimum_size = Vector2(11, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Polygon2D" type="Polygon2D" parent="HealthChunksContainer/Chunk25" unique_id=1657357190]
+scale = Vector2(0.78106594, 1.0333333)
+color = Color(0, 0.92, 1, 1)
+polygon = PackedVector2Array(0, 0, 14.083313, 0, 14.083313, 13.548389, 2.560608, 30.000004, 0, 30)
+
+[node name="PortraitFrameOuter" type="Polygon2D" parent="." unique_id=782798904]
+position = Vector2(5, 5)
+color = Color(0, 0.75, 1, 0.3)
+polygon = PackedVector2Array(43, -4, -1, 22, -1, 70, 43, 96, 88, 70, 88, 22)
+
+[node name="PortraitFrameInner" type="Polygon2D" parent="." unique_id=850857254]
+position = Vector2(5, 5)
+color = Color(0, 0.75, 1, 1)
+polygon = PackedVector2Array(43, 0, 3, 24, 3, 68, 43, 92, 84, 68, 84, 24)
+
+[node name="PortraitBg" type="Polygon2D" parent="." unique_id=1305879188]
+position = Vector2(5, 5)
+color = Color(0.2, 0.32156864, 0.49411765, 1)
+polygon = PackedVector2Array(43, 4, 7, 26, 7, 66, 43, 88, 80, 66, 80, 26)
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=1203329399]
+position = Vector2(10.444333, 10.379178)
+scale = Vector2(0.89585954, 0.9463759)
+texture = ExtResource("4_m477e")
+polygon = PackedVector2Array(41.921, 0.656, 3.969, 22.846, 3.969, 62.999, 41.921, 85.189, 80.99, 62.999, 80.99, 22.846)

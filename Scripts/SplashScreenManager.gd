@@ -1,13 +1,5 @@
 extends Control
 
-@export var load_scene : PackedScene
-@export var in_time : float =  0.5
-@export var fade_in_time : float = 1.5
-@export var pause_time : float = 1.5
-@export var fade_out_time : float = 1.5
-@export var out_time : float =  0.5
-@export var splash_screen : TextureRect
-
 func _ready() -> void:
 	_cleanup_temp_opponent_photo()
 	_ensure_decks_folder_exists()
@@ -27,18 +19,45 @@ func _cleanup_temp_opponent_photo():
 		DirAccess.remove_absolute(file_path)
 
 func fade() -> void:
-	if splash_screen == null:
-		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
-		return
-	splash_screen.modulate.a = 0.0
-	var tween = self.create_tween()
-	tween.tween_interval(in_time)
-	tween.tween_property(splash_screen, "modulate:a", 1.0, fade_in_time)
-	tween.tween_callback(_load_database)
-	tween.tween_interval(pause_time)
-	tween.tween_property(splash_screen, "modulate:a", 0.0, fade_out_time)
-	tween.tween_interval(out_time)
-	await tween.finished
+	await get_tree().process_frame
+	if has_node("LoadingBar/ChunksContainer"):
+		var container = $LoadingBar/ChunksContainer
+		var label = $LoadingBar/VBox/StatusLabel
+		var percent_label = $LoadingBar/VBox/PercentLabel
+		var chunks = container.get_children()
+		_load_database()
+		var loading_tween = self.create_tween()
+		var time_per_chunk = 0.03
+		var c1 = Color("524121ff")
+		var c2 = Color("c9a96e")
+		for i in range(chunks.size()):
+			var chunk = chunks[i]
+			var t = float(i) / float(max(1, chunks.size() - 1))
+			var target_color = c1.lerp(c2, t)
+			var target_node = chunk
+			if chunk.has_node("Polygon2D"):
+				target_node = chunk.get_node("Polygon2D")
+			loading_tween.tween_interval(time_per_chunk)
+			loading_tween.tween_property(target_node, "color", target_color, 0.01)
+			var update_pct = func(pct): percent_label.text = str(pct) + "%"
+			loading_tween.tween_callback(update_pct.bind(int((float(i+1) / float(chunks.size())) * 100)))
+			if i == 0:
+				loading_tween.tween_callback(func(): label.text = "Loading Cards Images")
+			elif i == 7:
+				loading_tween.tween_callback(func(): label.text = "Loading Scripts")
+			elif i == 15:
+				loading_tween.tween_callback(func(): label.text = "Loading Scenes")
+			elif i == 20:
+				loading_tween.tween_callback(func(): label.text = "Preparing UI")
+			elif i == 24:
+				loading_tween.tween_callback(func(): label.text = "Starting The Game")
+		await loading_tween.finished
+		while SceneCache._thread != null or SceneCache._needs_compile:
+			await get_tree().process_frame
+	else:
+		_load_database()
+		while SceneCache._thread != null or SceneCache._needs_compile:
+			await get_tree().process_frame
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 func _load_database() -> void:

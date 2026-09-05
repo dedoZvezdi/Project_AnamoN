@@ -81,10 +81,10 @@ func clear_cache():
 		_thread = null
 	if _preloaded_data != null and typeof(_preloaded_data) == TYPE_DICTIONARY:
 		if _preloaded_data.get("player_field"): 
-			if _preloaded_data["player_field"].get_parent(): _preloaded_data["player_field"].get_parent().remove_child(_preloaded_data["pf"])
+			if _preloaded_data["player_field"].get_parent(): _preloaded_data["player_field"].get_parent().remove_child(_preloaded_data["player_field"])
 			_preloaded_data["player_field"].queue_free()
 		if _preloaded_data.get("opponent_field"): 
-			if _preloaded_data["opponent_field"].get_parent(): _preloaded_data["opponent_field"].get_parent().remove_child(_preloaded_data["of"])
+			if _preloaded_data["opponent_field"].get_parent(): _preloaded_data["opponent_field"].get_parent().remove_child(_preloaded_data["opponent_field"])
 			_preloaded_data["opponent_field"].queue_free()
 	_preloaded_data = null
 	_needs_compile = false

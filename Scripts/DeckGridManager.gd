@@ -232,6 +232,18 @@ func sort_cards_by_name(get_sort_name: Callable):
 		return name_a < name_b)
 	_reorder_existing_cards()
 
+func sort_cards_custom(sort_func: Callable):
+	if card_slugs.size() <= 1:
+		return
+	card_slugs.sort_custom(sort_func)
+	_reorder_existing_cards()
+
+func apply_sorted_slugs(new_slugs: Array):
+	if new_slugs.size() != card_slugs.size():
+		return
+	card_slugs = new_slugs.duplicate()
+	_reorder_existing_cards()
+
 func get_card_count() -> int:
 	return card_slugs.size()
 

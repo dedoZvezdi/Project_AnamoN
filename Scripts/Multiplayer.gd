@@ -164,22 +164,9 @@ func _on_host_button_pressed() -> void:
 			peer = WebRTCMultiplayerPeer.new()
 			peer.create_server()
 			multiplayer.multiplayer_peer = peer
-			GlobalData.peer_connected_webrtc.connect(func(peer_id):
-				var p_conn = WebRTCPeerConnection.new()
-				p_conn.initialize({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
-				p_conn.session_description_created.connect(func(type, sdp):
-					p_conn.set_local_description(type, sdp)
-					GlobalData.send_webrtc_offer(peer_id, sdp))
-				p_conn.ice_candidate_created.connect(func(media, index, ice_name):
-					GlobalData.send_webrtc_candidate(peer_id, media, index, ice_name))
-				peer.add_peer(p_conn, peer_id)
-				p_conn.create_offer())
-			GlobalData.webrtc_answer_received.connect(func(peer_id, sdp):
-				if peer.has_peer(peer_id):
-					peer.get_peer(peer_id).connection.set_remote_description("answer", sdp))
-			GlobalData.webrtc_candidate_received.connect(func(peer_id, mid, index, sdp):
-				if peer.has_peer(peer_id):
-					peer.get_peer(peer_id).connection.add_ice_candidate(mid, index, sdp))
+			GlobalData.peer_connected_webrtc.connect(_on_global_peer_connected)
+			GlobalData.webrtc_answer_received.connect(_on_global_webrtc_answer_received)
+			GlobalData.webrtc_candidate_received.connect(_on_global_webrtc_candidate_received)
 		else:
 			peer = ENetMultiplayerPeer.new()
 			var error = peer.create_server(int(port.text))
@@ -269,19 +256,8 @@ func _on_join_button_pressed() -> void:
 			peer = WebRTCMultiplayerPeer.new()
 			peer.create_client(GlobalData.my_webrtc_id)
 			multiplayer.multiplayer_peer = peer
-			GlobalData.webrtc_offer_received.connect(func(peer_id, sdp):
-				var p_conn = WebRTCPeerConnection.new()
-				p_conn.initialize({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
-				p_conn.session_description_created.connect(func(type, lsdp):
-					p_conn.set_local_description(type, lsdp)
-					GlobalData.send_webrtc_answer(peer_id, lsdp))
-				p_conn.ice_candidate_created.connect(func(media, index, ice_name):
-					GlobalData.send_webrtc_candidate(peer_id, media, index, ice_name))
-				peer.add_peer(p_conn, peer_id, 1)
-				p_conn.set_remote_description("offer", sdp))
-			GlobalData.webrtc_candidate_received.connect(func(peer_id, mid, index, sdp):
-				if peer.has_peer(peer_id):
-					peer.get_peer(peer_id).connection.add_ice_candidate(mid, index, sdp))
+			GlobalData.webrtc_offer_received.connect(_on_global_webrtc_offer_received)
+			GlobalData.webrtc_candidate_received.connect(_on_global_webrtc_candidate_received)
 		else:
 			peer = ENetMultiplayerPeer.new()
 			peer.create_client(server.text, int(port.text))
@@ -1083,7 +1059,7 @@ func reset_ui():
 	$CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxButtonsContainer/JoinButton.visible = true
 	$CanvasLayer/PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxNameContainer/Name.visible = true
 	server.visible = true
-	port.visible = not use_websocket
+	port.visible = true
 	check.visible = true
 	$ChangePhotoButton.visible = true
 	$PhotoPreview.visible = false
@@ -1975,16 +1951,21 @@ func _enter_sideboard_phase():
 	if _deck_building_instance.has_method("enter_sideboard_mode"):
 		var mode_str = "Match" if _game_mode == 1 else "Best of 5"
 		var score_text = "Mode: " + mode_str + "\nYou " + str(_wins_local) + " - " + str(_wins_remote) + " Opponent"
-		_deck_building_instance.enter_sideboard_mode(_current_deck_data, Callable(self, "_on_sideboard_ok"), score_text)
+		var lobby_legality = ""
+		if current_lobby and current_lobby.legality_option:
+			var l_idx = current_lobby.legality_option.selected
+			if l_idx >= 0 and l_idx < current_lobby.legality_option.get_item_count():
+				lobby_legality = current_lobby.legality_option.get_item_text(l_idx)
+		_deck_building_instance.enter_sideboard_mode(_current_deck_data, Callable(self, "_on_sideboard_ok"), score_text, lobby_legality)
 
 func _on_sideboard_ok(modified_decks: Dictionary):
-	DiscordManager.update_status("Side Decking", "Waiting for Opponent")
+	DiscordManager.update_status("Side Decking")
 	_current_deck_data = modified_decks.duplicate(true)
 	_sideboard_ready_local = true
 	rpc("rpc_sideboard_ready")
 
 func _exit_sideboard_phase():
-	DiscordManager.update_status("In a Match", "Dueling")
+	DiscordManager.update_status("Dueling")
 	_free_sideboard_instance()
 	start_game_instances()
 
@@ -2154,3 +2135,38 @@ func sync_transcendental_rite_activate(player_id: int):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote: return
 	TranscendentalRiteEffect.apply_opponent_activation(get_tree().current_scene)
+
+func _on_global_peer_connected(peer_id):
+	var p_conn = WebRTCPeerConnection.new()
+	p_conn.initialize({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
+	p_conn.session_description_created.connect(_on_p_conn_session_description_created.bind(peer_id, p_conn))
+	p_conn.ice_candidate_created.connect(_on_p_conn_ice_candidate_created.bind(peer_id))
+	peer.add_peer(p_conn, peer_id)
+	p_conn.create_offer()
+
+func _on_p_conn_session_description_created(type, sdp, peer_id, p_conn):
+	p_conn.set_local_description(type, sdp)
+	GlobalData.send_webrtc_offer(peer_id, sdp)
+
+func _on_p_conn_ice_candidate_created(media, index, ice_name, peer_id):
+	GlobalData.send_webrtc_candidate(peer_id, media, index, ice_name)
+
+func _on_global_webrtc_answer_received(peer_id, sdp):
+	if peer and peer.has_peer(peer_id):
+		peer.get_peer(peer_id).connection.set_remote_description("answer", sdp)
+
+func _on_global_webrtc_candidate_received(peer_id, mid, index, sdp):
+	if peer and peer.has_peer(peer_id):
+		peer.get_peer(peer_id).connection.add_ice_candidate(mid, index, sdp)
+
+func _on_global_webrtc_offer_received(peer_id, sdp):
+	var p_conn = WebRTCPeerConnection.new()
+	p_conn.initialize({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
+	p_conn.session_description_created.connect(_on_p_conn_session_description_created_client.bind(peer_id, p_conn))
+	p_conn.ice_candidate_created.connect(_on_p_conn_ice_candidate_created.bind(peer_id))
+	peer.add_peer(p_conn, peer_id, 1)
+	p_conn.set_remote_description("offer", sdp)
+
+func _on_p_conn_session_description_created_client(type, lsdp, peer_id, p_conn):
+	p_conn.set_local_description(type, lsdp)
+	GlobalData.send_webrtc_answer(peer_id, lsdp)

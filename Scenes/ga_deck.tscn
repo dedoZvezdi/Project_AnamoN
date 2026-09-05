@@ -118,10 +118,12 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_xpb52")
 theme_override_styles/hover = SubResource("StyleBoxFlat_fdbsd")
 
 [node name="DeckViewWindow" type="Window" parent="." unique_id=522525823]
+transparent_bg = true
 oversampling_override = 1.0
 size = Vector2i(600, 142)
 visible = false
 unresizable = true
+transparent = true
 
 [node name="PopupMenu" type="PopupMenu" parent="DeckViewWindow" unique_id=1371315731]
 oversampling_override = 1.0

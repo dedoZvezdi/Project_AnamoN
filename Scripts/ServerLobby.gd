@@ -21,7 +21,7 @@ const USER_PHOTO_PATH = "user://Player_Image.png"
 const DEFAULT_PHOTO_PATH = "res://Assets/Textures/Player Info/Player_photos/Player_Image.png"
 
 func _ready():
-	DiscordManager.update_status("Looking for Battle", "In Server Lobby")
+	DiscordManager.update_status("In Server Lobby")
 	join_btn.disabled = true
 	error_popup.get_label().horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_load_player_info()
@@ -266,9 +266,12 @@ func show_popup(message: String):
 	if message.length() <= 18:
 		error_popup.dialog_autowrap = false
 		error_popup.size = Vector2i(200, 100)
+	elif message.length() <= 27:
+		error_popup.dialog_autowrap = false
+		error_popup.size = Vector2i(250, 100)
 	else:
 		error_popup.dialog_autowrap = true
-		error_popup.size = Vector2i(300, 150)
+		error_popup.size = Vector2i(300, 125)
 	error_popup.dialog_text = message
 	error_popup.popup_centered()
 

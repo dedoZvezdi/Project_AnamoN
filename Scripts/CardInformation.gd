@@ -364,20 +364,17 @@ func format_slug(slug):
 	return " ".join(formatted_words)
 
 func find_base_card_for_edition(edition_id):
+	if _base_card_for_edition_cache.is_empty() and card_database_reference and card_database_reference.cards_db:
+		for slug in card_database_reference.cards_db:
+			var data = card_database_reference.cards_db[slug]
+			if data.has("editions"):
+				for edition in data["editions"]:
+					var ed_id = edition.get("edition_id")
+					if ed_id:
+						_base_card_for_edition_cache[ed_id] = slug
 	if _base_card_for_edition_cache.has(edition_id):
 		return _base_card_for_edition_cache[edition_id]
-	var result = null
-	for slug in card_database_reference.cards_db:
-		var data = card_database_reference.cards_db[slug]
-		if data.has("editions"):
-			for edition in data["editions"]:
-				if edition.get("edition_id") == edition_id:
-					result = slug
-					break
-			if result != null:
-				break
-	_base_card_for_edition_cache[edition_id] = result
-	return result
+	return null
 
 func get_slug_from_card(card) -> String:
 	if card.has_meta("slug"):
@@ -447,7 +444,7 @@ func is_card_of_type(slug: String, target_type: String) -> bool:
 			if parent_data.has("types") and parent_data["types"] is Array:
 				for types in parent_data["types"]:
 					if str(types).to_upper() == target_upper:
-						return true		
+						return true
 	return false
 
 func _has_ascendant_bonus(_slug: String) -> bool:

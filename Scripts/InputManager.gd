@@ -9,8 +9,12 @@ const COLLISION_MASK_OPPONENT_CARD = 64
 
 var card_manager_reference
 var deck_reference
+var _query_parameters = PhysicsPointQueryParameters2D.new()
 
 func _ready():
+	_query_parameters.collide_with_areas = true
+	_query_parameters.collision_mask = COLLISION_MASK_CARD | COLLISION_MASK_CARD_DECK
+	_query_parameters.collide_with_bodies = false
 	card_manager_reference = $"../CardManager"
 	deck_reference = $"../GA_DECK"
 
@@ -35,12 +39,8 @@ func raycast_for_card():
 	var space_state = get_world_2d().direct_space_state
 	if !space_state:
 		return null
-	var parameters = PhysicsPointQueryParameters2D.new()
-	parameters.position = get_global_mouse_position()
-	parameters.collide_with_areas = true
-	parameters.collision_mask = COLLISION_MASK_CARD | COLLISION_MASK_CARD_DECK
-	parameters.collide_with_bodies = false
-	var result = space_state.intersect_point(parameters)
+	_query_parameters.position = get_global_mouse_position()
+	var result = space_state.intersect_point(_query_parameters)
 	if result.size() > 0:
 		for collision in result:
 			var collider = collision.collider
