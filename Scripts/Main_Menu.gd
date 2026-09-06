@@ -25,6 +25,8 @@ func _ready():
 	settings_button.pressed.connect(_on_settings_pressed)
 	volume_button.pressed.connect(_on_volume_pressed)
 	music_button.pressed.connect(_on_music_pressed)
+	if has_node("BMAC"):
+		$BMAC.pressed.connect(func(): OS.shell_open("https://buymeacoffee.com/dedozvezdi"))
 
 func _toggle_info():
 	info_panel.visible = !info_panel.visible

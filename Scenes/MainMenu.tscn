@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bmmv8iiysg8a0" path="res://Assets/Textures/Main Menu Buttons/music-on.png" id="5_koqhg"]
 [ext_resource type="Texture2D" uid="uid://kjwqv44fdkey" path="res://Assets/Textures/Main Menu Buttons/volume-on.png" id="5_xim88"]
 [ext_resource type="Texture2D" uid="uid://bh4b1t4rtb1d4" path="res://Assets/Textures/icon.png" id="7_koqhg"]
+[ext_resource type="Texture2D" uid="uid://bmfhyga43igi1" path="res://Assets/Textures/red-button.png" id="8_koqhg"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rrcx7"]
 texture = ExtResource("2_xim88")
@@ -286,9 +287,10 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_rrcx7")
 visible = false
 layout_mode = 0
 offset_left = 1759.0
-offset_top = 15.0
+offset_top = 15.000001
 offset_right = 1905.0
 offset_bottom = 161.0
+scale = Vector2(0.8, 0.8)
 theme_override_styles/normal = SubResource("StyleBoxFlat_mr5cl")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tj4fr")
 theme_override_styles/hover = SubResource("StyleBoxFlat_sodvm")
@@ -301,6 +303,7 @@ offset_left = 15.0
 offset_top = 15.0
 offset_right = 161.0
 offset_bottom = 161.0
+scale = Vector2(0.8, 0.8)
 theme_override_styles/normal = SubResource("StyleBoxFlat_lfhol")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_nrjgg")
 theme_override_styles/hover = SubResource("StyleBoxFlat_vig0b")
@@ -313,6 +316,7 @@ offset_left = 176.0
 offset_top = 15.0
 offset_right = 322.0
 offset_bottom = 161.0
+scale = Vector2(0.8, 0.8)
 theme_override_styles/normal = SubResource("StyleBoxFlat_kudqy")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_mixjk")
 theme_override_styles/hover = SubResource("StyleBoxFlat_kihqq")
@@ -324,6 +328,7 @@ offset_left = 1759.0
 offset_top = 919.0
 offset_right = 1905.0
 offset_bottom = 1065.0
+scale = Vector2(0.8, 0.8)
 theme_override_styles/normal = SubResource("StyleBoxFlat_md12f")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_yxkem")
 theme_override_styles/hover = SubResource("StyleBoxFlat_7v4os")
@@ -419,3 +424,12 @@ offset_bottom = 337.0
 grow_horizontal = 2
 scale = Vector2(1.2, 1.2)
 texture = ExtResource("7_koqhg")
+
+[node name="BMAC" type="TextureButton" parent="." unique_id=1194846887]
+layout_mode = 0
+offset_left = 54.0
+offset_top = 847.0
+offset_right = 1144.0
+offset_bottom = 1153.0
+scale = Vector2(0.5, 0.5)
+texture_normal = ExtResource("8_koqhg")
