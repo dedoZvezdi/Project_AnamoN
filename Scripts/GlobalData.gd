@@ -22,7 +22,7 @@ signal webrtc_answer_received(peer_id: int, answer: String)
 signal webrtc_candidate_received(peer_id: int, mid: String, index: int, sdp: String)
 
 func _ready():
-	socket.connect_to_url("ws://164.92.251.69:8000")
+	socket.connect_to_url("ws://89.168.95.57:8000")
 
 func _process(_delta):
 	socket.poll()
@@ -45,7 +45,10 @@ func _handle_server_message(data):
 		emit_signal("server_error", data.get("message", "Unknown error occurred."))
 	elif action == "banned":
 		var reason = data.get("reason", "You have been banned.")
-		if get_tree().current_scene.name != "ServerLobby":
+		var current_scene_name = ""
+		if get_tree().current_scene:
+			current_scene_name = get_tree().current_scene.name
+		if current_scene_name != "ServerLobby":
 			if multiplayer.multiplayer_peer:
 				multiplayer.multiplayer_peer.close()
 			last_error_message = reason
@@ -54,6 +57,11 @@ func _handle_server_message(data):
 			emit_signal("server_error", reason)
 	elif action == "room_created":
 		emit_signal("room_created")
+	elif action == "host_disconnected":
+		if multiplayer.multiplayer_peer:
+			multiplayer.multiplayer_peer.close()
+		last_error_message = "The host was disconnected."
+		get_tree().change_scene_to_file("res://Scenes/Server_Lobby.tscn")
 	elif action == "peer_connected":
 		emit_signal("peer_connected_webrtc", int(data.get("peer_id")))
 	elif action == "peer_disconnected":
