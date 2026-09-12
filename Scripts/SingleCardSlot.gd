@@ -238,6 +238,8 @@ func _sync_move_to_deck(uuid: String, is_top: bool):
 
 func animate_card_to_deck_from_graveyard(card, deck_position: Vector2, slug: String, card_uuid: String, is_top: bool):
 	remove_card_from_slot(card)
+	if card.has_method("set_tweening"):
+		card.set_tweening(true)
 	var card_image = card.get_node("CardImage")
 	var original_texture = card_image.texture
 	card_image.texture = load("res://Assets/Textures/ga_back.png")

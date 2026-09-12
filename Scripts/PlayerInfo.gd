@@ -117,12 +117,8 @@ func get_base_life(card) -> int:
 	return int(life) if life != null else 0
 
 func calculate_current_life(card, base_life: int) -> int:
-	var mods = card.get("runtime_modifiers")
-	var counters = card.get("attached_counters")
-	var life_mod = 0
-	if mods and mods is Dictionary:
-		life_mod = int(mods.get("life", 0))
-	var counter_mod = 0
-	if counters and counters is Dictionary:
-		counter_mod = int(counters.get("Buff", 0)) - int(counters.get("Debuff", 0)) + int(counters.get("Life", 0)) - int(counters.get("Damage", 0))
-	return max(0, base_life + life_mod + counter_mod)
+	if card and card.has_method("get_effective_stats"):
+		var stats = card.get_effective_stats()
+		if stats.has("life"):
+			return stats["life"]
+	return max(0, base_life)

@@ -83,6 +83,14 @@ func _process(_delta: float) -> void:
 			else:
 				player_hand_reference.clear_external_preview()
 
+func set_card_hover_scale(card: Node, is_hovered: bool):
+	if not card or not is_instance_valid(card):
+		return
+	if card.has_method("animate_hover_scale"):
+		card.animate_hover_scale(is_hovered)
+	else:
+		card.scale = hover_scale if is_hovered else normal_scale
+
 func can_hover_card(card) -> bool:
 	if not card or not is_instance_valid(card):
 		return false
@@ -108,6 +116,8 @@ func can_hover_card(card) -> bool:
 
 func can_drag_card(card) -> bool:
 	if not card or not is_instance_valid(card):
+		return false
+	if card.get("is_tweening") == true:
 		return false
 	var space_state = get_world_2d().direct_space_state
 	if space_state:
@@ -269,7 +279,7 @@ func start_drag(card):
 	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
 		if last_hovered_card.has_node("Area2D/CollisionShape2D"):
 			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
-				last_hovered_card.scale = normal_scale
+				set_card_hover_scale(last_hovered_card, false)
 				last_hovered_card.z_index = base_z_index
 		last_hovered_card = null
 	if banish_slot and banish_slot.has_method("get_top_card"):
@@ -279,7 +289,7 @@ func start_drag(card):
 	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
 		if last_hovered_card.has_node("Area2D/CollisionShape2D"):
 			if not last_hovered_card.get_node("Area2D/CollisionShape2D").disabled:
-				last_hovered_card.scale = normal_scale
+				set_card_hover_scale(last_hovered_card, false)
 				last_hovered_card.z_index = base_z_index
 		last_hovered_card = null
 
@@ -683,6 +693,8 @@ func force_hover_check():
 func is_card_truly_hovered(card) -> bool:
 	if not card or not is_instance_valid(card):
 		return false
+	if card.get("is_tweening") == true:
+		return false
 	var mouse_pos = get_global_mouse_position()
 	var space_state = get_world_2d().direct_space_state
 	if !space_state:
@@ -695,9 +707,12 @@ func is_card_truly_hovered(card) -> bool:
 	var highest_z = -9999
 	for collision in result:
 		var detected_card = collision.collider.get_parent()
-		if detected_card and is_instance_valid(detected_card) and detected_card.z_index > highest_z:
-			highest_card = detected_card
-			highest_z = detected_card.z_index
+		if detected_card and is_instance_valid(detected_card):
+			if detected_card.get("is_tweening") == true:
+				continue
+			if detected_card.z_index > highest_z:
+				highest_card = detected_card
+				highest_z = detected_card.z_index
 	return highest_card == card
 
 func raycast_check_at_position(pos):
@@ -716,9 +731,12 @@ func raycast_check_at_position(pos):
 			var collider = collision.collider
 			if collider.collision_layer & COLLISION_MASK_CARD:
 				var card = collider.get_parent()
-				if card and is_instance_valid(card) and card.z_index > highest_z_index:
-					highest_card = card
-					highest_z_index = card.z_index
+				if card and is_instance_valid(card):
+					if card.get("is_tweening") == true:
+						continue
+					if card.z_index > highest_z_index:
+						highest_card = card
+						highest_z_index = card.z_index
 		return highest_card
 	return null
 
@@ -730,6 +748,8 @@ func handle_hover():
 		return
 	validate_references()
 	var current_card = raycast_check_for_card()
+	if current_card and is_instance_valid(current_card) and current_card.get("is_tweening") == true:
+		current_card = null
 	if current_card and is_instance_valid(current_card):
 		if current_card.get_parent() and current_card.get_parent().is_in_group("rotated_slots"):
 			current_card = null
@@ -758,7 +778,7 @@ func handle_hover():
 	if current_card != last_hovered_card:
 		if last_hovered_card and is_instance_valid(last_hovered_card):
 			if can_hover_card(last_hovered_card):
-				last_hovered_card.scale = normal_scale
+				set_card_hover_scale(last_hovered_card, false)
 				last_hovered_card.z_index = base_z_index
 				if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
 					player_hand_reference.clear_hovered_card()
@@ -776,7 +796,7 @@ func handle_hover():
 			if can_hover_card(current_card):
 				if not is_opponent_card(current_card):
 					current_card.get_parent().move_child(current_card, current_card.get_parent().get_child_count())
-					current_card.scale = hover_scale
+					set_card_hover_scale(current_card, true)
 					current_card.z_index = hover_z_index
 				if player_hand_reference and current_card in player_hand_reference.player_hand:
 					player_hand_reference.bring_card_to_front(current_card)
@@ -831,6 +851,8 @@ func disconnect_card_signals(card):
 func _on_card_hovered(card):
 	if not card or not is_instance_valid(card) or animation_in_progress:
 		return
+	if card.get("is_tweening") == true:
+		return
 	if card.get_parent() and card.get_parent().is_in_group("single_card_slots"):
 		return
 	for slot in get_tree().get_nodes_in_group("single_card_slots"):
@@ -857,7 +879,7 @@ func _on_card_hovered(card):
 	if not is_card_truly_hovered(card):
 		return
 	card.get_parent().move_child(card, card.get_parent().get_child_count())
-	card.scale = hover_scale
+	set_card_hover_scale(card, true)
 	card.z_index = hover_z_index
 	if player_hand_reference and card in player_hand_reference.player_hand:
 		player_hand_reference.bring_card_to_front(card)
@@ -870,7 +892,7 @@ func _on_card_hovered(card):
 	if last_hovered_card and last_hovered_card != card and is_instance_valid(last_hovered_card):
 		if can_hover_card(last_hovered_card):
 			if not is_opponent_card(last_hovered_card):
-				last_hovered_card.scale = normal_scale
+				set_card_hover_scale(last_hovered_card, false)
 				last_hovered_card.z_index = base_z_index
 			if player_hand_reference and last_hovered_card in player_hand_reference.player_hand:
 				player_hand_reference.clear_hovered_card()
@@ -885,9 +907,12 @@ func _on_card_hovered(card):
 func _on_card_unhovered(card):
 	if not card or not is_instance_valid(card) or card == card_being_dragged or card != last_hovered_card or animation_in_progress:
 		return
+	if card.get("is_tweening") == true:
+		last_hovered_card = null
+		return
 	if can_hover_card(card):
 		if not is_opponent_card(card):
-			card.scale = normal_scale
+			set_card_hover_scale(card, false)
 			card.z_index = base_z_index
 		if player_hand_reference and card in player_hand_reference.player_hand:
 			player_hand_reference.clear_hovered_card()

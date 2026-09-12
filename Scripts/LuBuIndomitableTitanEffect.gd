@@ -62,13 +62,18 @@ static func _execute_wipe_and_transform(champion: Node, main_field_node: Node, l
 		banish_slot = root.find_child("BANISH", true, false)
 	var current_champion = champion
 	if current_champion and banish_slot:
+		var banish_pos = banish_slot.get_node("Area2D/CollisionShape2D").global_position if banish_slot.has_node("Area2D/CollisionShape2D") else banish_slot.global_position
 		var champ_pos = current_champion.global_position
 		var card_uuid = current_champion.uuid if "uuid" in current_champion else ""
 		var card_slug = current_champion.get_meta("slug") if current_champion.has_meta("slug") else ""
 		if multiplayer_node and multiplayer_node.has_method("rpc"):
 			multiplayer_node.rpc("sync_move_to_banish", unique_id, card_uuid, card_slug, false, false)
 		var tween = tree.create_tween()
-		tween.tween_property(current_champion, "global_position", banish_slot.global_position, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		if current_champion.has_method("set_tweening"):
+			current_champion.set_tweening(true)
+		current_champion.z_index = 1000
+		tween.parallel().tween_property(current_champion, "global_position", banish_pos, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.parallel().tween_property(current_champion, "rotation_degrees", 90.0, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		var lineage_to_process = []
 		if main_field_node.has_method("deactivate_card_elements"):
 			main_field_node.deactivate_card_elements(current_champion)
@@ -86,7 +91,7 @@ static func _execute_wipe_and_transform(champion: Node, main_field_node: Node, l
 			if "transcendental_rite_active" in main_field_node:
 				main_field_node.transcendental_rite_active = false
 		await tween.finished
-		banish_slot.add_card_to_slot(current_champion, false)
+		banish_slot.add_card_to_slot(current_champion, false, -1, true)
 		var card_scene = load("res://Scenes/Card.tscn")
 		while lineage_to_process.size() > 0:
 			var pre_lineage = lineage_to_process.pop_back()
@@ -117,9 +122,13 @@ static func _execute_wipe_and_transform(champion: Node, main_field_node: Node, l
 				if multiplayer_node and multiplayer_node.has_method("rpc"):
 					multiplayer_node.rpc("sync_move_to_banish", unique_id, pre_uuid, pre_slug, false, false)
 				var banish_tween = tree.create_tween()
-				banish_tween.tween_property(temp_champ, "global_position", banish_slot.global_position, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				if temp_champ.has_method("set_tweening"):
+					temp_champ.set_tweening(true)
+				temp_champ.z_index = 1000
+				banish_tween.parallel().tween_property(temp_champ, "global_position", banish_pos, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				banish_tween.parallel().tween_property(temp_champ, "rotation_degrees", 90.0, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 				await banish_tween.finished
-				banish_slot.add_card_to_slot(temp_champ, false)
+				banish_slot.add_card_to_slot(temp_champ, false, -1, true)
 				if temp_champ in main_field_node.cards_in_field:
 					main_field_node.cards_in_field.erase(temp_champ)
 				if main_field_node.has_method("deactivate_card_elements"):
@@ -166,21 +175,11 @@ static func _execute_wipe_and_transform(champion: Node, main_field_node: Node, l
 						is_ally = true
 						break
 		if is_ally and base_data != null:
-			var mods = card.runtime_modifiers if "runtime_modifiers" in card else {}
-			var attached = card.attached_counters if "attached_counters" in card else {}
-			var buff_count = attached.get("Buff", 0)
-			var debuff_count = attached.get("Debuff", 0)
-			var counter_mod = buff_count - debuff_count
-			var card_pow = 0
-			if base_data.has("power") and base_data["power"] != null:
-				card_pow = int(base_data["power"]) + int(mods.get("power", 0)) + counter_mod + attached.get("Power", 0)
-				card_pow = max(0, card_pow)
-			var card_life = 0
-			if base_data.has("life") and base_data["life"] != null:
-				var life_count = attached.get("Life", 0)
-				var damage_count = attached.get("Damage", 0)
-				card_life = int(base_data["life"]) + int(mods.get("life", 0)) + counter_mod + (life_count - damage_count)
-				card_life = max(0, card_life)
+			var stats = {"power": 0, "life": 0}
+			if card.has_method("get_effective_stats"):
+				stats = card.get_effective_stats()
+			var card_pow = stats.get("power", 0)
+			var card_life = stats.get("life", 0)
 			total_ally_stats += (card_pow + card_life)
 		var uuid = ""
 		if "uuid" in card:
@@ -197,13 +196,19 @@ static func _execute_wipe_and_transform(champion: Node, main_field_node: Node, l
 		else:
 			var target_slot = banish_slot if goes_to_banish else graveyard_slot
 			if target_slot:
+				var target_pos = target_slot.get_node("Area2D/CollisionShape2D").global_position if target_slot.has_node("Area2D/CollisionShape2D") else target_slot.global_position
+				var target_rot = 90.0 if goes_to_banish else 0.0
 				var tween = tree.create_tween()
-				tween.tween_property(card, "global_position", target_slot.global_position, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				if card.has_method("set_tweening"):
+					card.set_tweening(true)
+				card.z_index = 1000
+				tween.parallel().tween_property(card, "global_position", target_pos, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				tween.parallel().tween_property(card, "rotation_degrees", target_rot, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 				await tween.finished
 				if main_field_node.has_method("remove_card_from_field"):
 					main_field_node.remove_card_from_field(card)
 				if goes_to_banish:
-					banish_slot.add_card_to_slot(card, false)
+					banish_slot.add_card_to_slot(card, false, -1, true)
 					if multiplayer_node and multiplayer_node.has_method("rpc"):
 						multiplayer_node.rpc("sync_move_to_banish", unique_id, uuid, card_slug, false, false)
 				else:

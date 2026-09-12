@@ -2,6 +2,7 @@ extends Node2D
 
 signal hovered
 signal hovered_off
+signal state_changed
 
 @onready var popup_menu: PopupMenu = $PopupMenu
 @onready var area: Area2D = $Area2D
@@ -29,6 +30,7 @@ var selected_lineage_card_slug: String = ""
 var selected_lineage_card_uuid: String = ""
 var is_tweening: bool = false
 var mark_tween: Tween
+var scale_tween: Tween = null
 var original_owner_id = 0
 var chosen_elements := []
 var is_marked = false
@@ -344,7 +346,8 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 							popup_menu.add_item("Give Control", 14)
 					var slug = get_slug_from_card()
 					if (slug.contains("imperial-seal") or slug.contains("apotheosis-rite") or slug.contains("sacramental-rite") or slug.contains("transcendental-rite")) and current_field and current_field.name == "MAINFIELD":
-						popup_menu.add_item("Activate", 21)
+						if current_field.get("current_champion_card") != null:
+							popup_menu.add_item("Activate", 21)
 					if is_transformable_card(slug) and not is_champion_card():
 						var target_slug = get_transform_target(slug)
 						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
@@ -622,29 +625,6 @@ func transform_card():
 		var animation: AnimationPlayer = $AnimationPlayer
 		if animation.has_animation("card_flip"):
 			animation.play("card_flip")
-	if is_in_main_field() and current_field:
-		if current_field.has_method("is_champion_card") and current_field.is_champion_card(self) and not is_regalia_card():
-			if current_field.current_champion_card and current_field.current_champion_card != self:
-				var previous = current_field.current_champion_card
-				if "attached_counters" in previous:
-					for c_name in previous.attached_counters:
-						attached_counters[c_name] = previous.attached_counters[c_name]
-				if "champion_lineage" in previous:
-					for entry in previous.champion_lineage:
-						add_to_lineage(entry)
-				var lineage_data = {
-					"slug": current_field.get_card_slug(previous),
-					"uuid": previous.uuid if "uuid" in previous else "",
-					"chosen_elements": previous.chosen_elements if "chosen_elements" in previous else [],
-					"element": _get_element_for_slug(current_field.get_card_slug(previous))}
-				add_to_lineage(lineage_data)
-				current_field.remove_previous_champions()
-			current_field.current_champion_card = self
-			global_position = current_field.global_position + Vector2(20, -60)
-			z_index = 1
-			current_field.champion_life_delta = 0
-			if has_method("apply_champion_life_delta"):
-				apply_champion_life_delta(0)
 	if is_in_main_field():
 		clear_runtime_modifiers()
 	if card_information_reference and mouse_inside and not is_dragging:
@@ -723,14 +703,8 @@ func show_card_info():
 			if plds_text_to_display == "":
 				plds_text_to_display = _build_plds_text_effective(parent_data)
 	if level_to_display != null:
-		if is_in_main_field():
-			var temp_mods = runtime_modifiers
-			temp_mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(self, data, temp_mods)
-			var lvl_eff = int(level_to_display) + int(temp_mods.get("level", 0)) + attached_counters.get("Level", 0)
-			level_to_display = lvl_eff
-		else:
-			var lvl_eff = int(level_to_display) + attached_counters.get("Level", 0)
-			level_to_display = lvl_eff
+		var stats = get_effective_stats()
+		level_to_display = stats["level"]
 		if card_level_lable:
 			card_level_lable.text = "LV. %s" % str(level_to_display)
 	if plds_text_to_display != "" and card_PLDS_lable:
@@ -764,29 +738,43 @@ func _build_plds_text(data: Dictionary) -> String:
 			parts.append("SPEED ?")
 	return " - ".join(parts)
 
-func _build_plds_text_effective(data: Dictionary) -> String:
-	var parts: Array[String] = []
-	var mods = runtime_modifiers if is_in_main_field() else {"level": 0, "power": 0, "life": 0, "durability": 0}
+func get_effective_stats() -> Dictionary:
+	var stats = {"level": 0, "power": 0, "life": 0, "durability": 0}
+	var data = _resolve_data_for_stats()
+	if data.size() == 0:
+		return stats
+	var mods = get_runtime_modifiers() if is_in_main_field() else {"level": 0, "power": 0, "life": 0, "durability": 0}
 	mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(self, data, mods)
 	var buff_count = attached_counters.get("Buff", 0)
 	var debuff_count = attached_counters.get("Debuff", 0)
 	var counter_mod = buff_count - debuff_count
 	var pow_counter = attached_counters.get("Power", 0)
 	var dur_counter = attached_counters.get("Durability", 0)
+	var life_count = attached_counters.get("Life", 0)
+	var damage_count = attached_counters.get("Damage", 0)
+	var lvl_counter = attached_counters.get("Level", 0)
+	if data.has("level") and data["level"] != null:
+		stats["level"] = int(data["level"]) + int(mods.get("level", 0)) + lvl_counter
 	if data.has("power") and data["power"] != null:
 		var value = int(data["power"]) + int(mods.get("power", 0)) + counter_mod + pow_counter
-		value = max(0, value)
-		parts.append("POW. %s" % str(value))
+		stats["power"] = max(0, value)
 	if data.has("life") and data["life"] != null:
-		var life_count = attached_counters.get("Life", 0)
-		var damage_count = attached_counters.get("Damage", 0)
 		var sec_val = int(data["life"]) + int(mods.get("life", 0)) + counter_mod + (life_count - damage_count)
-		sec_val = max(0, sec_val)
-		parts.append("LIFE %s" % str(sec_val))
+		stats["life"] = max(0, sec_val)
 	if data.has("durability") and data["durability"] != null:
 		var thirth_val = int(data["durability"]) + int(mods.get("durability", 0)) + dur_counter
-		thirth_val = max(0, thirth_val)
-		parts.append("DUR. %s" % str(thirth_val))
+		stats["durability"] = max(0, thirth_val)
+	return stats
+
+func _build_plds_text_effective(data: Dictionary) -> String:
+	var parts: Array[String] = []
+	var stats = get_effective_stats()
+	if data.has("power") and data["power"] != null:
+		parts.append("POW. %s" % str(stats["power"]))
+	if data.has("life") and data["life"] != null:
+		parts.append("LIFE %s" % str(stats["life"]))
+	if data.has("durability") and data["durability"] != null:
+		parts.append("DUR. %s" % str(stats["durability"]))
 	if data.has("speed") and data["speed"] != null:
 		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
 			if data["speed"] == 1:
@@ -878,6 +866,9 @@ func set_direction(direction: String):
 
 func on_drag_start():
 	is_dragging = true
+	if scale_tween and scale_tween.is_valid():
+		scale_tween.kill()
+	scale = Vector2(0.35, 0.35)
 	was_rotated_before_drag = is_rotated
 	if not is_shifting_currents_card():
 		if not is_in_main_field():
@@ -937,6 +928,7 @@ func clear_runtime_modifiers():
 	runtime_modifiers["power"] = 0
 	runtime_modifiers["life"] = 0
 	runtime_modifiers["durability"] = 0
+	state_changed.emit()
 
 func get_runtime_modifiers() -> Dictionary:
 	return runtime_modifiers.duplicate()
@@ -1297,6 +1289,7 @@ func go_to_mat_deck():
 		animate_card_to_mat_deck(mat_deck_node.global_position, slug, uuid)
 
 func animate_card_to_mat_deck(deck_position: Vector2, slug: String, card_uuid: String):
+	set_tweening(true)
 	if $Area2D.input_event.is_connected(_on_area_2d_input_event):
 		$Area2D.input_event.disconnect(_on_area_2d_input_event)
 	$Area2D.set_deferred("monitoring", false)
@@ -1339,6 +1332,7 @@ func _prepare_for_deck_move():
 			current_field.remove_card_from_slot(self)
 
 func animate_card_to_deck(deck_position: Vector2, slug: String, card_uuid: String, is_top: bool):
+	set_tweening(true)
 	if $Area2D.input_event.is_connected(_on_area_2d_input_event):
 		$Area2D.input_event.disconnect(_on_area_2d_input_event)
 	$Area2D.set_deferred("monitoring", false)
@@ -1438,6 +1432,7 @@ func destroy_status():
 	queue_free()
 
 func sync_stats_to_opponent(forced_rot: float = -999.0):
+	state_changed.emit()
 	var slug = get_slug_from_card()
 	if slug == "":
 		return
@@ -1665,11 +1660,33 @@ func set_tweening(active: bool):
 	is_tweening = active
 	if area:
 		area.set_deferred("input_pickable", !active)
+		area.set_deferred("monitoring", !active)
+		area.set_deferred("monitorable", !active)
+	if has_node("Area2D/CollisionShape2D"):
+		get_node("Area2D/CollisionShape2D").set_deferred("disabled", active)
 	if active:
+		if scale_tween and scale_tween.is_valid():
+			scale_tween.kill()
 		scale = Vector2(0.35, 0.35) 
 		hide_card_info()
 		mouse_inside = false
 		emit_signal("hovered_off", self)
+		var scene = get_tree().get_current_scene() if get_tree() else null
+		if scene:
+			var card_manager = scene.find_child("CardManager", true, false)
+			if card_manager and is_instance_valid(card_manager):
+				if card_manager.last_hovered_card == self:
+					card_manager.last_hovered_card = null
+
+func animate_hover_scale(is_hovered: bool):
+	if is_tweening or is_dragging:
+		return
+	if scale_tween and scale_tween.is_valid():
+		scale_tween.kill()
+	var target_scale = Vector2(0.42, 0.42) if is_hovered else Vector2(0.35, 0.35)
+	scale_tween = create_tween()
+	scale_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	scale_tween.tween_property(self, "scale", target_scale, 0.12)
 
 func give_control_to_opponent():
 	if not is_in_main_field():
