@@ -34,9 +34,9 @@ func activate_champion_elements(card):
 	if not elements_node:
 		return
 	if card_slug.contains("prismatic-sanctuary"):
-		PrismaticSanctuaryEffect.apply_activation(elements_node, false)
+		PrismaticSanctuaryEffect.apply_activation(elements_node, false, card, self)
 	elif card_slug.contains("prismatic-perseverance"):
-		PrismaticPerseveranceEffect.apply_activation(elements_node, false)
+		PrismaticPerseveranceEffect.apply_activation(elements_node, false, card, self)
 	elif card_slug.contains("prismatic-spirit"):
 		PrismaticSpiritEffect.apply_activation(card, elements_node, false)
 	if "champion_lineage" in card:
@@ -81,9 +81,9 @@ func deactivate_card_elements(card):
 			elements_node = root.find_child("Elements", true, false)	
 	if elements_node:
 		if card_slug.contains("prismatic-perseverance"):
-			PrismaticPerseveranceEffect.apply_deactivation(elements_node, false)
+			PrismaticPerseveranceEffect.apply_deactivation(elements_node, false, card)
 		elif card_slug.contains("prismatic-sanctuary"):
-			PrismaticSanctuaryEffect.apply_deactivation(elements_node, false)
+			PrismaticSanctuaryEffect.apply_deactivation(elements_node, false, card)
 		if is_champion_card(card):
 			var element_name = _get_element_for_slug(card_slug)
 			if element_name != "":
@@ -138,13 +138,15 @@ func add_card_to_field(card, position = null):
 					card.add_to_lineage(lineage_data)
 				remove_previous_champions()
 			current_champion_card = card
+			_connect_champion_signals(card)
 			cards_in_field.append(card)
 			card_in_slot = true
 			activate_champion_elements(card)
+			recheck_field_continuous_effects()
 		if card and is_instance_valid(card) and card.has_method("apply_champion_life_delta"):
 			card.apply_champion_life_delta(champion_life_delta)
 		card.global_position = global_position + Vector2(20, -60)
-		card.z_index = 400
+		card.z_index = 1
 		var card_image = card.get_node_or_null("CardImage")
 		var card_image_back = card.get_node_or_null("CardImageBack")
 		if card_image and card_image_back:
@@ -182,7 +184,7 @@ func add_card_to_field(card, position = null):
 			card.global_position = position
 		else:
 			card.global_position = global_position
-		card.z_index = 350
+		card.z_index = 1
 		var card_image_s = card.get_node_or_null("CardImage")
 		var card_image_back_s = card.get_node_or_null("CardImageBack")
 		if card_image_s and card_image_back_s:
@@ -210,15 +212,82 @@ func add_card_to_field(card, position = null):
 				card_image_back_s.visible = false
 				card_image_s.visible = true
 
+func _connect_champion_signals(champ: Node):
+	if champ and is_instance_valid(champ) and champ.has_signal("state_changed"):
+		if not champ.state_changed.is_connected(_on_champion_state_changed):
+			champ.state_changed.connect(_on_champion_state_changed)
+
+func _disconnect_champion_signals(champ: Node):
+	if champ and is_instance_valid(champ) and champ.has_signal("state_changed"):
+		if champ.state_changed.is_connected(_on_champion_state_changed):
+			champ.state_changed.disconnect(_on_champion_state_changed)
+
+func _on_champion_state_changed():
+	recheck_field_continuous_effects()
+
+func recheck_field_continuous_effects():
+	var root = get_tree().current_scene
+	var elements_node = get_parent().get_node_or_null("Elements")
+	if not elements_node:
+		if root and root.has_method("find_child"):
+			elements_node = root.find_child("Elements", true, false)
+	if not elements_node:
+		return
+	for card in cards_in_field:
+		if not card or not is_instance_valid(card):
+			continue
+		var slug = get_card_slug(card)
+		if slug.contains("prismatic-perseverance"):
+			PrismaticPerseveranceEffect.update_continuous_effect(elements_node, false, card, self)
+
 func notify_card_transformed(card, old_slug: String = ""):
-	if card == current_champion_card and not is_champion_card(card):
-		current_champion_card = null
-		if old_slug != "" and _is_slug_champion(old_slug):
-			_deactivate_element_by_slug(old_slug)
-	elif is_champion_card(card):
-		if old_slug != "" and _is_slug_champion(old_slug):
-			_deactivate_element_by_slug(old_slug)
+	if old_slug != "" and _is_slug_champion(old_slug):
+		_deactivate_element_by_slug(old_slug)
+	if is_champion_card(card) and not is_regalia_card(card):
+		if current_champion_card != null and current_champion_card != card:
+			var previous = current_champion_card
+			var old_lineage = []
+			if "champion_lineage" in previous:
+				old_lineage = previous.champion_lineage
+			for entry in old_lineage:
+				if card.has_method("add_to_lineage"):
+					card.add_to_lineage(entry)
+			var old_champ_slug = get_card_slug(previous)
+			var old_uuid = previous.uuid if "uuid" in previous else ""
+			if "attached_counters" in previous and "attached_counters" in card:
+				for c_name in previous.attached_counters:
+					card.attached_counters[c_name] = previous.attached_counters[c_name]
+			if card.has_method("add_to_lineage"):
+				var lineage_data = {
+					"slug": old_champ_slug,
+					"uuid": old_uuid,
+					"chosen_elements": previous.chosen_elements if "chosen_elements" in previous else [],
+					"element": _get_element_for_slug(old_champ_slug)}
+				card.add_to_lineage(lineage_data)
+			remove_previous_champions()
+		current_champion_card = card
+		_connect_champion_signals(card)
+		if not (card in cards_in_field):
+			cards_in_field.append(card)
+		card_in_slot = true
 		activate_champion_elements(card)
+		recheck_field_continuous_effects()
+		card.global_position = global_position + Vector2(20, -60)
+		card.z_index = 1
+		var card_image = card.get_node_or_null("CardImage")
+		var card_image_back = card.get_node_or_null("CardImageBack")
+		if card_image and card_image_back:
+			card_image_back.z_index = -1
+			card_image.z_index = 0
+			card_image_back.visible = false
+			card_image.visible = true
+		champion_life_delta = 0
+		if card.has_method("apply_champion_life_delta"):
+			card.apply_champion_life_delta(0)
+	elif card == current_champion_card:
+		_disconnect_champion_signals(current_champion_card)
+		current_champion_card = null
+		recheck_field_continuous_effects()
 	if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
 		var tree = get_tree()
 		if tree and tree.current_scene:
@@ -228,6 +297,7 @@ func notify_card_transformed(card, old_slug: String = ""):
 
 func remove_previous_champions():
 	if current_champion_card and is_instance_valid(current_champion_card):
+		_disconnect_champion_signals(current_champion_card)
 		cards_in_field.erase(current_champion_card)
 		if current_champion_card.has_method("set_current_field"):
 			current_champion_card.set_current_field(null)
@@ -236,6 +306,7 @@ func remove_previous_champions():
 		current_champion_card.queue_free()
 		deactivate_card_elements(current_champion_card)
 		current_champion_card = null
+		recheck_field_continuous_effects()
 		if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
 			var tree = get_tree()
 			if tree and tree.current_scene:
@@ -311,7 +382,9 @@ func remove_card_from_field(card):
 		if card.has_method("set_current_field"):
 			card.set_current_field(null)
 		if card == current_champion_card:
+			_disconnect_champion_signals(current_champion_card)
 			current_champion_card = null
+			recheck_field_continuous_effects()
 		if card == current_mastery_card:
 			current_mastery_card = null
 		deactivate_card_elements(card)
@@ -349,16 +422,10 @@ func clear_imperial_seal_activations():
 		transcendental_rite_turn_count = 0
 		return
 	while imperial_seal_turn_count > 0:
-		for e_name in ["Fire", "Water", "Wind"]:
-			var e_node = elements_node.get_node_or_null(e_name)
-			if e_node and e_node.has_method("deactivate"):
-				e_node.deactivate()
+		Gimmicks.gimmick_remove_basic_elements(elements_node, false)
 		imperial_seal_turn_count -= 1
 	while transcendental_rite_turn_count > 0:
-		for e_name in ["Fire", "Water", "Wind"]:
-			var e_node = elements_node.get_node_or_null(e_name)
-			if e_node and e_node.has_method("deactivate"):
-				e_node.deactivate()
+		Gimmicks.gimmick_remove_basic_elements(elements_node, false)
 		transcendental_rite_turn_count -= 1
 
 func _is_slug_champion(slug: String) -> bool:

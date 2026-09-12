@@ -52,8 +52,11 @@ func raycast_for_card():
 			var collider = collision.collider
 			if collider.collision_layer & COLLISION_MASK_CARD:
 				var card = collider.get_parent()
-				if card and is_instance_valid(card) and card.z_index > highest_z_index:
-					highest_card = card
-					highest_z_index = card.z_index
+				if card and is_instance_valid(card):
+					if card.get("is_tweening") == true:
+						continue
+					if card.z_index > highest_z_index:
+						highest_card = card
+						highest_z_index = card.z_index
 		return highest_card
 	return null

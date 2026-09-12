@@ -375,6 +375,8 @@ func _sync_banish_flip(uuid: String, is_face_down: bool):
 
 func animate_card_to_deck_from_banish(card, deck_position: Vector2, slug: String, card_uuid: String, is_top: bool):
 	remove_card_from_slot(card)
+	if card.has_method("set_tweening"):
+		card.set_tweening(true)
 	var card_image = card.get_node("CardImage")
 	var original_texture = card_image.texture
 	card_image.texture = load("res://Assets/Textures/ga_back.png")
@@ -476,6 +478,9 @@ func add_card_to_slot(card, face_down := false, at_index: int = -1, skip_animati
 		card.rotation_degrees = 90.0
 		_on_card_arrived_in_banish(card, face_down, at_index)
 	else:
+		if card.has_method("set_tweening"):
+			card.set_tweening(true)
+		card.z_index = 1000
 		var tween = create_tween()
 		tween.parallel().tween_property(card, "global_position", target_pos, 0.3)
 		tween.parallel().tween_property(card, "rotation_degrees", 90.0, 0.3)
@@ -657,6 +662,8 @@ func sent_to_mat_deck():
 
 func animate_card_to_mat_deck_from_banish(card, deck_position: Vector2, slug: String, card_uuid: String):
 	remove_card_from_slot(card)
+	if card.has_method("set_tweening"):
+		card.set_tweening(true)
 	var card_image = card.get_node("CardImage")
 	var original_texture = card_image.texture
 	card_image.texture = load("res://Assets/Textures/ga_back.png")

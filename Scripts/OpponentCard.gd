@@ -604,15 +604,8 @@ func show_card_info():
 			if plds_text_to_display == "":
 				plds_text_to_display = _build_plds_text_effective(parent_data)
 	if level_to_display != null:
-		if is_in_main_field():
-			var temp_mods = runtime_modifiers.duplicate()
-			if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
-				temp_mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(self, data, temp_mods)
-			var lvl_eff = int(level_to_display) + int(temp_mods.get("level", 0)) + attached_counters.get("Level", 0)
-			level_to_display = lvl_eff
-		else:
-			var lvl_eff = int(level_to_display) + attached_counters.get("Level", 0)
-			level_to_display = lvl_eff
+		var stats = get_effective_stats()
+		level_to_display = stats["level"]
 		if card_level_lable:
 			card_level_lable.text = "LV. %s" % str(level_to_display)
 	if plds_text_to_display != "" and card_PLDS_lable:
@@ -624,9 +617,24 @@ func hide_card_info():
 	if card_PLDS_lable:
 		card_PLDS_lable.text = ""
 
-func _build_plds_text_effective(data: Dictionary) -> String:
-	var parts: Array[String] = []
-	var mods = runtime_modifiers.duplicate() if is_in_main_field() else {"level": 0, "power": 0, "life": 0, "durability": 0}
+func get_effective_stats() -> Dictionary:
+	var stats = {"level": 0, "power": 0, "life": 0, "durability": 0}
+	var card_slug = get_slug_from_card()
+	if card_slug == "" or not card_information_reference or not card_information_reference.card_database_reference:
+		return stats
+	var card_database = card_information_reference.card_database_reference
+	if not card_database.cards_db.has(card_slug):
+		return stats
+	var data = card_database.cards_db[card_slug]
+	if data.has("edition_id") and not data.has("parent_orientation_slug"):
+		var base_slug = find_base_card_for_edition(data["edition_id"], card_database)
+		if base_slug and card_database.cards_db.has(base_slug):
+			data = card_database.cards_db[base_slug]
+	elif data.has("parent_orientation_slug"):
+		var parent_slug = data["parent_orientation_slug"]
+		if card_database.cards_db.has(parent_slug):
+			data = card_database.cards_db[parent_slug]
+	var mods = get_runtime_modifiers() if is_in_main_field() else {"level": 0, "power": 0, "life": 0, "durability": 0}
 	if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
 		mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(self, data, mods)
 	var buff_count = attached_counters.get("Buff", 0)
@@ -634,20 +642,31 @@ func _build_plds_text_effective(data: Dictionary) -> String:
 	var counter_mod = buff_count - debuff_count
 	var pow_counter = attached_counters.get("Power", 0)
 	var dur_counter = attached_counters.get("Durability", 0)
+	var life_count = attached_counters.get("Life", 0)
+	var damage_count = attached_counters.get("Damage", 0)
+	var lvl_counter = attached_counters.get("Level", 0)
+	if data.has("level") and data["level"] != null:
+		stats["level"] = int(data["level"]) + int(mods.get("level", 0)) + lvl_counter
 	if data.has("power") and data["power"] != null:
 		var value = int(data["power"]) + int(mods.get("power", 0)) + counter_mod + pow_counter
-		value = max(0, value)
-		parts.append("POW. %s" % str(value))
+		stats["power"] = max(0, value)
 	if data.has("life") and data["life"] != null:
-		var life_count = attached_counters.get("Life", 0)
-		var damage_count = attached_counters.get("Damage", 0)
 		var sec_val = int(data["life"]) + int(mods.get("life", 0)) + counter_mod + (life_count - damage_count)
-		sec_val = max(0, sec_val)
-		parts.append("LIFE %s" % str(sec_val))
+		stats["life"] = max(0, sec_val)
 	if data.has("durability") and data["durability"] != null:
 		var thirth_val = int(data["durability"]) + int(mods.get("durability", 0)) + dur_counter
-		thirth_val = max(0, thirth_val)
-		parts.append("DUR. %s" % str(thirth_val))
+		stats["durability"] = max(0, thirth_val)
+	return stats
+
+func _build_plds_text_effective(data: Dictionary) -> String:
+	var parts: Array[String] = []
+	var stats = get_effective_stats()
+	if data.has("power") and data["power"] != null:
+		parts.append("POW. %s" % str(stats["power"]))
+	if data.has("life") and data["life"] != null:
+		parts.append("LIFE %s" % str(stats["life"]))
+	if data.has("durability") and data["durability"] != null:
+		parts.append("DUR. %s" % str(stats["durability"]))
 	if data.has("speed") and data["speed"] != null:
 		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
 			if data["speed"] == 1:

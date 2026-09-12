@@ -1012,6 +1012,8 @@ func sync_card_state(player_id: int, uuid: String, slug: String, modifiers: Dict
 			var target_rot = rot_deg
 			var tween = create_tween()
 			tween.tween_property(card, "rotation_degrees", target_rot, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			if card.has_signal("state_changed"):
+				card.state_changed.emit()
 
 func disable_buttons():
 	$Panel.visible = false

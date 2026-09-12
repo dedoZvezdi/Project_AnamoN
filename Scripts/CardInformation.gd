@@ -128,7 +128,7 @@ func _update_card_display(slug: String):
 	var element_to_display = null
 	var cost_text_to_display = ""
 	var plds_text_to_display = ""
-	var mods = get_effective_mods_for_card()
+	var stats = get_effective_stats_for_card()
 	if card_database_reference and card_database_reference.cards_db.has(slug):
 		var data = card_database_reference.cards_db[slug]
 		if data.has("level") and data["level"] != null:
@@ -139,7 +139,7 @@ func _update_card_display(slug: String):
 			cost_text_to_display = "MEMORY %s" % str(data["cost_memory"])
 		elif data.has("cost_reserve") and data["cost_reserve"] != null:
 			cost_text_to_display = "RESERVE %s" % str(data["cost_reserve"])
-		plds_text_to_display = _build_plds_text_effective(data, mods)
+		plds_text_to_display = _build_plds_text_effective(data, stats)
 		if data.has("edition_id") and not data.has("parent_orientation_slug"):
 			var base_slug = find_base_card_for_edition(data["edition_id"])
 			if base_slug and card_database_reference.cards_db.has(base_slug):
@@ -156,7 +156,7 @@ func _update_card_display(slug: String):
 				elif base_data.has("cost_reserve") and base_data["cost_reserve"] != null:
 					cost_text_to_display = "RESERVE %s" % str(base_data["cost_reserve"])
 				if plds_text_to_display == "":
-					plds_text_to_display = _build_plds_text_effective(base_data, mods)
+					plds_text_to_display = _build_plds_text_effective(base_data, stats)
 				if (effect_to_display == null or effect_to_display.strip_edges() == "") and base_data.get("flavor"):
 					effect_to_display = base_data["flavor"]
 				elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -181,7 +181,7 @@ func _update_card_display(slug: String):
 				elif parent_data.has("cost_reserve") and parent_data["cost_reserve"] != null:
 					cost_text_to_display = "RESERVE %s" % str(parent_data["cost_reserve"])
 				if plds_text_to_display == "":
-					plds_text_to_display = _build_plds_text_effective(parent_data, mods)
+					plds_text_to_display = _build_plds_text_effective(parent_data, stats)
 				if (effect_to_display == null or effect_to_display.strip_edges() == "") and parent_data.get("flavor"):
 					effect_to_display = parent_data["flavor"]
 				elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -195,7 +195,7 @@ func _update_card_display(slug: String):
 			effect_to_display = data.get("effect_raw", "")
 			types_to_display = _format_types(data)
 			if plds_text_to_display == "":
-				plds_text_to_display = _build_plds_text_effective(data, mods)
+				plds_text_to_display = _build_plds_text_effective(data, stats)
 			if (effect_to_display == null or effect_to_display.strip_edges() == "") and data.get("flavor"):
 				effect_to_display = data["flavor"]
 			elif effect_to_display == null or effect_to_display.strip_edges() == "":
@@ -215,8 +215,8 @@ func _update_card_display(slug: String):
 	if types_to_display and types_to_display.strip_edges() != "":
 		card_types_lable.append_text("[center]%s[/center]" % types_to_display)
 	if level_to_display != null:
-		var lvl_eff = int(level_to_display) + int(mods.get("level", 0))
-		level_to_display = lvl_eff
+		if stats.has("level"):
+			level_to_display = stats["level"]
 		card_level_lable.append_text("[left]LV. %s[/left]" % str(level_to_display))
 	if element_to_display != null:
 		card_element_lable.append_text("[center]%s[/center]" % str(element_to_display))
@@ -274,20 +274,18 @@ func _build_plds_text(data: Dictionary) -> String:
 			parts.append("SPEED ?")
 	return " - ".join(parts)
 
-func _build_plds_text_effective(data: Dictionary, mods: Dictionary) -> String:
+func _build_plds_text_effective(data: Dictionary, stats: Dictionary) -> String:
 	var parts: Array[String] = []
 	if data.has("power") and data["power"] != null:
-		var power = int(data["power"]) + int(mods.get("power", 0))
-		power = max(0, power)
+		var power = stats["power"] if stats.has("power") else data["power"]
 		parts.append("POW. %s" % str(power))
 	if data.has("life") and data["life"] != null:
-		var life = int(data["life"]) + int(mods.get("life", 0))
-		life = max(0, life)
+		var life = stats["life"] if stats.has("life") else data["life"]
 		parts.append("LIFE %s" % str(life))
 	if data.has("durability") and data["durability"] != null:
-		var durability = int(data["durability"]) + int(mods.get("durability", 0))
-		durability = max(0, durability)
+		var durability = stats["durability"] if stats.has("durability") else data["durability"]
 		parts.append("DUR. %s" % str(durability))
+
 	if data.has("speed") and data["speed"] != null:
 		if typeof(data["speed"]) in [TYPE_INT, TYPE_FLOAT]:
 			if data["speed"] == 1:
@@ -302,39 +300,12 @@ func _build_plds_text_effective(data: Dictionary, mods: Dictionary) -> String:
 			parts.append("SPEED ?")
 	return " - ".join(parts)
 
-func get_effective_mods_for_card() -> Dictionary:
-	var mods = {"level": 0, "power": 0, "life": 0, "durability": 0}
+func get_effective_stats_for_card() -> Dictionary:
+	var stats = {}
 	if last_displayed_card and is_instance_valid(last_displayed_card):
-		if last_displayed_card.has_method("is_in_main_field") and last_displayed_card.is_in_main_field():
-			if last_displayed_card.has_method("get_runtime_modifiers"):
-				mods = last_displayed_card.get_runtime_modifiers().duplicate()
-			if last_displayed_card.has_method("get_attached_counters"):
-				var counters = last_displayed_card.get_attached_counters()
-				var buff = int(counters.get("Buff", 0))
-				var debuff = int(counters.get("Debuff", 0))
-				var life_count = int(counters.get("Life", 0))
-				var damage_count = int(counters.get("Damage", 0))
-				var pow_counter = int(counters.get("Power", 0))
-				var dur_counter = int(counters.get("Durability", 0))
-				var lvl_counter = int(counters.get("Level", 0))
-				mods["level"] += lvl_counter
-				mods["power"] += (buff - debuff) + pow_counter
-				mods["durability"] += dur_counter
-				mods["life"] += (buff - debuff) + (life_count - damage_count)
-		var data = {}
-		if card_database_reference and card_database_reference.cards_db.has(get_slug_from_card(last_displayed_card)):
-			data = card_database_reference.cards_db[get_slug_from_card(last_displayed_card)]
-			if data.has("edition_id") and not data.has("parent_orientation_slug"):
-				var base_slug = find_base_card_for_edition(data["edition_id"])
-				if base_slug and card_database_reference.cards_db.has(base_slug):
-					data = card_database_reference.cards_db[base_slug]
-			elif data.has("parent_orientation_slug"):
-				var parent_slug = data["parent_orientation_slug"]
-				if card_database_reference.cards_db.has(parent_slug):
-					data = card_database_reference.cards_db[parent_slug]
-		if typeof(LuBuIndomitableTitanEffect) == TYPE_OBJECT:
-			mods = LuBuIndomitableTitanEffect.apply_wrath_incarnate_global_mods(last_displayed_card, data, mods)
-	return mods
+		if last_displayed_card.has_method("get_effective_stats"):
+			stats = last_displayed_card.get_effective_stats()
+	return stats
 
 func clear_preview():
 	if card_name_label:
