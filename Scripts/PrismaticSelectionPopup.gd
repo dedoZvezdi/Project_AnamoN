@@ -3,58 +3,19 @@ extends CanvasLayer
 signal selection_confirmed(elements)
 
 var selected_elements := []
-var confirm_button: Button
 var element_buttons := {}
-var panel: PanelContainer
+
+@onready var confirm_button: Button = %ConfirmButton
 
 func _ready():
-	panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(400, 250)
-	panel.set_anchor(SIDE_LEFT, 0.5)
-	panel.set_anchor(SIDE_TOP, 0.5)
-	panel.set_anchor(SIDE_RIGHT, 0.5)
-	panel.set_anchor(SIDE_BOTTOM, 0.5)
-	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.15, 0.15, 0.15, 1.0)
-	style.set_border_width_all(2)
-	style.border_color = Color(0.4, 0.4, 0.4)
-	style.set_corner_radius_all(10)
-	panel.add_theme_stylebox_override("panel", style)
-	add_child(panel)
-	var margin = MarginContainer.new()
-	margin.add_theme_constant_override("margin_top", 20)
-	margin.add_theme_constant_override("margin_bottom", 20)
-	margin.add_theme_constant_override("margin_left", 20)
-	margin.add_theme_constant_override("margin_right", 20)
-	panel.add_child(margin)
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 15)
-	margin.add_child(vbox)
-	var title = Label.new()
-	title.text = "Prismatic Spirit: Choose 2 Elements"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(title)
-	var hbox = HBoxContainer.new()
-	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	hbox.add_theme_constant_override("separation", 20)
-	vbox.add_child(hbox)
-	for e_name in ["Fire", "Water", "Wind"]:
-		var button = Button.new()
-		button.text = e_name
-		button.toggle_mode = true
-		button.custom_minimum_size = Vector2(100, 50)
-		button.pressed.connect(func(): _on_element_toggled(e_name))
-		hbox.add_child(button)
-		element_buttons[e_name] = button
-	confirm_button = Button.new()
-	confirm_button.text = "Confirm"
-	confirm_button.disabled = true
-	confirm_button.custom_minimum_size = Vector2(150, 40)
-	confirm_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	element_buttons = {
+		"Fire": %FireButton,
+		"Water": %WaterButton,
+		"Wind": %WindButton,}
+	for e_name in element_buttons:
+		var button: Button = element_buttons[e_name]
+		button.pressed.connect(_on_element_toggled.bind(e_name))
 	confirm_button.pressed.connect(_on_confirm_pressed)
-	vbox.add_child(confirm_button)
 
 func _input(event):
 	if event is InputEventMouse:

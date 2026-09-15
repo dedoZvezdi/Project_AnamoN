@@ -1,5 +1,7 @@
 extends Node2D
 
+signal phase_advanced(phase_name: String)
+
 const PHASE_ORDER = ["WAKE UP", "MATERIALIZE", "RECOLLECTION", "DRAW", "MAIN", "END"]
 
 var current_phase_index = 0
@@ -23,6 +25,7 @@ func next_phase():
 		current_phase_index = (current_phase_index + 1) % PHASE_ORDER.size()
 		update_phase_visuals()
 		sync_phase_with_opponent()
+		phase_advanced.emit(PHASE_ORDER[current_phase_index])
 
 func back_phase():
 	current_phase_index = (current_phase_index - 1)

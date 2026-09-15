@@ -72,8 +72,8 @@ static func _execute_wipe_and_transform(champion: Node, main_field_node: Node, l
 		if current_champion.has_method("set_tweening"):
 			current_champion.set_tweening(true)
 		current_champion.z_index = 1000
-		tween.parallel().tween_property(current_champion, "global_position", banish_pos, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tween.parallel().tween_property(current_champion, "rotation_degrees", 90.0, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.parallel().tween_property(current_champion, "global_position", banish_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.parallel().tween_property(current_champion, "rotation_degrees", 90.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		var lineage_to_process = []
 		if main_field_node.has_method("deactivate_card_elements"):
 			main_field_node.deactivate_card_elements(current_champion)
@@ -125,8 +125,8 @@ static func _execute_wipe_and_transform(champion: Node, main_field_node: Node, l
 				if temp_champ.has_method("set_tweening"):
 					temp_champ.set_tweening(true)
 				temp_champ.z_index = 1000
-				banish_tween.parallel().tween_property(temp_champ, "global_position", banish_pos, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-				banish_tween.parallel().tween_property(temp_champ, "rotation_degrees", 90.0, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				banish_tween.parallel().tween_property(temp_champ, "global_position", banish_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				banish_tween.parallel().tween_property(temp_champ, "rotation_degrees", 90.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 				await banish_tween.finished
 				banish_slot.add_card_to_slot(temp_champ, false, -1, true)
 				if temp_champ in main_field_node.cards_in_field:
@@ -202,8 +202,8 @@ static func _execute_wipe_and_transform(champion: Node, main_field_node: Node, l
 				if card.has_method("set_tweening"):
 					card.set_tweening(true)
 				card.z_index = 1000
-				tween.parallel().tween_property(card, "global_position", target_pos, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-				tween.parallel().tween_property(card, "rotation_degrees", target_rot, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				tween.parallel().tween_property(card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				tween.parallel().tween_property(card, "rotation_degrees", target_rot, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 				await tween.finished
 				if main_field_node.has_method("remove_card_from_field"):
 					main_field_node.remove_card_from_field(card)

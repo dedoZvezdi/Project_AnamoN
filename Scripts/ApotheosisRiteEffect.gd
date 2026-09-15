@@ -7,7 +7,7 @@ static func apply_activation(card: Node, main_field_node: Node):
 	if conditions_met:
 		var root = card.get_tree().current_scene
 		Gimmicks.gimmick_apply_ascendant(main_field_node, root, "apotheosis", false)
-		Gimmicks.gimmick_draw_card(root)
+		Gimmicks.gimmick_draw_card(root, 1)
 		Gimmicks.gimmick_send_to_banish_face_up(card)
 
 static func activate_rite(card: Node):

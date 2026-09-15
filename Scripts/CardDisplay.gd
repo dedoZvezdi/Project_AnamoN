@@ -16,6 +16,7 @@ var deck_builder_drag_canceled = false
 signal request_popup_menu(slug, uuid)
 signal card_drag_started(card_display)
 signal card_held(slug, uuid)
+signal card_force_picked(slug, uuid)
 
 const HOLD_DURATION = 0.8
 const CARD_DISPLAY_SIZE = Vector2(98, 98)
@@ -201,6 +202,12 @@ func _gui_input(event):
 			emit_signal("request_popup_menu", card_slug, current_uuid)
 			accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if zone == "sacramental_pick":
+			if event.pressed:
+				var pick_uuid = get_meta("uuid") if has_meta("uuid") else ""
+				emit_signal("card_force_picked", card_slug, pick_uuid)
+			accept_event()
+			return
 		if _is_in_deck_builder():
 			if event.pressed:
 				if event.double_click:

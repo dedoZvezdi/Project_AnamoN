@@ -1344,6 +1344,16 @@ func _find_local_card_by_uuid(root_node, target_uuid):
 	return null
 
 @rpc("any_peer", "reliable")
+func sync_return_to_owner_graveyard(target_owner_id: int, uuid: String, slug: String):
+	if multiplayer.get_unique_id() == target_owner_id:
+		var opp_field = get_node_or_null("OpponentField")
+		if not opp_field:
+			return
+		var card = _find_opponent_card_by_uuid(opp_field, uuid)
+		if card:
+			_convert_opponent_to_local_graveyard(card, slug, uuid)
+
+@rpc("any_peer", "reliable")
 func sync_return_to_owner_banish(target_owner_id: int, uuid: String, slug: String, face_down: bool):
 	if multiplayer.get_unique_id() == target_owner_id:
 		var opp_field = get_node_or_null("OpponentField")
@@ -1354,6 +1364,55 @@ func sync_return_to_owner_banish(target_owner_id: int, uuid: String, slug: Strin
 			_convert_opponent_to_local_banish(card, slug, uuid, face_down)
 	else:
 		pass
+
+func _convert_opponent_to_local_graveyard(opp_card: Node, slug: String, uuid: String):
+	var player_field = get_node_or_null("PlayerField")
+	if not player_field:
+		return
+	var graveyard_node = player_field.get_node_or_null("GRAVEYARD")
+	if not graveyard_node:
+		return
+	var card_manager = player_field.get_node_or_null("CardManager")
+	var card_scene = load("res://Scenes/Card.tscn")
+	var new_card = card_scene.instantiate()
+	new_card.set_meta("slug", slug)
+	new_card.uuid = uuid
+	new_card.original_owner_id = multiplayer.get_unique_id()
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var image = new_card.get_node_or_null("CardImage")
+		if image:
+			image.texture = load(card_image_path)
+			image.visible = true
+			var back = new_card.get_node_or_null("CardImageBack")
+			if back:
+				back.visible = false
+	if card_manager:
+		card_manager.add_child(new_card)
+		if card_manager.has_method("connect_card_signals"):
+			card_manager.connect_card_signals(new_card)
+	new_card.global_position = opp_card.global_position
+	new_card.rotation_degrees = opp_card.rotation_degrees + 180.0
+	new_card.z_index = 1000
+	if opp_card.get_parent():
+		if opp_card.get_parent().has_method("remove_card_from_field"):
+			opp_card.get_parent().remove_card_from_field(opp_card)
+		elif opp_card.get_parent().has_method("remove_card_from_slot"):
+			opp_card.get_parent().remove_card_from_slot(opp_card)
+		else:
+			opp_card.get_parent().remove_child(opp_card)
+	opp_card.queue_free()
+	var target_pos = graveyard_node.global_position
+	if graveyard_node.has_node("Area2D/CollisionShape2D"):
+		target_pos = graveyard_node.get_node("Area2D/CollisionShape2D").global_position
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(new_card, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(new_card, "rotation_degrees", 0.0, 0.5)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		if graveyard_node.has_method("add_card_to_slot"):
+			graveyard_node.add_card_to_slot(new_card))
 
 func _convert_opponent_to_local_banish(opp_card: Node, slug: String, uuid: String, face_down: bool):
 	var player_field = get_node_or_null("PlayerField")
