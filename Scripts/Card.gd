@@ -486,7 +486,7 @@ func banish_lineage_card():
 			if elements:
 				if selected_lineage_card_slug.contains("prismatic-spirit"):
 					var chosen = entry.get("chosen_elements", [])
-					PrismaticSpiritEffect.remove_lineage_activation(elements, chosen, false)
+					Gimmicks.gimmick_remove_chosen_elements(elements, chosen, false, self)
 				var entry_element = entry.get("element", "")
 				if entry_element != "":
 					var cap_name = str(entry_element).capitalize()
@@ -571,7 +571,7 @@ func move_to_lineage():
 					if e_node and e_node.has_method("activate"):
 						e_node.activate()
 				if card_slug.contains("prismatic-spirit"):
-					PrismaticSpiritEffect.apply_lineage_activation(elements_node, chosen_elements, false)
+					PrismaticSpiritEffect.apply_lineage_activation(elements_node, champion, false)
 		remove_from_current_position())
 
 func find_champion_on_field():
@@ -1111,6 +1111,114 @@ func update_visuals_based_on_mark():
 func is_in_banish() -> bool:
 	return current_field != null and current_field.is_in_group("rotated_slots")
 
+func go_to_graveyard():
+	if is_in_main_field():
+		revert_if_transformed()
+	var scene = get_tree().get_current_scene()
+	if scene == null:
+		return
+	var graveyard_node = scene.find_child("GRAVEYARD", true, false)
+	if graveyard_node == null:
+		return
+	if original_owner_id != 0 and original_owner_id != multiplayer.get_unique_id():
+		_return_to_original_owner_graveyard()
+		return
+	var player_hand_node = scene.find_child("PlayerHand", true, false)
+	if player_hand_node and player_hand_node.has_method("remove_card_from_hand"):
+		player_hand_node.remove_card_from_hand(self)
+	if current_field:
+		if current_field.is_in_group("main_fields") and current_field.has_method("remove_card_from_field"):
+			current_field.remove_card_from_field(self)
+		elif current_field.is_in_group("memory_slots") and current_field.has_method("remove_card_from_memory"):
+			current_field.remove_card_from_memory(self)
+		elif current_field.has_method("remove_card_from_slot"):
+			current_field.remove_card_from_slot(self)
+	var target_pos = graveyard_node.global_position
+	if graveyard_node.has_node("Area2D/CollisionShape2D"):
+		target_pos = graveyard_node.get_node("Area2D/CollisionShape2D").global_position
+	z_index = 1000
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "rotation_degrees", 0.0, 0.5)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		if graveyard_node.has_method("add_card_to_slot"):
+			graveyard_node.add_card_to_slot(self))
+	var multiplayer_node = get_tree().get_root().get_node("Main")
+	if multiplayer_node:
+		var slug = get_slug_from_card()
+		if slug != "":
+			multiplayer_node.rpc("sync_move_to_graveyard", multiplayer.get_unique_id(), get_uuid(), slug, false)
+
+func _return_to_original_owner_graveyard():
+	var scene = get_tree().get_current_scene()
+	if not scene:
+		return
+	var multiplayer_node = get_tree().get_root().get_node_or_null("Main")
+	if multiplayer_node and multiplayer_node.has_method("rpc"):
+		multiplayer_node.rpc("sync_return_to_owner_graveyard", original_owner_id, get_uuid(), get_slug_from_card())
+	var opp_field = scene.find_child("OpponentField", true, false)
+	var target_pos = global_position
+	if opp_field:
+		var opp_grave = opp_field.find_child("OpponentGraveyard", true, false)
+		if opp_grave:
+			target_pos = opp_grave.global_position
+			if opp_grave.has_node("Area2D/CollisionShape2D"):
+				target_pos = opp_grave.get_node("Area2D/CollisionShape2D").global_position
+	z_index = 1000
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "global_position", target_pos, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "rotation_degrees", -180.0, 0.5)
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		_convert_to_opponent_graveyard_visuals(target_pos))
+
+func _convert_to_opponent_graveyard_visuals(final_pos):
+	var scene = get_tree().get_current_scene()
+	if not scene:
+		remove_from_current_position()
+		return
+	var opp_field = scene.find_child("OpponentField", true, false)
+	if not opp_field:
+		remove_from_current_position()
+		return
+	var opp_grave = opp_field.find_child("OpponentGraveyard", true, false)
+	if not opp_grave:
+		remove_from_current_position()
+		return
+	var opp_card_scene = load("res://Scenes/OpponentCard.tscn")
+	var new_opp_card = opp_card_scene.instantiate()
+	new_opp_card.set_meta("slug", get_slug_from_card())
+	new_opp_card.uuid = uuid
+	if "original_owner_id" in new_opp_card:
+		new_opp_card.original_owner_id = original_owner_id
+	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
+	new_opp_card.attached_counters = attached_counters.duplicate()
+	new_opp_card.is_marked = is_marked
+	if new_opp_card.has_method("update_visuals_based_on_mark"):
+		new_opp_card.update_visuals_based_on_mark()
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + get_slug_from_card() + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var image = new_opp_card.get_node_or_null("CardImage")
+		if image:
+			image.texture = load(card_image_path)
+			image.visible = true
+			var back = new_opp_card.get_node_or_null("CardImageBack")
+			if back:
+				back.visible = false
+	var card_manager = opp_field.get_node_or_null("CardManager")
+	if card_manager:
+		card_manager.add_child(new_opp_card)
+	else:
+		opp_field.add_child(new_opp_card)
+	new_opp_card.global_position = final_pos
+	new_opp_card.rotation_degrees = 0.0
+	if opp_grave.has_method("add_card_to_slot"):
+		opp_grave.add_card_to_slot(new_opp_card)
+	remove_from_current_position()
+
 func go_to_banish_face_down():
 	go_to_banish(true)
 
@@ -1299,7 +1407,7 @@ func animate_card_to_mat_deck(deck_position: Vector2, slug: String, card_uuid: S
 	z_index = 2
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(self, "global_position", deck_position, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "global_position", deck_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "rotation_degrees", 0.0, 0.3)
 	tween.set_parallel(false)
 	var mid_timer = get_tree().create_timer(0.2)
@@ -1342,7 +1450,7 @@ func animate_card_to_deck(deck_position: Vector2, slug: String, card_uuid: Strin
 	z_index = 1 if is_top else -1
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(self, "global_position", deck_position, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "global_position", deck_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "rotation_degrees", 0.0, 0.3)
 	tween.set_parallel(false)
 	var mid_timer = get_tree().create_timer(0.2)
@@ -1639,6 +1747,7 @@ func _update_local_card_visuals(revealed: bool, skip_animation: bool = false):
 	if anim_player and anim_player.has_animation("card_flip"):
 		front.visible = true
 		back.visible = true
+		anim_player.stop()
 		anim_player.play("card_flip")
 		var timer = get_tree().create_timer(0.1)
 		timer.timeout.connect(func():

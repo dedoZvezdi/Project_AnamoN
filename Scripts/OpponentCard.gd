@@ -227,6 +227,7 @@ func set_opponent_reveal_status(revealed: bool, skip_animation: bool = false):
 		else:
 			front.z_index = 0
 			back.z_index = -1
+		anim_player.stop()
 		anim_player.play("card_flip")
 		var timer = get_tree().create_timer(0.1)
 		timer.timeout.connect(func():
@@ -399,7 +400,7 @@ func animate_lineage_banish(slug: String, lineage_uuid: String):
 			if elements:
 				if slug.contains("prismatic-spirit"):
 					var chosen = entry.get("chosen_elements", [])
-					PrismaticSpiritEffect.remove_lineage_activation(elements, chosen, true)
+					Gimmicks.gimmick_remove_chosen_elements(elements, chosen, true, self)
 				var entry_element = entry.get("element", "")
 				if entry_element != "":
 					var cap_name = str(entry_element).capitalize()
@@ -468,7 +469,7 @@ func animate_send_to_lineage(card_to_move: Node, card_slug: String, card_uuid: S
 					if e_node and e_node.has_method("activate"):
 						e_node.activate()
 				if card_slug.contains("prismatic-spirit"):
-					PrismaticSpiritEffect.apply_lineage_activation(opp_elements, chosen_el, true)
+					PrismaticSpiritEffect.apply_lineage_activation(opp_elements, self, true)
 		if card_to_move and is_instance_valid(card_to_move):
 			if card_to_move.get_parent():
 				if card_to_move.get_parent().has_method("remove_card_from_field"):

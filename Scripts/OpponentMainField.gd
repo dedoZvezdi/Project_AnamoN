@@ -61,13 +61,10 @@ func activate_champion_elements(card):
 	elif card_slug.contains("prismatic-perseverance"):
 		PrismaticPerseveranceEffect.apply_activation(elements_node, true, card, self)
 	elif card_slug.contains("prismatic-spirit"):
-		PrismaticSpiritEffect.apply_activation(card, elements_node, true)
+		PrismaticSpiritEffect.apply_activation(elements_node, true, card, self)
 	if "champion_lineage" in card:
+		PrismaticSpiritEffect.apply_lineage_activation(elements_node, card, true)
 		for entry in card.champion_lineage:
-			var slug = entry.get("slug", "")
-			if slug.contains("prismatic-spirit"):
-				var chosen = entry.get("chosen_elements", [])
-				PrismaticSpiritEffect.apply_lineage_activation(elements_node, chosen, true)
 			var entry_element = entry.get("element", "")
 			if entry_element != "":
 				var cap_name = str(entry_element).capitalize()
@@ -115,11 +112,8 @@ func deactivate_card_elements(card):
 				if e_node and e_node.has_method("deactivate"):
 					e_node.deactivate()
 		if "champion_lineage" in card:
+			PrismaticSpiritEffect.remove_lineage_activation(elements_node, card, true)
 			for entry in card.champion_lineage:
-				var slug = entry.get("slug", "")
-				if slug.contains("prismatic-spirit"):
-					var chosen = entry.get("chosen_elements", [])
-					PrismaticSpiritEffect.remove_lineage_activation(elements_node, chosen, true)
 				var entry_element = entry.get("element", "")
 				if entry_element != "":
 					var cap_name = str(entry_element).capitalize()
@@ -184,6 +178,7 @@ func notify_card_transformed(card: Node, old_slug: String = ""):
 		current_champion_card = card
 		_connect_champion_signals(card)
 		if not (card in cards_in_field):
+			card.set_meta("just_entered_main_field", true)
 			activate_champion_elements(card)
 		recheck_field_continuous_effects()
 		card.global_position = global_position + Vector2(-20, 60)
@@ -243,6 +238,7 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 		current_champion_card = card
 		_connect_champion_signals(card)
 		if not (card in cards_in_field):
+			card.set_meta("just_entered_main_field", true)
 			activate_champion_elements(card)
 		recheck_field_continuous_effects()
 		card.global_position = global_position + Vector2(-20, 60)

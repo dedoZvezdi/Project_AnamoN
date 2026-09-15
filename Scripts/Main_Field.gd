@@ -38,13 +38,10 @@ func activate_champion_elements(card):
 	elif card_slug.contains("prismatic-perseverance"):
 		PrismaticPerseveranceEffect.apply_activation(elements_node, false, card, self)
 	elif card_slug.contains("prismatic-spirit"):
-		PrismaticSpiritEffect.apply_activation(card, elements_node, false)
+		PrismaticSpiritEffect.apply_activation(elements_node, false, card, self)
 	if "champion_lineage" in card:
+		PrismaticSpiritEffect.apply_lineage_activation(elements_node, card, false)
 		for entry in card.champion_lineage:
-			var slug = entry.get("slug", "")
-			if slug.contains("prismatic-spirit"):
-				var chosen = entry.get("chosen_elements", [])
-				PrismaticSpiritEffect.apply_lineage_activation(elements_node, chosen, false)
 			var entry_element = entry.get("element", "")
 			if entry_element != "":
 				var cap_name = str(entry_element).capitalize()
@@ -92,11 +89,8 @@ func deactivate_card_elements(card):
 				if e_node and e_node.has_method("deactivate"):
 					e_node.deactivate()
 		if "champion_lineage" in card:
+			PrismaticSpiritEffect.remove_lineage_activation(elements_node, card, false)
 			for entry in card.champion_lineage:
-				var slug = entry.get("slug", "")
-				if slug.contains("prismatic-spirit"):
-					var chosen = entry.get("chosen_elements", [])
-					PrismaticSpiritEffect.remove_lineage_activation(elements_node, chosen, false)
 				var entry_element = entry.get("element", "")
 				if entry_element != "":
 					var cap_name = str(entry_element).capitalize()
@@ -141,6 +135,7 @@ func add_card_to_field(card, position = null):
 			_connect_champion_signals(card)
 			cards_in_field.append(card)
 			card_in_slot = true
+			card.set_meta("just_entered_main_field", true)
 			activate_champion_elements(card)
 			recheck_field_continuous_effects()
 		if card and is_instance_valid(card) and card.has_method("apply_champion_life_delta"):
@@ -200,6 +195,9 @@ func add_card_to_field(card, position = null):
 			card_in_slot = true
 			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance"):
 				activate_champion_elements(card)
+			elif get_card_slug(card).contains("sacramental-rite"):
+				card.set_meta("just_entered_main_field", true)
+				SacramentalRiteEffect.apply_on_enter_banish(card, self)
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
 		if position != null:
@@ -269,6 +267,7 @@ func notify_card_transformed(card, old_slug: String = ""):
 		_connect_champion_signals(card)
 		if not (card in cards_in_field):
 			cards_in_field.append(card)
+			card.set_meta("just_entered_main_field", true)
 		card_in_slot = true
 		activate_champion_elements(card)
 		recheck_field_continuous_effects()

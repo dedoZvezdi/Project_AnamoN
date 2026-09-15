@@ -173,12 +173,13 @@ func _on_deck_view_popup_menu_pressed(id):
 		0: banish_card_fd()
 		1: banish_card_fu()
 
-func banish_card_fd():
-	if selected_card_uuid == "":
+func banish_card_fd(pick_uuid: String = ""):
+	var target_uuid = pick_uuid if pick_uuid != "" else selected_card_uuid
+	if target_uuid == "":
 		return
 	var card_index = -1
 	for i in range(player_deck.size()):
-		if player_deck[i]["uuid"] == selected_card_uuid:
+		if player_deck[i]["uuid"] == target_uuid:
 			card_index = i
 			break
 	if card_index == -1:
