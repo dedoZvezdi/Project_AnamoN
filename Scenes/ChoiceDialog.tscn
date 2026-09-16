@@ -1,0 +1,102 @@
+[gd_scene format=3 uid="uid://b8oprl5qn5q3y"]
+
+[ext_resource type="Script" path="res://Scripts/ChoiceDialog.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k2erv"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i1fpi"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ddb1i"]
+bg_color = Color(0.22745098, 0.18431373, 0.11372549, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_ddb1i"]
+Button/colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+Button/colors/font_hover_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+Button/colors/font_pressed_color = Color(0.9607843, 0.8901961, 0.70980394, 1)
+Button/styles/hover = SubResource("StyleBoxFlat_k2erv")
+Button/styles/normal = SubResource("StyleBoxFlat_i1fpi")
+Button/styles/pressed = SubResource("StyleBoxFlat_ddb1i")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qtj1e"]
+bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="ChoiceDialog" type="CanvasLayer" unique_id=116305747]
+layer = 100
+script = ExtResource("1")
+
+[node name="Center" type="CenterContainer" parent="." unique_id=330037470]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = SubResource("Theme_ddb1i")
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=1313344768]
+custom_minimum_size = Vector2(440, 220)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_qtj1e")
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=275441512]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=144543863]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1184062666]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Title"
+horizontal_alignment = 1
+
+[node name="MessageLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1006884580]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_font_sizes/font_size = 20
+text = "Message"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ButtonRow" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=1314832166]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1

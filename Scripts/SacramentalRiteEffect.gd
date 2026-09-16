@@ -1,30 +1,37 @@
 class_name SacramentalRiteEffect
 
+const CHOICE_TITLE = "Sacramental Rite"
+const CHOICE_TEXT = "Do you want to play the banished card?"
+const CHOICE_BUTTONS = ["Yes", "No"]
+const CHOICE_YES = 0
+const CHOICE_NO = 1
+
 static func apply_activation(card: Node, main_field_node: Node):
 	var conditions_met = (
 		Gimmicks.condition_requires_champion(main_field_node)
 		and Gimmicks.condition_while_on_main_field(card, main_field_node))
-	if conditions_met:
-		var root = card.get_tree().current_scene
-		Gimmicks.gimmick_apply_ascendant(main_field_node, root, "sacramental", false)
-		Gimmicks.gimmick_send_to_banish_face_up(card)
+	if not conditions_met:
+		return
+	if Gimmicks.find_stored_card(card, Gimmicks.find_banish_node(card)).is_empty():
+		Gimmicks.gimmick_finish_rite_activation(card, main_field_node, "sacramental")
+		return
+	show_sacramental_choice(card, Callable(SacramentalRiteEffect, "_resolve_play_choice").bind(card, main_field_node))
 
-static func apply_on_enter_banish(card: Node, main_field_node: Node):
-	if not Gimmicks.condition_on_main_field_enter(card, main_field_node):
+static func _resolve_play_choice(index: int, card: Node, main_field_node: Node) -> void:
+	if not card or not is_instance_valid(card):
 		return
-	var mat_deck = Gimmicks.condition_find_mat_deck(card)
-	if not mat_deck:
+	if not is_instance_valid(main_field_node):
 		return
-	var pickables = Gimmicks.condition_mat_deck_has_pickable(mat_deck)
-	if pickables.is_empty():
+	if not Gimmicks.condition_while_on_main_field(card, main_field_node):
 		return
-	Gimmicks.gimmick_show_mat_deck_pick(mat_deck, pickables, Callable(SacramentalRiteEffect, "apply_banish_pick"))
+	var stored = Gimmicks.find_stored_card(card, Gimmicks.find_banish_node(card))
+	Gimmicks.gimmick_finish_rite_activation(card, main_field_node, "sacramental")
+	if index != CHOICE_YES or stored.is_empty():
+		return
+	Gimmicks.gimmick_spawn_play_proxy(card, stored)
 
-static func apply_banish_pick(mat_deck: Node, _slug: String, uuid: String) -> void:
-	if not mat_deck or not is_instance_valid(mat_deck):
-		return
-	if mat_deck.has_method("banish_card_fd"):
-		mat_deck.banish_card_fd(uuid)
+static func show_sacramental_choice(card: Node, on_chosen: Callable = Callable()):
+	Gimmicks.gimmick_show_choice_panel(card, CHOICE_TITLE, CHOICE_TEXT, CHOICE_BUTTONS, on_chosen)
 
 static func activate_rite(card: Node):
 	var root = card.get_tree().current_scene

@@ -218,6 +218,39 @@ func remove_card_from_original_slot():
 		"logo_mastery":
 			pass
 
+func _commit_play_proxy(card) -> bool:
+	var real_uuid = get_card_uuid(card)
+	var banish_node = get_tree().current_scene.find_child("BANISH", true, false)
+	if not banish_node or not ("cards_in_banish" in banish_node):
+		return false
+	var real = null
+	for cards in banish_node.cards_in_banish:
+		if cards and is_instance_valid(cards) and "uuid" in cards and cards.uuid == real_uuid:
+			real = cards
+			break
+	if real == null:
+		return false
+	if banish_node.has_method("remove_card_from_slot"):
+		banish_node.remove_card_from_slot(real)
+	if is_instance_valid(real):
+		real.queue_free()
+	card.remove_meta("play_proxy")
+	return true
+
+func _return_play_proxy_home(card) -> void:
+	var home = card.global_position
+	if card.has_meta("play_proxy_home"):
+		home = card.get_meta("play_proxy_home")
+	if card.has_method("set_tweening"):
+		card.set_tweening(true)
+	var tween = create_tween()
+	tween.tween_property(card, "global_position", home, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(func():
+		card.scale = normal_scale
+		card.z_index = 1000
+		if card.has_method("set_tweening"):
+			card.set_tweening(false))
+
 func start_drag(card):
 	_reset_drag_state_vars()
 	if not card or not is_instance_valid(card):
@@ -303,6 +336,17 @@ func finish_drag():
 		card.on_drag_end()
 	var card_slot_found = raycast_check_for_card_single_slot()
 	var is_staying_on_mainfield = (drag_source_was_main_field and card_slot_found and card_slot_found.name == "MAINFIELD")
+	if card.has_meta("play_proxy") and card.get_meta("play_proxy"):
+		if not (card_slot_found and card_slot_found.name == "MAINFIELD"):
+			_return_play_proxy_home(card)
+			_reset_drag_state_vars()
+			card_being_dragged = null
+			return
+		if not _commit_play_proxy(card):
+			card.queue_free()
+			_reset_drag_state_vars()
+			card_being_dragged = null
+			return
 	free_card_from_slot(card, is_staying_on_mainfield)
 	if drag_source_was_main_field and not is_staying_on_mainfield:
 		remove_card_from_main_field(card)
