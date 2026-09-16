@@ -197,7 +197,7 @@ func add_card_to_field(card, position = null):
 				activate_champion_elements(card)
 			elif get_card_slug(card).contains("sacramental-rite"):
 				card.set_meta("just_entered_main_field", true)
-				SacramentalRiteEffect.apply_on_enter_banish(card, self)
+				Gimmicks.gimmick_enter_pick_from_mat_deck(card, self, Callable(Gimmicks, "gimmick_banish_mat_pick").bind(card))
 		if card.has_method("set_current_field"):
 			card.set_current_field(self)
 		if position != null:

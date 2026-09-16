@@ -116,6 +116,81 @@ static func gimmick_show_mat_deck_pick(mat_deck_node: Node, pickables: Array, on
 		if on_picked.is_valid():
 			on_picked.call(mat_deck_node, slug, uuid))
 
+static func gimmick_show_choice_panel(card: Node, title_text: String, message_text: String, buttons: Array, on_chosen: Callable = Callable()):
+	if not card or not is_instance_valid(card):
+		return
+	if buttons.is_empty():
+		return
+	var dialog_scene = load("res://Scenes/ChoiceDialog.tscn")
+	if not dialog_scene:
+		return
+	var dialog = dialog_scene.instantiate()
+	card.get_tree().root.add_child(dialog)
+	dialog.setup(title_text, message_text, buttons)
+	dialog.chosen.connect(func(index):
+		if on_chosen.is_valid():
+			on_chosen.call(index))
+
+static func gimmick_finish_rite_activation(card: Node, main_field_node: Node, rite_type: String) -> void:
+	if not card or not is_instance_valid(card):
+		return
+	var root = card.get_tree().current_scene
+	gimmick_apply_ascendant(main_field_node, root, rite_type, false)
+	gimmick_send_to_banish_face_up(card)
+
+static func gimmick_spawn_play_proxy(host_card: Node, banished: Dictionary) -> void:
+	if not host_card or not is_instance_valid(host_card):
+		return
+	var tree = host_card.get_tree()
+	var scene = tree.current_scene
+	if not scene:
+		return
+	var card_manager = scene.find_child("CardManager", true, false)
+	if not card_manager:
+		return
+	var proxy = load("res://Scenes/Card.tscn").instantiate()
+	proxy.set_meta("slug", str(banished.get("slug", "")))
+	proxy.uuid = str(banished.get("uuid", ""))
+	proxy.set_meta("play_proxy", true)
+	var center = Vector2(tree.root.size) * 0.5
+	proxy.set_meta("play_proxy_home", center)
+	var card_image_path = "res://Assets/Grand Archive/Card Images/" + str(banished.get("slug", "")) + ".png"
+	if ResourceLoader.exists(card_image_path):
+		var card_image = proxy.get_node("CardImage")
+		var card_image_back = proxy.get_node("CardImageBack")
+		card_image.texture = load(card_image_path)
+		card_image.visible = true
+		card_image_back.visible = false
+		card_image.z_index = 0
+	card_manager.add_child(proxy)
+	proxy.add_to_group("cards")
+	if card_manager.has_method("connect_card_signals"):
+		card_manager.connect_card_signals(proxy)
+	proxy.global_position = center
+	proxy.z_index = 1000
+	proxy.scale = Vector2(0.35, 0.35)
+
+static func gimmick_enter_pick_from_mat_deck(card: Node, main_field_node: Node, on_picked: Callable = Callable()) -> void:
+	if not condition_on_main_field_enter(card, main_field_node):
+		return
+	var mat_deck = condition_find_mat_deck(card)
+	if not mat_deck:
+		return
+	var pickables = condition_mat_deck_has_pickable(mat_deck)
+	if pickables.is_empty():
+		return
+	gimmick_show_mat_deck_pick(mat_deck, pickables, on_picked)
+
+static func gimmick_banish_mat_pick(mat_deck: Node, slug: String, uuid: String, card: Node) -> void:
+	if not card or not is_instance_valid(card):
+		return
+	card.set_meta("stored_pick_slug", slug)
+	card.set_meta("stored_pick_uuid", uuid)
+	if not mat_deck or not is_instance_valid(mat_deck):
+		return
+	if mat_deck.has_method("banish_card_fd"):
+		mat_deck.banish_card_fd(uuid)
+
 static func gimmick_apply_ascendant(main_field_node: Node, root: Node, rite_type: String, is_opponent: bool = false):
 	if not main_field_node:
 		return
@@ -513,3 +588,33 @@ static func _scene_of(from_node: Node) -> Node:
 	if tree:
 		return tree.current_scene
 	return null
+	
+static func find_stored_card(card: Node, zone_node: Node) -> Dictionary:
+	if not card or not is_instance_valid(card):
+		return {}
+	if not zone_node or not is_instance_valid(zone_node):
+		return {}
+	if not card.has_meta("stored_pick_uuid"):
+		return {}
+	var uuid = str(card.get_meta("stored_pick_uuid"))
+	var slug = str(card.get_meta("stored_pick_slug")) if card.has_meta("stored_pick_slug") else ""
+	if uuid == "" or slug == "":
+		return {}
+	for array_name in ["cards_in_banish", "cards_in_slot", "cards_in_graveyard", "cards_in_field", "player_hand", "opponent_hand"]:
+		if not (array_name in zone_node):
+			continue
+		var pool = zone_node.get(array_name)
+		if typeof(pool) != TYPE_ARRAY:
+			continue
+		for cards in pool:
+			if cards and is_instance_valid(cards) and "uuid" in cards and cards.uuid == uuid:
+				return {"slug": slug, "uuid": uuid, "node": cards}
+	return {}
+	
+static func find_banish_node(from_node: Node) -> Node:
+	if not from_node or not is_instance_valid(from_node):
+		return null
+	var tree = from_node.get_tree()
+	if not tree or not tree.current_scene:
+		return null
+	return tree.current_scene.find_child("BANISH", true, false)
