@@ -1498,6 +1498,7 @@ func _convert_opponent_to_player_card(opp_card: Node, stats: Dictionary, final_p
 	new_card.uuid = stats.get("uuid", "")
 	if "original_owner_id" in new_card:
 		new_card.original_owner_id = stats.get("original_owner_id", 0)
+	Gimmicks.gimmick_carry_stored_pick(opp_card, new_card)
 	new_card.runtime_modifiers = stats.get("modifiers", {}).duplicate()
 	new_card.attached_counters = stats.get("counters", {}).duplicate()
 	new_card.is_rotated = false
@@ -2088,6 +2089,26 @@ func sync_apply_damage_to_champion(player_id: int, damage_amount: int):
 		if current_champ and current_champ.has_method("add_damage_counters"):
 			current_champ.add_damage_counters(damage_amount)
 
+@rpc("any_peer", "reliable")
+func sync_apply_damage_to_card(player_id: int, uuid: String, damage_amount: int):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote:
+		return
+	var player_field = get_node_or_null("PlayerField")
+	if not player_field:
+		return
+	var main_field = player_field.get_node_or_null("MAINFIELD")
+	if not main_field:
+		return
+	var cards = main_field.get("cards_in_field")
+	if typeof(cards) != TYPE_ARRAY:
+		return
+	for card in cards:
+		if card and is_instance_valid(card) and "uuid" in card and card.uuid == uuid:
+			if card.has_method("add_damage_counters"):
+				card.add_damage_counters(damage_amount)
+			break
+
 @rpc("any_peer", "call_local", "reliable")
 func rpc_request_rematch():
 	var sender_id = multiplayer.get_remote_sender_id()
@@ -2196,6 +2217,17 @@ func sync_transcendental_rite_activate(player_id: int):
 	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
 	if not is_from_remote: return
 	TranscendentalRiteEffect.apply_opponent_activation(get_tree().current_scene)
+
+@rpc("any_peer", "reliable")
+func sync_ascendant_clear(player_id: int):
+	var is_from_remote = multiplayer.get_remote_sender_id() == player_id
+	if not is_from_remote: return
+	var root = get_tree().current_scene
+	if not root: return
+	var opp_main_field = root.find_child("OpponentMainField", true, false)
+	if opp_main_field:
+		Gimmicks.gimmick_clear_ascendant(opp_main_field, root, true)
+		Gimmicks.gimmick_refresh_all_cards_visuals(self)
 
 func _on_global_peer_connected(peer_id):
 	var p_conn = WebRTCPeerConnection.new()

@@ -135,7 +135,11 @@ func add_card_to_field(card, position = null):
 			_connect_champion_signals(card)
 			cards_in_field.append(card)
 			card_in_slot = true
-			card.set_meta("just_entered_main_field", true)
+			var skip_enter = Gimmicks.condition_is_given(card) or Gimmicks.condition_is_lineage_replay(card)
+			card.remove_meta("is_given")
+			card.remove_meta("lineage_replay_temp")
+			if not skip_enter:
+				card.set_meta("just_entered_main_field", true)
 			activate_champion_elements(card)
 			recheck_field_continuous_effects()
 		if card and is_instance_valid(card) and card.has_method("apply_champion_life_delta"):
@@ -164,7 +168,7 @@ func add_card_to_field(card, position = null):
 			if tree and tree.current_scene:
 				var main_node = tree.get_root().get_node_or_null("Main")
 				if not main_node: main_node = tree.current_scene if tree.current_scene.name == "Main" else null
-				if main_node: LuBuIndomitableTitanEffect.refresh_all_cards_visuals(main_node)
+				if main_node: Gimmicks.gimmick_refresh_all_cards_visuals(main_node)
 	elif is_mastery_card(card):
 		var card_already_in_field = card in cards_in_field
 		if not card_already_in_field:
@@ -193,9 +197,12 @@ func add_card_to_field(card, position = null):
 		if not (card in cards_in_field):
 			cards_in_field.append(card)
 			card_in_slot = true
+			var skip_enter = Gimmicks.condition_is_given(card) or Gimmicks.condition_is_lineage_replay(card)
+			card.remove_meta("is_given")
+			card.remove_meta("lineage_replay_temp")
 			if get_card_slug(card).contains("prismatic-sanctuary") or get_card_slug(card).contains("prismatic-perseverance"):
 				activate_champion_elements(card)
-			elif get_card_slug(card).contains("sacramental-rite"):
+			elif get_card_slug(card).contains("sacramental-rite") and not skip_enter:
 				card.set_meta("just_entered_main_field", true)
 				Gimmicks.gimmick_enter_pick_from_mat_deck(card, self, Callable(Gimmicks, "gimmick_banish_mat_pick").bind(card))
 		if card.has_method("set_current_field"):
@@ -292,7 +299,7 @@ func notify_card_transformed(card, old_slug: String = ""):
 		if tree and tree.current_scene:
 			var main_node = tree.get_root().get_node_or_null("Main")
 			if not main_node: main_node = tree.current_scene if tree.current_scene.name == "Main" else null
-			if main_node: LuBuIndomitableTitanEffect.refresh_all_cards_visuals(main_node)
+			if main_node: Gimmicks.gimmick_refresh_all_cards_visuals(main_node)
 
 func remove_previous_champions():
 	if current_champion_card and is_instance_valid(current_champion_card):
@@ -311,7 +318,7 @@ func remove_previous_champions():
 			if tree and tree.current_scene:
 				var main_node = tree.get_root().get_node_or_null("Main")
 				if not main_node: main_node = tree.current_scene if tree.current_scene.name == "Main" else null
-				if main_node: LuBuIndomitableTitanEffect.refresh_all_cards_visuals(main_node)
+				if main_node: Gimmicks.gimmick_refresh_all_cards_visuals(main_node)
 		
 func is_champion_card(card) -> bool:
 	if not card or not is_instance_valid(card):

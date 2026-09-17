@@ -178,8 +178,12 @@ func notify_card_transformed(card: Node, old_slug: String = ""):
 		current_champion_card = card
 		_connect_champion_signals(card)
 		if not (card in cards_in_field):
-			card.set_meta("just_entered_main_field", true)
-			activate_champion_elements(card)
+			var skip_enter = Gimmicks.condition_is_given(card) or Gimmicks.condition_is_lineage_replay(card)
+			card.remove_meta("is_given")
+			card.remove_meta("lineage_replay_temp")
+			if not skip_enter:
+				card.set_meta("just_entered_main_field", true)
+		activate_champion_elements(card)
 		recheck_field_continuous_effects()
 		card.global_position = global_position + Vector2(-20, 60)
 		card.z_index = 400
@@ -204,7 +208,7 @@ func remove_previous_champions():
 			if tree and tree.current_scene:
 				var main_node = tree.get_root().get_node_or_null("Main")
 				if not main_node: main_node = tree.current_scene if tree.current_scene.name == "Main" else null
-				if main_node: LuBuIndomitableTitanEffect.refresh_all_cards_visuals(main_node)
+				if main_node: Gimmicks.gimmick_refresh_all_cards_visuals(main_node)
 
 func _ready() -> void:
 	base_position = Vector2.ZERO
@@ -238,7 +242,11 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 		current_champion_card = card
 		_connect_champion_signals(card)
 		if not (card in cards_in_field):
-			card.set_meta("just_entered_main_field", true)
+			var skip_enter = Gimmicks.condition_is_given(card) or Gimmicks.condition_is_lineage_replay(card)
+			card.remove_meta("is_given")
+			card.remove_meta("lineage_replay_temp")
+			if not skip_enter:
+				card.set_meta("just_entered_main_field", true)
 			activate_champion_elements(card)
 		recheck_field_continuous_effects()
 		card.global_position = global_position + Vector2(-20, 60)
@@ -247,7 +255,7 @@ func add_card_to_field(card: Node, target_pos: Vector2, target_rot_deg: float = 
 			if tree and tree.current_scene:
 				var main_node = tree.get_root().get_node_or_null("Main")
 				if not main_node: main_node = tree.current_scene if tree.current_scene.name == "Main" else null
-				if main_node: LuBuIndomitableTitanEffect.refresh_all_cards_visuals(main_node)
+				if main_node: Gimmicks.gimmick_refresh_all_cards_visuals(main_node)
 	elif is_mastery_card(card):
 		if current_mastery_card != null and current_mastery_card != card:
 			remove_previous_mastery()

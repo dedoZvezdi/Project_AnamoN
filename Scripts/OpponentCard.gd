@@ -567,8 +567,8 @@ func update_visuals_based_on_mark():
 			mark_tween.tween_property($ShadowPanel, "modulate:a", 0.0, 0.4)
 			mark_tween.tween_callback(func(): $ShadowPanel.visible = false)
 
-func show_card_info():
-	if not mouse_inside:
+func show_card_info(force: bool = false):
+	if not mouse_inside and not force:
 		return
 	if not card_information_reference:
 		return
