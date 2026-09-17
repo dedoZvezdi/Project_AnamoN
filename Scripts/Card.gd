@@ -665,8 +665,8 @@ func _update_card_image(card_slug: String):
 			$CardImageBack.visible = false
 		$CardImage.z_index = 0
 
-func show_card_info():
-	if not mouse_inside:
+func show_card_info(force: bool = false):
+	if not mouse_inside and not force:
 		return
 	if not card_information_reference:
 		return
@@ -1194,6 +1194,7 @@ func _convert_to_opponent_graveyard_visuals(final_pos):
 	new_opp_card.uuid = uuid
 	if "original_owner_id" in new_opp_card:
 		new_opp_card.original_owner_id = original_owner_id
+	Gimmicks.gimmick_carry_stored_pick(self, new_opp_card)
 	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
 	new_opp_card.attached_counters = attached_counters.duplicate()
 	new_opp_card.is_marked = is_marked
@@ -1310,6 +1311,7 @@ func _convert_to_opponent_banish_visuals(final_pos, face_down):
 	new_opp_card.uuid = uuid
 	if "original_owner_id" in new_opp_card:
 		new_opp_card.original_owner_id = original_owner_id
+	Gimmicks.gimmick_carry_stored_pick(self, new_opp_card)
 	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
 	new_opp_card.attached_counters = attached_counters.duplicate()
 	new_opp_card.is_marked = is_marked
@@ -1845,6 +1847,7 @@ func _convert_to_opponent_card_visuals(final_pos, final_rot):
 	new_opp_card.uuid = uuid
 	if "original_owner_id" in new_opp_card:
 		new_opp_card.original_owner_id = original_owner_id
+	Gimmicks.gimmick_carry_stored_pick(self, new_opp_card)
 	new_opp_card.runtime_modifiers = runtime_modifiers.duplicate()
 	new_opp_card.attached_counters = attached_counters.duplicate()
 	new_opp_card.is_marked = is_marked
