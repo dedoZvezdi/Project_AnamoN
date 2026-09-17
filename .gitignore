@@ -35,3 +35,7 @@ addons/godot-sqlite/bin/~libgdsqlite.windows.template_debug.x86_64.dll
 # Godot specific asset meta files
 *.uid
 *.import
+
+# Decks For Testing Effects
+
+Test Deck.gad
