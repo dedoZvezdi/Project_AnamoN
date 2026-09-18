@@ -125,7 +125,7 @@ func _on_p2_avatar_gui_input(event: InputEvent):
 
 func setup_host(player_name: String):
 	p1_name_input.text = player_name
-	p1_ready_btn.disabled = false
+	p1_ready_btn.disabled = not _has_selectable_deck()
 	p2_ready_btn.disabled = true
 	start_button.visible = true
 	_apply_local_photo(p1_photo_rect)
@@ -137,7 +137,7 @@ func setup_host(player_name: String):
 func setup_client(player_name: String):
 	p2_name_input.text = player_name
 	p1_ready_btn.disabled = true
-	p2_ready_btn.disabled = false
+	p2_ready_btn.disabled = not _has_selectable_deck()
 	start_button.visible = false
 	_apply_local_photo(p2_photo_rect)
 	p1_name_input.text = "Waiting..."
@@ -315,6 +315,29 @@ func sync_lobby_settings(mode_idx: int, legality_idx: int):
 		if old_legality != legality_idx:
 			_refresh_deck_options()
 
+func _has_selectable_deck() -> bool:
+	return deck_option and deck_option.get_item_count() > 0 and deck_option.selected >= 0
+
+func _update_local_ready_button():
+	if not deck_option or not p1_ready_btn or not p2_ready_btn:
+		return
+	var has_deck = _has_selectable_deck()
+	if multiplayer.is_server():
+		if not has_deck and p1_ready:
+			p1_ready = false
+			_update_player_ui(p1_ready, p1_ready_btn, p1_status_label, p1_status_dot, p1_progress_fill, false)
+			deck_option.disabled = false
+			rpc("sync_ready_state", 1, false)
+		p1_ready_btn.disabled = not has_deck
+	else:
+		if not has_deck and p2_ready:
+			p2_ready = false
+			_update_player_ui(p2_ready, p2_ready_btn, p2_status_label, p2_status_dot, p2_progress_fill, true)
+			deck_option.disabled = false
+			rpc("sync_ready_state", 2, false)
+		p2_ready_btn.disabled = not has_deck
+	check_start_button()
+
 func _refresh_deck_options():
 	if not deck_option or not legality_option: return
 	var old_selected_name = ""
@@ -363,6 +386,7 @@ func _refresh_deck_options():
 	else:
 		deck_option.selected = -1
 		_on_deck_selected(-1)
+	_update_local_ready_button()
 
 func get_selected_deck_data() -> Dictionary:
 	if not deck_option or deck_option.selected < 0 or deck_option.get_item_count() == 0:

@@ -160,6 +160,10 @@ func remove_card_by_uuid(target_uuid: String):
 func _on_deck_view_close():
 	deck_view_window.hide()
 
+func close_deck_view():
+	if deck_view_window and deck_view_window.visible:
+		deck_view_window.hide()
+
 func _on_card_display_popup_menu(_slug, card_uuid):
 	selected_card_uuid = card_uuid
 	var popup_menu = $MAT_DECK_VIEW_WINDOW/PopupMenu

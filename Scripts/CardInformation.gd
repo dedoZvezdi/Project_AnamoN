@@ -136,9 +136,9 @@ func _update_card_display(slug: String):
 		if data.has("element") and data["element"] != null:
 			element_to_display = data["element"]
 		if data.has("cost_memory") and data["cost_memory"] != null:
-			cost_text_to_display = "MEMORY %s" % str(data["cost_memory"])
+			cost_text_to_display = "MEMORY %s" % _format_cost_value(data["cost_memory"])
 		elif data.has("cost_reserve") and data["cost_reserve"] != null:
-			cost_text_to_display = "RESERVE %s" % str(data["cost_reserve"])
+			cost_text_to_display = "RESERVE %s" % _format_cost_value(data["cost_reserve"])
 		plds_text_to_display = _build_plds_text_effective(data, stats)
 		if data.has("edition_id") and not data.has("parent_orientation_slug"):
 			var base_slug = find_base_card_for_edition(data["edition_id"])
@@ -152,9 +152,9 @@ func _update_card_display(slug: String):
 				if base_data.has("element") and base_data["element"] != null:
 					element_to_display = base_data["element"]
 				if base_data.has("cost_memory") and base_data["cost_memory"] != null:
-					cost_text_to_display = "MEMORY %s" % str(base_data["cost_memory"])
+					cost_text_to_display = "MEMORY %s" % _format_cost_value(base_data["cost_memory"])
 				elif base_data.has("cost_reserve") and base_data["cost_reserve"] != null:
-					cost_text_to_display = "RESERVE %s" % str(base_data["cost_reserve"])
+					cost_text_to_display = "RESERVE %s" % _format_cost_value(base_data["cost_reserve"])
 				if plds_text_to_display == "":
 					plds_text_to_display = _build_plds_text_effective(base_data, stats)
 				if (effect_to_display == null or effect_to_display.strip_edges() == "") and base_data.get("flavor"):
@@ -177,9 +177,9 @@ func _update_card_display(slug: String):
 				if parent_data.has("element") and parent_data["element"] != null:
 					element_to_display = parent_data["element"]
 				if parent_data.has("cost_memory") and parent_data["cost_memory"] != null:
-					cost_text_to_display = "MEMORY %s" % str(parent_data["cost_memory"])
+					cost_text_to_display = "MEMORY %s" % _format_cost_value(parent_data["cost_memory"])
 				elif parent_data.has("cost_reserve") and parent_data["cost_reserve"] != null:
-					cost_text_to_display = "RESERVE %s" % str(parent_data["cost_reserve"])
+					cost_text_to_display = "RESERVE %s" % _format_cost_value(parent_data["cost_reserve"])
 				if plds_text_to_display == "":
 					plds_text_to_display = _build_plds_text_effective(parent_data, stats)
 				if (effect_to_display == null or effect_to_display.strip_edges() == "") and parent_data.get("flavor"):
@@ -417,6 +417,15 @@ func is_card_of_type(slug: String, target_type: String) -> bool:
 					if str(types).to_upper() == target_upper:
 						return true
 	return false
+
+func _format_cost_value(value) -> String:
+	if value == null:
+		return ""
+	if str(value).strip_edges() == "-1":
+		return "X"
+	if typeof(value) in [TYPE_INT, TYPE_FLOAT] and int(value) == -1:
+		return "X"
+	return str(value)
 
 func _has_ascendant_bonus(_slug: String) -> bool:
 	if not last_displayed_card: return false

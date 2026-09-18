@@ -134,15 +134,19 @@ func _ready():
 	if element_option:
 		element_option.selected = 0
 		element_option.get_popup().max_size = Vector2i(1000, 165)
+		element_option.item_selected.connect(func(_i): _on_search_pressed())
 	if type_option:
 		type_option.selected = 0
 		type_option.get_popup().max_size = Vector2i(1000, 165)
+		type_option.item_selected.connect(func(_i): _on_search_pressed())
 	if subtype_option:
 		subtype_option.selected = 0
 		subtype_option.get_popup().max_size = Vector2i(1000, 165)
+		subtype_option.item_selected.connect(func(_i): _on_search_pressed())
 	if class_option:
 		class_option.selected = 0
 		class_option.get_popup().max_size = Vector2i(1000, 165)
+		class_option.item_selected.connect(func(_i): _on_search_pressed())
 	if cost_mem_edit:
 		cost_mem_edit.text_changed.connect(_on_cost_mem_changed)
 	if cost_res_edit:
@@ -202,13 +206,19 @@ func _ready():
 	_create_deck_saved_label()
 	_create_delete_dialog()
 	_refresh_deck_options()
-	if _current_deck_filename == "" and _last_deck_filename != "":
-		for i in range(deck_option_button.get_item_count()):
-			var deck_name = deck_option_button.get_item_text(i)
-			if _available_decks.has(deck_name) and _available_decks[deck_name] == _last_deck_filename:
-				deck_option_button.selected = i
-				_on_deck_selected(i)
-				break
+	if _current_deck_filename == "":
+		var target_filename = ""
+		if _last_deck_filename != "" and FileAccess.file_exists(_decks_dir_path.path_join(_last_deck_filename)):
+			target_filename = _last_deck_filename
+		else:
+			target_filename = _get_newest_deck_filename()
+		if target_filename != "":
+			for i in range(deck_option_button.get_item_count()):
+				var deck_name = deck_option_button.get_item_text(i)
+				if _available_decks.has(deck_name) and _available_decks[deck_name] == target_filename:
+					deck_option_button.selected = i
+					_on_deck_selected(i)
+					break
 	if unique_checkbox:
 		unique_checkbox.button_pressed = _unique_cards_only
 		unique_checkbox.toggled.connect(_on_unique_checkbox_toggled)
@@ -266,28 +276,37 @@ func _on_legality_selected(index: int):
 	_save_prefs()
 	_increment_deck_version()
 	update_all_labels()
+	_on_search_pressed()
 
 func _on_digits_only_changed(new_text: String, field: LineEdit):
 	var clean = _strip_non_digits(new_text)
 	if clean != new_text:
 		field.text = clean
 		field.caret_column = clean.length()
+		return
+	_on_search_pressed()
 
 func _on_cost_mem_changed(new_text: String):
 	var clean = _strip_non_digits(new_text)
 	if clean != new_text and cost_mem_edit:
 		cost_mem_edit.text = clean
 		cost_mem_edit.caret_column = clean.length()
+		return
 	if cost_res_edit and clean != "" and cost_res_edit.text != "":
 		cost_res_edit.text = ""
+		return
+	_on_search_pressed()
 
 func _on_cost_res_changed(new_text: String):
 	var clean = _strip_non_digits(new_text)
 	if clean != new_text and cost_res_edit:
 		cost_res_edit.text = clean
 		cost_res_edit.caret_column = clean.length()
+		return
 	if cost_mem_edit and clean != "" and cost_mem_edit.text != "":
 		cost_mem_edit.text = ""
+		return
+	_on_search_pressed()
 
 func _on_field_gui_input(event: InputEvent):
 	if event is InputEventKey and event.pressed:
@@ -321,6 +340,9 @@ func _get_selected_legality() -> String:
 func _is_name_limits_active() -> bool:
 	var legality = _get_selected_legality()
 	return legality != "N/A" and legality != "DRAFT"
+
+func _is_format_check_active() -> bool:
+	return _get_selected_legality() != "N/A"
 
 func _get_card_name(slug: String) -> String:
 	var data = _get_base_card_data(slug)
@@ -441,68 +463,89 @@ func can_add_card_to_zone(slug: String, target_zone: String) -> bool:
 
 func _compute_illegal_card_keys() -> Dictionary:
 	var illegal: Dictionary = {}
-	if not _is_name_limits_active():
+	if not _is_format_check_active():
 		return illegal
 	var legality = _get_selected_legality()
-	var reserve_names: Dictionary = {}
-	var memory_names: Dictionary = {}
 	if main_deck_grid:
 		for i in range(main_deck_grid.card_slugs.size()):
 			var slug = main_deck_grid.card_slugs[i]
-			if slug == "" or _is_boon(slug) or _uses_memory_name_pool(slug):
-				continue
-			var card_name = _get_card_name(slug)
-			if not reserve_names.has(card_name):
-				reserve_names[card_name] = {"main_deck": [], "side_deck": []}
-			reserve_names[card_name]["main_deck"].append(i)
+			if slug != "" and not _is_card_legal_in_format(slug, legality):
+				illegal["main_deck:" + str(i)] = true
 	if mat_deck_grid:
 		for i in range(mat_deck_grid.card_slugs.size()):
 			var slug = mat_deck_grid.card_slugs[i]
-			if slug == "" or _is_boon(slug) or not _uses_memory_name_pool(slug):
-				continue
-			var card_name = _get_card_name(slug)
-			if not memory_names.has(card_name):
-				memory_names[card_name] = {"mat_deck": [], "side_deck": []}
-			memory_names[card_name]["mat_deck"].append(i)
+			if slug != "" and not _is_card_legal_in_format(slug, legality):
+				illegal["mat_deck:" + str(i)] = true
 	if side_deck_grid:
 		for i in range(side_deck_grid.card_slugs.size()):
 			var slug = side_deck_grid.card_slugs[i]
-			if slug == "" or _is_boon(slug):
-				continue
-			var card_name = _get_card_name(slug)
-			if _uses_memory_name_pool(slug):
-				if not memory_names.has(card_name):
-					memory_names[card_name] = {"mat_deck": [], "side_deck": []}
-				memory_names[card_name]["side_deck"].append(i)
-			else:
+			if slug != "" and not _is_card_legal_in_format(slug, legality):
+				illegal["side_deck:" + str(i)] = true
+	if pantheon_deck_grid:
+		for i in range(pantheon_deck_grid.card_slugs.size()):
+			var slug = pantheon_deck_grid.card_slugs[i]
+			if slug != "" and not _is_card_legal_in_format(slug, legality):
+				illegal["pantheon_deck:" + str(i)] = true
+	if _is_name_limits_active():
+		var reserve_names: Dictionary = {}
+		var memory_names: Dictionary = {}
+		if main_deck_grid:
+			for i in range(main_deck_grid.card_slugs.size()):
+				var slug = main_deck_grid.card_slugs[i]
+				if slug == "" or _is_boon(slug) or _uses_memory_name_pool(slug):
+					continue
+				var card_name = _get_card_name(slug)
 				if not reserve_names.has(card_name):
 					reserve_names[card_name] = {"main_deck": [], "side_deck": []}
-				reserve_names[card_name]["side_deck"].append(i)
-	var main_limit = MAIN_NAME_LIMIT
-	if legality == "PANTHEON":
-		main_limit = 1
-	for card_name in reserve_names:
-		var grouped = reserve_names[card_name]
-		var ordered: Array = []
-		for idx in grouped["main_deck"]:
-			ordered.append(["main_deck", idx])
-		for idx in grouped["side_deck"]:
-			ordered.append(["side_deck", idx])
-		for j in range(ordered.size()):
-			if j >= main_limit:
-				var entry = ordered[j]
-				illegal[entry[0] + ":" + str(entry[1])] = true
-	for card_name in memory_names:
-		var grouped = memory_names[card_name]
-		var ordered: Array = []
-		for idx in grouped["mat_deck"]:
-			ordered.append(["mat_deck", idx])
-		for idx in grouped["side_deck"]:
-			ordered.append(["side_deck", idx])
-		for j in range(ordered.size()):
-			if j >= MAT_NAME_LIMIT:
-				var entry = ordered[j]
-				illegal[entry[0] + ":" + str(entry[1])] = true
+				reserve_names[card_name]["main_deck"].append(i)
+		if mat_deck_grid:
+			for i in range(mat_deck_grid.card_slugs.size()):
+				var slug = mat_deck_grid.card_slugs[i]
+				if slug == "" or _is_boon(slug) or not _uses_memory_name_pool(slug):
+					continue
+				var card_name = _get_card_name(slug)
+				if not memory_names.has(card_name):
+					memory_names[card_name] = {"mat_deck": [], "side_deck": []}
+				memory_names[card_name]["mat_deck"].append(i)
+		if side_deck_grid:
+			for i in range(side_deck_grid.card_slugs.size()):
+				var slug = side_deck_grid.card_slugs[i]
+				if slug == "" or _is_boon(slug):
+					continue
+				var card_name = _get_card_name(slug)
+				if _uses_memory_name_pool(slug):
+					if not memory_names.has(card_name):
+						memory_names[card_name] = {"mat_deck": [], "side_deck": []}
+					memory_names[card_name]["side_deck"].append(i)
+				else:
+					if not reserve_names.has(card_name):
+						reserve_names[card_name] = {"main_deck": [], "side_deck": []}
+					reserve_names[card_name]["side_deck"].append(i)
+		var main_limit = MAIN_NAME_LIMIT
+		if legality == "PANTHEON":
+			main_limit = 1
+		for card_name in reserve_names:
+			var grouped = reserve_names[card_name]
+			var ordered: Array = []
+			for idx in grouped["main_deck"]:
+				ordered.append(["main_deck", idx])
+			for idx in grouped["side_deck"]:
+				ordered.append(["side_deck", idx])
+			for j in range(ordered.size()):
+				if j >= main_limit:
+					var entry = ordered[j]
+					illegal[entry[0] + ":" + str(entry[1])] = true
+		for card_name in memory_names:
+			var grouped = memory_names[card_name]
+			var ordered: Array = []
+			for idx in grouped["mat_deck"]:
+				ordered.append(["mat_deck", idx])
+			for idx in grouped["side_deck"]:
+				ordered.append(["side_deck", idx])
+			for j in range(ordered.size()):
+				if j >= MAT_NAME_LIMIT:
+					var entry = ordered[j]
+					illegal[entry[0] + ":" + str(entry[1])] = true
 	if legality == "STANDARD":
 		if mat_deck_grid:
 			var has_champ = false
@@ -746,6 +789,7 @@ func _on_clear_search_pressed():
 		subtype_option.selected = 0
 	if class_option:
 		class_option.selected = 0
+	_on_search_pressed()
 
 func _on_exit_pressed():
 	if _sideboard_mode:
@@ -777,6 +821,21 @@ func _is_greater_boon(slug: String) -> bool:
 
 func _is_boon(slug: String) -> bool:
 	return _is_lesser_boon(slug) or _is_greater_boon(slug)
+
+func _is_card_legal_in_format(slug: String, format_name: String) -> bool:
+	if format_name == "" or format_name == "N/A":
+		return true
+	var data = _get_base_card_data(slug)
+	if data.is_empty() or not data.has("legalities"):
+		return true
+	for legality in data["legalities"]:
+		if not (legality is Dictionary) or not legality.has("formats"):
+			continue
+		for format in legality["formats"]:
+			if str(format.get("format", "")).to_upper() == format_name.to_upper():
+				if format.has("limit") and int(format["limit"]) == 0:
+					return false
+	return true
 
 func _has_cost_memory(slug: String) -> bool:
 	var data = _get_base_card_data(slug)
@@ -1415,6 +1474,24 @@ func _refresh_deck_options():
 			if _available_decks.has(deck_name) and _available_decks[deck_name] == _current_deck_filename:
 				deck_option_button.selected = i
 				break
+
+func _get_newest_deck_filename() -> String:
+	var newest_file = ""
+	var newest_time = -1
+	var dir = DirAccess.open(_decks_dir_path)
+	if not dir:
+		return ""
+	dir.list_dir_begin()
+	var file_name = dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir() and file_name.ends_with(".gad"):
+			var full_path = _decks_dir_path.path_join(file_name)
+			var mtime = FileAccess.get_modified_time(full_path)
+			if mtime > newest_time:
+				newest_time = mtime
+				newest_file = file_name
+		file_name = dir.get_next()
+	return newest_file
 
 func _on_deck_option_pressed():
 	_refresh_deck_options()
