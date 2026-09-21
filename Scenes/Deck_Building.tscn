@@ -856,6 +856,9 @@ bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cmpxm"]
 bg_color = Color(0.050980393, 0.050980393, 0.050980393, 0.9490196)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yu6tf"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
 [node name="Deck_Building" type="Control" unique_id=1091405845]
 layout_mode = 3
 anchors_preset = 15
@@ -1471,6 +1474,7 @@ theme_override_colors/font_focus_color = Color(0.7882353, 0.6627451, 0.43137255,
 theme_override_colors/font_pressed_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_hover_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
 theme_override_colors/font_hover_pressed_color = Color(0.7882353, 0.6627451, 0.43137255, 1)
+theme_override_styles/focus = SubResource("StyleBoxFlat_yu6tf")
 theme_override_icons/checked = ExtResource("4_1swxn")
 theme_override_icons/unchecked = ExtResource("5_ss27m")
 text = "Unique Only"

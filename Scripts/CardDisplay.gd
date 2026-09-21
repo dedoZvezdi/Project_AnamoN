@@ -43,6 +43,11 @@ func _ready():
 	if card_image_path != "" and ResourceLoader.exists(card_image_path):
 		texture_rect.texture = load(card_image_path)
 		texture_rect.size = CARD_DISPLAY_SIZE
+	elif card_slug != "":
+		var back_path = "res://Assets/Textures/ga_back.png"
+		if ResourceLoader.exists(back_path):
+			texture_rect.texture = load(back_path)
+			texture_rect.size = CARD_DISPLAY_SIZE
 	if has_meta("deck_z_index"):
 		self.z_index = get_meta("deck_z_index")
 	mouse_entered.connect(_on_mouse_entered)

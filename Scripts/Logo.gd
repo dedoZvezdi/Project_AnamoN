@@ -625,9 +625,7 @@ func fetch_slugs_by_type(target_type: String) -> Array:
 					for edition in data["editions"]:
 						var slug = edition["slug"]
 						if not slugs.has(slug):
-							var image_path = "res://Assets/Grand Archive/Card Images/" + slug + ".png"
-							if ResourceLoader.exists(image_path) or FileAccess.file_exists(image_path) or FileAccess.file_exists(image_path + ".import"):
-								slugs.append(slug)
+							slugs.append(slug)
 	return slugs
 
 func populate_tokens():

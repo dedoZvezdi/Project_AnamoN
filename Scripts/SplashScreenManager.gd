@@ -17,6 +17,14 @@ func _cleanup_temp_opponent_photo():
 	var file_path = base_path.path_join("temp_opponent_photo.png")
 	if FileAccess.file_exists(file_path):
 		DirAccess.remove_absolute(file_path)
+	var user_dir = DirAccess.open("user://")
+	if user_dir:
+		user_dir.list_dir_begin()
+		var file_name = user_dir.get_next()
+		while file_name != "":
+			if not user_dir.current_is_dir() and file_name.begins_with("Opponent_Image_") and file_name.ends_with(".png"):
+				user_dir.remove(file_name)
+			file_name = user_dir.get_next()
 
 func fade() -> void:
 	await get_tree().process_frame
