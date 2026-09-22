@@ -607,8 +607,15 @@ func _handle_menu_action(id, metadata = {}):
 					custom_counters[counter_name] -= 1
 				update_status_display()
 
+func _load_unique_pref() -> bool:
+	var config = ConfigFile.new()
+	if config.load("user://deck_builder_prefs.cfg") == OK:
+		return bool(config.get_value("filters", "unique_cards_only", true))
+	return true
+
 func fetch_slugs_by_type(target_type: String) -> Array:
 	var slugs = []
+	var unique_only = _load_unique_pref()
 	var card_info = find_card_information_reference()
 	var db = null
 	if card_info and card_info.get("card_database_reference"):
@@ -622,10 +629,16 @@ func fetch_slugs_by_type(target_type: String) -> Array:
 			var data = db.cards_db[key]
 			if data.has("types") and target_type in data["types"]:
 				if data.has("editions"):
-					for edition in data["editions"]:
-						var slug = edition["slug"]
-						if not slugs.has(slug):
-							slugs.append(slug)
+					if unique_only:
+						if data["editions"].size() > 0:
+							var slug = data["editions"][0]["slug"]
+							if not slugs.has(slug):
+								slugs.append(slug)
+					else:
+						for edition in data["editions"]:
+							var slug = edition["slug"]
+							if not slugs.has(slug):
+								slugs.append(slug)
 	return slugs
 
 func populate_tokens():
