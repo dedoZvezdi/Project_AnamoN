@@ -129,8 +129,11 @@ func _update_card_display(slug: String):
 	var cost_text_to_display = ""
 	var plds_text_to_display = ""
 	var stats = get_effective_stats_for_card()
-	if card_database_reference and card_database_reference.cards_db.has(slug):
-		var data = card_database_reference.cards_db[slug]
+	var db_slug = slug
+	if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(slug):
+		db_slug = DivineComedyEffect.get_cover_slug(slug)
+	if card_database_reference and card_database_reference.cards_db.has(db_slug):
+		var data = card_database_reference.cards_db[db_slug]
 		if data.has("level") and data["level"] != null:
 			level_to_display = data["level"]
 		if data.has("element") and data["element"] != null:
@@ -204,6 +207,8 @@ func _update_card_display(slug: String):
 						if edition.get("flavor"):
 							effect_to_display = edition["flavor"]
 							break
+		if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(slug):
+			effect_to_display = DivineComedyEffect.get_hardcoded_effect(slug)
 	if _has_ascendant_bonus(slug):
 		types_to_display += " ASCENDANT"
 	if name_to_display and name_to_display.strip_edges() != "":

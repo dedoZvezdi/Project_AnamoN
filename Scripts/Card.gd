@@ -133,6 +133,8 @@ func find_node_by_script(node: Node, script_path: String) -> Node:
 	return null
 func get_original_slug_for_restrictions() -> String:
 	var current_slug = get_slug_from_card()
+	if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(current_slug):
+		return DivineComedyEffect.get_cover_slug(current_slug)
 	var stripped_slug = current_slug.to_lower().replace("-", "").replace("_", "")
 	if stripped_slug.contains("lubu"):
 		return current_slug
@@ -301,6 +303,9 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 						var target_slug = get_transform_target(slug)
 						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
 							popup_menu.add_item("Transform", 5)
+					if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.can_multitransform(self):
+						if original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id():
+							popup_menu.add_item("Cascade", 22)
 			elif is_status():
 				if is_in_main_field():
 					popup_menu.add_item("Sacrifice", 8)
@@ -678,6 +683,8 @@ func show_card_info(force: bool = false):
 	if card_PLDS_lable:
 		card_PLDS_lable.text = ""
 	var card_database = card_information_reference.card_database_reference
+	if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(card_slug):
+		card_slug = DivineComedyEffect.get_cover_slug(card_slug)
 	if not card_database or not card_database.cards_db.has(card_slug):
 		return
 	var level_to_display = null
@@ -833,6 +840,7 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 			elif "apotheosis-rite" in s: ApotheosisRiteEffect.activate_rite(self)
 			elif "sacramental-rite" in s: SacramentalRiteEffect.activate_rite(self)
 			elif "transcendental-rite" in s: TranscendentalRiteEffect.activate_rite(self)
+		22: if typeof(DivineComedyEffect) == TYPE_OBJECT: DivineComedyEffect.apply_multitransform(self)
 
 func rotate_card():
 	if not is_in_main_field():
@@ -938,6 +946,8 @@ func _resolve_data_for_stats() -> Dictionary:
 		return {}
 	var card_database = card_information_reference.card_database_reference
 	var slug = get_slug_from_card()
+	if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(slug):
+		slug = DivineComedyEffect.get_cover_slug(slug)
 	if not card_database or not card_database.cards_db.has(slug):
 		return {}
 	var data = card_database.cards_db[slug]
@@ -1488,6 +1498,8 @@ func is_token() -> bool:
 
 func is_mastery() -> bool:
 	var slug = get_slug_from_card()
+	if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(slug):
+		slug = DivineComedyEffect.get_cover_slug(slug)
 	var logos = get_tree().get_nodes_in_group("logo")
 	if logos.size() > 0:
 		var logo = logos[0]

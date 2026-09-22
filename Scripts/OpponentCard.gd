@@ -138,6 +138,8 @@ func is_token() -> bool:
 
 func is_mastery() -> bool:
 	var slug = get_slug_from_card()
+	if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(slug):
+		slug = DivineComedyEffect.get_cover_slug(slug)
 	var logos = get_tree().get_nodes_in_group("logo")
 	if logos.size() > 0:
 		var logo = logos[0]
@@ -580,6 +582,8 @@ func show_card_info(force: bool = false):
 	if card_PLDS_lable:
 		card_PLDS_lable.text = ""
 	var card_database = card_information_reference.card_database_reference
+	if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(card_slug):
+		card_slug = DivineComedyEffect.get_cover_slug(card_slug)
 	if not card_database or not card_database.cards_db.has(card_slug):
 		return
 	var level_to_display = null
@@ -624,6 +628,8 @@ func get_effective_stats() -> Dictionary:
 	if card_slug == "" or not card_information_reference or not card_information_reference.card_database_reference:
 		return stats
 	var card_database = card_information_reference.card_database_reference
+	if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.is_multitransform_slug(card_slug):
+		card_slug = DivineComedyEffect.get_cover_slug(card_slug)
 	if not card_database.cards_db.has(card_slug):
 		return stats
 	var data = card_database.cards_db[card_slug]

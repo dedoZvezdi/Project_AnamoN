@@ -297,6 +297,45 @@ static func gimmick_clear_ascendant(main_field_node: Node, root: Node, is_oppone
 			var my_id = multiplayer_node.multiplayer.get_unique_id()
 			multiplayer_node.rpc("sync_ascendant_clear", my_id)
 
+static func gimmick_apply_multitransform(card: Node, old_slug: String, new_slug: String) -> void:
+	if not card or not is_instance_valid(card):
+		return
+	if old_slug == "" or new_slug == "":
+		return
+	card.set_meta("slug", new_slug)
+	if "is_marked" in card and card.has_method("set_marked"):
+		card.set_marked(false)
+	if card.has_method("_update_card_image"):
+		card._update_card_image(new_slug)
+	if "current_field" in card:
+		var field = card.get("current_field")
+		if field and is_instance_valid(field) and field.has_method("notify_card_transformed"):
+			field.notify_card_transformed(card, old_slug)
+	var tree = card.get_tree()
+	if tree:
+		var multiplayer_node = tree.get_root().get_node_or_null("Main")
+		if multiplayer_node and multiplayer_node.has_method("rpc"):
+			var uuid := ""
+			if card.has_method("get_uuid"):
+				uuid = str(card.get_uuid())
+			elif "uuid" in card:
+				uuid = str(card.uuid)
+			multiplayer_node.rpc("sync_card_transform", multiplayer_node.multiplayer.get_unique_id(), uuid, new_slug)
+	if card.has_node("AnimationPlayer"):
+		var animation: AnimationPlayer = card.get_node("AnimationPlayer")
+		if animation.has_animation("card_flip"):
+			animation.play("card_flip")
+	if card.has_method("is_in_main_field") and card.is_in_main_field() and card.has_method("clear_runtime_modifiers"):
+		card.clear_runtime_modifiers()
+	if "card_information_reference" in card and "mouse_inside" in card and "is_dragging" in card:
+		if card.card_information_reference and card.mouse_inside and not card.is_dragging:
+			if card.has_method("hide_card_info"):
+				card.hide_card_info()
+			if card.has_method("show_card_info"):
+				card.show_card_info()
+			if card.card_information_reference.has_method("show_card_preview"):
+				card.card_information_reference.show_card_preview(card)
+
 static func gimmick_sync_activation(root: Node, rpc_name: String, args: Array = []):
 	if not root:
 		return
@@ -832,6 +871,27 @@ static func condition_card_exact_damage_counters(card: Node, count: int) -> bool
 		return false
 	return int(counters["Damage"]) == count
 
+static func condition_multitransform_slug(slug: String, base_slug: String, suffix: String, max_pages: int) -> bool:
+	return bool(_parse_multitransform_slug(slug, base_slug, suffix, max_pages).get("is_chain", false))
+
+static func condition_multitransform_can_apply(card: Node, base_slug: String, suffix: String, max_pages: int, mainfield_only: bool) -> bool:
+	if not card or not is_instance_valid(card):
+		return false
+	var slug := ""
+	if card.has_meta("slug"):
+		slug = str(card.get_meta("slug"))
+	if not condition_multitransform_slug(slug, base_slug, suffix, max_pages):
+		return false
+	if find_multitransform_target_slug(slug, base_slug, suffix, max_pages) == "":
+		return false
+	if card.has_method("is_in_main_field") and not card.is_in_main_field():
+		return false
+	if mainfield_only and "current_field" in card:
+		var field = card.current_field
+		if not field or not is_instance_valid(field) or str(field.name) != "MAINFIELD":
+			return false
+	return true
+
 static func condition_card_has_memory_cost(db_ref, slug: String, card_info_node: Node = null) -> bool:
 	if not db_ref or slug == "":
 		return false
@@ -956,6 +1016,31 @@ static func _scene_of(from_node: Node) -> Node:
 static func _normalize_slug(s: String) -> String:
 	return str(s).to_lower().replace("-", "").replace("_", "").replace(" ", "")
 
+static func _parse_multitransform_slug(slug: String, base_slug: String, suffix: String, max_pages: int) -> Dictionary:
+	var result := {"is_chain": false, "cover": slug, "page": 0, "edition": ""}
+	if slug == "" or base_slug == "":
+		return result
+	if slug == base_slug:
+		result["is_chain"] = true
+		return result
+	var prefix := base_slug + suffix
+	if slug.begins_with(prefix):
+		var rest := slug.substr(prefix.length())
+		var digits := ""
+		for i in range(rest.length()):
+			var chapter := rest.substr(i, 1)
+			if chapter >= "0" and chapter <= "9":
+				digits += chapter
+			else:
+				break
+		if digits != "" and int(digits) >= 1 and int(digits) <= max_pages:
+			result["is_chain"] = true
+			result["page"] = int(digits)
+			result["edition"] = rest.substr(digits.length())
+			result["cover"] = base_slug + str(result["edition"])
+			return result
+	return result
+
 static func _tween_card_to_zone(card: Node, zone_node: Node, duration: float = 0.5) -> void:
 	if not card or not is_instance_valid(card) or not zone_node:
 		return
@@ -1070,6 +1155,25 @@ static func find_field_card_by_slug(main_field_node: Node, slug_fragment: String
 			if _normalize_slug(str(card.get_meta("slug"))).contains(fragmet):
 				return card
 	return null
+
+static func find_multitransform_cover_slug(slug: String, base_slug: String, suffix: String, max_pages: int) -> String:
+	return str(_parse_multitransform_slug(slug, base_slug, suffix, max_pages).get("cover", slug))
+
+static func find_multitransform_page(slug: String, base_slug: String, suffix: String, max_pages: int) -> int:
+	var info := _parse_multitransform_slug(slug, base_slug, suffix, max_pages)
+	if not bool(info.get("is_chain", false)):
+		return -1
+	return int(info.get("page", 0))
+
+static func find_multitransform_target_slug(slug: String, base_slug: String, suffix: String, max_pages: int) -> String:
+	var info := _parse_multitransform_slug(slug, base_slug, suffix, max_pages)
+	if not bool(info.get("is_chain", false)):
+		return ""
+	var page := int(info.get("page", 0))
+	if page < 0 or page >= max_pages:
+		return ""
+	var edition := str(info.get("edition", ""))
+	return base_slug + suffix + str(page + 1) + edition
 
 static func find_base_card_data(db_ref, slug: String, card_info_node: Node = null) -> Dictionary:
 	if not db_ref or slug == "":
