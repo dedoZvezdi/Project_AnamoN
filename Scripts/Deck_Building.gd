@@ -102,6 +102,7 @@ func _ready():
 		pantheon_deck_grid.has_scrollbar_padding = false
 		pantheon_deck_grid._rebuild_grid()
 	_load_prefs()
+	Gimmicks.refresh_divine_relic_slugs()
 	if legality_option:
 		legality_option.add_item("N/A")
 		legality_option.add_item("STANDARD")
@@ -449,6 +450,8 @@ func can_add_card_to_zone(slug: String, target_zone: String) -> bool:
 							return false
 			elif target_zone == "side_deck":
 				return false
+	if _is_format_check_active() and _is_divine_relic(slug) and _count_divine_relics() >= 1:
+		return false
 	if not _is_name_limits_active() or _is_boon(slug):
 		return true
 	var limit = _get_shared_name_limit(slug)
@@ -486,6 +489,19 @@ func _compute_illegal_card_keys() -> Dictionary:
 			var slug = pantheon_deck_grid.card_slugs[i]
 			if slug != "" and not _is_card_legal_in_format(slug, legality):
 				illegal["pantheon_deck:" + str(i)] = true
+	var relic_entries: Array = []
+	for zone_data in [["main_deck", main_deck_grid], ["mat_deck", mat_deck_grid], ["side_deck", side_deck_grid], ["pantheon_deck", pantheon_deck_grid]]:
+		var zone_name: String = zone_data[0]
+		var grid = zone_data[1]
+		if not grid:
+			continue
+		for i in range(grid.card_slugs.size()):
+			var slug = grid.card_slugs[i]
+			if slug != "" and _is_divine_relic(slug):
+				relic_entries.append([zone_name, i])
+	for j in range(relic_entries.size()):
+		if j >= 1:
+			illegal[relic_entries[j][0] + ":" + str(relic_entries[j][1])] = true
 	if _is_name_limits_active():
 		var reserve_names: Dictionary = {}
 		var memory_names: Dictionary = {}
@@ -821,6 +837,22 @@ func _is_greater_boon(slug: String) -> bool:
 
 func _is_boon(slug: String) -> bool:
 	return _is_lesser_boon(slug) or _is_greater_boon(slug)
+
+func _is_divine_relic(slug: String) -> bool:
+	if slug == "" or not card_info or not card_info.card_database_reference:
+		return false
+	var base := Gimmicks.find_divine_relic_base_slug(card_info.card_database_reference, card_info, slug)
+	return base != "" and Gimmicks.find_divine_relic_slugs().has(base)
+
+func _count_divine_relics() -> int:
+	var count := 0
+	for grid in [main_deck_grid, mat_deck_grid, side_deck_grid, pantheon_deck_grid]:
+		if not grid:
+			continue
+		for slug in grid.card_slugs:
+			if slug != "" and _is_divine_relic(slug):
+				count += 1
+	return count
 
 func _is_card_legal_in_format(slug: String, format_name: String) -> bool:
 	if format_name == "" or format_name == "N/A":
