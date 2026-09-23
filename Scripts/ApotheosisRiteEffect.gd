@@ -1,5 +1,8 @@
 class_name ApotheosisRiteEffect
 
+const CARD_SLUG := "apotheosis-rite"
+const IS_DIVINE_RELIC := true
+
 static func apply_activation(card: Node, main_field_node: Node):
 	var conditions_met = (
 		Gimmicks.condition_requires_champion(main_field_node)

@@ -3,6 +3,9 @@ class_name Gimmicks
 const ALL_ELEMENTS = ["Norm", "Fire", "Water", "Wind", "Astra", "Umbra", "Arcane", "Exia", "Crux", "Tera", "Neos", "Luxem"]
 const BASIC_ELEMENTS = ["Fire", "Water", "Wind"]
 
+static var _divine_relic_slugs_cache: Array = []
+static var _divine_relic_scanned := false
+
 # ==========================================
 # GIMMICKS (Effects)
 # ==========================================
@@ -892,6 +895,24 @@ static func condition_multitransform_can_apply(card: Node, base_slug: String, su
 			return false
 	return true
 
+static func condition_card_is_divine_relic(card: Node) -> bool:
+	if not card or not is_instance_valid(card) or not card.has_meta("slug"):
+		return false
+	var slug := str(card.get_meta("slug"))
+	if slug == "":
+		return false
+	var tree = card.get_tree()
+	var card_info = null
+	var db = null
+	if tree and tree.current_scene:
+		card_info = tree.current_scene.find_child("CardInformation", true, false)
+		if card_info and ("card_database_reference" in card_info):
+			db = card_info.card_database_reference
+	if not db:
+		return false
+	var base := find_divine_relic_base_slug(db, card_info, slug)
+	return base != "" and find_divine_relic_slugs().has(base)
+
 static func condition_card_has_memory_cost(db_ref, slug: String, card_info_node: Node = null) -> bool:
 	if not db_ref or slug == "":
 		return false
@@ -1060,6 +1081,61 @@ static func _tween_card_to_zone(card: Node, zone_node: Node, duration: float = 0
 	tween.tween_property(card, "rotation_degrees", target_rot, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	await tween.finished
 
+static func _scan_script_for_divine_relic(path: String) -> void:
+	if not FileAccess.file_exists(path):
+		return
+	var file := FileAccess.open(path, FileAccess.READ)
+	if not file:
+		return
+	var text: String = file.get_as_text()
+	if text == "" or not _script_declares_divine_relic(text):
+		return
+	var base := _script_declared_card_slug(text)
+	if base != "" and not _divine_relic_slugs_cache.has(base):
+		_divine_relic_slugs_cache.append(base)
+
+static func _script_declares_divine_relic(text: String) -> bool:
+	for line in text.split("\n"):
+		var t := line.strip_edges()
+		if not t.begins_with("const"):
+			continue
+		var rest := t.substr(5).strip_edges()
+		if not rest.begins_with("IS_DIVINE_RELIC"):
+			continue
+		rest = rest.substr(15).strip_edges()
+		if rest.begins_with(":"):
+			rest = rest.substr(1).strip_edges()
+		if not rest.begins_with("="):
+			continue
+		rest = rest.substr(1).strip_edges()
+		if rest == "true" or rest.begins_with("true;") or rest.begins_with("true ") or rest.begins_with("true\t") or rest.begins_with("true#"):
+			return true
+	return false
+
+static func _script_declared_card_slug(text: String) -> String:
+	for line in text.split("\n"):
+		var t := line.strip_edges()
+		if not t.begins_with("const"):
+			continue
+		var rest := t.substr(5).strip_edges()
+		if not rest.begins_with("CARD_SLUG"):
+			continue
+		rest = rest.substr(9).strip_edges()
+		if rest.begins_with(":"):
+			rest = rest.substr(1).strip_edges()
+		if not rest.begins_with("="):
+			continue
+		rest = rest.substr(1).strip_edges()
+		if rest.begins_with("\""):
+			var end := rest.find("\"", 1)
+			if end > 1:
+				return rest.substr(1, end - 1).strip_edges()
+	return ""
+
+static func refresh_divine_relic_slugs() -> Array:
+	_divine_relic_scanned = false
+	return find_divine_relic_slugs()
+
 # ==========================================
 # FINDERS
 # ==========================================
@@ -1174,6 +1250,38 @@ static func find_multitransform_target_slug(slug: String, base_slug: String, suf
 		return ""
 	var edition := str(info.get("edition", ""))
 	return base_slug + suffix + str(page + 1) + edition
+
+static func find_divine_relic_slugs() -> Array:
+	if _divine_relic_scanned:
+		return _divine_relic_slugs_cache
+	_divine_relic_scanned = true
+	_divine_relic_slugs_cache = []
+	var dir := DirAccess.open("res://Scripts")
+	if dir:
+		dir.list_dir_begin()
+		var file_name := dir.get_next()
+		while file_name != "":
+			if not dir.current_is_dir() and file_name.ends_with(".gd"):
+				_scan_script_for_divine_relic("res://Scripts/".path_join(file_name))
+			file_name = dir.get_next()
+	return _divine_relic_slugs_cache
+
+static func find_divine_relic_base_slug(db, card_info_node: Node, slug: String) -> String:
+	if slug == "":
+		return ""
+	if db and db.cards_db.has(slug):
+		var data = db.cards_db[slug]
+		if data.has("types") and typeof(data["types"]) == TYPE_ARRAY and (data["types"] as Array).size() > 0:
+			return slug
+		if data.has("parent_orientation_slug"):
+			return str(data["parent_orientation_slug"])
+		if data.has("edition_id"):
+			var base := ""
+			if card_info_node and is_instance_valid(card_info_node) and card_info_node.has_method("find_base_card_for_edition"):
+				base = str(card_info_node.find_base_card_for_edition(data["edition_id"]))
+			if base != "":
+				return base
+	return slug
 
 static func find_base_card_data(db_ref, slug: String, card_info_node: Node = null) -> Dictionary:
 	if not db_ref or slug == "":

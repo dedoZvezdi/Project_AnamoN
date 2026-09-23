@@ -1,5 +1,8 @@
 class_name SacramentalRiteEffect
 
+const CARD_SLUG := "sacramental-rite"
+const IS_DIVINE_RELIC := true
+
 const CHOICE_TITLE = "Sacramental Rite"
 const CHOICE_TEXT = "Do you want to play the banished card?"
 const CHOICE_BUTTONS = ["Yes", "No"]

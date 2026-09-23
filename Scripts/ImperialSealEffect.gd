@@ -1,5 +1,8 @@
 class_name ImperialSealEffect
 
+const CARD_SLUG := "imperial-seal"
+const IS_DIVINE_RELIC := true
+
 static func apply_activation(card: Node, main_field_node: Node):
 	var conditions_met = (
 		Gimmicks.condition_while_on_main_field(card, main_field_node))
