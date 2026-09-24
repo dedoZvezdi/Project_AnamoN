@@ -2,6 +2,7 @@ extends Node2D
 
 const COLLISION_MASK_CARD = 1
 const COLLISION_MASK_CARD_SINGLE_SLOT = 2
+const SHARED_CARD_MENU_SCENE = preload("res://Scenes/SharedCardMenu.tscn")
 
 var screen_size
 var card_being_dragged = null
@@ -32,6 +33,9 @@ var original_memory_index = -1
 var drag_card_was_marked = false
 var drag_source_was_main_field = false
 var _hover_parameters = PhysicsPointQueryParameters2D.new()
+var shared_card_menu: PopupMenu = null
+var shared_card_menu_layer: CanvasLayer = null
+var active_menu_card = null
 
 func _ready() -> void:
 	_hover_parameters.collide_with_areas = true
@@ -57,6 +61,38 @@ func _ready() -> void:
 			connect_card_signals(card)
 			card.z_index = base_z_index
 	card_information_reference = find_card_information_reference()
+	_setup_shared_card_menu()
+
+func _setup_shared_card_menu() -> void:
+	if is_instance_valid(shared_card_menu):
+		return
+	shared_card_menu_layer = SHARED_CARD_MENU_SCENE.instantiate()
+	add_child(shared_card_menu_layer)
+	shared_card_menu = shared_card_menu_layer.get_node("SharedCardMenu")
+	shared_card_menu.id_pressed.connect(_on_shared_card_menu_pressed)
+	shared_card_menu.popup_hide.connect(_on_shared_card_menu_hidden)
+
+func get_shared_card_menu(card) -> PopupMenu:
+	if not is_instance_valid(shared_card_menu):
+		_setup_shared_card_menu()
+	active_menu_card = card
+	if is_instance_valid(shared_card_menu) and is_instance_valid(card):
+		shared_card_menu.set_meta("active_card_id", card.get_instance_id())
+	return shared_card_menu
+
+func _on_shared_card_menu_pressed(id: int) -> void:
+	var card = active_menu_card
+	if not is_instance_valid(card) and is_instance_valid(shared_card_menu) and shared_card_menu.has_meta("active_card_id"):
+		card = instance_from_id(int(shared_card_menu.get_meta("active_card_id")))
+	active_menu_card = null
+	if card and is_instance_valid(card) and card.has_method("_on_PopupMenu_id_pressed"):
+		card._on_PopupMenu_id_pressed(id)
+
+func _on_shared_card_menu_hidden() -> void:
+	call_deferred("_clear_active_menu_card")
+
+func _clear_active_menu_card() -> void:
+	active_menu_card = null
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
@@ -1013,6 +1049,7 @@ func validate_references():
 func cleanup():
 	card_being_dragged = null
 	last_hovered_card = null
+	active_menu_card = null
 	var viewport = get_viewport()
 	if viewport and viewport.is_connected("size_changed", Callable(self, "update_screen_size")):
 		viewport.disconnect("size_changed", Callable(self, "update_screen_size"))

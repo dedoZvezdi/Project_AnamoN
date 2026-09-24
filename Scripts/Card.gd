@@ -96,9 +96,8 @@ func _ready() -> void:
 		uuid = str(Time.get_unix_time_from_system()) + "_" + str(get_instance_id()) + "_" + str(randi())
 	if get_parent() and get_parent().has_method("connect_card_signals"):
 		get_parent().connect_card_signals(self)
-	popup_menu.id_pressed.connect(_on_PopupMenu_id_pressed)
-	popup_menu.add_theme_font_size_override("font_size", 40)
-	popup_menu.add_theme_constant_override("v_separation", 12)
+	if is_instance_valid(popup_menu):
+		popup_menu.hide()
 	area.input_event.connect(_on_area_2d_input_event)
 	find_card_information_reference()
 	if card_level_lable:
@@ -277,89 +276,105 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 			if is_champion_card() and is_in_main_field():
 				rotate_card()
 				return
-			popup_menu.clear()
+			var menu: PopupMenu = _resolve_card_menu()
+			if menu == null:
+				return
+			menu.clear()
 			if is_token():
 				if is_in_main_field():
-					popup_menu.add_item("Sacrifice", 6)
+					menu.add_item("Sacrifice", 6)
 					if is_rotated:
-						popup_menu.add_item("Wake Up", 4)
+						menu.add_item("Wake Up", 4)
 					else:
-						popup_menu.add_item("Rest", 4)
+						menu.add_item("Rest", 4)
 					var slug = get_slug_from_card()
 					if is_transformable_card(slug):
 						var target_slug = get_transform_target(slug)
 						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
-							popup_menu.add_item("Transform", 5)
+							menu.add_item("Transform", 5)
 			elif is_mastery():
 				if is_in_main_field():
-					popup_menu.add_item("Sacrifice", 7)
+					menu.add_item("Sacrifice", 7)
 					var slug = get_slug_from_card()
 					if is_shifting_currents_card():
-						if current_direction != "North": popup_menu.add_item("North", 16)
-						if current_direction != "East": popup_menu.add_item("East", 17)
-						if current_direction != "South": popup_menu.add_item("South", 18)
-						if current_direction != "West": popup_menu.add_item("West", 19)
+						if current_direction != "North": menu.add_item("North", 16)
+						if current_direction != "East": menu.add_item("East", 17)
+						if current_direction != "South": menu.add_item("South", 18)
+						if current_direction != "West": menu.add_item("West", 19)
 					if is_transformable_card(slug) and not is_champion_card():
 						var target_slug = get_transform_target(slug)
 						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
-							popup_menu.add_item("Transform", 5)
+							menu.add_item("Transform", 5)
 					if typeof(DivineComedyEffect) == TYPE_OBJECT and DivineComedyEffect.can_multitransform(self):
 						if original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id():
-							popup_menu.add_item("Cascade", 22)
+							menu.add_item("Cascade", 22)
 			elif is_status():
 				if is_in_main_field():
-					popup_menu.add_item("Sacrifice", 8)
+					menu.add_item("Sacrifice", 8)
 					if is_rotated:
-						popup_menu.add_item("Wake Up", 4)
+						menu.add_item("Wake Up", 4)
 					else:
-						popup_menu.add_item("Rest", 4)
+						menu.add_item("Rest", 4)
 			else:
 				if is_in_memory_slot() or is_in_hand():
 					if not is_publicly_revealed:
-						popup_menu.add_item("Show", 9)
+						menu.add_item("Show", 9)
 					else:
-						popup_menu.add_item("Hide", 10)
+						menu.add_item("Hide", 10)
 					if is_in_memory_slot():
 						var has_hidden = _has_hidden_cards_in_container()
 						var has_revealed = _has_revealed_cards_in_container()
 						if has_hidden:
-							popup_menu.add_item("Show All", 11)
+							menu.add_item("Show All", 11)
 						if has_revealed:
-							popup_menu.add_item("Hide All", 12)
-						popup_menu.add_item("Recollect ", 15)
+							menu.add_item("Hide All", 12)
+						menu.add_item("Recollect ", 15)
 				if not is_champion_card() or is_in_hand() or is_in_memory_slot():
-					popup_menu.add_item("Banish Face Down", 1)
+					menu.add_item("Banish Face Down", 1)
 					if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
 						if is_regalia_card():
-							popup_menu.add_item("Return to Mat Deck", 20)
+							menu.add_item("Return to Mat Deck", 20)
 						else:
-							popup_menu.add_item("Go to Top Deck", 2)
-							popup_menu.add_item("Go to Bottom Deck", 3)
+							menu.add_item("Go to Top Deck", 2)
+							menu.add_item("Go to Bottom Deck", 3)
 				if is_in_main_field():
 					if is_rotated:
-						popup_menu.add_item("Wake Up", 4)
+						menu.add_item("Wake Up", 4)
 					else:
-						popup_menu.add_item("Rest", 4)
+						menu.add_item("Rest", 4)
 					if not is_champion_card() and not is_token() and not is_mastery() and not is_status():
 						if current_field and current_field.name == "MAINFIELD":
 							if (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
 								if "current_champion_card" in current_field and current_field.current_champion_card != null:
-									popup_menu.add_item("Move to Lineage", 13)
+									menu.add_item("Move to Lineage", 13)
 					if not is_champion_card() and not is_token() and not is_mastery() and not is_status():
 						var opponent_field = get_tree().get_root().find_child("OpponentField", true, false)
 						if opponent_field:
-							popup_menu.add_item("Give Control", 14)
+							menu.add_item("Give Control", 14)
 					var slug = get_slug_from_card()
 					if (slug.contains("imperial-seal") or slug.contains("apotheosis-rite") or slug.contains("sacramental-rite") or slug.contains("transcendental-rite")) and current_field and current_field.name == "MAINFIELD":
 						if current_field.get("current_champion_card") != null:
-							popup_menu.add_item("Activate", 21)
+							menu.add_item("Activate", 21)
 					if is_transformable_card(slug) and not is_champion_card():
 						var target_slug = get_transform_target(slug)
 						if not is_slug_champion(target_slug) or (original_owner_id == 0 or original_owner_id == multiplayer.get_unique_id()):
-							popup_menu.add_item("Transform", 5)
+							menu.add_item("Transform", 5)
 			var mouse_pos = get_global_mouse_position()
-			popup_menu.reset_size()
-			popup_menu.popup(Rect2(mouse_pos.x, mouse_pos.y, 0, 0))
+			menu.popup(Rect2(mouse_pos.x, mouse_pos.y, 0, 0))
+			menu.reset_size()
+
+func _resolve_card_menu() -> PopupMenu:
+	var parent = get_parent()
+	if parent and parent.has_method("get_shared_card_menu"):
+		return parent.get_shared_card_menu(self)
+	var scene = get_tree().current_scene
+	if scene:
+		var manager = scene.find_child("CardManager", true, false)
+		if manager and manager.has_method("get_shared_card_menu"):
+			return manager.get_shared_card_menu(self)
+	if is_instance_valid(popup_menu) and not popup_menu.id_pressed.is_connected(_on_PopupMenu_id_pressed):
+		popup_menu.id_pressed.connect(_on_PopupMenu_id_pressed)
+	return popup_menu
 
 func _on_area_2d_mouse_entered() -> void:
 	mouse_inside = true
